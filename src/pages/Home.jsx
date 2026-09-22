@@ -7,7 +7,6 @@ import WordsGame from '../components/home/WordsGame.jsx';
 import Members from '../components/home/Members.jsx';
 import PhotoViewer from '../components/home/PhotoViewer.jsx';
 import { SITE } from '../data/site.js';
-import { instagramUrl } from '../lib/format.js';
 import Logo from '../components/Logo.jsx';
 
 // Home. Everything below the sticky header is absolutely placed in a 390px-wide page.
@@ -19,7 +18,7 @@ export default function Home({ motion = true }) {
 
   return (
     <>
-      <div id="top" className={motion ? 'page-home' : 'page-home no-motion'} style={{ position: "relative", width: "390px", height: "3910px", margin: "0 auto", overflow: "clip", background: "#F3EEE4", fontFamily: "'Figtree', system-ui, sans-serif", color: "#1E2723" }}>
+      <div id="top" className={motion ? 'page-home' : 'page-home no-motion'} style={{ position: "relative", width: "390px", height: "3720px", margin: "0 auto", overflow: "clip", background: "#F3EEE4", fontFamily: "'Figtree', system-ui, sans-serif", color: "#1E2723" }}>
         {/* sticky header: the page root must stay overflow: clip (not hidden) for sticky to work */}
         <header className="site-header" style={{ position: "sticky", top: "0", zIndex: "50", width: "390px", height: "64px", boxSizing: "border-box", padding: "0 10px 0 16px", background: "#F3EEE4", borderBottom: "2px solid #111111", display: "flex", alignItems: "center", gap: "4px" }}>
           <Link aria-label="Aquaterra — home" style={{ display: "flex", alignItems: "center", gap: "6px", minHeight: "44px", textDecoration: "none" }} to="/">
@@ -51,22 +50,6 @@ export default function Home({ motion = true }) {
         <PhotoWall onOpen={setPhoto} />
         <WordsGame />
         <Members />
-        <footer style={{ position: "absolute", left: "0", top: "3720px", width: "390px", height: "190px", boxSizing: "border-box", padding: "26px 24px 0", borderTop: "1.5px solid #1E2723", display: "flex", flexDirection: "column", gap: "14px" }}>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
-            <a href="#top" aria-label="Aquaterra — home" style={{ display: "flex", alignItems: "center", gap: "6px", minHeight: "44px", textDecoration: "none" }}>
-              <img src="/logo.png" alt="" width="32" height="32" style={{ display: "block", width: "32px", height: "32px" }} />
-              <span className="wordmark" style={{ fontFamily: "'Archivo Black', Impact, sans-serif", fontSize: "25px", lineHeight: "1", letterSpacing: "0.5px", textTransform: "uppercase" }}>Aquaterra</span>
-            </a>
-            <a href={instagramUrl(SITE.instagram)} target="_blank" rel="noreferrer" style={{ fontSize: "13px", textDecoration: "none", padding: "12px 0" }}>{`@${SITE.instagram}`}</a>
-          </div>
-          <nav style={{ display: "flex", flexWrap: "wrap", gap: "4px 18px", fontSize: "14px" }}>
-            <Link to="/articles" style={{ textDecoration: "none", padding: "10px 0" }}>Articles</Link>
-            <a href="#photos" style={{ textDecoration: "none", padding: "10px 0" }}>Photos</a>
-            <a href="#words" style={{ textDecoration: "none", padding: "10px 0" }}>Words</a>
-            <a href="#members" style={{ textDecoration: "none", padding: "10px 0" }}>Members</a>
-          </nav>
-          <div style={{ fontSize: "12px", color: "#4A524D" }}>Terranotes · © {new Date().getFullYear()}</div>
-        </footer>
       </div>
       <MenuSheet open={menuOpen} onClose={() => setMenuOpen(false)} current="home" />
       {photo != null && <PhotoViewer start={photo} onClose={() => setPhoto(null)} />}

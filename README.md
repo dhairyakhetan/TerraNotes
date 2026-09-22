@@ -38,6 +38,15 @@ Leave a field `''` and the design's bracketed placeholder shows instead.
 | `src/data/photos.js` | Photo wall and "See every photo" viewer |
 | `src/data/words.js` | "Words we should bring back" game |
 
+## Footer and link previews
+
+- The footer (orbit banner + bar) is mounted once in `src/App.jsx`, outside the pages. It links nowhere, by design.
+- Banner video: `public/footer-vid.mp4`, a strip of 8 square panels side by side (8:1, e.g. 2560×320, H.264, no audio, under 3 MB), one panel per bubble.
+  Replace it in place (same name) and update `FOOTER_VIDEO.description` in `src/data/site.js` to match the new footage.
+- Footer second line and the 8 bubble colours: `src/data/site.js`.
+- Link preview image: `public/opengraph.jpg` (1200×630). On Vercel the preview tags get the production domain automatically;
+  set `SITE_URL` (e.g. `https://example.com`) in the Vercel project if you use a custom domain.
+
 ## Adding images
 
 Put the file in the right folder under `public/`, then write its path (starting with `/`) in the data file:

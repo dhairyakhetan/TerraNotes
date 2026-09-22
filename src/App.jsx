@@ -3,6 +3,8 @@ import { Navigate, Route, Routes, useLocation, useParams } from 'react-router';
 import Home from './pages/Home.jsx';
 import Articles from './pages/Articles.jsx';
 import Article from './pages/Article.jsx';
+import OrbitBanner from './components/OrbitBanner.jsx';
+import Footer from './components/Footer.jsx';
 import { ARTICLES } from './data/articles.js';
 
 // On navigation: jump to the #section when the URL has one, otherwise start at the top.
@@ -34,6 +36,9 @@ export default function App() {
         <Route path="/articles/:slug" element={<ArticleRoute />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
+      {/* outside the routes so the banner's one <video> survives navigation */}
+      <OrbitBanner />
+      <Footer />
     </>
   );
 }

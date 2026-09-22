@@ -6,6 +6,7 @@ import './styles/global.css';
 import './styles/home.css';
 import './styles/articles.css';
 import './styles/article.css';
+import './styles/footer.css';
 
 createRoot(document.getElementById('root')).render(
   <React.StrictMode>

@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router';
 import PageHeader from '../components/PageHeader.jsx';
-import SiteFooter from '../components/SiteFooter.jsx';
 import MenuSheet from '../components/MenuSheet.jsx';
 import ArticleCard from '../components/ArticleCard.jsx';
 import Img from '../components/Img.jsx';
@@ -23,7 +22,7 @@ export default function Articles() {
 
   return (
     <>
-      <div className="page-articles" style={{ position: "relative", width: "390px", height: "2320px", margin: "0 auto", overflow: "clip", background: "#F3EEE4", fontFamily: "'Figtree', system-ui, sans-serif", color: "#111111" }}>
+      <div className="page-articles" style={{ position: "relative", width: "390px", height: "2150px", margin: "0 auto", overflow: "clip", background: "#F3EEE4", fontFamily: "'Figtree', system-ui, sans-serif", color: "#111111" }}>
         <PageHeader backTo="/" backLabel="Back to home" menuOpen={menuOpen} onOpenMenu={() => setMenuOpen(true)} />
         <div style={{ position: "absolute", left: "20px", top: "96px", fontFamily: "'Space Mono', monospace", fontSize: "11px", letterSpacing: "1.6px" }}>{`INDEX · ${pad2(ARTICLES.length)} PIECES`}</div>
         <h1 style={{ position: "absolute", left: "18px", top: "116px", margin: "0", fontFamily: "'Archivo Black', Impact, sans-serif", fontWeight: "400", fontSize: "60px", lineHeight: "0.9", letterSpacing: "-1.5px", textTransform: "uppercase" }}>All<br />articles</h1>
@@ -97,7 +96,6 @@ export default function Articles() {
           <path d="M50 4 C40 30 20 34 6 24" />
           <path d="M12 18 L6 24 L14 28" />
         </svg>
-        <SiteFooter top="2150px" />
       </div>
       <MenuSheet open={menuOpen} onClose={() => setMenuOpen(false)} current="articles" />
     </>

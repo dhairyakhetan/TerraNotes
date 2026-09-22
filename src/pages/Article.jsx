@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router';
 import PageHeader from '../components/PageHeader.jsx';
-import SiteFooter from '../components/SiteFooter.jsx';
 import MenuSheet from '../components/MenuSheet.jsx';
 import ArticleCard from '../components/ArticleCard.jsx';
 import Img from '../components/Img.jsx';
@@ -106,7 +105,7 @@ export default function Article({ article: a, next }) {
           <div style={{ padding: "10px", background: tag.color, color: tag.ink }}>{`${a.readTime || '[x]'} min`}</div>
         </div>
         {/* body: the blocks stack with 22px gaps; the page grows with them */}
-        <div className="rise-in" style={{ position: "relative", margin: "660px 0 0 24px", width: "342px", minHeight: "2776px", display: "flex", flexDirection: "column", gap: "22px" }}>
+        <div className="rise-in" style={{ position: "relative", margin: "660px 0 0 24px", width: "342px", minHeight: "2606px", display: "flex", flexDirection: "column", gap: "22px" }}>
           {a.body.map((b, i) => <Block key={i} b={b} first={i === firstText} a={a} tag={tag} />)}
           <div style={{ width: "16px", height: "16px", background: "#111111" }} />
           {/* author */}
@@ -132,9 +131,6 @@ export default function Article({ article: a, next }) {
             <div style={{ position: "absolute", left: "200px", top: "32px", width: "1.4px", height: "36px", background: "#5B3A1E" }} />
             <ArticleCard article={next} style={{ position: "absolute", left: "70px", top: "70px", width: "250px", height: "330px", transform: "rotate(-2deg)" }} imgH="150px" titleSize="22px" dekSize="18px" />
             <Link style={{ position: "absolute", left: "20px", top: "420px", minHeight: "44px", display: "flex", alignItems: "center", fontFamily: "'Caveat', cursive", fontSize: "21px", textDecoration: "none" }} to="/articles">← back to all articles</Link>
-          </div>
-          <div style={{ margin: "auto -24px 0", width: "390px", position: "relative", height: "170px" }}>
-            <SiteFooter top="0px" />
           </div>
         </div>
       </div>
