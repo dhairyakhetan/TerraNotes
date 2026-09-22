@@ -15,6 +15,18 @@ html{scroll-padding-top:64px}
 
 a,button{-webkit-tap-highlight-color:transparent}
 
+/* ---- INSTANT TAPS ------------------------------------------------------
+   The page is zoomable, so phones wait ~300ms after every tap to see if it's a double-tap zoom.
+   manipulation turns double-tap zoom off (pinch zoom still works), so taps fire straight away. */
+html,a,button{touch-action:manipulation}
+/* press feedback the moment a finger lands. Anything with its own press style below opts out of the dim. */
+:where(a,button):active{opacity:.6}
+:where(a:has(> article),.card,.menu-card,.w-opt,.bub,.legend-chip,.press):active{opacity:1}
+/* hard-shadow buttons: drop into their shadow (--c = shadow colour). `translate` keeps any rotation. */
+.press:active{translate:2px 2px;box-shadow:1px 1px 0 var(--c,#111111) !important}
+/* stops the page shifting sideways on desktop when a sheet locks scrolling */
+html{scrollbar-gutter:stable}
+
 /* ---- LOGO: AQUATERRA block wordmark (matches the supplied logo) --------
    Heavy block caps; left→right colour run: deep indigo (AQU) → bright blue/cyan (A-T-E) → mint → green (RRA),
    plus a white gloss on the top half of every letter, thin navy outline and a hard navy drop shadow.
@@ -23,5 +35,12 @@ a,button{-webkit-tap-highlight-color:transparent}
 /* on the dark menu the outline and shadow turn cream */
 nav[aria-label="Main menu"] .wordmark{-webkit-text-stroke:1px #F3EEE4;filter:drop-shadow(1.5px 1.8px 0 #F3EEE4)}
 
-/* ---- MENU SHEET: no slide when the OS asks for reduced motion ---------- */
+/* ---- MENU SHEET ----------------------------------------------------------
+   The sheet is exactly the visible screen height (dvh = excludes the browser bars) and scrolls if it must.
+   --s = how much shorter than the 844px design the screen is (0–232px); the wire, gaps, cards and
+   footer each give some of it back so all five stops fit. Below 612px the sheet scrolls instead. */
+.menu-sheet{--vh:100vh;height:var(--vh);overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain;touch-action:pan-y}
+@supports (height:100dvh){.menu-sheet{--vh:100dvh}}
+.main-menu{--s:clamp(0px, calc(844px - var(--vh)), 232px);--lift:calc(var(--s) * -0.1);--gap:calc(30px - var(--s) * 0.075);--card:calc(76px - var(--s) * 0.09);--title:calc(32px - var(--s) * 0.026);--foot:calc(144px - var(--s) * 0.1);height:100%;min-height:612px;box-sizing:border-box}
+.menu-card:active{translate:4px 4px;box-shadow:2px 2px 0 var(--c) !important}
 @media (prefers-reduced-motion: reduce){.menu-sheet{transition:none !important}}

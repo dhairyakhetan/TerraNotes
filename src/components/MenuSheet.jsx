@@ -1,5 +1,6 @@
 import React from 'react';
 import Menu from './Menu.jsx';
+import { lockScroll, unlockScroll } from '../lib/scrollLock.js';
 
 const EASE = 'cubic-bezier(0.32, 0.72, 0, 1)';
 
@@ -8,10 +9,20 @@ const EASE = 'cubic-bezier(0.32, 0.72, 0, 1)';
   Swipe it to the right to dismiss (it follows the finger). Easing matches the photo viewer:
   cubic-bezier(0.32, 0.72, 0, 1). The hard-shadow edge (`edge`) shows while it travels.
   Centred with left/right 0 + margin auto so it lines up with the 390px page on wider screens.
+  Its height is the visible screen (styles/global.css), so the menu fits and never runs under the browser bars.
   STATE: mdx = drag px, mdrag = finger down. `open` / `onClose` belong to the page.
 */
 export default class MenuSheet extends React.Component {
   state = { mdx: 0, mdrag: false };
+
+  componentDidUpdate(prev) {
+    if (this.props.open && !prev.open) lockScroll();
+    if (!this.props.open && prev.open) unlockScroll();
+  }
+
+  componentWillUnmount() {
+    if (this.props.open) unlockScroll();
+  }
 
   close = () => {
     this.setState({ mdx: 0, mdrag: false });
@@ -51,12 +62,12 @@ export default class MenuSheet extends React.Component {
         onTouchEnd={this.te}
         onTouchCancel={this.te}
         style={{
-          position: 'fixed', left: '0', right: '0', top: '0', margin: '0 auto', width: '390px', height: '100vh', minHeight: '844px', zIndex: '100',
+          position: 'fixed', left: '0', right: '0', top: '0', margin: '0 auto', width: '390px', zIndex: '100',
           background: '#111111', boxShadow: `-12px 0 0 ${edge}`,
           transform: `translate3d(${open ? d + 'px' : 'calc(100% + 16px)'}, 0, 0)`,
           visibility: open ? 'visible' : 'hidden',
-          transition: drag ? 'none' : (open ? `transform 560ms ${EASE}, visibility 0s` : `transform 460ms ${EASE}, visibility 0s linear 460ms`),
-          touchAction: 'pan-y', willChange: 'transform',
+          transition: drag ? 'none' : (open ? `transform 360ms ${EASE}, visibility 0s` : `transform 300ms ${EASE}, visibility 0s linear 300ms`),
+          willChange: 'transform',
         }}
       >
         <Menu current={current} onClose={this.close} />

@@ -27,7 +27,8 @@ rewrite so links like `/articles/who-owns-the-roof` work on refresh.
 
 ## Where things live
 
-- `src/pages/Home.jsx`: the home screen. Photo wall, words game (`WORDS_GAME`) and team (`members`) data are in `renderVals()`.
+- `src/pages/Home.jsx`: the home screen. Its interactive sections live in `src/components/home/`: the words game, the team section and the photo viewer.
+- `src/data/words.js`: the "Words we should bring back" pool. Each game draws 5 at random; every word has a hint that fades in as a "psst." note after 16 seconds without an answer.
 - `src/pages/Articles.jsx`: the all-articles index.
 - `src/pages/Article.jsx` + `src/data/articles.js`: one template for all six articles; titles, tags, colours and intro copy are in the data file.
 - `src/components/`: menu (slide-in sheet with swipe-to-close), header, footer.

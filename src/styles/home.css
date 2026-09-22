@@ -63,12 +63,16 @@
 .fl6{animation:flC 6.2s ease-in-out infinite -4s}
 .bub{transition:transform .12s ease}
 .bub:active{transform:translate(3px,3px)}
-/* words game: reveal line / score card fade up */
-.w-reveal{animation:riseIn 420ms cubic-bezier(0.32,0.72,0,1) both}
+/* words game: reveal line / score card fade up; the "psst." hint fades in slower, like a note slid across */
+.w-reveal{animation:riseIn 260ms cubic-bezier(0.32,0.72,0,1) both}
+.w-hint{animation:hintIn 900ms ease-out both}
+@keyframes hintIn{from{opacity:0;translate:0 10px}to{opacity:1;translate:0 0}}
 @keyframes riseIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
 .w-opt:active{transform:translate(2px,2px);box-shadow:2px 2px 0 #111111 !important}
 
 .legend-chip:active{transform:translate(1px,1px)}
+/* polaroids flash when tapped (the tap target is a clear button over the photo) */
+.ph-open:active{background:rgba(255,255,255,.16) !important}
 
 /* member pop-up */
 .pop-in{animation:popIn 420ms cubic-bezier(0.32,0.72,0,1) both}
@@ -83,8 +87,16 @@
 .no-motion .flutter{animation:none;transform:rotate(var(--r,0deg))}
 .no-motion .twist{animation:none;transform:rotate(var(--r,0deg))}
 .no-motion .glint,.no-motion .spark,.no-motion .bulb{animation:none}
+/* ---- PHOTO VIEWER --------------------------------------------------------
+   Exactly the visible screen height; --ph = photo height, which shrinks on short screens
+   (330px at the 844px design height, 170px at the least) so arrows and thumbnails stay on screen. */
+.photo-viewer{--vh:100vh;height:var(--vh);overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain;touch-action:manipulation}
+@supports (height:100dvh){.photo-viewer{--vh:100dvh}}
+.photo-viewer{--ph:clamp(170px, calc(var(--vh) - 514px), 330px)}
+
 @media (prefers-reduced-motion: reduce){
 .menu-sheet{transition:none !important}
+.w-hint{animation:none}
 .gal-track,.gal-slide{transition:none !important}
 .sway,.fl1,.fl2,.fl3,.fl4,.fl5,.fl6{animation:none}
 .flutter{animation:none;transform:rotate(var(--r,0deg))}
