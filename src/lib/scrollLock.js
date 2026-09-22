@@ -1,4 +1,4 @@
-// Stops the page behind a full-screen sheet from scrolling. Counted, so overlapping sheets are fine.
+// Stops the page behind a full-screen sheet from scrolling (counted, so sheets can overlap).
 let locks = 0;
 
 export function lockScroll() {

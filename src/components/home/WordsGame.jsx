@@ -14,19 +14,13 @@ const draw = (prev = []) => shuffle(WORDS.filter((w) => !prev.includes(w))).slic
 // shrink long words so they stay inside the cloud (Archivo Black caps run ~0.66em wide)
 const wordSize = (word) => Math.min(42, Math.floor(300 / (word.length * 0.66)));
 
-/*
-  WORDS WE SHOULD BRING BACK — mini game.
-  One word at a time. Tap the meaning you think is right: the right answer turns yellow (✓),
-  a wrong pick turns black (✗), the real definition appears, then "next word". After the last word: score + play again.
-  If a word sits unanswered for HINT_DELAY while the game is on screen, a "psst." hint fades in below the options.
-  Words live in src/data/words.js. State: rounds, wq (round), wpick (option tapped or null), wscore, wdone, hint.
-*/
+// "Words we should bring back" mini game (words: src/data/words.js).
 export default class WordsGame extends React.Component {
   state = { rounds: draw(), wq: 0, wpick: null, wscore: 0, wdone: false, hint: false };
   ref = React.createRef();
 
   componentDidMount() {
-    // the hint clock only starts once the game has actually been seen
+    // the hint clock starts once the game is on screen
     this.io = new IntersectionObserver(([e]) => {
       if (!e.isIntersecting) return;
       this.io.disconnect();
@@ -49,7 +43,7 @@ export default class WordsGame extends React.Component {
     const { rounds, wq, wpick, wscore } = this.state;
     if (wpick != null) return;
     clearTimeout(this.hintTimer);
-    this.setState({ wpick: k, wscore: wscore + (k === rounds[wq].a ? 1 : 0) });
+    this.setState({ wpick: k, wscore: wscore + (k === rounds[wq].answer ? 1 : 0) });
   };
 
   next = () => {
@@ -80,15 +74,15 @@ export default class WordsGame extends React.Component {
       revealed: wpick != null,
       hint: round.hint,
       showHint: hint && wpick == null && !wdone,
-      verdict: wpick == null ? '' : (wpick === round.a ? 'Yes!' : 'Not quite.'),
-      def: round.def,
+      verdict: wpick == null ? '' : (wpick === round.answer ? 'Yes!' : 'Not quite.'),
+      def: round.meaning,
       nextLabel: wlast ? 'Score' : 'Next word',
       next: this.next,
       restart: this.restart,
       message: wscore === rounds.length ? 'all of them. you should be writing for us.' : (wscore === 0 ? 'zero. that\'s why we need to bring them back.' : 'not bad. now use one in a sentence today.')
     };
-    round.opts.forEach((text, k) => {
-      const right = k === round.a, picked = k === wpick, shown = wpick != null;
+    round.options.forEach((text, k) => {
+      const right = k === round.answer, picked = k === wpick, shown = wpick != null;
       w['o' + k] = {
         text: text,
         mark: shown ? (right ? '✓' : (picked ? '✗' : String.fromCharCode(65 + k))) : String.fromCharCode(65 + k),
@@ -136,7 +130,7 @@ export default class WordsGame extends React.Component {
                 <span style={{ flexGrow: "1" }}>{v.w.o2.text}</span>
               </button>
             </div>
-            {/* "psst." hint: fades in after HINT_DELAY with no answer; the reveal line takes its place once they pick */}
+            {/* "psst." hint; the reveal line replaces it once they answer */}
             {v.w.showHint && (
               <div className="w-hint" role="status" style={{ position: "absolute", left: "34px", top: "550px", width: "300px", boxSizing: "border-box", background: "#FFFFFF", border: "2px solid #111111", boxShadow: "5px 5px 0 #F7C21A", padding: "12px 16px 10px 18px", transform: "rotate(-1.5deg)" }}>
                 <div style={{ position: "absolute", left: "-12px", top: "-17px", background: "#111111", color: "#F7C21A", fontFamily: "'Caveat', cursive", fontSize: "20px", padding: "2px 12px", transform: "rotate(-6deg)" }}>psst.</div>

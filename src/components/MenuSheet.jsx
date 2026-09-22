@@ -4,14 +4,7 @@ import { lockScroll, unlockScroll } from '../lib/scrollLock.js';
 
 const EASE = 'cubic-bezier(0.32, 0.72, 0, 1)';
 
-/*
-  FULL-SCREEN MENU — always mounted; slides in from the RIGHT (translateX) and back out on close.
-  Swipe it to the right to dismiss (it follows the finger). Easing matches the photo viewer:
-  cubic-bezier(0.32, 0.72, 0, 1). The hard-shadow edge (`edge`) shows while it travels.
-  Centred with left/right 0 + margin auto so it lines up with the 390px page on wider screens.
-  Its height is the visible screen (styles/global.css), so the menu fits and never runs under the browser bars.
-  STATE: mdx = drag px, mdrag = finger down. `open` / `onClose` belong to the page.
-*/
+// Slides the menu in from the right; swipe right to close. `open` / `onClose` belong to the page.
 export default class MenuSheet extends React.Component {
   state = { mdx: 0, mdrag: false };
 

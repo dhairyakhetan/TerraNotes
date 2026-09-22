@@ -1,4 +1,6 @@
 import { Link } from 'react-router';
+import { SITE } from '../data/site.js';
+import { instagramUrl } from '../lib/format.js';
 
 // Dark footer for inner pages. `top` = its y inside the page root.
 export default function SiteFooter({ top }) {
@@ -9,7 +11,7 @@ export default function SiteFooter({ top }) {
           <img src="/logo.png" alt="" width="32" height="32" style={{ display: "block", width: "32px", height: "32px" }} />
           <span className="wordmark" style={{ fontFamily: "'Archivo Black', Impact, sans-serif", fontSize: "25px", lineHeight: "1", letterSpacing: "0.5px", textTransform: "uppercase" }}>Aquaterra</span>
         </Link>
-        <a href="#" style={{ fontSize: "13px", textDecoration: "none", padding: "12px 0", color: "#F3EEE4" }}>@ngo.aquaterra</a>
+        <a href={instagramUrl(SITE.instagram)} target="_blank" rel="noreferrer" style={{ fontSize: "13px", textDecoration: "none", padding: "12px 0", color: "#F3EEE4" }}>{`@${SITE.instagram}`}</a>
       </div>
       <nav style={{ display: "flex", flexWrap: "wrap", gap: "4px 18px", fontSize: "14px" }}>
         <Link to="/" style={{ textDecoration: "none", padding: "10px 0", color: "#F3EEE4" }}>Home</Link>

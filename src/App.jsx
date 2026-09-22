@@ -3,7 +3,7 @@ import { Navigate, Route, Routes, useLocation, useParams } from 'react-router';
 import Home from './pages/Home.jsx';
 import Articles from './pages/Articles.jsx';
 import Article from './pages/Article.jsx';
-import { articles } from './data/articles.js';
+import { ARTICLES } from './data/articles.js';
 
 // On navigation: jump to the #section when the URL has one, otherwise start at the top.
 function ScrollManager() {
@@ -18,10 +18,10 @@ function ScrollManager() {
 
 function ArticleRoute() {
   const { slug } = useParams();
-  const i = articles.findIndex((a) => a.slug === slug);
+  const i = ARTICLES.findIndex((a) => a.slug === slug);
   if (i === -1) return <Navigate to="/articles" replace />;
   // key: remount per article so the hero drop animation replays
-  return <Article key={slug} article={articles[i]} next={articles[(i + 1) % articles.length]} />;
+  return <Article key={slug} article={ARTICLES[i]} next={ARTICLES[(i + 1) % ARTICLES.length]} />;
 }
 
 export default function App() {

@@ -1,7 +1,8 @@
 import SmartLink from './SmartLink.jsx';
+import { SITE } from '../data/site.js';
+import { instagramUrl } from '../lib/format.js';
 
-// The five stops hanging on the wire. left = x of the card; string = x of the string it hangs from
-// (relative to the card); rot = resting tilt; here = the page that shows "you're here" on this card.
+// Stops on the wire. left = card x; string = x of its string on the card; rot = tilt; here = page that shows "you're here".
 const STOPS = [
   { num: '01', label: 'Home', hrefKey: 'home', left: '20px', string: '170px', rot: '-1.5deg', color: '#F0442B', here: 'home', note: { left: '270px', top: 'calc(var(--card) - 10px)' } },
   { num: '02', label: 'Articles', hrefKey: 'articles', left: '50px', string: '60px', rot: '1.2deg', color: '#3DA5F4', here: 'articles', note: { left: '-30px', top: 'calc(var(--card) - 2px)' } },
@@ -10,12 +11,7 @@ const STOPS = [
   { num: '05', label: 'Members', hrefKey: 'members', left: '22px', string: '228px', rot: '-1.2deg', color: '#EE4E8A' },
 ];
 
-/*
-  Full-screen menu, rendered inside each page's MenuSheet (which does the slide-in from the right).
-  current: which stop gets the "you're here" note. On the home page the stops scroll within the page.
-  Fits the screen: the design is 844px tall; on shorter screens the gaps, cards and footer shrink together
-  (the --s, --gap, --card… variables in styles/global.css), and below 612px the sheet scrolls.
-*/
+// Full-screen menu (inside MenuSheet). Sized by the --gap/--card/… variables in styles/global.css so it fits any screen.
 export default function Menu({ current = 'home', onClose }) {
   const home = current === 'home';
   const close = () => { if (onClose) onClose(); };
@@ -66,7 +62,7 @@ export default function Menu({ current = 'home', onClose }) {
       <div style={{ position: "relative", marginTop: "auto", height: "var(--foot)", flexShrink: "0" }}>
         <div style={{ position: "absolute", left: "20px", top: "0", width: "350px", height: "1.5px", background: "#3A3A36" }} />
         <div style={{ position: "absolute", left: "20px", top: "16px", width: "200px", fontFamily: "'Caveat', cursive", fontSize: "22px", lineHeight: "1.05", color: "#F7C21A", transform: "rotate(-2deg)" }}>notes from where the land meets the water.</div>
-        <a href="#" style={{ position: "absolute", right: "20px", top: "12px", minHeight: "44px", display: "flex", alignItems: "center", gap: "6px", fontFamily: "'Space Mono', monospace", fontSize: "12px", textDecoration: "none", color: "#F3EEE4" }}>@ngo.aquaterra{" "}
+        <a href={instagramUrl(SITE.instagram)} target="_blank" rel="noreferrer" style={{ position: "absolute", right: "20px", top: "12px", minHeight: "44px", display: "flex", alignItems: "center", gap: "6px", fontFamily: "'Space Mono', monospace", fontSize: "12px", textDecoration: "none", color: "#F3EEE4" }}>{`@${SITE.instagram}`}{" "}
           <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.8">
             <path d="M2 10 L10 2" />
             <path d="M4 2 H10 V8" />

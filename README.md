@@ -25,17 +25,36 @@ rewrite so links like `/articles/who-owns-the-roof` work on refresh.
 | `/articles` | All articles |
 | `/articles/:slug` | One article (six slugs, from `src/data/articles.js`) |
 
-## Where things live
+## Editing content
 
-- `src/pages/Home.jsx`: the home screen. Its interactive sections live in `src/components/home/`: the words game, the team section and the photo viewer.
-- `src/data/words.js`: the "Words we should bring back" pool. Each game draws 5 at random; every word has a hint that fades in as a "psst." note after 16 seconds without an answer.
-- `src/pages/Articles.jsx`: the all-articles index.
-- `src/pages/Article.jsx` + `src/data/articles.js`: one template for all six articles; titles, tags, colours and intro copy are in the data file.
-- `src/components/`: menu (slide-in sheet with swipe-to-close), header, footer.
-- `src/styles/`: shared styles, logo wordmark, and each page's animations.
+All content lives in `src/data/`. Each file starts with a short note on its fields.
+Leave a field `''` and the design's bracketed placeholder shows instead.
+
+| File | What's in it |
+|------|--------------|
+| `src/data/site.js` | Home intro text, Instagram handle |
+| `src/data/team.js` | Teams (legend colours) and members: name, role, team, photo, bio, Instagram |
+| `src/data/articles.js` | Tags (colours) and articles: title, tag, cover, author, date, read time, body |
+| `src/data/photos.js` | Photo wall and "See every photo" viewer |
+| `src/data/words.js` | "Words we should bring back" game |
+
+## Adding images
+
+Put the file in the right folder under `public/`, then write its path (starting with `/`) in the data file:
+
+| Picture | Folder | Example path | Field |
+|---------|--------|--------------|-------|
+| Team member | `public/team/` | `/team/ananya.jpg` | `photo` in `src/data/team.js` |
+| Photo wall | `public/photos/` | `/photos/terrace.jpg` | `photo` in `src/data/photos.js` |
+| Article cover or in-article photo | `public/articles/` | `/articles/wetlands.jpg` | `cover` or a `photo` block in `src/data/articles.js` |
+
+Pictures are cropped to fill their frame, so any shape works. Square images suit the round team faces.
+Keep files under about 500 KB (JPG or WebP) so the site stays fast.
+
+## Code layout
+
+- `src/pages/`: Home, All articles, Article.
+- `src/components/`: header, footer, menu, article card, image slot; `components/home/` has the home page sections.
+- `src/styles/`: shared styles and each page's animations.
 - `public/logo.png`: globe mark and favicon.
-
-## Still placeholder copy
-
-Bracketed text from the design is still waiting for real content: the intro blurb, article body copy,
-authors, dates and read times, photos and captions, member bios, and the `@ngo.aquaterra` / `[@HANDLE]` links (currently `#`).
+- The home page has 8 spots for team faces, 5 for photos and shows articles 01, 02, 03 and 05; the All articles page has 6 spots.

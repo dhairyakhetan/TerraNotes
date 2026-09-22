@@ -1,11 +1,6 @@
 import { Link } from 'react-router';
 
-/*
-  STICKY HEADER for inner pages: back arrow + logo + menu button.
-  It is the only in-flow element of the page (everything else is absolutely positioned), so
-  position: sticky pins it to the top while scrolling. It needs the page root to use overflow: clip
-  (NOT hidden), otherwise sticky silently stops working.
-*/
+// Sticky header for inner pages (the page root must stay overflow: clip for sticky to work).
 export default function PageHeader({ backTo, backLabel, menuOpen, onOpenMenu }) {
   return (
     <header className="site-header" style={{ position: "sticky", top: "0", zIndex: "50", width: "390px", height: "64px", boxSizing: "border-box", padding: "0 10px 0 12px", background: "#F3EEE4", borderBottom: "2px solid #111111", display: "flex", alignItems: "center", gap: "4px" }}>
