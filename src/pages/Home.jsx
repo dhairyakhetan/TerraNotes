@@ -208,10 +208,10 @@ export default class Home extends React.Component {
             <div style={{ position: "absolute", left: "190px", top: "30px", fontFamily: "'Caveat', cursive", fontSize: "20px", color: "#E9A23B", transform: "rotate(-4deg)" }}>moments, strung up</div>
             <svg width="370" height="600" viewBox="10 0 370 600" style={{ position: "absolute", left: "0", top: "0" }} aria-hidden="true">
               <defs>
-                <radialgradient id="glow">
+                <radialGradient id="glow">
                   <stop offset="0" stopColor="#FFC861" stopOpacity=".75" />
                   <stop offset="1" stopColor="#FFC861" stopOpacity="0" />
-                </radialgradient>
+                </radialGradient>
               </defs>
               <g stroke="#8E8A7A" strokeWidth="1.2" fill="none">
                 <path d="M-10 90 Q95 170 200 100 Q300 40 400 120" />
@@ -337,14 +337,6 @@ export default class Home extends React.Component {
               </div>
               <button className="ph-open" onClick={v.g.open4} aria-label="Open photo 5 of 5" style={{ position: "absolute", left: "0", top: "0", width: "100%", height: "100%", padding: "0", background: "transparent", border: "0" }} />
             </figure>
-            {/* "glow" annotation */}
-            <div style={{ position: "absolute", left: "180px", top: "408px", display: "flex", flexDirection: "column", alignItems: "center", color: "#E9A23B" }}>
-              <svg width="16" height="28" viewBox="0 0 16 28" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round">
-                <path d="M8 27 C6 18 10 10 8 2" />
-                <path d="M3 7 L8 2 L13 7" />
-              </svg>
-              <div style={{ fontFamily: "'Caveat', cursive", fontSize: "20px", lineHeight: "1" }}>glow</div>
-            </div>
             {/* opens the highlights overlay (no separate page) */}
             <button onClick={v.g.open0} style={{ position: "absolute", left: "22px", bottom: "16px", minHeight: "44px", padding: "0", background: "transparent", border: "0", color: "#F3EEE4", fontFamily: "'Figtree', system-ui, sans-serif", fontSize: "13px", letterSpacing: "1.4px", textTransform: "uppercase", display: "flex", alignItems: "center", gap: "8px" }}>
               <span style={{ borderBottom: "1px solid #8E8A7A", paddingBottom: "3px" }}>See every photo</span>
