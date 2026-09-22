@@ -17,9 +17,6 @@
 .orbit-video{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
 
 .site-footer{margin:0;background:var(--color-near-black);color:var(--color-cream);padding:0 1rem 2rem;text-align:center}
-.site-footer-brand{display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:12px}
-.site-footer-brand img{display:block;width:32px;height:32px;border-radius:50%;object-fit:cover}
-.site-footer-word{font-family:'Archivo Black',Impact,sans-serif;font-size:20px;line-height:1;letter-spacing:.02em}
 .site-footer p{margin:0}
 .site-footer-l1{opacity:.7}
 .site-footer-l2{opacity:.4;margin-top:6px !important}
