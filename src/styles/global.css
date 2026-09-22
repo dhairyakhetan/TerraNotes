@@ -1,0 +1,27 @@
+/* =====================================================================
+   AQUATERRA / TERRANOTES — shared styles for every screen.
+   Phone design, 390px wide. Each page root is absolutely laid out at 390px.
+
+   TOUCH ONLY: no :hover and no cursor styles on purpose. Press feedback uses
+   :active (fires on tap). A desktop build should add its own hover styles.
+   ===================================================================== */
+
+/* ---- MOBILE WIDTH LOCK ------------------------------------------------
+   Wider screens: the page stays 390px and centres on a darker surround. */
+html,body{margin:0;background:#E6E0D3}
+body{font-family:'Figtree',system-ui,sans-serif;color:#1E2723}
+/* keep #section jumps clear of the 64px sticky header */
+html{scroll-padding-top:64px}
+
+a,button{-webkit-tap-highlight-color:transparent}
+
+/* ---- LOGO: AQUATERRA block wordmark (matches the supplied logo) --------
+   Heavy block caps; left→right colour run: deep indigo (AQU) → bright blue/cyan (A-T-E) → mint → green (RRA),
+   plus a white gloss on the top half of every letter, thin navy outline and a hard navy drop shadow.
+   Globe mark = same image as the favicon, sized a bit taller than the caps. */
+.wordmark{background:linear-gradient(180deg,rgba(255,255,255,.6) 0%,rgba(255,255,255,.25) 40%,rgba(255,255,255,0) 55%),linear-gradient(90deg,#2336A8 0%,#2A3DB4 30%,#2464D2 42%,#46B9EE 52%,#B4F4F2 62%,#94F5CB 74%,#5FE3A0 88%,#48CF8C 100%);-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent;-webkit-text-stroke:0.9px #0B1330;filter:drop-shadow(1.5px 1.8px 0 #0B1330);letter-spacing:-0.3px !important}
+/* on the dark menu the outline and shadow turn cream */
+nav[aria-label="Main menu"] .wordmark{-webkit-text-stroke:1px #F3EEE4;filter:drop-shadow(1.5px 1.8px 0 #F3EEE4)}
+
+/* ---- MENU SHEET: no slide when the OS asks for reduced motion ---------- */
+@media (prefers-reduced-motion: reduce){.menu-sheet{transition:none !important}}

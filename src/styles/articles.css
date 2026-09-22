@@ -1,0 +1,6 @@
+/* ---- ALL ARTICLES ------------------------------------------------------ */
+.page-articles a{color:#111111}
+
+/* TAP FEEDBACK (replaces hover) — brutalist "press": a card drops into its hard shadow while touched. */
+.page-articles a:active > article{transform:translate(4px,4px);box-shadow:2px 2px 0 #111111 !important}
+.page-articles button:active{transform:translate(1px,1px)}
