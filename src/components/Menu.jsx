@@ -1,6 +1,7 @@
 import SmartLink from './SmartLink.jsx';
 import { SITE } from '../data/site.js';
 import { instagramUrl } from '../lib/format.js';
+import Logo from './Logo.jsx';
 
 // Stops on the wire. left = card x; string = x of its string on the card; rot = tilt; here = page that shows "you're here".
 const STOPS = [
@@ -27,8 +28,7 @@ export default function Menu({ current = 'home', onClose }) {
       {/* top bar */}
       <div style={{ position: "absolute", left: "18px", top: "16px" }}>
         <SmartLink href={hrefs.home} onClick={close} aria-label="Aquaterra — home" style={{ display: "flex", alignItems: "center", gap: "6px", minHeight: "44px", textDecoration: "none" }}>
-          <img src="/logo.png" alt="" width="36" height="36" style={{ display: "block", width: "36px", height: "36px" }} />
-          <span className="wordmark" style={{ fontFamily: "'Archivo Black', Impact, sans-serif", fontSize: "27px", lineHeight: "1", letterSpacing: "0.5px", textTransform: "uppercase" }}>Aquaterra</span>
+          <Logo globe={36} word={21} sub={13} dark />
         </SmartLink>
       </div>
       <button className="press" onClick={close} aria-label="Close menu" style={{ "--c": "#F0442B", position: "absolute", right: "20px", top: "18px", width: "48px", height: "48px", background: "#FFFFFF", border: "2px solid #F3EEE4", boxShadow: "4px 4px 0 #F0442B", padding: "0", display: "flex", alignItems: "center", justifyContent: "center" }}>
