@@ -8,6 +8,7 @@ import Members from '../components/home/Members.jsx';
 import PhotoViewer from '../components/home/PhotoViewer.jsx';
 import { SITE } from '../data/site.js';
 import { instagramUrl } from '../lib/format.js';
+import Logo from '../components/Logo.jsx';
 
 // Home. Everything below the sticky header is absolutely placed in a 390px-wide page.
 // motion={false} turns off the sway/float animations.
@@ -22,8 +23,7 @@ export default function Home({ motion = true }) {
         {/* sticky header: the page root must stay overflow: clip (not hidden) for sticky to work */}
         <header className="site-header" style={{ position: "sticky", top: "0", zIndex: "50", width: "390px", height: "64px", boxSizing: "border-box", padding: "0 10px 0 16px", background: "#F3EEE4", borderBottom: "2px solid #111111", display: "flex", alignItems: "center", gap: "4px" }}>
           <Link aria-label="Aquaterra — home" style={{ display: "flex", alignItems: "center", gap: "6px", minHeight: "44px", textDecoration: "none" }} to="/">
-            <img src="/logo.png" alt="" width="38" height="38" style={{ display: "block", width: "38px", height: "38px" }} />
-            <span className="wordmark" style={{ fontFamily: "'Archivo Black', Impact, sans-serif", fontSize: "30px", lineHeight: "1", letterSpacing: "0.5px", textTransform: "uppercase" }}>Aquaterra</span>
+            <Logo globe={38} word={22} sub={14} />
           </Link>
           <span style={{ flexGrow: "1" }} />
           <button onClick={() => setMenuOpen(true)} aria-label="Open menu" aria-expanded={menuOpen ? 'true' : 'false'} style={{ width: "44px", height: "44px", flexShrink: "0", border: "0", background: "transparent", padding: "0", display: "flex", alignItems: "center", justifyContent: "center" }}>

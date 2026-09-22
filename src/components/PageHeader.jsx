@@ -1,4 +1,5 @@
 import { Link } from 'react-router';
+import Logo from './Logo.jsx';
 
 // Sticky header for inner pages (the page root must stay overflow: clip for sticky to work).
 export default function PageHeader({ backTo, backLabel, menuOpen, onOpenMenu }) {
@@ -11,8 +12,7 @@ export default function PageHeader({ backTo, backLabel, menuOpen, onOpenMenu }) 
         </svg>
       </Link>
       <Link to="/" aria-label="Aquaterra — home" style={{ display: "flex", alignItems: "center", gap: "6px", minHeight: "44px", textDecoration: "none" }}>
-        <img src="/logo.png" alt="" width="32" height="32" style={{ display: "block", width: "32px", height: "32px" }} />
-        <span className="wordmark" style={{ fontFamily: "'Archivo Black', Impact, sans-serif", fontSize: "25px", lineHeight: "1", letterSpacing: "0.5px", textTransform: "uppercase" }}>Aquaterra</span>
+        <Logo globe={32} word={19} sub={12} />
       </Link>
       <span style={{ flexGrow: "1" }} />
       <button onClick={onOpenMenu} aria-label="Open menu" aria-expanded={menuOpen ? 'true' : 'false'} style={{ width: "44px", height: "44px", flexShrink: "0", border: "0", background: "transparent", padding: "0", display: "flex", alignItems: "center", justifyContent: "center" }}>
