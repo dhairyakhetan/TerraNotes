@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react';
 import WebCard from './WebCard.jsx';
+import { webZoom } from '../lib/layout.js';
 import { ARTICLES, COMING_SOON } from '../data/articles.js';
 import { pad2 } from '../lib/format.js';
 
@@ -53,6 +54,27 @@ export default function ArticleLine() {
     if (Math.abs(p - progress) > 0.01 || p === 0 || p === 1) setProgress(p);
   };
   const scrollBy = (dx) => scroller.current.scrollBy({ left: dx, behavior: 'smooth' });
+  // Mouse: drag the line sideways (touch and trackpads scroll it natively). A drag isn't a click on a card.
+  const dragged = useRef(false);
+  const onPointerDown = (e) => {
+    if (e.pointerType !== 'mouse' || e.button !== 0) return;
+    const el = scroller.current, x0 = e.clientX, left0 = el.scrollLeft, z = webZoom();
+    dragged.current = false;
+    const move = (ev) => {
+      const dx = (ev.clientX - x0) / z;
+      if (!dragged.current && Math.abs(dx) > 5) { dragged.current = true; el.classList.add('dragging'); el.style.scrollSnapType = 'none'; }
+      if (dragged.current) el.scrollLeft = left0 - dx;
+    };
+    const up = () => {
+      removeEventListener('pointermove', move);
+      removeEventListener('pointerup', up);
+      el.classList.remove('dragging');
+      el.style.scrollSnapType = 'x proximity';
+    };
+    addEventListener('pointermove', move);
+    addEventListener('pointerup', up);
+  };
+  const onClickCapture = (e) => { if (dragged.current) { e.preventDefault(); e.stopPropagation(); dragged.current = false; } };
   const arrow = { width: "48px", height: "48px", padding: "0", border: "2px solid #111111", boxShadow: "4px 4px 0 #111111", display: "flex", alignItems: "center", justifyContent: "center" };
 
   return (
@@ -72,7 +94,7 @@ export default function ArticleLine() {
           </div>
         </div>
       </div>
-      <div ref={scroller} className="art-scroller" onScroll={onScroll} tabIndex={0} aria-label="All write-ups, scroll sideways" style={{ position: "absolute", left: "300px", top: "470px", width: "1140px", height: "530px", overflowX: "auto", overflowY: "hidden", scrollSnapType: "x proximity", scrollPaddingLeft: "40px" }}>
+      <div ref={scroller} className="art-scroller" onScroll={onScroll} onPointerDown={onPointerDown} onClickCapture={onClickCapture} onDragStart={(e) => e.preventDefault()} tabIndex={0} aria-label="All write-ups, scroll sideways" style={{ position: "absolute", left: "300px", top: "470px", width: "1140px", height: "530px", overflowX: "auto", overflowY: "hidden", scrollSnapType: "x proximity", scrollPaddingLeft: "40px", userSelect: "none", WebkitUserSelect: "none" }}>
         <div style={{ position: "relative", width: `${width}px`, height: "520px" }}>
           <svg width={width} height="200" viewBox={`0 0 ${width} 200`} style={{ position: "absolute", left: "0", top: "0" }} aria-hidden="true">
             <path d={wirePath(pegs, width)} fill="none" stroke="#5B3A1E" strokeWidth="1.8" />

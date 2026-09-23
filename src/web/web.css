@@ -31,6 +31,8 @@ html[data-layout="web"]{scroll-padding-top:calc(80px * var(--web-zoom,1))}
 .art-scroller::-webkit-scrollbar{height:6px}
 .art-scroller::-webkit-scrollbar-thumb{background:#111111}
 .art-scroller .hang{scroll-snap-align:start}
+.art-scroller{cursor:grab}
+.art-scroller.dragging,.art-scroller.dragging *{cursor:grabbing !important}
 .art-scroller:focus-visible{outline:3px solid #3DA5F4;outline-offset:4px}
 
 /* photo wall: on web the photos stay still; the glint still crosses them */
