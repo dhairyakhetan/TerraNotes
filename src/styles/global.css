@@ -31,3 +31,6 @@ nav[aria-label="Main menu"] .wordmark{-webkit-text-stroke:1px #F3EEE4;filter:dro
 
 /* sections scrolled out of view hold their animations (lib/offscreen.js) */
 .off-screen,.off-screen *{animation-play-state:paused !important}
+
+/* keyboard focus: a clear ring (mouse and touch don't show it) */
+:focus-visible{outline:3px solid #3DA5F4;outline-offset:3px}

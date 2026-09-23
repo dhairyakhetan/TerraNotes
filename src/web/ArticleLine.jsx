@@ -88,6 +88,7 @@ function runLine(r, pegs, width) {
   // Where things are, in the lead svg's coordinates. Read from the DOM once (and on resize), never per frame.
   const g = {};
   const measure = () => {
+    if (!el.isConnected) return; // the page is being left
     const z = svg.getBoundingClientRect().width / svg.width.baseVal.value || 1;
     const sr = svg.getBoundingClientRect(), er = el.getBoundingClientRect(), root = label.offsetParent.getBoundingClientRect();
     g.ox = (er.left - sr.left) / z; g.oy = (er.top - sr.top) / z;          // the scroller's top-left
@@ -119,6 +120,7 @@ function runLine(r, pegs, width) {
 
   const frame = (now) => {
     raf = 0;
+    if (!el.isConnected) return;
     if (pulling) {
       vel = (vel + (want - pos) * PULL_K) * PULL_DAMP;
       pos += vel;

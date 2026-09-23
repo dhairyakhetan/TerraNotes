@@ -52,6 +52,15 @@ Leave a field `''` and the design's bracketed placeholder shows instead.
 - Link preview image: `public/opengraph.jpg` (1200×630). On Vercel the preview tags get the production domain automatically;
   set `SITE_URL` (e.g. `https://example.com`) in the Vercel project if you use a custom domain.
 
+## Built in
+
+- **404 page** (`src/pages/NotFound.jsx`) for any address that isn't a page or an article.
+- **Link previews per article:** the build writes `articles/<slug>.html` with that article's title and line, so shared links preview the article (served at `/articles/<slug>` via `cleanUrls` in `vercel.json`). It also writes `sitemap.xml` (when the site's address is known) and `robots.txt`.
+- **Back/Forward** return to where you were on the page.
+- **If a page crashes** (say, a typo in a data file) visitors get a "the line broke" card instead of a blank screen; the error is in the browser console.
+- **Console hello** for anyone who opens dev tools (`src/lib/hello.js`, names from `src/data/team.js`).
+- Icons (`public/icon-48.png`, `apple-touch-icon.png`, `icon-192.png`), `site.webmanifest` for "add to home screen", a no-JavaScript notice, security and caching headers (`vercel.json`), and a focus ring for keyboard users.
+
 ## Adding images
 
 Put the file in the right folder under `public/`, then write its path (starting with `/`) in the data file:
