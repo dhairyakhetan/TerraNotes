@@ -44,11 +44,14 @@ const easeInOut = (t) => {
 };
 const KICK = [1, 0.8, 1.15, 0.9, 1.05]; // how strongly each card answers the swing
 const RETIE_MS = 220;                    // the lead string sliding over to the next card
+const PULL_WAIT = 160;                   // after the last scroll/drag, how long before the string starts pulling
+const PULL_K = 0.07, PULL_DAMP = 0.8;    // the pull's spring: a little overshoot, then it settles
 
 // Everything that moves on the line, in one requestAnimationFrame loop that only runs while the line is on screen:
 // - cards on screen (or one card away) sway; the rest hold still
 // - moving the line swings the cards: they trail behind it, swing back and settle (a damped spring)
-// - the lead string runs tight from the label card's knot (following its sway) to the nearest card on the line
+// - the lead string runs tight from the label card's knot (following its sway) to the card nearest its spot,
+//   and once you let go of the line it pulls that card into the spot (where the first card hangs at rest)
 // - the progress bar and arrows (written directly, so scrolling never re-renders React)
 function runLine(r, pegs, width) {
   const { el, svg, knot, lead, wire, bar, prev, next, label } = r;
@@ -66,6 +69,20 @@ function runLine(r, pegs, width) {
   hangs.forEach((h) => near.observe(h));
 
   let shown = false, raf = 0;
+  const SPOT = pegs[0].x; // the perfect spot: where the first card's peg sits when the line is at rest
+  const tagged = (s) => pegs.reduce((b, p, i) => (Math.abs(p.x - s - SPOT) < Math.abs(pegs[b].x - s - SPOT) ? i : b), 0);
+  // the pull: only ever after you've moved the line, and it stops the moment you touch it again
+  let pulling = false, want = 0, pos = 0, vel = 0, idle = 0, held = false;
+  const stopPull = () => { pulling = false; clearTimeout(idle); };
+  const pullSoon = () => { clearTimeout(idle); if (!still && !held) idle = setTimeout(startPull, PULL_WAIT); };
+  const startPull = () => {
+    if (held || !shown) return;
+    const s = el.scrollLeft, max = el.scrollWidth - el.clientWidth;
+    // rest with a card in the spot, or at the very end of the line (so the last cards and the bar's 100% are reachable)
+    want = [...pegs.map((p) => Math.max(0, Math.min(max, p.x - SPOT))), max].reduce((b, x) => (Math.abs(x - s) < Math.abs(b - s) ? x : b));
+    if (Math.abs(want - s) < 0.5) return;
+    pulling = true; pos = s; vel = 0; tick();
+  };
   let last = el.scrollLeft, lean = 0, speed = 0, swinging = false;
   let tie = -1, from = null, end = null, tiedAt = 0, drawn = [NaN, NaN, NaN];
   // Where things are, in the lead svg's coordinates. Read from the DOM once (and on resize), never per frame.
@@ -102,6 +119,12 @@ function runLine(r, pegs, width) {
 
   const frame = (now) => {
     raf = 0;
+    if (pulling) {
+      vel = (vel + (want - pos) * PULL_K) * PULL_DAMP;
+      pos += vel;
+      if (Math.abs(want - pos) < 0.3 && Math.abs(vel) < 0.3) { pos = want; pulling = false; }
+      el.scrollLeft = pos;
+    }
     const s = el.scrollLeft, moved = s - last; // + = line moving left
     last = s;
     if (moved) progress();
@@ -116,9 +139,8 @@ function runLine(r, pegs, width) {
       else { lean = speed = 0; kicks.forEach((k) => { k.style.transform = ''; }); }
     }
 
-    // lead string: knot on the label card → nearest card whose peg is inside the line's view
-    let k = pegs.findIndex((p) => p.x - s >= 6);
-    if (k < 0) k = pegs.length - 1;
+    // lead string: knot on the label card → the card nearest the spot
+    const k = tagged(s);
     const target = { x: g.ox + pegs[k].x - s, y: g.oy + pegs[k].y };
     if (k !== tie) {
       if (tie >= 0 && !still) { from = end; tiedAt = now; }
@@ -138,7 +160,7 @@ function runLine(r, pegs, width) {
     }
 
     // keep going while on screen (the label card sways); with reduced motion, only while something moves
-    if (shown && (!still || swinging || from)) raf = requestAnimationFrame(frame);
+    if (shown && (!still || swinging || from || pulling)) raf = requestAnimationFrame(frame);
   };
   const tick = () => { if (shown && !raf) raf = requestAnimationFrame(frame); };
 
@@ -149,14 +171,28 @@ function runLine(r, pegs, width) {
     if (shown) { measure(); tick(); }
   });
   seen.observe(el);
-  el.addEventListener('scroll', tick, { passive: true });
+  const onScroll = () => { tick(); if (!pulling) pullSoon(); }; // our own pull's scrolling doesn't restart it
+  const grab = () => { held = true; stopPull(); };
+  const letGo = () => { if (held) { held = false; pullSoon(); } };
+  el.addEventListener('scroll', onScroll, { passive: true });
+  el.addEventListener('pointerdown', grab);
+  el.addEventListener('touchstart', grab, { passive: true });
+  el.addEventListener('wheel', stopPull, { passive: true });
+  el.addEventListener('keydown', stopPull);
+  addEventListener('pointerup', letGo);
+  addEventListener('pointercancel', letGo);
+  addEventListener('touchend', letGo);
+  r.stopPull = stopPull; // the arrow buttons take over from a pull in progress
   const onResize = () => { measure(); tick(); };
   addEventListener('resize', onResize);
   progress();
 
   return () => {
-    near.disconnect(); seen.disconnect(); cancelAnimationFrame(raf);
-    el.removeEventListener('scroll', tick); removeEventListener('resize', onResize);
+    near.disconnect(); seen.disconnect(); cancelAnimationFrame(raf); clearTimeout(idle);
+    el.removeEventListener('scroll', onScroll); removeEventListener('resize', onResize);
+    el.removeEventListener('pointerdown', grab); el.removeEventListener('touchstart', grab);
+    el.removeEventListener('wheel', stopPull); el.removeEventListener('keydown', stopPull);
+    removeEventListener('pointerup', letGo); removeEventListener('pointercancel', letGo); removeEventListener('touchend', letGo);
   };
 }
 
@@ -185,7 +221,7 @@ export default function ArticleLine() {
   const pegs = items.map((_, i) => peg(i));
   const width = pegs[pegs.length - 1].x + 224;
   useEffect(() => runLine(refs, pegs, width), []);
-  const scrollBy = (dx) => refs.el.scrollBy({ left: dx, behavior: 'smooth' });
+  const scrollBy = (dx) => { refs.stopPull?.(); refs.el.scrollBy({ left: dx, behavior: 'smooth' }); };
 
   // Mouse: drag the line sideways (touch and trackpads scroll it natively). A drag isn't a click on a card.
   const dragged = useRef(false);
