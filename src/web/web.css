@@ -30,15 +30,17 @@ html[data-layout="web"]{scroll-padding-top:calc(80px * var(--web-zoom,1))}
 .art-scroller{scrollbar-width:thin;scrollbar-color:#111111 transparent;overscroll-behavior-x:contain}
 .art-scroller::-webkit-scrollbar{height:6px}
 .art-scroller::-webkit-scrollbar-thumb{background:#111111}
-.art-scroller .hang{scroll-snap-align:start}
 .art-scroller{cursor:grab}
 /* only cards on screen (or next up) sway; nothing does once the line is scrolled out of the window */
 .art-scroller .hang{contain:layout style}
-.art-scroller .hang:not(.live),.art-scroller.away .hang{animation-play-state:paused}
+.art-scroller .hang:not(.live),.art-scroller.away .hang,.hang.away,.hang.away .flutter{animation-play-state:paused}
 .art-scroller.dragging,.art-scroller.dragging *{cursor:grabbing !important}
 .art-scroller:focus-visible{outline:3px solid #3DA5F4;outline-offset:4px}
 
 /* photo wall: on web the photos stay still; the glint still crosses them */
+.bulb-h{position:absolute;width:34px;height:34px;border-radius:50%;background:radial-gradient(circle closest-side,rgba(255,200,97,.75),rgba(255,200,97,0));pointer-events:none}
+.bulb-h::after{content:"";position:absolute;left:13px;top:13px;width:8px;height:8px;border-radius:50%;background:#FFE6AE}
+.spark-h{position:absolute;width:20px;height:20px;background:#FFF4D6;clip-path:polygon(50% 0,59% 41%,100% 50%,59% 59%,50% 100%,41% 59%,0 50%,41% 41%);pointer-events:none}
 .web .twist{animation:none}
 
 /* team: faces hold still on hover and grow a little; legend chips light up */
@@ -61,5 +63,6 @@ html[data-layout="web"]{scroll-padding-top:calc(80px * var(--web-zoom,1))}
 
 @media (prefers-reduced-motion: reduce){
 .web-pop,.web aside.rise-in{animation:none}
+.bulb-h,.spark-h{animation:none}
 .card-link article,.btn{transition:none}
 }

@@ -1,3 +1,5 @@
+import { useRef } from 'react';
+import { usePauseOffscreen } from '../../lib/offscreen.js';
 import { PHOTOS } from '../../data/photos.js';
 
 // Where each photo hangs on the wall (PHOTOS[0] → first spot). r = tilt; dur/delay = its occasional turn on the peg.
@@ -17,8 +19,10 @@ const BULBS = [
 const SPARKS = [[130, 130, 9, 'sp1'], [266, 76, 8, 'sp2'], [207, 376, 11, 'sp3'], [352, 347, 8, 'sp1 sp-late'], [25, 112.5, 7, 'sp2 sp-late']];
 
 export default function PhotoWall({ onOpen }) {
+  const self = useRef(null);
+  usePauseOffscreen(self);
   return (
-    <section id="photos" style={{ position: "absolute", left: "10px", top: "1190px", width: "370px", height: "600px", background: "#1C2622", borderRadius: "28px", overflow: "hidden" }}>
+    <section ref={self} id="photos" style={{ position: "absolute", left: "10px", top: "1190px", width: "370px", height: "600px", background: "#1C2622", borderRadius: "28px", overflow: "hidden" }}>
       <div style={{ position: "absolute", left: "22px", top: "24px", fontFamily: "'Instrument Serif', Georgia, serif", fontSize: "30px", color: "#F3EEE4", lineHeight: "1" }}>Photo wall</div>
       <div style={{ position: "absolute", left: "190px", top: "30px", fontFamily: "'Caveat', cursive", fontSize: "20px", color: "#E9A23B", transform: "rotate(-4deg)" }}>moments, strung up</div>
       <svg width="370" height="600" viewBox="10 0 370 600" style={{ position: "absolute", left: "0", top: "0" }} aria-hidden="true">

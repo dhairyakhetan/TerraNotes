@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useRef } from 'react';
 import ArticleCard from '../ArticleCard.jsx';
 import { DURATION, SoonCard, SWING, TILT, wirePath } from '../../web/ArticleLine.jsx';
 import { ARTICLES, COMING_SOON } from '../../data/articles.js';
@@ -14,15 +14,17 @@ const peg = (i) => {
 };
 
 export default function ScrollingArticles() {
-  const scroller = useRef(null);
-  const [progress, setProgress] = useState(0); // 0…1
+  const scroller = useRef(null), bar = useRef(null), prev = useRef(null), next = useRef(null);
   const items = [...ARTICLES.map((a) => ({ a })), ...COMING_SOON.map((text) => ({ text }))];
   const pegs = items.map((_, i) => peg(i));
   const width = pegs[pegs.length - 1].x + 150;
+  // progress bar and arrows are written directly, so swiping never re-renders the cards
   const onScroll = (e) => {
     const el = e.currentTarget, max = el.scrollWidth - el.clientWidth;
     const p = max > 0 ? el.scrollLeft / max : 0;
-    if (Math.abs(p - progress) > 0.01 || p === 0 || p === 1) setProgress(p);
+    bar.current.style.width = `${Math.round(Math.max(0.06, p) * 100)}%`;
+    prev.current.style.opacity = p <= 0.01 ? '0.35' : '1';
+    next.current.style.opacity = p >= 0.99 ? '0.35' : '1';
   };
   const scrollBy = (dx) => scroller.current.scrollBy({ left: dx, behavior: 'smooth' });
   const arrow = { width: "40px", height: "40px", flexShrink: "0", padding: "0", border: "2px solid #111111", boxShadow: "3px 3px 0 #111111", display: "flex", alignItems: "center", justifyContent: "center", "--c": "#111111" };
@@ -46,6 +48,8 @@ export default function ScrollingArticles() {
           <svg width={width} height="120" viewBox={`0 0 ${width} 120`} style={{ position: "absolute", left: "0", top: "0" }} aria-hidden="true">
             <path d={wirePath(pegs, width, -48)} fill="none" stroke="#5B3A1E" strokeWidth="1.8" />
           </svg>
+          {/* snap points sit still at each peg; snapping to the swaying cards made the line drift on its own */}
+          {pegs.map((p, i) => <span key={i} style={{ position: "absolute", left: `${p.x - 88}px`, top: "0", width: "1px", height: "1px", scrollSnapAlign: "start" }} />)}
           {items.map((item, i) => {
             const p = pegs[i];
             return (
@@ -64,12 +68,12 @@ export default function ScrollingArticles() {
       <div style={{ position: "absolute", left: "20px", top: "946px", width: "350px", display: "flex", alignItems: "center", gap: "12px" }}>
         <div style={{ fontFamily: "'Space Mono', monospace", fontSize: "9.5px", letterSpacing: "1.2px", whiteSpace: "nowrap" }}>{`${pad2(ARTICLES.length)} WRITE-UPS`}</div>
         <div style={{ flexGrow: "1", height: "4px", background: "#D9D1BF", position: "relative" }}>
-          <div style={{ position: "absolute", left: "0", top: "0", height: "4px", width: `${Math.round(Math.max(0.06, progress) * 100)}%`, background: "#111111", transition: "width 120ms linear" }} />
+          <div ref={bar} style={{ position: "absolute", left: "0", top: "0", height: "4px", width: "6%", background: "#111111", transition: "width 120ms linear" }} />
         </div>
-        <button className="press" onClick={() => scrollBy(-392)} aria-label="Scroll write-ups left" style={{ ...arrow, background: "#FFFFFF", opacity: progress <= 0.01 ? 0.35 : 1 }}>
+        <button ref={prev} className="press" onClick={() => scrollBy(-392)} aria-label="Scroll write-ups left" style={{ ...arrow, background: "#FFFFFF", opacity: "0.35" }}>
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#111111" strokeWidth="2.8" strokeLinecap="square"><path d="M15 4 L7 12 L15 20" /></svg>
         </button>
-        <button className="press" onClick={() => scrollBy(392)} aria-label="Scroll write-ups right" style={{ ...arrow, background: "#F7C21A", opacity: progress >= 0.99 ? 0.35 : 1 }}>
+        <button ref={next} className="press" onClick={() => scrollBy(392)} aria-label="Scroll write-ups right" style={{ ...arrow, background: "#F7C21A" }}>
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#111111" strokeWidth="2.8" strokeLinecap="square"><path d="M9 4 L17 12 L9 20" /></svg>
         </button>
       </div>

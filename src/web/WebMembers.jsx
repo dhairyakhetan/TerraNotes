@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
+import { usePauseOffscreen } from '../lib/offscreen.js';
 import { Link } from 'react-router';
 import { Chair, NUMBER_WORDS, PhotoIcon } from '../components/home/Members.jsx';
 import { MEMBERS, TEAMS, teamsOf } from '../data/team.js';
@@ -28,6 +29,8 @@ const photoFill = { width: "100%", height: "100%", objectFit: "cover", display: 
 
 // "Meet the team", web layout: click a team to fade the others, click a face for a profile card beside it.
 export default function WebMembers() {
+  const self = useRef(null);
+  usePauseOffscreen(self);
   const [team, setTeam] = useState(null);
   const { colorFor, fade } = useFaceColors(team); // people in two teams switch colours
   const [open, setOpen] = useState(null);
@@ -39,7 +42,7 @@ export default function WebMembers() {
   const close = () => setOpen(null);
 
   return (
-    <section id="members" style={{ position: "absolute", left: "0", top: "2570px", width: "1440px", height: `${WEB_MEMBERS_HEIGHT}px` }}>
+    <section ref={self} id="members" style={{ position: "absolute", left: "0", top: "2570px", width: "1440px", height: `${WEB_MEMBERS_HEIGHT}px` }}>
       <div style={{ position: "absolute", left: "80px", top: "0", width: "1280px", height: "2px", background: "#111111" }} />
       <h2 style={{ position: "absolute", left: "78px", top: "36px", margin: "0", fontFamily: "'Archivo Black', Impact, sans-serif", fontWeight: "400", fontSize: "72px", lineHeight: "0.9", letterSpacing: "-1.5px", textTransform: "uppercase", color: "#111111" }}>Meet<br />the team</h2>
       <div style={{ position: "absolute", left: "1080px", top: "30px", width: "280px", textAlign: "right", fontFamily: "'Space Mono', monospace", fontSize: "11px", letterSpacing: "1.8px", color: "#111111" }}>{`${count.toUpperCase()} OF US · CLICK A FACE`}</div>

@@ -28,3 +28,6 @@ nav[aria-label="Main menu"] .wordmark{-webkit-text-stroke:1px #F3EEE4;filter:dro
 .main-menu{--s:clamp(0px, calc(844px - var(--vh)), 232px);--lift:calc(var(--s) * -0.1);--gap:calc(30px - var(--s) * 0.075);--card:calc(76px - var(--s) * 0.09);--title:calc(32px - var(--s) * 0.026);--foot:calc(144px - var(--s) * 0.1);height:100%;min-height:612px;box-sizing:border-box}
 .menu-card:active{translate:4px 4px;box-shadow:2px 2px 0 var(--c) !important}
 @media (prefers-reduced-motion: reduce){.menu-sheet{transition:none !important}}
+
+/* sections scrolled out of view hold their animations (lib/offscreen.js) */
+.off-screen,.off-screen *{animation-play-state:paused !important}

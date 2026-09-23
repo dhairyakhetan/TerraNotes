@@ -1,3 +1,5 @@
+import { useRef } from 'react';
+import { usePauseOffscreen } from '../lib/offscreen.js';
 import { PHOTOS } from '../data/photos.js';
 
 // Where each photo hangs (PHOTOS[0] → first spot): top-left, tilt, and the glint's clock.
@@ -21,33 +23,21 @@ const SPARKS = [[262, 198, 'sp1'], [817, 207, 'sp2'], [502, 489, 'sp3'], [1069, 
 
 // Web photo wall: click a photo (or the hanging tag) to open the viewer at that photo.
 export default function WebPhotoWall({ onOpen }) {
+  const self = useRef(null);
+  usePauseOffscreen(self);
   return (
-    <section id="photos" style={{ position: "absolute", left: "40px", top: "1090px", width: "1360px", height: "760px", background: "#1C2622", borderRadius: "36px", overflow: "hidden" }}>
+    <section ref={self} id="photos" style={{ position: "absolute", left: "40px", top: "1090px", width: "1360px", height: "760px", background: "#1C2622", borderRadius: "36px", overflow: "hidden" }}>
       <div style={{ position: "absolute", left: "48px", top: "40px", fontFamily: "'Instrument Serif', Georgia, serif", fontSize: "56px", color: "#F3EEE4", lineHeight: "1" }}>Photo wall</div>
       <div style={{ position: "absolute", left: "330px", top: "56px", fontFamily: "'Caveat', cursive", fontSize: "28px", color: "#E9A23B", transform: "rotate(-4deg)" }}>moments, strung up</div>
       <svg width="1360" height="760" viewBox="0 0 1360 760" style={{ position: "absolute", left: "0", top: "0" }} aria-hidden="true">
-        <defs>
-          <radialGradient id="glow-web">
-            <stop offset="0" stopColor="#FFC861" stopOpacity=".75" />
-            <stop offset="1" stopColor="#FFC861" stopOpacity="0" />
-          </radialGradient>
-        </defs>
         <g stroke="#8E8A7A" strokeWidth="1.4" fill="none">
           <path d="M-10 150 Q560 290 1380 130" />
           <path d="M-10 430 Q700 560 1380 420" />
         </g>
-        {BULBS.map(([x, y, fk], i) => (
-          <g key={i} className={fk ? `bulb ${fk}` : 'bulb'}>
-            <circle cx={x} cy={y} r="17" fill="url(#glow-web)" />
-            <circle cx={x} cy={y} r="4" fill="#FFE6AE" />
-          </g>
-        ))}
-        {SPARKS.map(([x, y, cls], i) => (
-          <g key={i} transform={`translate(${x} ${y})`}>
-            <path className={`spark ${cls}`} d="M0 -10 L1.8 -1.8 L10 0 L1.8 1.8 L0 10 L-1.8 1.8 L-10 0 L-1.8 -1.8 Z" fill="#FFF4D6" />
-          </g>
-        ))}
       </svg>
+      {/* lights and sparkles are plain elements (not SVG) so their flicker runs on the GPU */}
+      {BULBS.map(([x, y, fk], i) => <span key={i} className={fk ? `bulb-h ${fk}` : 'bulb-h'} style={{ left: `${x - 17}px`, top: `${y - 17}px` }} aria-hidden="true" />)}
+      {SPARKS.map(([x, y, cls], i) => <span key={i} className={`spark-h spark ${cls}`} style={{ left: `${x - 10}px`, top: `${y - 10}px` }} aria-hidden="true" />)}
       {SPOTS.map((s, i) => {
         const p = PHOTOS[i];
         if (!p) return null;
