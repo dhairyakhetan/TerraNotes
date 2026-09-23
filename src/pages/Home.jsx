@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router';
 import MenuSheet from '../components/MenuSheet.jsx';
 import HangingArticles from '../components/home/HangingArticles.jsx';
+import ScrollingArticles from '../components/home/ScrollingArticles.jsx';
 import PhotoWall from '../components/home/PhotoWall.jsx';
 import WordsGame from '../components/home/WordsGame.jsx';
 import Members from '../components/home/Members.jsx';
@@ -14,6 +15,9 @@ import Logo from '../components/Logo.jsx';
 export default function Home({ motion = true }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [photo, setPhoto] = useState(null); // index open in the photo viewer
+  // TEMPORARY: header switch between the hanging articles and the sideways line; remembered on this device
+  const [view, setView] = useState(() => { try { return localStorage.getItem('aq-articles-view') || 'hang'; } catch { return 'hang'; } });
+  const pick = (v) => { setView(v); try { localStorage.setItem('aq-articles-view', v); } catch { /* private mode */ } };
   useEffect(() => { document.title = 'Aquaterra'; }, []);
 
   return (
@@ -25,6 +29,12 @@ export default function Home({ motion = true }) {
             <Logo globe={38} word={22} sub={14} />
           </Link>
           <span style={{ flexGrow: "1" }} />
+          {/* TEMPORARY articles view switch */}
+          <div role="group" aria-label="Articles view (temporary)" style={{ display: "flex", padding: "2px", gap: "2px", border: "1.5px dashed #111111", borderRadius: "999px" }}>
+            {[['hang', 'Hang'], ['scroll', 'Scroll']].map(([v, label]) => (
+              <button key={v} onClick={() => pick(v)} aria-pressed={view === v ? 'true' : 'false'} style={{ minHeight: "30px", padding: "0 9px", border: "0", borderRadius: "999px", background: view === v ? '#111111' : 'transparent', color: view === v ? '#F3EEE4' : '#111111', fontFamily: "'Space Mono', monospace", fontWeight: "700", fontSize: "9px", letterSpacing: "1px", textTransform: "uppercase" }}>{label}</button>
+            ))}
+          </div>
           <button onClick={() => setMenuOpen(true)} aria-label="Open menu" aria-expanded={menuOpen ? 'true' : 'false'} style={{ width: "44px", height: "44px", flexShrink: "0", border: "0", background: "transparent", padding: "0", display: "flex", alignItems: "center", justifyContent: "center" }}>
             <svg width="26" height="18" viewBox="0 0 26 18" fill="none" stroke="#1E2723" strokeWidth="1.8" strokeLinecap="round">
               <path d="M2 5 C9 3 17 6 24 4" />
@@ -42,7 +52,7 @@ export default function Home({ motion = true }) {
           </div>
           <div style={{ position: "absolute", left: "68px", top: "194px", width: "14px", height: "14px", boxSizing: "border-box", borderRadius: "50%", background: "#F0442B", border: "2px solid #111111" }} />
         </section>
-        <HangingArticles />
+        {view === 'scroll' ? <ScrollingArticles /> : <HangingArticles />}
         <Link style={{ position: "absolute", right: "22px", top: "1122px", fontFamily: "'Caveat', cursive", fontSize: "22px", textDecoration: "none", display: "flex", alignItems: "center", gap: "6px", minHeight: "44px" }} to="/articles">all articles{" "}<svg width="30" height="12" viewBox="0 0 30 12" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round">
           <path d="M1 7 C10 4 18 8 28 6" />
           <path d="M23 2 L28 6 L23 10" />

@@ -6,31 +6,31 @@ import { pad2 } from '../lib/format.js';
 // Peg i hangs from x = 164 + 208·i on the wire; these repeat every 12 pegs.
 const PITCH = 208;
 const CARD_TOP = [106, 158, 118, 180, 112, 150, 162, 118, 136, 184, 122, 160]; // where each card's clip sits
-const TILT = [-2.2, 1.6, -1.2, 2.4, -1.8, 1.4, -2.6, 1.9, -1.1, 2.2, -1.6, 1.2];
-const SWING = [1.75, 1.39, 1.63, 1.26, 1.69, 1.45, 1.3, 1.73, 1.48, 1.23, 1.59, 1.38];
-const DURATION = [4.8, 5.5, 6.2];
+export const TILT = [-2.2, 1.6, -1.2, 2.4, -1.8, 1.4, -2.6, 1.9, -1.1, 2.2, -1.6, 1.2];
+export const SWING = [1.75, 1.39, 1.63, 1.26, 1.69, 1.45, 1.3, 1.73, 1.48, 1.23, 1.59, 1.38];
+export const DURATION = [4.8, 5.5, 6.2];
 
 const peg = (i) => {
   const x = 164 + PITCH * i, y = i % 2 ? 88 : 78, drop = CARD_TOP[i % 12] - y;
   return { x, y, drop, tilt: TILT[i % 12], swing: SWING[i % 12], dur: DURATION[i % 3] };
 };
 
-// The wire: sags between pegs, runs off both ends of the track.
-const wirePath = (pegs, width) => {
-  let d = `M0 78 Q82 100 ${pegs[0].x} ${pegs[0].y}`;
-  for (let i = 1; i < pegs.length; i++) d += ` Q${(pegs[i - 1].x + pegs[i].x) / 2} 110 ${pegs[i].x} ${pegs[i].y}`;
+// The wire: sags between pegs, runs off both ends of the track. dy moves it up or down.
+export const wirePath = (pegs, width, dy = 0) => {
+  let d = `M0 ${78 + dy} Q82 ${100 + dy} ${pegs[0].x} ${pegs[0].y}`;
+  for (let i = 1; i < pegs.length; i++) d += ` Q${(pegs[i - 1].x + pegs[i].x) / 2} ${110 + dy} ${pegs[i].x} ${pegs[i].y}`;
   const last = pegs[pegs.length - 1];
-  return `${d} Q${(last.x + width) / 2} 110 ${width} 78`;
+  return `${d} Q${(last.x + width) / 2} ${110 + dy} ${width} ${78 + dy}`;
 };
 
 // A peg with no story yet: dashed card with a handwritten note.
-function SoonCard({ text }) {
+export function SoonCard({ text, w = 172, h = 272, font = '27px' }) {
   return (
-    <div style={{ position: "absolute", left: "0", top: "0", width: "172px", height: "272px" }}>
+    <div style={{ position: "absolute", left: "0", top: "0", width: `${w}px`, height: `${h}px` }}>
       <div style={{ position: "absolute", left: "50%", top: "-7px", marginLeft: "-14px", width: "28px", height: "10px", background: "#D9D1BF", border: "1.5px solid #111111", boxSizing: "border-box", zIndex: "2" }} />
       <div style={{ width: "100%", height: "100%", boxSizing: "border-box", background: "#FBF8F1", border: "2px dashed #8E7A5E", padding: "14px 14px 16px", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
         <span style={{ fontFamily: "'Space Mono', monospace", fontSize: "10px", letterSpacing: "1.4px", color: "#8E7A5E" }}>ON THE LINE SOON</span>
-        <p style={{ margin: "0", fontFamily: "'Caveat', cursive", fontSize: "27px", lineHeight: "1.05", color: "#5B3A1E", transform: "rotate(-2deg)" }}>{text}</p>
+        <p style={{ margin: "0", fontFamily: "'Caveat', cursive", fontSize: font, lineHeight: "1.05", color: "#5B3A1E", transform: "rotate(-2deg)" }}>{text}</p>
         <svg width="34" height="14" viewBox="0 0 34 14" fill="none" stroke="#8E7A5E" strokeWidth="1.6" strokeLinecap="round" aria-hidden="true">
           <path d="M1 8 C8 3 14 12 21 7 S30 4 33 7" />
         </svg>

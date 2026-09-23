@@ -150,7 +150,7 @@ export const ARTICLES = [
   },
 ];
 
-// Web home only: empty pegs after the real articles, so the line has something to scroll. One peg per line.
+// Empty pegs after the real articles on the sideways line (web home, and the phone's scroll view). One peg per line.
 export const COMING_SOON = [
   "this peg's saving a spot for the next one",
   'still drying. check back soon.',
