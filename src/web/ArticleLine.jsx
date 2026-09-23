@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import WebCard from './WebCard.jsx';
 import { webZoom } from '../lib/layout.js';
 import { ARTICLES, COMING_SOON } from '../data/articles.js';
@@ -23,6 +23,26 @@ export const wirePath = (pegs, width, dy = 0) => {
   const last = pegs[pegs.length - 1];
   return `${d} Q${(last.x + width) / 2} ${110 + dy} ${width} ${78 + dy}`;
 };
+
+// Cards swing when the line moves: they trail behind it, then swing back and settle (a damped spring).
+// Writes the angle to --kick on the scroller; each card multiplies it by its own --k.
+function swingWithScroll(el) {
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  let angle = 0, speed = 0, last = el.scrollLeft, raf = 0;
+  const step = () => {
+    const moved = el.scrollLeft - last; // px this frame; + = line moving left
+    last = el.scrollLeft;
+    const target = Math.max(-10, Math.min(10, moved * 0.35)); // lean back against the motion
+    speed = (speed + (target - angle) * 0.06) * 0.9;
+    angle += speed;
+    el.style.setProperty('--kick', `${angle.toFixed(3)}deg`);
+    if (Math.abs(angle) < 0.02 && Math.abs(speed) < 0.02 && moved === 0) { el.style.setProperty('--kick', '0deg'); raf = 0; return; }
+    raf = requestAnimationFrame(step);
+  };
+  const onScroll = () => { if (!raf) raf = requestAnimationFrame(step); };
+  el.addEventListener('scroll', onScroll, { passive: true });
+  return () => { el.removeEventListener('scroll', onScroll); cancelAnimationFrame(raf); };
+}
 
 // A peg with no story yet: dashed card with a handwritten note.
 export function SoonCard({ text, w = 172, h = 272, font = '27px' }) {
@@ -54,6 +74,7 @@ export default function ArticleLine() {
     if (Math.abs(p - progress) > 0.01 || p === 0 || p === 1) setProgress(p);
   };
   const scrollBy = (dx) => scroller.current.scrollBy({ left: dx, behavior: 'smooth' });
+  useEffect(() => swingWithScroll(scroller.current), []);
   // Mouse: drag the line sideways (touch and trackpads scroll it natively). A drag isn't a click on a card.
   const dragged = useRef(false);
   const onPointerDown = (e) => {
@@ -102,10 +123,13 @@ export default function ArticleLine() {
           {items.map((item, i) => {
             const p = pegs[i];
             return (
-              <div key={i} className="hang sway" style={{ position: "absolute", left: `${p.x - 86}px`, top: `${p.y}px`, width: "172px", height: `${p.drop + 272}px`, "--a": `${p.swing}deg`, "--d": `${p.dur}s`, animationDelay: `${(-0.9 * i).toFixed(1)}s` }}>
-                <div style={{ position: "absolute", left: "85.3px", top: "0", width: "1.4px", height: `${p.drop + 2}px`, background: "#5B3A1E" }} />
-                <div className="flutter" style={{ position: "absolute", left: "0", top: `${p.drop}px`, width: "172px", height: "272px", "--r": `${p.tilt}deg`, transform: `rotate(${p.tilt}deg)`, animationDelay: `${(-0.7 - 0.9 * i).toFixed(1)}s` }}>
-                  {item.a ? <WebCard article={item.a} /> : <SoonCard text={item.text} />}
+              // a gentle idle sway (half the phone's, slower); .kick adds the swing from scrolling
+              <div key={i} className="hang sway" style={{ position: "absolute", left: `${p.x - 86}px`, top: `${p.y}px`, width: "172px", height: `${p.drop + 272}px`, "--a": `${(p.swing * 0.45).toFixed(2)}deg`, "--d": `${(p.dur * 1.5).toFixed(1)}s`, animationDelay: `${(-1.3 * i).toFixed(1)}s` }}>
+                <div className="kick" style={{ position: "absolute", inset: "0", transformOrigin: "50% 0", "--k": `${[1, 0.8, 1.15, 0.9, 1.05][i % 5]}` }}>
+                  <div style={{ position: "absolute", left: "85.3px", top: "0", width: "1.4px", height: `${p.drop + 2}px`, background: "#5B3A1E" }} />
+                  <div style={{ position: "absolute", left: "0", top: `${p.drop}px`, width: "172px", height: "272px", transform: `rotate(${p.tilt}deg)`, transformOrigin: "50% 0" }}>
+                    {item.a ? <WebCard article={item.a} /> : <SoonCard text={item.text} />}
+                  </div>
                 </div>
               </div>
             );
