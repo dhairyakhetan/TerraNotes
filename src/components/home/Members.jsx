@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router';
-import { MEMBERS, TEAMS, colorOf, teamsOf } from '../../data/team.js';
+import { MEMBERS, TEAMS, teamsOf } from '../../data/team.js';
+import { teamLinks, useFaceColors } from '../../lib/team.js';
 import { instagramUrl, pad2 } from '../../lib/format.js';
 
 // Faces sit in loose rows of 3 and 2 (a honeycomb), each nudged a little so it looks hand-placed.
@@ -19,8 +20,8 @@ for (let row = 0; SPOTS.length < MEMBERS.length; row++) {
     SPOTS.push({ cx, cy: top + size / 2, left: cx - 58, top, size, float: `fl${(i % 6) + 1}` });
   }
 }
-// Dotted trail through the face centres, spot by spot.
-const TRAIL = SPOTS.slice(1).map((s, i) => { const p = SPOTS[i]; return `M${p.cx} ${p.cy} Q${(p.cx + s.cx) / 2 + 18} ${(p.cy + s.cy) / 2 + 22} ${s.cx} ${s.cy}`; }).join(' ');
+// Dotted links joining each team's faces (lib/team.js).
+const LINKS = teamLinks(SPOTS, 18);
 const FACES_END = Math.max(...SPOTS.map((s) => s.top + s.size)) + 56;
 // Section height; the home page grows with it.
 export const MEMBERS_HEIGHT = FACES_END + 260;
@@ -50,11 +51,12 @@ export const Chair = ({ empty, width = 34, height = 40 }) => (
 
 // "Meet the team": tap a team in the legend to fade the others, tap a face for its profile.
 export default function Members() {
-  const [team, setTeam] = useState(null);     // legend filter, null = everyone
+  const [team, setTeam] = useState(null);
+  const { colorFor, fade } = useFaceColors(team); // people in two teams switch colours     // legend filter, null = everyone
   const [open, setOpen] = useState(null);     // index of the member whose profile is open
   const count = NUMBER_WORDS[MEMBERS.length] || String(MEMBERS.length);
   const sel = open != null ? MEMBERS[open] : null;
-  const selColor = sel ? colorOf(sel) : "#111111";
+  const selColor = sel ? colorFor(sel) : "#111111";
   const close = () => setOpen(null);
 
   return (
@@ -64,8 +66,8 @@ export default function Members() {
       <div style={{ position: "absolute", right: "20px", top: "30px", textAlign: "right", fontFamily: "'Space Mono', monospace", fontSize: "9px", letterSpacing: "1.6px", lineHeight: "1.6", color: "#111111" }}>{count.toUpperCase()} OF US<br />TAP A FACE</div>
       <p style={{ position: "absolute", left: "20px", top: "136px", width: "340px", margin: "0", fontSize: "15px", lineHeight: "1.5", color: "#1E2723" }}>four desks, one terrace, {count} people who are all doing something else on a weekday. writing writes the articles, design made this site's look and layout, tech built it, and the heads keep everyone on track.</p>
       <div style={{ position: "absolute", left: "22px", top: "270px", width: "250px", fontFamily: "'Caveat', cursive", fontSize: "21px", lineHeight: "1.1", color: "#5B3A1E", transform: "rotate(-2deg)" }}>nobody here is a professional. that is the point.</div>
-      <svg width="390" height={MEMBERS_HEIGHT} viewBox={`0 0 390 ${MEMBERS_HEIGHT}`} style={{ position: "absolute", left: "0", top: "0", pointerEvents: "none" }} aria-hidden="true" fill="none" stroke="#1E2723" strokeWidth="1.2" strokeDasharray="3 5" strokeLinecap="round" opacity=".5">
-        <path d={TRAIL} />
+      <svg width="390" height={MEMBERS_HEIGHT} viewBox={`0 0 390 ${MEMBERS_HEIGHT}`} style={{ position: "absolute", left: "0", top: "0", pointerEvents: "none" }} aria-hidden="true" fill="none" strokeWidth="1.2" strokeDasharray="3 5" strokeLinecap="round">
+        {LINKS.map((l) => <path key={l.team} d={l.d} stroke={TEAMS[l.team].color} opacity={team == null ? 0.55 : team === l.team ? 0.95 : 0.12} style={{ transition: "opacity .25s" }} />)}
       </svg>
       {/* legend */}
       <div style={{ position: "absolute", left: "16px", top: "340px", width: "142px", display: "flex", flexDirection: "column", gap: "4px" }}>
@@ -86,7 +88,7 @@ export default function Members() {
         if (!m) return null;
         return (
           <div key={i} className={s.float} style={{ position: "absolute", left: `${s.left}px`, top: `${s.top}px`, width: "116px", display: "flex", flexDirection: "column", alignItems: "center", gap: "8px", opacity: team == null || teamsOf(m).includes(team) ? 1 : 0.18, transition: "opacity .25s" }}>
-            <button className="bub" onClick={() => setOpen(i)} aria-label={`${m.name}, ${m.role} — open profile`} style={{ width: `${s.size}px`, height: `${s.size}px`, padding: "0", borderRadius: "50%", border: "2px solid #111111", background: "#F2F1ED", boxShadow: `6px 5px 0 ${colorOf(m)}`, overflow: "hidden", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "3px", fontSize: "11px", color: "#444" }}>
+            <button className="bub" onClick={() => setOpen(i)} aria-label={`${m.name}, ${m.role} — open profile`} style={{ width: `${s.size}px`, height: `${s.size}px`, padding: "0", borderRadius: "50%", border: "2px solid #111111", background: "#F2F1ED", boxShadow: `6px 5px 0 ${colorFor(m)}`, transition: `box-shadow ${fade} ease, transform .12s ease`, overflow: "hidden", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "3px", fontSize: "11px", color: "#444" }}>
               {m.photo ? <img src={m.photo} alt="" style={photoFill} /> : <><PhotoIcon size="20" /><span>{m.name.split(' ')[0].toLowerCase()}</span></>}
             </button>
             <div style={{ textAlign: "center", lineHeight: "1.1", padding: "2px 6px", background: "#F3EEE4" }}>

@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { Link } from 'react-router';
 import { Chair, NUMBER_WORDS, PhotoIcon } from '../components/home/Members.jsx';
-import { MEMBERS, TEAMS, colorOf, teamsOf } from '../data/team.js';
+import { MEMBERS, TEAMS, teamsOf } from '../data/team.js';
+import { teamLinks, useFaceColors } from '../lib/team.js';
 import { instagramUrl, pad2 } from '../lib/format.js';
 
 // Faces sit in loose rows of 5 and 4 right of the text (a honeycomb), each nudged a little so it looks hand-placed.
@@ -21,16 +22,18 @@ for (let row = 0; SPOTS.length < MEMBERS.length; row++) {
 }
 // Section height; the web home page grows with it.
 export const WEB_MEMBERS_HEIGHT = Math.max(900, Math.max(...SPOTS.map((s) => s.cy + s.size / 2)) + 110);
-const TRAIL = SPOTS.slice(1).map((s, i) => { const p = SPOTS[i]; return `M${p.cx} ${p.cy} Q${(p.cx + s.cx) / 2} ${(p.cy + s.cy) / 2 + 30} ${s.cx} ${s.cy}`; }).join(' ');
+// Dotted links joining each team's faces (lib/team.js).
+const LINKS = teamLinks(SPOTS, 24);
 const photoFill = { width: "100%", height: "100%", objectFit: "cover", display: "block" };
 
 // "Meet the team", web layout: click a team to fade the others, click a face for a profile card beside it.
 export default function WebMembers() {
   const [team, setTeam] = useState(null);
+  const { colorFor, fade } = useFaceColors(team); // people in two teams switch colours
   const [open, setOpen] = useState(null);
   const count = NUMBER_WORDS[MEMBERS.length] || String(MEMBERS.length);
   const sel = open != null ? MEMBERS[open] : null;
-  const color = sel ? colorOf(sel) : '#111111';
+  const color = sel ? colorFor(sel) : '#111111';
   const spot = sel ? SPOTS[open] : null;
   const r = spot ? spot.size / 2 : 0;
   const close = () => setOpen(null);
@@ -54,15 +57,15 @@ export default function WebMembers() {
           );
         })}
       </div>
-      <svg width="1440" height={WEB_MEMBERS_HEIGHT} viewBox={`0 0 1440 ${WEB_MEMBERS_HEIGHT}`} style={{ position: "absolute", left: "0", top: "0", pointerEvents: "none" }} aria-hidden="true" fill="none" stroke="#1E2723" strokeWidth="1.3" strokeDasharray="3 6" strokeLinecap="round" opacity=".5">
-        <path d={TRAIL} />
+      <svg width="1440" height={WEB_MEMBERS_HEIGHT} viewBox={`0 0 1440 ${WEB_MEMBERS_HEIGHT}`} style={{ position: "absolute", left: "0", top: "0", pointerEvents: "none" }} aria-hidden="true" fill="none" strokeWidth="1.3" strokeDasharray="3 6" strokeLinecap="round">
+        {LINKS.map((l) => <path key={l.team} d={l.d} stroke={TEAMS[l.team].color} opacity={team == null ? 0.55 : team === l.team ? 0.95 : 0.12} style={{ transition: "opacity .25s" }} />)}
       </svg>
       {SPOTS.map((s, i) => {
         const m = MEMBERS[i];
         if (!m) return null;
         return (
           <div key={i} className={`${s.float} face`} style={{ position: "absolute", left: `${s.cx - 66}px`, top: `${s.cy - s.size / 2}px`, width: "132px", display: "flex", flexDirection: "column", alignItems: "center", gap: "10px", opacity: team == null || teamsOf(m).includes(team) ? 1 : 0.18, transition: "opacity .25s" }}>
-            <button className="bub" onClick={() => setOpen(i)} aria-label={`${m.name}, ${m.role} — open profile`} style={{ width: `${s.size}px`, height: `${s.size}px`, padding: "0", borderRadius: "50%", border: "2px solid #111111", background: "#F2F1ED", boxShadow: `8px 6px 0 ${colorOf(m)}`, overflow: "hidden", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "4px", fontSize: "13px", color: "#444" }}>
+            <button className="bub" onClick={() => setOpen(i)} aria-label={`${m.name}, ${m.role} — open profile`} style={{ width: `${s.size}px`, height: `${s.size}px`, padding: "0", borderRadius: "50%", border: "2px solid #111111", background: "#F2F1ED", boxShadow: `8px 6px 0 ${colorFor(m)}`, transition: `box-shadow ${fade} ease, transform 180ms cubic-bezier(0.32, 0.72, 0, 1)`, overflow: "hidden", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "4px", fontSize: "13px", color: "#444" }}>
               {m.photo ? <img src={m.photo} alt="" style={photoFill} /> : <><PhotoIcon size="22" /><span>{m.name.split(' ')[0].toLowerCase()}</span></>}
             </button>
             <div style={{ textAlign: "center", lineHeight: "1.1", padding: "2px 8px", background: "#F3EEE4" }}>
