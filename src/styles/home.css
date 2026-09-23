@@ -55,7 +55,7 @@
 
 .legend-chip:active{transform:translate(1px,1px)}
 /* TEMPORARY tiles view: tiles sink a little while pressed; no scrollbar */
-.tile{transition:transform .12s ease}
+.tile{transition:transform .12s ease;-webkit-font-smoothing:antialiased}
 .tile:active{transform:scale(.98);opacity:1}
 .tiles::-webkit-scrollbar{display:none}
 /* polaroids flash when tapped */
