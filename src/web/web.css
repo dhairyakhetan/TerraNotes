@@ -32,7 +32,9 @@ html[data-layout="web"]{scroll-padding-top:calc(80px * var(--web-zoom,1))}
 .art-scroller::-webkit-scrollbar-thumb{background:#111111}
 .art-scroller .hang{scroll-snap-align:start}
 .art-scroller{cursor:grab}
-.art-scroller .kick{transform:rotate(calc(var(--kick,0deg) * var(--k,1)))}
+/* only cards on screen (or next up) sway; nothing does once the line is scrolled out of the window */
+.art-scroller .hang{contain:layout style}
+.art-scroller .hang:not(.live),.art-scroller.away .hang{animation-play-state:paused}
 .art-scroller.dragging,.art-scroller.dragging *{cursor:grabbing !important}
 .art-scroller:focus-visible{outline:3px solid #3DA5F4;outline-offset:4px}
 

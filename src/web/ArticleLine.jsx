@@ -24,10 +24,26 @@ export const wirePath = (pegs, width, dy = 0) => {
   return `${d} Q${(last.x + width) / 2} ${110 + dy} ${width} ${78 + dy}`;
 };
 
-// Cards swing when the line moves: they trail behind it, then swing back and settle (a damped spring).
-// Writes the angle to --kick on the scroller; each card multiplies it by its own --k.
-function swingWithScroll(el) {
-  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+const KICK = [1, 0.8, 1.15, 0.9, 1.05]; // how strongly each card answers the swing
+
+// Only cards on screen, or one card away from it, do any work: the rest stop swaying and skip the swing.
+// Cards swing when the line moves: they trail behind it, swing back and settle (a damped spring),
+// written straight onto each live card's .kick element.
+function animateLine(el, hangs, kicks) {
+  const live = new Set();
+  const near = new IntersectionObserver((entries) => {
+    for (const e of entries) {
+      const i = hangs.indexOf(e.target);
+      e.target.classList.toggle('live', e.isIntersecting);
+      if (e.isIntersecting) live.add(i); else live.delete(i);
+    }
+  }, { root: el, rootMargin: `0px ${PITCH}px` });
+  hangs.forEach((h) => near.observe(h));
+  // the whole line scrolled out of the window: nothing moves
+  const shown = new IntersectionObserver(([e]) => el.classList.toggle('away', !e.isIntersecting));
+  shown.observe(el);
+
+  const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
   let angle = 0, speed = 0, last = el.scrollLeft, raf = 0;
   const step = () => {
     const moved = el.scrollLeft - last; // px this frame; + = line moving left
@@ -35,13 +51,17 @@ function swingWithScroll(el) {
     const target = Math.max(-10, Math.min(10, moved * 0.35)); // lean back against the motion
     speed = (speed + (target - angle) * 0.06) * 0.9;
     angle += speed;
-    el.style.setProperty('--kick', `${angle.toFixed(3)}deg`);
-    if (Math.abs(angle) < 0.02 && Math.abs(speed) < 0.02 && moved === 0) { el.style.setProperty('--kick', '0deg'); raf = 0; return; }
+    if (Math.abs(angle) < 0.02 && Math.abs(speed) < 0.02 && moved === 0) {
+      kicks.forEach((k) => { k.style.transform = ''; });
+      raf = 0;
+      return;
+    }
+    live.forEach((i) => { kicks[i].style.transform = `rotate(${(angle * KICK[i % KICK.length]).toFixed(2)}deg)`; });
     raf = requestAnimationFrame(step);
   };
   const onScroll = () => { if (!raf) raf = requestAnimationFrame(step); };
-  el.addEventListener('scroll', onScroll, { passive: true });
-  return () => { el.removeEventListener('scroll', onScroll); cancelAnimationFrame(raf); };
+  if (!still) el.addEventListener('scroll', onScroll, { passive: true });
+  return () => { near.disconnect(); shown.disconnect(); el.removeEventListener('scroll', onScroll); cancelAnimationFrame(raf); };
 }
 
 // A peg with no story yet: dashed card with a handwritten note.
@@ -74,7 +94,8 @@ export default function ArticleLine() {
     if (Math.abs(p - progress) > 0.01 || p === 0 || p === 1) setProgress(p);
   };
   const scrollBy = (dx) => scroller.current.scrollBy({ left: dx, behavior: 'smooth' });
-  useEffect(() => swingWithScroll(scroller.current), []);
+  const hangs = useRef([]), kicks = useRef([]);
+  useEffect(() => animateLine(scroller.current, hangs.current, kicks.current), []);
   // Mouse: drag the line sideways (touch and trackpads scroll it natively). A drag isn't a click on a card.
   const dragged = useRef(false);
   const onPointerDown = (e) => {
@@ -123,9 +144,9 @@ export default function ArticleLine() {
           {items.map((item, i) => {
             const p = pegs[i];
             return (
-              // a gentle idle sway (half the phone's, slower); .kick adds the swing from scrolling
-              <div key={i} className="hang sway" style={{ position: "absolute", left: `${p.x - 86}px`, top: `${p.y}px`, width: "172px", height: `${p.drop + 272}px`, "--a": `${(p.swing * 0.45).toFixed(2)}deg`, "--d": `${(p.dur * 1.5).toFixed(1)}s`, animationDelay: `${(-1.3 * i).toFixed(1)}s` }}>
-                <div className="kick" style={{ position: "absolute", inset: "0", transformOrigin: "50% 0", "--k": `${[1, 0.8, 1.15, 0.9, 1.05][i % 5]}` }}>
+              // a gentle idle sway (half the phone's, slower); the inner box takes the swing from scrolling
+              <div key={i} ref={(n) => { hangs.current[i] = n; }} className="hang sway" style={{ position: "absolute", left: `${p.x - 86}px`, top: `${p.y}px`, width: "172px", height: `${p.drop + 272}px`, "--a": `${(p.swing * 0.45).toFixed(2)}deg`, "--d": `${(p.dur * 1.5).toFixed(1)}s`, animationDelay: `${(-1.3 * i).toFixed(1)}s` }}>
+                <div ref={(n) => { kicks.current[i] = n; }} style={{ position: "absolute", inset: "0", transformOrigin: "50% 0" }}>
                   <div style={{ position: "absolute", left: "85.3px", top: "0", width: "1.4px", height: `${p.drop + 2}px`, background: "#5B3A1E" }} />
                   <div style={{ position: "absolute", left: "0", top: `${p.drop}px`, width: "172px", height: "272px", transform: `rotate(${p.tilt}deg)`, transformOrigin: "50% 0" }}>
                     {item.a ? <WebCard article={item.a} /> : <SoonCard text={item.text} />}
