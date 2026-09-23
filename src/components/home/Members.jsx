@@ -3,16 +3,22 @@ import { Link } from 'react-router';
 import { MEMBERS, TEAMS, colorOf, teamsOf } from '../../data/team.js';
 import { instagramUrl, pad2 } from '../../lib/format.js';
 
-// Faces fill three staggered columns under the legend, row by row; sizes and nudges repeat so it looks hand-placed.
-const COLS = [72, 196, 318];                   // column centres
-const SIZES = [92, 82, 88, 84, 96, 80];
-const NUDGE = [-5, 4, -2, 6, -4, 2];
-const FACES_TOP = 510, ROW = 190;
-const SPOTS = MEMBERS.map((_, i) => {
-  const row = Math.floor(i / 3), col = row % 2 ? 2 - (i % 3) : i % 3; // snake, so the trail zigzags
-  const cx = COLS[col] + NUDGE[i % 6], size = SIZES[i % 6];
-  return { cx, cy: FACES_TOP + row * ROW + (col === 1 ? 44 : 0) + size / 2, left: cx - 58, top: FACES_TOP + row * ROW + (col === 1 ? 44 : 0), size, float: `fl${(i % 6) + 1}` };
-});
+// Faces sit in loose rows of 3 and 2 (a honeycomb), each nudged a little so it looks hand-placed.
+const ROWS = [[72, 196, 318], [134, 256]];     // face centres (x) for the two kinds of row
+const SIZES = [92, 80, 98, 84, 88, 96, 82, 90];
+const NUDGE_X = [-6, 5, -3, 8, -8, 4, 2, -5, 7];
+const NUDGE_Y = [0, 16, -10, 8, 20, -6, 12, -14, 4, 18, -4];
+const FACES_TOP = 510, ROW = 176;
+const SPOTS = [];
+for (let row = 0; SPOTS.length < MEMBERS.length; row++) {
+  const xs = ROWS[row % 2], line = row % 4 < 2 ? xs : [...xs].reverse(); // alternate direction so the trail zigzags
+  for (const x of line) {
+    if (SPOTS.length === MEMBERS.length) break;
+    const i = SPOTS.length, size = SIZES[i % SIZES.length], top = FACES_TOP + row * ROW + NUDGE_Y[i % NUDGE_Y.length];
+    const cx = x + NUDGE_X[i % NUDGE_X.length];
+    SPOTS.push({ cx, cy: top + size / 2, left: cx - 58, top, size, float: `fl${(i % 6) + 1}` });
+  }
+}
 // Dotted trail through the face centres, spot by spot.
 const TRAIL = SPOTS.slice(1).map((s, i) => { const p = SPOTS[i]; return `M${p.cx} ${p.cy} Q${(p.cx + s.cx) / 2 + 18} ${(p.cy + s.cy) / 2 + 22} ${s.cx} ${s.cy}`; }).join(' ');
 const FACES_END = Math.max(...SPOTS.map((s) => s.top + s.size)) + 56;
@@ -56,7 +62,7 @@ export default function Members() {
       <div style={{ position: "absolute", left: "20px", top: "0", width: "350px", height: "2px", background: "#111111" }} />
       <h2 style={{ position: "absolute", left: "18px", top: "22px", margin: "0", fontFamily: "'Archivo Black', Impact, sans-serif", fontWeight: "400", fontSize: "46px", lineHeight: "0.92", letterSpacing: "-1px", textTransform: "uppercase", color: "#111111" }}>Meet<br />the team</h2>
       <div style={{ position: "absolute", right: "20px", top: "30px", textAlign: "right", fontFamily: "'Space Mono', monospace", fontSize: "9px", letterSpacing: "1.6px", lineHeight: "1.6", color: "#111111" }}>{count.toUpperCase()} OF US<br />TAP A FACE</div>
-      <p style={{ position: "absolute", left: "20px", top: "136px", width: "340px", margin: "0", fontSize: "15px", lineHeight: "1.5", color: "#1E2723" }}>four desks, one terrace, {count} people who are all doing something else on a weekday. writing puts it into words, design makes it look like something, tech keeps the site standing, and the heads keep everyone on track.</p>
+      <p style={{ position: "absolute", left: "20px", top: "136px", width: "340px", margin: "0", fontSize: "15px", lineHeight: "1.5", color: "#1E2723" }}>four desks, one terrace, {count} people who are all doing something else on a weekday. writing writes the articles, design made this site's look and layout, tech built it, and the heads keep everyone on track.</p>
       <div style={{ position: "absolute", left: "22px", top: "270px", width: "250px", fontFamily: "'Caveat', cursive", fontSize: "21px", lineHeight: "1.1", color: "#5B3A1E", transform: "rotate(-2deg)" }}>nobody here is a professional. that is the point.</div>
       <svg width="390" height={MEMBERS_HEIGHT} viewBox={`0 0 390 ${MEMBERS_HEIGHT}`} style={{ position: "absolute", left: "0", top: "0", pointerEvents: "none" }} aria-hidden="true" fill="none" stroke="#1E2723" strokeWidth="1.2" strokeDasharray="3 5" strokeLinecap="round" opacity=".5">
         <path d={TRAIL} />
@@ -125,8 +131,12 @@ export default function Members() {
             <div style={{ fontFamily: "'Archivo Black', Impact, sans-serif", fontSize: "30px", lineHeight: "0.95", textTransform: "uppercase", color: "#111111" }}>{sel.name}</div>
             <div style={{ fontFamily: "'Caveat', cursive", fontSize: "20px", lineHeight: "1.1", color: "#5B3A1E" }}>{sel.role}</div>
             <p style={{ margin: "0", fontSize: "14px", lineHeight: "1.5", color: "#333333" }}>{sel.bio || '[Two lines about them: where they work from, what they write or shoot, what they care about.]'}</p>
+            {/* what their team made; only writers have articles */}
+            {teamsOf(sel).filter((t) => t !== 'writing').map((t) => (
+              <p key={t} style={{ margin: "0", paddingLeft: "10px", borderLeft: `3px solid ${TEAMS[t].color}`, fontSize: "13px", lineHeight: "1.45", color: "#1E2723" }}><strong style={{ fontWeight: "600" }}>{TEAMS[t].label}</strong>{` ${TEAMS[t].made}.`}</p>
+            ))}
             <div style={{ display: "flex", gap: "10px" }}>
-              <Link to="/articles" style={{ minHeight: "44px", flexGrow: "1", display: "flex", alignItems: "center", justifyContent: "center", background: "#111111", color: "#FFFFFF", border: "2px solid #111111", fontFamily: "'Space Mono', monospace", fontWeight: "700", fontSize: "11px", letterSpacing: "1px", textDecoration: "none" }}>THEIR ARTICLES</Link>
+              {teamsOf(sel).includes('writing') && <Link to="/articles" style={{ minHeight: "44px", flexGrow: "1", display: "flex", alignItems: "center", justifyContent: "center", background: "#111111", color: "#FFFFFF", border: "2px solid #111111", fontFamily: "'Space Mono', monospace", fontWeight: "700", fontSize: "11px", letterSpacing: "1px", textDecoration: "none" }}>THEIR ARTICLES</Link>}
               <a href={instagramUrl(sel.instagram)} target="_blank" rel="noreferrer" style={{ minHeight: "44px", padding: "0 14px", display: "flex", alignItems: "center", background: "#FFFFFF", color: "#111111", border: "2px solid #111111", boxShadow: "3px 3px 0 #111111", fontFamily: "'Space Mono', monospace", fontWeight: "700", fontSize: "11px", letterSpacing: "1px", textDecoration: "none" }}>{`${sel.instagram ? `@${sel.instagram}` : '[@HANDLE]'} ↗`}</a>
             </div>
           </div>

@@ -5,32 +5,34 @@
 //   instagram: handle without the @
 // Leave a field '' and the design's placeholder shows instead.
 
+// label: the legend and profile tag. made: what the team made, shown on its members' profiles (writers get "their articles" instead).
 export const TEAMS = {
-  heads: { label: 'Heads', color: '#1E7A4C' },
-  design: { label: 'Design', color: '#3DA5F4' },
-  writing: { label: 'Writing', color: '#F0442B' },
-  tech: { label: 'Tech', color: '#7B5CE6' },
+  heads: { label: 'Heads', color: '#1E7A4C', made: 'keep everyone on track' },
+  design: { label: 'Design team', color: '#3DA5F4', made: 'made the layout and style of this website, along with its other design elements' },
+  writing: { label: 'Writing team', color: '#F0442B', made: 'writes the articles' },
+  tech: { label: 'Tech team', color: '#7B5CE6', made: 'made this website' },
 };
 
+// Mixed on purpose: the order sets where each face sits, so teams end up spread around the section.
 export const MEMBERS = [
   { name: 'Aarav Agarwal', role: 'Head of department', team: 'heads', photo: '', bio: '', instagram: '' },
+  { name: 'Sara Abedin', role: 'Writing team', team: 'writing', photo: '', bio: '', instagram: '' },
+  { name: 'Anushka Paul', role: 'Design team', team: 'design', photo: '', bio: '', instagram: '' },
+  { name: 'Dhairya Khetan', role: 'Tech team', team: 'tech', photo: '', bio: '', instagram: '' },
+  { name: 'Pahal Sethi', role: 'Writing team', team: 'writing', photo: '', bio: '', instagram: '' },
+  { name: 'Anoushka Chandak', role: 'Design & writing team', team: ['design', 'writing'], photo: '', bio: '', instagram: '' },
   { name: 'Hiya Khara', role: 'Head of department', team: 'heads', photo: '', bio: '', instagram: '' },
+  { name: 'Ahel Sarkar', role: 'Writing team', team: 'writing', photo: '', bio: '', instagram: '' },
+  { name: 'Syeda Tashirun Nabi', role: 'Design team', team: 'design', photo: '', bio: '', instagram: '' },
+  { name: 'Priyam Agarwal', role: 'Tech team', team: 'tech', photo: '', bio: '', instagram: '' },
+  { name: 'Dhriti Agarwal', role: 'Writing team', team: 'writing', photo: '', bio: '', instagram: '' },
+  { name: 'Divya Rathi', role: 'Design & writing team', team: ['design', 'writing'], photo: '', bio: '', instagram: '' },
   { name: 'Ashwika Tripathi', role: 'Head of department', team: 'heads', photo: '', bio: '', instagram: '' },
-  { name: 'Anoushka Chandak', role: 'Design & writing intern', team: ['design', 'writing'], photo: '', bio: '', instagram: '' },
-  { name: 'Divya Rathi', role: 'Design & writing intern', team: ['design', 'writing'], photo: '', bio: '', instagram: '' },
-  { name: 'Anushka Paul', role: 'Design intern', team: 'design', photo: '', bio: '', instagram: '' },
-  { name: 'Syeda Tashirun Nabi', role: 'Design intern', team: 'design', photo: '', bio: '', instagram: '' },
-  { name: 'Ayushi Khemka', role: 'Design intern', team: 'design', photo: '', bio: '', instagram: '' },
-  { name: 'Sara Abedin', role: 'Writing intern', team: 'writing', photo: '', bio: '', instagram: '' },
-  { name: 'Ahel Sarkar', role: 'Writing intern', team: 'writing', photo: '', bio: '', instagram: '' },
-  { name: 'Pahal Sethi', role: 'Writing intern', team: 'writing', photo: '', bio: '', instagram: '' },
-  { name: 'Dhriti Agarwal', role: 'Writing intern', team: 'writing', photo: '', bio: '', instagram: '' },
-  { name: 'Diti Shah', role: 'Writing intern', team: 'writing', photo: '', bio: '', instagram: '' },
-  { name: 'Priyadarshini Hazra', role: 'Writing intern', team: 'writing', photo: '', bio: '', instagram: '' },
-  { name: 'Rishavi Banerjee', role: 'Writing intern', team: 'writing', photo: '', bio: '', instagram: '' },
-  { name: 'Dhairya Khetan', role: 'Tech intern', team: 'tech', photo: '', bio: '', instagram: '' },
-  { name: 'Priyam Agarwal', role: 'Tech intern', team: 'tech', photo: '', bio: '', instagram: '' },
-  { name: 'Bhavishya Agarwal', role: 'Tech intern', team: 'tech', photo: '', bio: '', instagram: '' },
+  { name: 'Diti Shah', role: 'Writing team', team: 'writing', photo: '', bio: '', instagram: '' },
+  { name: 'Ayushi Khemka', role: 'Design team', team: 'design', photo: '', bio: '', instagram: '' },
+  { name: 'Bhavishya Agarwal', role: 'Tech team', team: 'tech', photo: '', bio: '', instagram: '' },
+  { name: 'Priyadarshini Hazra', role: 'Writing team', team: 'writing', photo: '', bio: '', instagram: '' },
+  { name: 'Rishavi Banerjee', role: 'Writing team', team: 'writing', photo: '', bio: '', instagram: '' },
 ];
 
 // Every team someone is in, and the colour they wear (their first team's).
