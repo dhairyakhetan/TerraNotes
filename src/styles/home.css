@@ -54,6 +54,10 @@
 .w-opt:active{transform:translate(2px,2px);box-shadow:2px 2px 0 #111111 !important}
 
 .legend-chip:active{transform:translate(1px,1px)}
+/* TEMPORARY tiles view: tiles sink a little while pressed; no scrollbar */
+.tile{transition:transform .12s ease}
+.tile:active{transform:scale(.98);opacity:1}
+.tiles::-webkit-scrollbar{display:none}
 /* polaroids flash when tapped */
 .ph-open:active{background:rgba(255,255,255,.16) !important}
 
