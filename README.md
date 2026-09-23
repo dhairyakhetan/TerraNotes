@@ -74,4 +74,5 @@ Keep files under about 500 KB (JPG or WebP) so the site stays fast.
 - `src/styles/`: shared styles and each page's animations.
 - `public/logo.png`: globe mark and favicon.
 - The phone home page has 8 spots for team faces, 5 for photos and shows articles 01, 02, 03 and 05; the All articles page has 6 spots.
+  Spots without an article yet show the dotted "on the line soon" cards (`COMING_SOON`).
 - The web home page has the same 8 faces and 5 photos. Its article line holds every article followed by the `COMING_SOON` pegs, and grows with the lists.

@@ -64,11 +64,11 @@ function animateLine(el, hangs, kicks) {
   return () => { near.disconnect(); shown.disconnect(); el.removeEventListener('scroll', onScroll); cancelAnimationFrame(raf); };
 }
 
-// A peg with no story yet: dashed card with a handwritten note.
-export function SoonCard({ text, w = 172, h = 272, font = '27px' }) {
+// A peg with no story yet: dashed card with a handwritten note. clips = where its clips sit (px from the left), centred by default.
+export function SoonCard({ text, w = 172, h = 272, font = '27px', clips = [w / 2 - 14], style }) {
   return (
-    <div style={{ position: "absolute", left: "0", top: "0", width: `${w}px`, height: `${h}px` }}>
-      <div style={{ position: "absolute", left: "50%", top: "-7px", marginLeft: "-14px", width: "28px", height: "10px", background: "#D9D1BF", border: "1.5px solid #111111", boxSizing: "border-box", zIndex: "2" }} />
+    <div style={{ position: "absolute", left: "0", top: "0", width: `${w}px`, height: `${h}px`, ...style }}>
+      {clips.map((x) => <div key={x} style={{ position: "absolute", left: `${x}px`, top: "-7px", width: "28px", height: "10px", background: "#D9D1BF", border: "1.5px solid #111111", boxSizing: "border-box", zIndex: "2" }} />)}
       <div style={{ width: "100%", height: "100%", boxSizing: "border-box", background: "#FBF8F1", border: "2px dashed #8E7A5E", padding: "14px 14px 16px", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
         <span style={{ fontFamily: "'Space Mono', monospace", fontSize: "10px", letterSpacing: "1.4px", color: "#8E7A5E" }}>ON THE LINE SOON</span>
         <p style={{ margin: "0", fontFamily: "'Caveat', cursive", fontSize: font, lineHeight: "1.05", color: "#5B3A1E", transform: "rotate(-2deg)" }}>{text}</p>
