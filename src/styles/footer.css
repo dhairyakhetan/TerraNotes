@@ -13,8 +13,8 @@
 /* a faint cream ring, drawn over the video, so the black bubble still has an edge */
 .orbit-bubble::after{content:'';position:absolute;inset:0;border-radius:inherit;box-shadow:inset 0 0 0 1px rgb(251 248 239 / .22)}
 @keyframes orbit-drift{from{transform:translate(-50%,-50%) translate3d(-5px,-4px,0)}to{transform:translate(-50%,-50%) translate3d(5px,4px,0)}}
-/* laid out, not display:none, which stops the decode in some browsers */
-.orbit-video{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
+/* laid out and (barely) visible: display:none or opacity:0 stops the decode in some phone browsers */
+.orbit-video{position:absolute;left:50%;top:50%;width:1px;height:1px;opacity:.01;pointer-events:none}
 
 .site-footer{margin:0;background:var(--color-near-black);color:var(--color-cream);padding:0 1rem 2rem;text-align:center}
 .site-footer p{margin:0}

@@ -14,6 +14,8 @@ const BUBBLES = [
 ];
 const SIZE = { lg: '10.4%', md: '7.8%', sm: '5.8%' };
 const RETRY_MS = [1500, 4000, 10000];
+const STALL_MS = 8000;        // asked to play but no frame by then: retry
+const ACTIVATION = ['pointerup', 'touchend', 'click', 'keydown']; // events that count as a real tap/press
 const FRAME_MS = 1000 / 15;   // decoration: 15fps is plenty
 const BACKING = 160;          // canvas backing store per bubble
 
@@ -30,9 +32,9 @@ export default function OrbitBanner() {
     const v = video.current;
     v.muted = true; // required, or autoplay is refused
     const ctxs = canvases.current.map((c) => c.getContext('2d'));
-    let near = false, shown = !document.hidden;
+    let seen = false, shown = !document.hidden, loaded = false;
     let raf = 0, last = 0, painting = false;
-    let attempt = 0, retryTimer = 0, gen = 0, failedGen = -1, armed = false;
+    let attempt = 0, retryTimer = 0, stallTimer = 0, gen = 0, failedGen = -1, armed = false;
 
     const draw = (t) => {
       raf = requestAnimationFrame(draw);
@@ -42,52 +44,65 @@ export default function OrbitBanner() {
       if (!pw) return;
       ctxs.forEach((ctx, i) => ctx.drawImage(v, i * pw, 0, pw, h, 0, 0, BACKING, BACKING));
     };
-    const startPaint = () => { if (!painting && v.readyState >= 2) { painting = true; raf = requestAnimationFrame(draw); } };
+    const startPaint = () => { if (!painting && v.readyState >= 2) { clearTimeout(stallTimer); painting = true; raf = requestAnimationFrame(draw); } };
     const stopPaint = () => { painting = false; cancelAnimationFrame(raf); };
-    const wanted = () => near && shown;
+    // play only while the banner is actually on screen: phones (iOS) pause muted video that isn't visible
+    const wanted = () => seen && shown;
 
-    const onPointer = () => { armed = false; if (wanted()) play(); };
+    // no frame within STALL_MS of asking (slow or dropped connection, a stuck decoder): count it as a failure
+    const watch = (g) => { clearTimeout(stallTimer); stallTimer = setTimeout(() => { if (g === gen && wanted() && !painting) fail(g); }, STALL_MS); };
+    // autoplay refused (e.g. Low Power Mode): phones only allow a start inside a real tap, which ends on finger-up
+    const onActivate = () => { disarm(); attempt = 0; if (wanted()) { v.load(); play(); } };
+    const arm = () => { if (!armed) { armed = true; ACTIVATION.forEach((t) => addEventListener(t, onActivate, { passive: true })); } };
+    const disarm = () => { armed = false; ACTIVATION.forEach((t) => removeEventListener(t, onActivate)); };
     const fail = (g) => {
       if (g === failedGen) return; // a rejected play() and its error event are one failure
       failedGen = g;
       stopPaint();
-      clearTimeout(retryTimer);
+      clearTimeout(retryTimer); clearTimeout(stallTimer);
       if (attempt < RETRY_MS.length) {
         // after a media error play() alone keeps failing on the same element: reload first
         retryTimer = setTimeout(() => { if (wanted()) { v.load(); play(); } }, RETRY_MS[attempt++]);
-      } else if (!armed) {
-        // backoff spent (e.g. autoplay refused in Low Power Mode): wait for the reader's next tap
-        armed = true;
-        addEventListener('pointerdown', onPointer, { once: true });
-      }
+      } else arm(); // backoff spent: wait for the reader's next tap
     };
     const play = () => {
       const mine = ++gen;
+      watch(mine);
       v.play().catch(() => { if (mine === gen && wanted()) fail(mine); }); // ignore rejections from superseded plays
     };
-    const stop = () => { gen++; clearTimeout(retryTimer); stopPaint(); v.pause(); };
+    const stop = () => { gen++; clearTimeout(retryTimer); clearTimeout(stallTimer); stopPaint(); v.pause(); };
     const update = () => { if (!wanted()) stop(); else if (v.paused) play(); else startPaint(); };
 
-    const onPlaying = () => { attempt = 0; startPaint(); }; // only `playing` resets the attempts
-    const onWaiting = () => stopPaint();                    // a stall holds the last frame
+    const onPlaying = () => { attempt = 0; disarm(); startPaint(); }; // only `playing` resets the attempts
+    const onWaiting = () => { stopPaint(); watch(gen); };              // a stall holds the last frame
     const onError = () => { if (wanted()) fail(gen); };
+    const onPause = () => { if (wanted() && !v.ended) fail(gen); };     // paused by the browser, not by us: go again
     v.addEventListener('playing', onPlaying);
     v.addEventListener('waiting', onWaiting);
     v.addEventListener('error', onError);
+    v.addEventListener('pause', onPause);
 
-    // fetch only when near the viewport; a fling can deliver several crossings, so read the last one
-    const io = new IntersectionObserver((entries) => { near = entries[entries.length - 1].isIntersecting; update(); }, { rootMargin: '600px 0px' });
-    io.observe(stage.current);
+    // start downloading a little before the banner arrives, so it's ready when it does
+    const near = new IntersectionObserver((entries) => {
+      if (!loaded && entries[entries.length - 1].isIntersecting) { loaded = true; v.preload = 'auto'; v.load(); }
+    }, { rootMargin: '600px 0px' });
+    near.observe(stage.current);
+    // a fling can deliver several crossings, so read the last one
+    const onScreen = new IntersectionObserver((entries) => { seen = entries[entries.length - 1].isIntersecting; update(); });
+    onScreen.observe(stage.current);
     const onVisibility = () => { shown = !document.hidden; update(); };
     document.addEventListener('visibilitychange', onVisibility);
+    addEventListener('pageshow', onVisibility); // back/forward cache restores
 
     return () => {
-      io.disconnect();
+      near.disconnect(); onScreen.disconnect();
       document.removeEventListener('visibilitychange', onVisibility);
-      removeEventListener('pointerdown', onPointer);
+      removeEventListener('pageshow', onVisibility);
+      disarm();
       v.removeEventListener('playing', onPlaying);
       v.removeEventListener('waiting', onWaiting);
       v.removeEventListener('error', onError);
+      v.removeEventListener('pause', onPause);
       stop();
     };
   }, [reduced]);
@@ -103,8 +118,9 @@ export default function OrbitBanner() {
             </span>
           ))}
         </div>
+        {/* inside the stage, so it's on screen exactly when the bubbles are */}
+        {!reduced && <video ref={video} className="orbit-video" src={FOOTER_VIDEO.src} preload="none" muted loop playsInline aria-hidden="true" tabIndex={-1} />}
       </div>
-      {!reduced && <video ref={video} className="orbit-video" src={FOOTER_VIDEO.src} preload="none" muted loop playsInline aria-hidden="true" tabIndex={-1} />}
     </section>
   );
 }
