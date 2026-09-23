@@ -4,24 +4,28 @@ import { useEffect, useState } from 'react';
 const WEB = '(min-width: 900px)';
 const DESIGN_WIDTH = 1440;
 
+// Marks <html> with the layout and, on web, the scale (--web-zoom) the 1440px page is drawn at.
+// body, not <html>: with scrollbar-gutter the root's clientWidth still counts the scrollbar's strip
+const fit = () => document.documentElement.style.setProperty('--web-zoom', String(Math.min(1, document.body.clientWidth / DESIGN_WIDTH)));
+const apply = (web) => {
+  const root = document.documentElement;
+  root.dataset.layout = web ? 'web' : 'phone';
+  if (web) fit(); else root.style.removeProperty('--web-zoom');
+};
+
 export function useIsWeb() {
-  const [web, setWeb] = useState(() => matchMedia(WEB).matches);
+  // applied straight away, so the first jump to a section (/members…) already has the right header offset
+  const [web, setWeb] = useState(() => { const w = matchMedia(WEB).matches; apply(w); return w; });
   useEffect(() => {
     const m = matchMedia(WEB);
-    const on = () => setWeb(m.matches);
+    const on = () => { apply(m.matches); setWeb(m.matches); };
     m.addEventListener('change', on);
     return () => m.removeEventListener('change', on);
   }, []);
   useEffect(() => {
-    const root = document.documentElement;
-    root.dataset.layout = web ? 'web' : 'phone';
     if (!web) return;
-    // the web layout is drawn at 1440px; narrower windows get it scaled down to fit.
-    // body, not <html>: with scrollbar-gutter the root's clientWidth still counts the scrollbar's strip
-    const fit = () => root.style.setProperty('--web-zoom', String(Math.min(1, document.body.clientWidth / DESIGN_WIDTH)));
-    fit();
     addEventListener('resize', fit);
-    return () => { removeEventListener('resize', fit); root.style.removeProperty('--web-zoom'); };
+    return () => removeEventListener('resize', fit);
   }, [web]);
   return web;
 }

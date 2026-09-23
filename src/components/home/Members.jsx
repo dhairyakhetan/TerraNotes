@@ -55,7 +55,7 @@ export default function Members() {
       <div style={{ position: "absolute", right: "20px", top: "30px", textAlign: "right", fontFamily: "'Space Mono', monospace", fontSize: "9px", letterSpacing: "1.6px", lineHeight: "1.6", color: "#111111" }}>{count.toUpperCase()} OF US<br />TAP A FACE</div>
       <p style={{ position: "absolute", left: "20px", top: "136px", width: "340px", margin: "0", fontSize: "15px", lineHeight: "1.5", color: "#1E2723" }}>four desks, one terrace, {count} people who are all doing something else on a weekday. editorial writes it, visual shoots and lays it out, research keeps the numbers honest, operations makes sure a building says yes.</p>
       <div style={{ position: "absolute", left: "22px", top: "270px", width: "250px", fontFamily: "'Caveat', cursive", fontSize: "21px", lineHeight: "1.1", color: "#5B3A1E", transform: "rotate(-2deg)" }}>nobody here is a professional. that is the point.</div>
-      <svg width="390" height="1240" viewBox="0 0 390 1240" style={{ position: "absolute", left: "0", top: "0" }} aria-hidden="true" fill="none" stroke="#1E2723" strokeWidth="1.2" strokeDasharray="3 5" strokeLinecap="round" opacity=".5">
+      <svg width="390" height="1240" viewBox="0 0 390 1240" style={{ position: "absolute", left: "0", top: "0", pointerEvents: "none" }} aria-hidden="true" fill="none" stroke="#1E2723" strokeWidth="1.2" strokeDasharray="3 5" strokeLinecap="round" opacity=".5">
         <path d={TRAIL} />
       </svg>
       {/* legend */}

@@ -49,7 +49,7 @@ export default function WebMembers() {
           );
         })}
       </div>
-      <svg width="1440" height="900" viewBox="0 0 1440 900" style={{ position: "absolute", left: "0", top: "0" }} aria-hidden="true" fill="none" stroke="#1E2723" strokeWidth="1.3" strokeDasharray="3 6" strokeLinecap="round" opacity=".5">
+      <svg width="1440" height="900" viewBox="0 0 1440 900" style={{ position: "absolute", left: "0", top: "0", pointerEvents: "none" }} aria-hidden="true" fill="none" stroke="#1E2723" strokeWidth="1.3" strokeDasharray="3 6" strokeLinecap="round" opacity=".5">
         <path d={TRAIL} />
       </svg>
       {SPOTS.map((s, i) => {
@@ -100,7 +100,7 @@ export default function WebMembers() {
             <div style={{ fontFamily: "'Caveat', cursive", fontSize: "23px", lineHeight: "1.1", color: "#5B3A1E" }}>{sel.role}</div>
             <p style={{ margin: "0", fontSize: "15px", lineHeight: "1.5", color: "#333333" }}>{sel.bio || '[Two lines about them: where they work from, what they write or shoot, what they care about.]'}</p>
             <div style={{ display: "flex", gap: "10px" }}>
-              <Link className="btn" to="/#articles" onClick={close} style={{ minHeight: "44px", flexGrow: "1", display: "flex", alignItems: "center", justifyContent: "center", background: "#111111", color: "#FFFFFF", border: "2px solid #111111", fontFamily: "'Space Mono', monospace", fontWeight: "700", fontSize: "11px", letterSpacing: "1px", textDecoration: "none" }}>THEIR ARTICLES</Link>
+              <Link className="btn" to="/articles" onClick={close} style={{ minHeight: "44px", flexGrow: "1", display: "flex", alignItems: "center", justifyContent: "center", background: "#111111", color: "#FFFFFF", border: "2px solid #111111", fontFamily: "'Space Mono', monospace", fontWeight: "700", fontSize: "11px", letterSpacing: "1px", textDecoration: "none" }}>THEIR ARTICLES</Link>
               <a className="btn" href={instagramUrl(sel.instagram)} target="_blank" rel="noreferrer" style={{ minHeight: "44px", padding: "0 14px", display: "flex", alignItems: "center", background: "#FFFFFF", color: "#111111", border: "2px solid #111111", boxShadow: "3px 3px 0 #111111", fontFamily: "'Space Mono', monospace", fontWeight: "700", fontSize: "11px", letterSpacing: "1px", textDecoration: "none" }}>{`${sel.instagram ? `@${sel.instagram}` : '[@HANDLE]'} ↗`}</a>
             </div>
           </div>

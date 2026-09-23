@@ -21,7 +21,7 @@ export default function WebHome() {
     <div className="web">
       {/* the root must stay overflow: clip (not hidden) for the sticky header to work */}
       <div id="top" style={{ position: "relative", width: "1440px", height: "3510px", margin: "0 auto", overflow: "clip", background: "#F3EEE4", fontFamily: "'Figtree', system-ui, sans-serif", color: "#111111" }}>
-        <WebHeader home />
+        <WebHeader />
         {/* intro card; the red knot is where the "Articles" string is tied */}
         <section style={{ position: "absolute", left: "80px", top: "124px", width: "520px", transform: "rotate(-1deg)", zIndex: "3" }}>
           <div style={{ position: "absolute", left: "10px", top: "10px", width: "520px", height: "300px", background: "#111111" }} />

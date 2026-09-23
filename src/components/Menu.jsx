@@ -16,13 +16,7 @@ const STOPS = [
 export default function Menu({ current = 'home', onClose }) {
   const home = current === 'home';
   const close = () => { if (onClose) onClose(); };
-  const hrefs = {
-    home: home ? '#top' : '/',
-    articles: '/articles',
-    photos: home ? '#photos' : '/#photos',
-    words: home ? '#words' : '/#words',
-    members: home ? '#members' : '/#members',
-  };
+  const hrefs = { home: '/', articles: '/articles', photos: '/photos', words: '/words', members: '/members' };
   return (
     <nav aria-label="Main menu" className="main-menu" style={{ position: "relative", width: "390px", overflow: "hidden", background: "#111111", color: "#F3EEE4", fontFamily: "'Figtree', system-ui, sans-serif", display: "flex", flexDirection: "column" }}>
       {/* top bar */}
