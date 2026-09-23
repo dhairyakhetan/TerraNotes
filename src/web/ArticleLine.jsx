@@ -185,6 +185,9 @@ function runLine(r, pegs, width) {
   addEventListener('pointercancel', letGo);
   addEventListener('touchend', letGo);
   r.stopPull = stopPull; // the arrow buttons take over from a pull in progress
+  // easter egg (see lib/hello.js): a gust of wind swings every card on screen
+  const gust = () => { if (!still) { speed -= 3.2; swinging = true; tick(); } };
+  addEventListener('aq-wind', gust);
   const onResize = () => { measure(); tick(); };
   addEventListener('resize', onResize);
   progress();
@@ -195,6 +198,7 @@ function runLine(r, pegs, width) {
     el.removeEventListener('pointerdown', grab); el.removeEventListener('touchstart', grab);
     el.removeEventListener('wheel', stopPull); el.removeEventListener('keydown', stopPull);
     removeEventListener('pointerup', letGo); removeEventListener('pointercancel', letGo); removeEventListener('touchend', letGo);
+    removeEventListener('aq-wind', gust);
   };
 }
 

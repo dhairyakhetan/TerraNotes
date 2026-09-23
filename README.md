@@ -58,7 +58,7 @@ Leave a field `''` and the design's bracketed placeholder shows instead.
 - **Link previews per article:** the build writes `articles/<slug>.html` with that article's title and line, so shared links preview the article (served at `/articles/<slug>` via `cleanUrls` in `vercel.json`). It also writes `sitemap.xml` (when the site's address is known) and `robots.txt`.
 - **Back/Forward** return to where you were on the page.
 - **If a page crashes** (say, a typo in a data file) visitors get a "the line broke" card instead of a blank screen; the error is in the browser console.
-- **Console hello** for anyone who opens dev tools (`src/lib/hello.js`, names from `src/data/team.js`).
+- **Console hello** for anyone who opens dev tools (`src/lib/hello.js`), printed once the page has loaded. Easter egg: `aquaterra.wind()` sends a gust down the article line (web).
 - Icons (`public/icon-48.png`, `apple-touch-icon.png`, `icon-192.png`), `site.webmanifest` for "add to home screen", a no-JavaScript notice, security and caching headers (`vercel.json`), and a focus ring for keyboard users.
 
 ## Adding images
