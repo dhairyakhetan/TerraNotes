@@ -10,13 +10,16 @@ import { pad2 } from '../lib/format.js';
 
 const P = { fontFamily: "'Newsreader', Georgia, serif", fontSize: "18px", lineHeight: "1.6", color: "#1E2723", margin: "0" };
 
+// Drop cap: the first letter, plus any opening quote mark in front of it.
+const cap = (t) => t.match(/^[“‘"'(]*./u)[0];
+
 // One body block from the article's data (see src/data/articles.js).
 function Block({ b, first, a, tag }) {
   if (typeof b === 'string') {
     if (!first) return <p style={P}>{b}</p>;
     // drop cap = the paragraph's first letter (the title's while the paragraph is still a [placeholder])
     const draft = b.startsWith('[');
-    return <p style={P}><span style={{ float: "left", fontFamily: "'Archivo Black', Impact, sans-serif", fontSize: "62px", lineHeight: "0.8", margin: "6px 10px 0 0", padding: "6px 8px", background: tag.color, color: tag.ink, border: "2px solid #111111" }}>{draft ? a.title[0] : b[0]}</span>{draft ? b : b.slice(1)}</p>;
+    return <p style={P}><span style={{ float: "left", fontFamily: "'Archivo Black', Impact, sans-serif", fontSize: "62px", lineHeight: "0.8", margin: "6px 10px 0 0", padding: "6px 8px", background: tag.color, color: tag.ink, border: "2px solid #111111" }}>{draft ? a.title[0] : cap(b)}</span>{draft ? b : b.slice(cap(b).length)}</p>;
   }
   if (b.h2 != null) {
     return <h2 style={{ margin: "10px 0 0", fontFamily: "'Archivo Black', Impact, sans-serif", fontWeight: "400", fontSize: "24px", lineHeight: "1", textTransform: "uppercase", display: "flex", alignItems: "center", gap: "10px" }}><span style={{ width: "14px", height: "14px", background: tag.color, border: "2px solid #111111", flexShrink: "0" }} />{b.h2}</h2>;
@@ -121,7 +124,7 @@ export default function Article({ article: a, next }) {
             <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
               <div style={{ fontFamily: "'Space Mono', monospace", fontSize: "10px", letterSpacing: "1px" }}>WORDS BY</div>
               <div style={{ fontFamily: "'Archivo Black', Impact, sans-serif", fontSize: "20px", textTransform: "uppercase", lineHeight: "1" }}>{a.author || '[Name]'}</div>
-              <div style={{ fontFamily: "'Caveat', cursive", fontSize: "17px", color: "#5B3A1E" }}>{author ? author.role : '[role / one line about them]'}</div>
+              <div style={{ fontFamily: "'Caveat', cursive", fontSize: "17px", color: "#5B3A1E" }}>{author ? author.role : a.author ? '' : '[role / one line about them]'}</div>
             </div>
           </div>
           {/* next on the line */}
