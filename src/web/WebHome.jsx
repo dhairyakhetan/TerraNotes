@@ -3,7 +3,7 @@ import WebHeader from './WebHeader.jsx';
 import ArticleLine from './ArticleLine.jsx';
 import WebPhotoWall from './WebPhotoWall.jsx';
 import WebWords from './WebWords.jsx';
-import WebMembers from './WebMembers.jsx';
+import WebMembers, { WEB_MEMBERS_HEIGHT } from './WebMembers.jsx';
 import WebPhotoViewer from './WebPhotoViewer.jsx';
 import { NUMBER_WORDS } from '../components/home/Members.jsx';
 import { ARTICLES } from '../data/articles.js';
@@ -20,7 +20,7 @@ export default function WebHome() {
   return (
     <div className="web">
       {/* the root must stay overflow: clip (not hidden) for the sticky header to work */}
-      <div id="top" style={{ position: "relative", width: "1440px", height: "3510px", margin: "0 auto", overflow: "clip", background: "#F3EEE4", fontFamily: "'Figtree', system-ui, sans-serif", color: "#111111" }}>
+      <div id="top" style={{ position: "relative", width: "1440px", height: `${2610 + WEB_MEMBERS_HEIGHT}px`, margin: "0 auto", overflow: "clip", background: "#F3EEE4", fontFamily: "'Figtree', system-ui, sans-serif", color: "#111111" }}>
         <WebHeader />
         {/* intro card; the red knot is where the "Articles" string is tied */}
         <section style={{ position: "absolute", left: "80px", top: "124px", width: "520px", transform: "rotate(-1deg)", zIndex: "3" }}>

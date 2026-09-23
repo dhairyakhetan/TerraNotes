@@ -38,7 +38,7 @@ Leave a field `''` and the design's bracketed placeholder shows instead.
 | File | What's in it |
 |------|--------------|
 | `src/data/site.js` | Home intro text, Instagram handle |
-| `src/data/team.js` | Teams (legend colours) and members: name, role, team, photo, bio, Instagram |
+| `src/data/team.js` | Teams (legend colours) and members: name, role, team (or two teams), photo, bio, Instagram |
 | `src/data/articles.js` | Tags (colours) and articles: title, tag, cover, author, date, read time, body. `COMING_SOON`: the notes on the empty pegs after the articles (web only) |
 | `src/data/photos.js` | Photo wall and "See every photo" viewer |
 | `src/data/words.js` | "Words we should bring back" game |
@@ -73,6 +73,6 @@ Keep files under about 500 KB (JPG or WebP) so the site stays fast.
 - `src/lib/`: shared logic: the words game, which layout to show (`layout.js`), scroll lock.
 - `src/styles/`: shared styles and each page's animations.
 - `public/logo.png`: globe mark and favicon.
-- The phone home page has 8 spots for team faces, 5 for photos and shows articles 01, 02, 03 and 05; the All articles page has 6 spots.
+- The team faces lay themselves out for however many members `src/data/team.js` lists, on both layouts. The phone home page has 5 spots for photos and shows articles 01, 02, 03 and 05; the All articles page has 6 spots.
   Spots without an article yet show the dotted "on the line soon" cards (`COMING_SOON`).
-- The web home page has the same 8 faces and 5 photos. Its article line holds every article followed by the `COMING_SOON` pegs, and grows with the lists.
+- The web home page has the same 5 photos. Its article line holds every article followed by the `COMING_SOON` pegs, and grows with the lists.
