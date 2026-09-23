@@ -8,7 +8,7 @@
 //   body:     the article, top to bottom. Each item is one block:
 //     'Some text.'                                         paragraph (the first one gets the drop cap)
 //     { h2: 'Heading' }                                    section heading
-//     { quote: 'The line.', by: 'Who said it' }            pull quote
+//     { quote: 'The line.', by: 'who said it' }            pull quote
 //     { photo: '/articles/x.jpg', caption: '' }            pinned photo
 //     { photos: [{ photo, caption }, { photo, caption }] } two small photos
 //     { log: [['PLACE', 'Kolkata'], ['VISITS', '3']] }     yellow field log box
@@ -47,14 +47,21 @@ export const ARTICLES = [
     tag: 'Field notes',
     cover: '',
     alt: 'wetlands',
-    author: '',
-    date: '',
-    readTime: '',
+    author: 'Ananya',
+    date: '19 Jul 2026',
+    readTime: '6',
     body: [
-      '[Opening paragraph. Set the scene: where you were, what time it was, what the air felt like. Two or three sentences that pull the reader straight into the wetland before any explanation.]',
-      '[Second paragraph. Why this place matters, and why you went back twice. Keep it plain and specific — a detail only someone who was there would notice.]',
-      { log: [['PLACE', '[Location]'], ['VISITS', '2 mornings'], ['DATES', '[Dates]'], ['KIT', '1 flask of tea']] },
-      ...DRAFT.slice(3),
+      'The first morning we got there before the birds did. The marsh was a sheet of grey, and the only sound was a pump somewhere behind the reeds, working as if it had somewhere to be.',
+      'We went back twice because the first visit felt like a guess. A place changes with the light, and we wanted to count what was there, not what we hoped was there.',
+      { log: [['PLACE', 'wetland edge, east'], ['VISITS', '2 mornings'], ['DATES', '12 & 19 July'], ['KIT', '1 flask of tea']] },
+      "On the second dawn a man cutting grass for his cows walked us along the edge. He pointed at the places where water used to stand in the dry season and now doesn't.",
+      { quote: 'Nobody fills in a marsh all at once. They do it one truck at a time.', by: 'a grass-cutter, on the second morning' },
+      'Most of what we saw was ordinary: egrets, water hyacinth, plastic caught in the roots. It is the ordinary that disappears first, because nobody writes it down.',
+      { photo: '', caption: 'the eastern edge, just after sunrise' },
+      "By the time the tea in the flask went cold we had a list, a few photos and a map covered in pencil. It isn't science. It's a record, and a record is a start.",
+      { h2: 'What we counted' },
+      "We'll go back next season with the same list. If it gets shorter, at least we'll know by how much.",
+      { photos: [{ photo: '', caption: 'egrets, counted twice' }, { photo: '', caption: 'the pump behind the reeds' }] },
     ],
   },
   {
@@ -64,10 +71,22 @@ export const ARTICLES = [
     tag: 'Reportage',
     cover: '',
     alt: 'the river',
-    author: '',
-    date: '',
-    readTime: '',
-    body: DRAFT,
+    author: 'Rehan',
+    date: '9 Aug 2026',
+    readTime: '5',
+    body: [
+      'We borrowed a water-quality meter from a friend of a friend, then borrowed it again when the batteries died halfway through the first day.',
+      'The plan was simple: walk the riverbank, stop wherever people actually use the water, and take a reading. Bathing ghats, washing steps, a pipe nobody would explain.',
+      { log: [['PLACE', 'the ghats, north to south'], ['STOPS', '9'], ['KIT', '1 borrowed meter']] },
+      "The numbers moved in ways we didn't expect. Cleaner near a busy ghat, worse by a quiet wall where a drain came in unannounced.",
+      { quote: "The river doesn't forget what you put in it. It just carries it somewhere else.", by: 'a boatman, near the third stop' },
+      'We are not scientists, and a borrowed meter is not a lab. But the pattern was clear enough to be worth writing down and checking again.',
+      { photo: '', caption: 'testing at the washing steps' },
+      'The people we met knew most of it already. They could tell you which step to avoid and which day the water smells different.',
+      { h2: 'The readings' },
+      "What they didn't have was the numbers. Now there are some, rough as they are, and we're sharing all of them.",
+      { photos: [{ photo: '', caption: 'reading no. 4, the washing steps' }, { photo: '', caption: 'the drain nobody explained' }] },
+    ],
   },
   {
     slug: 'six-months-of-compost',
@@ -76,10 +95,22 @@ export const ARTICLES = [
     tag: 'Logbook',
     cover: '',
     alt: 'compost',
-    author: '',
-    date: '',
-    readTime: '',
-    body: DRAFT,
+    author: 'Nishtha',
+    date: '30 Aug 2026',
+    readTime: '7',
+    body: [
+      'It started with a bin, a bag of dry leaves and a lot of confidence. The confidence lasted about three weeks.',
+      'Week three smelled like a mistake. Too wet, not enough air, and a neighbour who started closing her window when we came up the stairs.',
+      { log: [['PLACE', 'our terrace'], ['DURATION', '6 months'], ['KIT', '1 bin, 1 stick']] },
+      'So we kept a log. What went in, how it looked, how it smelled, and what we changed. Most changes were small: more leaves, a daily turn, a lid with holes.',
+      { quote: 'Compost is mostly patience with a bad smell in the middle.', by: 'our logbook, month two' },
+      'By month three it smelled like soil after rain. By month five there was something dark and crumbly at the bottom that we were ridiculously proud of.',
+      { photo: '', caption: 'the bin, month five' },
+      'The terrace plants got the first batch. The neighbour got the second, which is how she started opening her window again.',
+      { h2: 'Month by month' },
+      'The whole log is below, including the bad weeks. Especially the bad weeks.',
+      { photos: [{ photo: '', caption: 'week three, the bad week' }, { photo: '', caption: 'month five, the good stuff' }] },
+    ],
   },
   {
     slug: 'a-history-of-the-plastic-chair',
@@ -117,4 +148,14 @@ export const ARTICLES = [
     readTime: '',
     body: DRAFT,
   },
+];
+
+// Web home only: empty pegs after the real articles, so the line has something to scroll. One peg per line.
+export const COMING_SOON = [
+  "this peg's saving a spot for the next one",
+  'still drying. check back soon.',
+  'out in the field, back with notes',
+  'the next story is still in the wash',
+  "reserved for something we haven't seen yet",
+  'more on the line soon. pinky promise.',
 ];

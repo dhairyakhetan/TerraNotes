@@ -2,8 +2,17 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <!-- The design is a fixed 390px phone layout: phones scale it to fit, wider screens centre it. -->
-    <meta name="viewport" content="width=390" />
+    <!-- Phones, and tablets held upright: the 390px phone layout, scaled to fit.
+         Tablets turned sideways: real width, so they get the web layout (900px and up). Desktop browsers ignore this tag. -->
+    <meta name="viewport" content="width=390" id="viewport" />
+    <script>
+      if (Math.min(screen.width, screen.height) >= 700) {
+        var land = matchMedia('(orientation: landscape)');
+        var fit = function () { document.getElementById('viewport').content = land.matches ? 'width=device-width, initial-scale=1' : 'width=390'; };
+        fit();
+        land.addEventListener('change', fit);
+      }
+    </script>
     <meta name="theme-color" content="#F3EEE4" />
     <meta name="description" content="Terranotes by Aquaterra: notes from where the land meets the water." />
     <title>Aquaterra</title>

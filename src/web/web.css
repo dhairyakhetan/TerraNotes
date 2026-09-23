@@ -1,0 +1,60 @@
+/* Web layout (900px and up). Drawn at 1440px and scaled down to fit narrower windows (--web-zoom, lib/layout.js).
+   Mouse users: hover lifts things out of their hard shadow, press drops them in. */
+.web{zoom:var(--web-zoom,1)}
+html[data-layout="web"]{scroll-padding-top:calc(80px * var(--web-zoom,1))}
+.web a{color:#111111}
+.web a,.web button{cursor:pointer}
+.web button[disabled]{cursor:default}
+.web :is(a,button):active{opacity:1}
+
+/* nav: underline slides in on hover */
+.nav-link{position:relative;text-decoration:none;padding:12px 0}
+.nav-link::after{content:"";position:absolute;left:0;right:0;bottom:6px;height:3px;background:currentColor;transform:scaleX(0);transform-origin:left;transition:transform 260ms cubic-bezier(0.32,0.72,0,1)}
+.nav-link:hover::after{transform:scaleX(1)}
+
+/* cards and buttons: lift on hover, drop into the shadow on press (`translate` keeps any tilt) */
+.card-link article{transition:translate 200ms cubic-bezier(0.32,0.72,0,1),box-shadow 200ms cubic-bezier(0.32,0.72,0,1)}
+.card-link:hover article{translate:-3px -3px;box-shadow:10px 10px 0 #111111 !important}
+.card-link:active article{translate:3px 3px;box-shadow:2px 2px 0 #111111 !important}
+.btn{transition:translate 160ms ease,box-shadow 160ms ease}
+.btn:hover{translate:-2px -2px}
+.btn:active{translate:2px 2px}
+.btn[disabled]:hover,.btn[disabled]:active{translate:none}
+.web .w-opt:active{transform:none}
+
+/* hanging cards: only the cards catch the mouse; hovering one holds its swing still */
+.hang .card-link,.hang .card-link *{pointer-events:auto}
+.web .sway:hover,.web .sway:hover .flutter{animation-play-state:paused}
+
+/* the line of write-ups: native sideways scroll, loose snapping, thin ink scrollbar */
+.art-scroller{scrollbar-width:thin;scrollbar-color:#111111 transparent;overscroll-behavior-x:contain}
+.art-scroller::-webkit-scrollbar{height:6px}
+.art-scroller::-webkit-scrollbar-thumb{background:#111111}
+.art-scroller .hang{scroll-snap-align:start}
+.art-scroller:focus-visible{outline:3px solid #3DA5F4;outline-offset:4px}
+
+/* photo wall: on web the photos stay still; the glint still crosses them */
+.web .twist{animation:none}
+
+/* team: faces hold still on hover and grow a little; legend chips light up */
+.web .face:hover{animation-play-state:paused}
+.web .bub{transition:transform 180ms cubic-bezier(0.32,0.72,0,1)}
+.web .bub:hover{transform:scale(1.05)}
+.web .legend-chip{transition:background-color 160ms ease}
+.web .legend-chip:hover{background:#E6E0D3 !important;color:#111111 !important}
+.web-pop{animation:webPop 380ms cubic-bezier(0.32,0.72,0,1) both}
+@keyframes webPop{from{opacity:0;transform:translateY(20px) scale(.95) rotate(-2deg)}to{opacity:1;transform:rotate(-1deg)}}
+
+/* article page: the field log fades up keeping its tilt */
+.web aside.rise-in{animation-name:riseInTilt}
+@keyframes riseInTilt{from{opacity:0;transform:translateY(18px) rotate(1.5deg)}to{opacity:1;transform:rotate(1.5deg)}}
+
+/* photo viewer: fills the visible screen; --ph = photo height, shrinks on short screens so everything fits */
+.web-viewer{--vh:100vh;height:calc(var(--vh) / var(--web-zoom,1));overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain}
+@supports (height:100dvh){.web-viewer{--vh:100dvh}}
+.web-viewer{--ph:clamp(240px, calc(var(--vh) / var(--web-zoom,1) - 430px), 470px)}
+
+@media (prefers-reduced-motion: reduce){
+.web-pop,.web aside.rise-in{animation:none}
+.card-link article,.btn{transition:none}
+}

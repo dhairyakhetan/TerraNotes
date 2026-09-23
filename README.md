@@ -1,7 +1,12 @@
-# Aquaterra — Terranotes (mobile)
+# Aquaterra — Terranotes
 
-The Aquaterra mobile site, built with Vite + React and ready for Vercel.
-It's a fixed 390px phone layout: phones scale it to fit, and wider screens centre it.
+The Aquaterra site, built with Vite + React and ready for Vercel. It has two layouts:
+
+- **Phone** (`src/pages/`): a fixed 390px layout. Phones, and tablets held upright, scale it to fit.
+- **Web** (`src/web/`): a 1440px layout for windows 900px wide and up, and tablets turned sideways.
+  Narrower windows get it scaled down to fit; wider ones centre it.
+
+Both read the same data files, so an edit shows up in both.
 
 ## Run it
 
@@ -22,7 +27,7 @@ rewrite so links like `/articles/who-owns-the-roof` work on refresh.
 | Path | Page |
 |------|------|
 | `/` | Home: intro, hanging articles, photo wall, words game, team |
-| `/articles` | All articles |
+| `/articles` | All articles (on web: jumps to the article line on the home page) |
 | `/articles/:slug` | One article (six slugs, from `src/data/articles.js`) |
 
 ## Editing content
@@ -34,7 +39,7 @@ Leave a field `''` and the design's bracketed placeholder shows instead.
 |------|--------------|
 | `src/data/site.js` | Home intro text, Instagram handle |
 | `src/data/team.js` | Teams (legend colours) and members: name, role, team, photo, bio, Instagram |
-| `src/data/articles.js` | Tags (colours) and articles: title, tag, cover, author, date, read time, body |
+| `src/data/articles.js` | Tags (colours) and articles: title, tag, cover, author, date, read time, body. `COMING_SOON`: the notes on the empty pegs after the articles (web only) |
 | `src/data/photos.js` | Photo wall and "See every photo" viewer |
 | `src/data/words.js` | "Words we should bring back" game |
 
@@ -62,8 +67,11 @@ Keep files under about 500 KB (JPG or WebP) so the site stays fast.
 
 ## Code layout
 
-- `src/pages/`: Home, All articles, Article.
-- `src/components/`: header, footer, menu, article card, image slot; `components/home/` has the home page sections.
+- `src/pages/`: phone pages: Home, All articles, Article.
+- `src/web/`: web pages and sections, plus `web.css` (hover states, scaling).
+- `src/components/`: header, footer, menu, article card, image slot; `components/home/` has the phone home page sections.
+- `src/lib/`: shared logic: the words game, which layout to show (`layout.js`), scroll lock.
 - `src/styles/`: shared styles and each page's animations.
 - `public/logo.png`: globe mark and favicon.
-- The home page has 8 spots for team faces, 5 for photos and shows articles 01, 02, 03 and 05; the All articles page has 6 spots.
+- The phone home page has 8 spots for team faces, 5 for photos and shows articles 01, 02, 03 and 05; the All articles page has 6 spots.
+- The web home page has the same 8 faces and 5 photos. Its article line holds every article followed by the `COMING_SOON` pegs, and grows with the lists.

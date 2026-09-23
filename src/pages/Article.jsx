@@ -25,7 +25,7 @@ function Block({ b, first, a, tag }) {
     return (
       <blockquote style={{ margin: "8px 0", boxSizing: "border-box", width: "342px", transform: "rotate(-1.5deg)", background: "#FFFFFF", border: "2px solid #111111", boxShadow: `8px 8px 0 ${tag.color}`, padding: "20px 18px 18px" }}>
         <div style={{ fontFamily: "'Archivo Black', Impact, sans-serif", fontSize: "26px", lineHeight: "1", textTransform: "uppercase", letterSpacing: "-0.4px" }}>{`“${b.quote}”`}</div>
-        <div style={{ marginTop: "12px", fontFamily: "'Space Mono', monospace", fontSize: "10px", letterSpacing: "1px" }}>{`— ${b.by}`}</div>
+        <div style={{ marginTop: "12px", fontFamily: "'Space Mono', monospace", fontSize: "10px", letterSpacing: "1px", textTransform: "uppercase" }}>{`— ${b.by}`}</div>
       </blockquote>
     );
   }

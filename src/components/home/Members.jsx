@@ -16,9 +16,9 @@ const SPOTS = [
 ];
 // Dotted trail through the face centres, spot by spot.
 const TRAIL = 'M262 392 Q299 484 336 524 M336 524 Q270.5 577 205 578 M205 578 Q140.5 631 76 632 M76 632 Q131 738 186 792 M186 792 Q252 773 318 702 M318 702 Q309 823 300 892 M300 892 Q185 914 70 884';
-const NUMBER_WORDS = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve'];
+export const NUMBER_WORDS = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve'];
 
-const PhotoIcon = ({ size }) => (
+export const PhotoIcon = ({ size }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="#444" strokeWidth="1.6" aria-hidden="true">
     <rect x="3" y="4" width="18" height="16" rx="1" />
     <circle cx="9" cy="10" r="2" />
@@ -27,8 +27,8 @@ const PhotoIcon = ({ size }) => (
 );
 const photoFill = { width: "100%", height: "100%", objectFit: "cover", display: "block" };
 
-const Chair = ({ empty }) => (
-  <svg width="34" height="40" viewBox="0 0 34 40" aria-hidden="true">
+export const Chair = ({ empty, width = 34, height = 40 }) => (
+  <svg width={width} height={height} viewBox="0 0 34 40" aria-hidden="true">
     <g fill="none" stroke="#111111" strokeWidth="2.4" strokeLinecap="square" strokeDasharray={empty ? "3 3" : undefined}>
       <path d="M7 2 V22" />
       <rect x="7" y="18" width="21" height="5" fill={empty ? "none" : "#111111"} />
