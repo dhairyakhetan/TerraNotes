@@ -1,10 +1,10 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useLayoutEffect } from 'react';
 import { usePauseOffscreen } from '../../lib/offscreen.js';
 import { Link } from 'react-router';
 import { MEMBERS, TEAMS, teamsOf } from '../../data/team.js';
 import { NoArticlesYet, articlesBy, byLink } from '../../lib/byWriter.jsx';
 import { usePresence } from '../../lib/presence.js';
-import { teamLinks, useFaceColors } from '../../lib/team.js';
+import { profileTop, teamLinks, useFaceColors } from '../../lib/team.js';
 import { instagramUrl, pad2 } from '../../lib/format.js';
 
 // Faces sit in loose rows of 3 and 2 (a honeycomb), each nudged a little so it looks hand-placed.
@@ -63,7 +63,12 @@ export default function Members() {
   useEffect(() => setEmpty(false), [open]);
   const card = useRef(null);
   // a profile card opening off-screen scrolls itself into view
-  useEffect(() => { if (open != null && card.current) card.current.scrollIntoView({ block: 'nearest', behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' }); }, [open]);
+  // the card opens on screen, as central as it can be while level with the face (measured before it's painted)
+  const [cardAt, setCardAt] = useState(null);
+  useLayoutEffect(() => {
+    if (open == null || !card.current) return;
+    setCardAt(profileTop({ section: self.current, header: 64, cy: SPOTS[open].cy, height: card.current.offsetHeight }));
+  }, [open]);
   const count = NUMBER_WORDS[MEMBERS.length] || String(MEMBERS.length);
   const [shown, leaving] = usePresence(open, 170);     // stays on screen while it animates closed
   const [emptyShown, emptyLeaving] = usePresence(empty ? true : null, 140);
@@ -128,7 +133,7 @@ export default function Members() {
       {sel && (
         <>
           <button className={leaving ? 'fade-out' : 'fade-in'} onClick={close} aria-label="Close profile" style={{ position: "absolute", left: "0", top: "0", width: "390px", height: `${MEMBERS_HEIGHT}px`, border: "0", padding: "0", background: "rgba(17,17,17,.55)" }} />
-          <div ref={card} className={leaving ? 'card-lift' : 'card-drop'} role="dialog" aria-label="Member profile" style={{ position: "absolute", left: "28px", top: `${Math.max(120, Math.min(SPOTS[shown].top - 60, MEMBERS_HEIGHT - 540))}px`, width: "334px", boxSizing: "border-box", background: "#FFFFFF", border: "2px solid #111111", boxShadow: `8px 8px 0 ${selColor}`, padding: "18px", display: "flex", flexDirection: "column", gap: "12px", transform: "rotate(-1deg)" }}>
+          <div ref={card} className={leaving ? 'card-lift' : 'card-drop'} role="dialog" aria-label="Member profile" style={{ position: "absolute", left: "28px", top: `${cardAt ?? Math.max(120, Math.min(SPOTS[shown].top - 60, MEMBERS_HEIGHT - 540))}px`, width: "334px", boxSizing: "border-box", background: "#FFFFFF", border: "2px solid #111111", boxShadow: `8px 8px 0 ${selColor}`, padding: "18px", display: "flex", flexDirection: "column", gap: "12px", transform: "rotate(-1deg)" }}>
             {emptyShown && <NoArticlesYet name={sel.name} leaving={emptyLeaving} onOk={() => setEmpty(false)} onAll={close} />}
             <div style={{ position: "absolute", left: "50%", top: "-7px", marginLeft: "-17px", width: "34px", height: "10px", background: selColor, border: "1.5px solid #111111", boxSizing: "border-box" }} />
             <button className="press" onClick={close} aria-label="Close profile" style={{ "--c": "#111111", position: "absolute", right: "10px", top: "10px", width: "44px", height: "44px", background: "#FFFFFF", border: "2px solid #111111", boxShadow: "3px 3px 0 #111111", padding: "0", display: "flex", alignItems: "center", justifyContent: "center" }}>

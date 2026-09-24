@@ -1,11 +1,11 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useLayoutEffect } from 'react';
 import { usePauseOffscreen } from '../lib/offscreen.js';
 import { Link } from 'react-router';
 import { Chair, NUMBER_WORDS, PhotoIcon } from '../components/home/Members.jsx';
 import { MEMBERS, TEAMS, teamsOf } from '../data/team.js';
 import { NoArticlesYet, articlesBy, byLink } from '../lib/byWriter.jsx';
 import { usePresence } from '../lib/presence.js';
-import { teamLinks, useFaceColors } from '../lib/team.js';
+import { profileTop, teamLinks, useFaceColors } from '../lib/team.js';
 import { instagramUrl, pad2 } from '../lib/format.js';
 
 // Faces sit in loose rows of 5 and 4 right of the text (a honeycomb), each nudged a little so it looks hand-placed.
@@ -39,8 +39,17 @@ export default function WebMembers() {
   const [empty, setEmpty] = useState(false); // "their articles" tapped for a writer with none yet
   useEffect(() => setEmpty(false), [open]);
   const card = useRef(null);
-  // a profile card opening off-screen scrolls itself into view
-  useEffect(() => { if (open != null && card.current) card.current.scrollIntoView({ block: 'nearest', behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' }); }, [open]);
+  // the card opens on screen beside the face: on the side nearer the middle (if it fits), and as central up and down
+  // as it can be while level with the face (measured before it's painted)
+  const [cardAt, setCardAt] = useState(null);
+  useLayoutEffect(() => {
+    if (open == null || !card.current) return;
+    const s = SPOTS[open], W = 360, gap = s.size / 2 + 28;
+    const sides = [s.cx + gap, s.cx - gap - W], fits = sides.filter((x) => x >= 16 && x + W <= 1424);
+    const left = (fits.length ? fits : sides).sort((a, b) => Math.abs(a + W / 2 - 720) - Math.abs(b + W / 2 - 720))[0];
+    const zoom = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--web-zoom')) || 1;
+    setCardAt({ left: Math.round(left), top: profileTop({ section: self.current, header: 80, cy: s.cy, height: card.current.offsetHeight, zoom }) });
+  }, [open]);
   const count = NUMBER_WORDS[MEMBERS.length] || String(MEMBERS.length);
   const [shown, leaving] = usePresence(open, 170);     // stays on screen while it animates closed
   const [emptyShown, emptyLeaving] = usePresence(empty ? true : null, 140);
@@ -105,7 +114,7 @@ export default function WebMembers() {
       {sel && (
         <>
           <button className={leaving ? 'fade-out' : 'fade-in'} onClick={close} aria-label="Close profile" style={{ position: "absolute", left: "0", top: "0", width: "1440px", height: `${WEB_MEMBERS_HEIGHT}px`, border: "0", padding: "0", background: "rgba(17,17,17,.35)", cursor: "default" }} />
-          <div className={leaving ? 'card-lift' : 'card-drop'} ref={card} role="dialog" aria-label={`${sel.name} — profile`} style={{ position: "absolute", left: `${spot.cx < 1000 ? Math.round(spot.cx + r + 28) : Math.round(spot.cx - r - 28 - 360)}px`, top: `${Math.max(20, Math.min(Math.round(spot.cy - 150), WEB_MEMBERS_HEIGHT - 530))}px`, width: "360px", boxSizing: "border-box", background: "#FFFFFF", border: "2px solid #111111", boxShadow: `9px 9px 0 ${color}`, padding: "22px", display: "flex", flexDirection: "column", gap: "12px", transform: "rotate(-1deg)" }}>
+          <div className={leaving ? 'card-lift' : 'card-drop'} ref={card} role="dialog" aria-label={`${sel.name} — profile`} style={{ position: "absolute", left: `${cardAt ? cardAt.left : spot.cx < 1000 ? Math.round(spot.cx + r + 28) : Math.round(spot.cx - r - 28 - 360)}px`, top: `${cardAt ? cardAt.top : Math.max(20, Math.min(Math.round(spot.cy - 150), WEB_MEMBERS_HEIGHT - 530))}px`, width: "360px", boxSizing: "border-box", background: "#FFFFFF", border: "2px solid #111111", boxShadow: `9px 9px 0 ${color}`, padding: "22px", display: "flex", flexDirection: "column", gap: "12px", transform: "rotate(-1deg)" }}>
             {emptyShown && <NoArticlesYet name={sel.name} leaving={emptyLeaving} onOk={() => setEmpty(false)} onAll={close} />}
             <div style={{ position: "absolute", left: "50%", top: "-8px", marginLeft: "-18px", width: "36px", height: "11px", background: color, border: "1.5px solid #111111", boxSizing: "border-box" }} />
             <button className="btn" onClick={close} aria-label="Close profile" style={{ position: "absolute", right: "12px", top: "12px", width: "44px", height: "44px", background: "#FFFFFF", border: "2px solid #111111", boxShadow: "3px 3px 0 #111111", padding: "0", display: "flex", alignItems: "center", justifyContent: "center" }}>

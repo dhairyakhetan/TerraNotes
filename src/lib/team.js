@@ -44,3 +44,17 @@ export function useFaceColors(filter) {
   };
   return { colorFor, fade: mode.current === 'slow' ? '3s' : '0.8s' };
 }
+
+// Where a profile card opens (px from the top of the team section): as near the middle of the screen as it can be
+// while staying level with the tapped face (the face's centre inside the card, `hug` px in from either end), and
+// always wholly on screen. section: the team <section>; header: the sticky header's height; cy: the face's centre;
+// zoom: the web page's scale (--web-zoom).
+export function profileTop({ section, header, cy, height, zoom = 1, hug = 70, pad = 16 }) {
+  const y0 = scrollY / zoom - section.offsetTop;                // the top of the screen, in section px
+  const vTop = y0 + header + pad, vBot = y0 + innerHeight / zoom - pad;
+  let top = (vTop + vBot - height) / 2;                         // the middle of the screen…
+  top = Math.min(Math.max(top, cy - height + hug), cy - hug);   // …but level with the face
+  top = Math.min(Math.max(top, 0), section.offsetHeight - height); // inside the section
+  top = vBot - vTop >= height ? Math.min(Math.max(top, vTop), vBot - height) : vTop; // on screen wins (too tall: top edge at the top)
+  return Math.round(top);
+}
