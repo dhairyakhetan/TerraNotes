@@ -53,6 +53,15 @@ export const Chair = ({ empty, width = 34, height = 40 }) => (
 );
 
 // "Meet the team": tap a team in the legend to fade the others, tap a face for its profile.
+// a crown for the one card that asks for it (crown: true in data/team.js)
+const Crown = () => (
+  <svg className="crown" width="44" height="34" viewBox="0 0 44 34" aria-hidden="true" style={{ position: "absolute", left: "-12px", top: "-18px", transform: "rotate(-22deg)", zIndex: "1" }}>
+    <path d="M4 28 L2 8 L13 17 L22 3 L31 17 L42 8 L40 28 Z" fill="#F7C21A" stroke="#111111" strokeWidth="2.4" strokeLinejoin="round" />
+    <path d="M4 28 H40" stroke="#111111" strokeWidth="2.4" />
+    <circle cx="22" cy="21" r="2.6" fill="#F0442B" stroke="#111111" strokeWidth="1.4" /><circle cx="12" cy="23" r="1.8" fill="#3DA5F4" stroke="#111111" strokeWidth="1.2" /><circle cx="32" cy="23" r="1.8" fill="#3DA5F4" stroke="#111111" strokeWidth="1.2" />
+  </svg>
+);
+
 export default function Members() {
   const self = useRef(null);
   usePauseOffscreen(self);
@@ -142,15 +151,18 @@ export default function Members() {
                 <path d="M17 3 L3 17" />
               </svg>
             </button>
-            <div style={{ width: "96px", height: "96px", borderRadius: "50%", border: "2px solid #111111", background: "#F2F1ED", boxShadow: `6px 5px 0 ${selColor}`, display: "flex", alignItems: "center", justifyContent: "center", overflow: sel.photo ? "hidden" : undefined }}>
+            <div style={{ position: "relative", alignSelf: "flex-start" }}>
+              {sel.crown && <Crown />}
+              <div style={{ width: "96px", height: "96px", borderRadius: "50%", border: "2px solid #111111", background: "#F2F1ED", boxShadow: `6px 5px 0 ${selColor}`, display: "flex", alignItems: "center", justifyContent: "center", overflow: sel.photo ? "hidden" : undefined }}>
               {sel.photo ? <img src={sel.photo} alt={sel.name} style={photoFill} /> : <PhotoIcon size="22" />}
+            </div>
             </div>
             <div style={{ fontFamily: "'Archivo Black', Impact, sans-serif", fontSize: "30px", lineHeight: "0.95", textTransform: "uppercase", color: "#111111" }}>{sel.name}</div>
             <div style={{ fontFamily: "'Caveat', cursive", fontSize: "20px", lineHeight: "1.1", color: "#5B3A1E" }}>{sel.role}</div>
             <p style={{ margin: "0", fontSize: "14px", lineHeight: "1.5", color: "#333333" }}>{sel.bio || '[Two lines about them: where they work from, what they write or shoot, what they care about.]'}</p>
             {/* what their team made; only writers have articles */}
             {teamsOf(sel).map((t) => (
-              <p key={t} style={{ margin: "0", paddingLeft: "10px", borderLeft: `3px solid ${TEAMS[t].color}`, fontSize: "13px", lineHeight: "1.45", color: "#1E2723" }}><strong style={{ fontWeight: "600" }}>{TEAMS[t].label}</strong>{` — ${TEAMS[t].credit[0].toLowerCase()}${TEAMS[t].credit.slice(1)}.`}</p>
+              <p key={t} style={{ margin: "0", paddingLeft: "10px", borderLeft: `3px solid ${TEAMS[t].color}`, fontSize: "13px", lineHeight: "1.45", color: "#1E2723" }}><strong style={{ fontWeight: "600" }}>{TEAMS[t].label}</strong>{` — ${(sel.credit || TEAMS[t].credit)[0].toLowerCase()}${(sel.credit || TEAMS[t].credit).slice(1)}.`}</p>
             ))}
             <div style={{ display: "flex", gap: "10px" }}>
               {teamsOf(sel).includes('writing') && <Link to={byLink(sel.name)} onClick={(e) => { if (!articlesBy(sel.name).length) { e.preventDefault(); setEmpty(true); } }} style={{ minHeight: "44px", flexGrow: "1", display: "flex", alignItems: "center", justifyContent: "center", background: "#111111", color: "#FFFFFF", border: "2px solid #111111", fontFamily: "'Space Mono', monospace", fontWeight: "700", fontSize: "11px", letterSpacing: "1px", textDecoration: "none" }}>THEIR ARTICLES</Link>}

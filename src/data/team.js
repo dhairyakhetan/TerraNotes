@@ -4,6 +4,8 @@
 //              their face fades between the two every so often, or with steady: true keeps the first unless the legend picks the other)
 //   bio:       2 lines for the pop-up when someone taps the face
 //   instagram: handle without the @
+//   credit:    (optional) their own line in place of the team's "what we made" line on their profile
+//   crown:     (optional) true = a little crown on their photo in the profile pop-up
 // Leave a field '' and the design's placeholder shows instead.
 
 // label: the legend and profile tag. made: what the team made; credit: the same as a sentence, shown on its members' profiles (writers also get "their articles").
@@ -19,7 +21,7 @@ export const MEMBERS = [
   { name: 'Aarav Agarwal', role: 'Head of department', team: 'heads', photo: '', bio: 'Hey, I’m Aarav! I’m in Class 11, studying commerce, and I’m into economics, geopolitics, and just exploring new stuff. Pretty chill otherwise :)', instagram: 'aaravagarwal2010' },
   { name: 'Sara Abedin', role: 'Writing team', team: 'writing', photo: '', bio: '', instagram: '' },
   { name: 'Anushka Paul', role: 'Design team', team: 'design', photo: '', bio: '', instagram: '' },
-  { name: 'Dhairya Khetan', role: 'Tech team', team: 'tech', photo: '', bio: '', instagram: '' },
+  { name: 'Dhairya Khetan', role: 'Tech team', team: 'tech', photo: '', bio: 'One man army', instagram: 'dhairyakhetan', credit: 'Made this entire website alone', crown: true },
   { name: 'Pahal Sethi', role: 'Writing team', team: 'writing', photo: '', bio: 'Writing, Creating, and Romanticising the little things. Mentally somewhere in New York.', instagram: 'pahalsethi' },
   { name: 'Anoushka Chandak', role: 'Design & writing team', team: ['design', 'writing'], photo: '', bio: '', instagram: '' },
   { name: 'Hiya Khara', role: 'Head of department', team: 'heads', photo: '', bio: 'I live on Starbucks ;)', instagram: 'hiyakhara' },
