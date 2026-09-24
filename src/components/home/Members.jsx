@@ -76,7 +76,7 @@ export default function Members() {
       <div style={{ position: "absolute", left: "20px", top: "0", width: "350px", height: "2px", background: "#111111" }} />
       <h2 style={{ position: "absolute", left: "18px", top: "22px", margin: "0", fontFamily: "'Archivo Black', Impact, sans-serif", fontWeight: "400", fontSize: "46px", lineHeight: "0.92", letterSpacing: "-1px", textTransform: "uppercase", color: "#111111" }}>Meet<br />the team</h2>
       <div style={{ position: "absolute", right: "20px", top: "30px", textAlign: "right", fontFamily: "'Space Mono', monospace", fontSize: "9px", letterSpacing: "1.6px", lineHeight: "1.6", color: "#111111" }}>{count.toUpperCase()} OF US<br />TAP A FACE</div>
-      <p style={{ position: "absolute", left: "20px", top: "136px", width: "340px", margin: "0", fontSize: "15px", lineHeight: "1.5", color: "#1E2723" }}>four desks, one terrace, {count} people who are all doing something else on a weekday. writing writes the articles, design made this site's look and layout, tech built it, and the heads keep everyone on track.</p>
+      <p style={{ position: "absolute", left: "20px", top: "136px", width: "340px", margin: "0", fontSize: "15px", lineHeight: "1.5", color: "#1E2723" }}>one magazine, a meeting every Friday, {count} people who are all doing something else the rest of the week. writing writes the articles, design made this site's look and layout, tech built it, and the heads keep everyone on track.</p>
       <div style={{ position: "absolute", left: "22px", top: "270px", width: "250px", fontFamily: "'Caveat', cursive", fontSize: "21px", lineHeight: "1.1", color: "#5B3A1E", transform: "rotate(-2deg)" }}>nobody here is a professional. that is the point.</div>
       <svg width="390" height={MEMBERS_HEIGHT} viewBox={`0 0 390 ${MEMBERS_HEIGHT}`} style={{ position: "absolute", left: "0", top: "0", pointerEvents: "none" }} aria-hidden="true" fill="none" strokeWidth="1.2" strokeDasharray="3 5" strokeLinecap="round">
         {LINKS.map((l) => <path key={l.team} d={l.d} stroke={TEAMS[l.team].color} opacity={team == null ? 0.55 : team === l.team ? 0.95 : 0.12} style={{ transition: "opacity .25s" }} />)}
@@ -110,11 +110,11 @@ export default function Members() {
           </div>
         );
       })}
-      {/* terrace note: four chairs taken, a dashed fifth for the reader */}
+      {/* Friday note: four chairs taken, a dashed fifth for the reader */}
       <div style={{ position: "absolute", left: "22px", top: `${FACES_END}px`, width: "330px", boxSizing: "border-box", background: "#F7C21A", border: "2px solid #111111", boxShadow: "8px 8px 0 #111111", padding: "18px 18px 16px", transform: "rotate(-2deg)" }}>
         <div style={{ position: "absolute", right: "-12px", top: "-16px", background: "#111111", color: "#F7C21A", fontFamily: "'Caveat', cursive", fontSize: "20px", padding: "2px 12px", transform: "rotate(6deg)" }}>psst.</div>
-        <div style={{ fontFamily: "'Archivo Black', Impact, sans-serif", fontSize: "25px", lineHeight: "0.95", textTransform: "uppercase", color: "#111111" }}>We meet on<br />the terrace.</div>
-        <div style={{ marginTop: "8px", fontFamily: "'Caveat', cursive", fontSize: "23px", lineHeight: "1.1", color: "#111111" }}>bring a chair — there are only four.</div>
+        <div style={{ fontFamily: "'Archivo Black', Impact, sans-serif", fontSize: "25px", lineHeight: "0.95", textTransform: "uppercase", color: "#111111" }}>We meet<br />every Friday.</div>
+        <div style={{ marginTop: "8px", fontFamily: "'Caveat', cursive", fontSize: "23px", lineHeight: "1.1", color: "#111111" }}>there's always room for one more.</div>
         <div style={{ marginTop: "12px", display: "flex", alignItems: "flex-end", gap: "8px" }}>
           <Chair /><Chair /><Chair /><Chair />
           <div style={{ marginLeft: "6px", display: "flex", alignItems: "flex-end", gap: "4px" }}>

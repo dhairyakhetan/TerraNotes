@@ -55,7 +55,7 @@ export default function WebMembers() {
       <div style={{ position: "absolute", left: "80px", top: "0", width: "1280px", height: "2px", background: "#111111" }} />
       <h2 style={{ position: "absolute", left: "78px", top: "36px", margin: "0", fontFamily: "'Archivo Black', Impact, sans-serif", fontWeight: "400", fontSize: "72px", lineHeight: "0.9", letterSpacing: "-1.5px", textTransform: "uppercase", color: "#111111" }}>Meet<br />the team</h2>
       <div style={{ position: "absolute", left: "1080px", top: "30px", width: "280px", textAlign: "right", fontFamily: "'Space Mono', monospace", fontSize: "11px", letterSpacing: "1.8px", color: "#111111" }}>{`${count.toUpperCase()} OF US · CLICK A FACE`}</div>
-      <p style={{ position: "absolute", left: "80px", top: "200px", width: "440px", margin: "0", fontSize: "17px", lineHeight: "1.55", color: "#1E2723" }}>four desks, one terrace, {count} people who are all doing something else on a weekday. writing writes the articles, design made this site's look and layout, tech built it, and the heads keep everyone on track.</p>
+      <p style={{ position: "absolute", left: "80px", top: "200px", width: "440px", margin: "0", fontSize: "17px", lineHeight: "1.55", color: "#1E2723" }}>one magazine, a meeting every Friday, {count} people who are all doing something else the rest of the week. writing writes the articles, design made this site's look and layout, tech built it, and the heads keep everyone on track.</p>
       <div style={{ position: "absolute", left: "82px", top: "360px", width: "400px", fontFamily: "'Caveat', cursive", fontSize: "27px", lineHeight: "1.1", color: "#5B3A1E", transform: "rotate(-2deg)" }}>nobody here is a professional. that is the point.</div>
       <div style={{ position: "absolute", left: "78px", top: "440px", width: "220px", display: "flex", flexDirection: "column", gap: "6px" }}>
         {Object.entries(TEAMS).map(([key, t]) => {
@@ -87,11 +87,11 @@ export default function WebMembers() {
           </div>
         );
       })}
-      {/* terrace note: four chairs taken, a dashed fifth for the reader */}
+      {/* Friday note: four chairs taken, a dashed fifth for the reader */}
       <div style={{ position: "absolute", left: "90px", top: "660px", width: "400px", boxSizing: "border-box", background: "#F7C21A", border: "2px solid #111111", boxShadow: "9px 9px 0 #111111", padding: "22px 24px 18px", transform: "rotate(-2deg)" }}>
         <div style={{ position: "absolute", right: "-14px", top: "-18px", background: "#111111", color: "#F7C21A", fontFamily: "'Caveat', cursive", fontSize: "22px", padding: "2px 14px", transform: "rotate(6deg)" }}>psst.</div>
-        <div style={{ fontFamily: "'Archivo Black', Impact, sans-serif", fontSize: "30px", lineHeight: "0.95", textTransform: "uppercase", color: "#111111" }}>We meet on the terrace.</div>
-        <div style={{ marginTop: "8px", fontFamily: "'Caveat', cursive", fontSize: "26px", lineHeight: "1.1", color: "#111111" }}>bring a chair — there are only four.</div>
+        <div style={{ fontFamily: "'Archivo Black', Impact, sans-serif", fontSize: "30px", lineHeight: "0.95", textTransform: "uppercase", color: "#111111" }}>We meet<br />every Friday.</div>
+        <div style={{ marginTop: "8px", fontFamily: "'Caveat', cursive", fontSize: "26px", lineHeight: "1.1", color: "#111111" }}>there's always room for one more.</div>
         <div style={{ marginTop: "12px", display: "flex", alignItems: "flex-end", gap: "10px" }}>
           <Chair width={40} height={48} /><Chair width={40} height={48} /><Chair width={40} height={48} /><Chair width={40} height={48} />
           <div style={{ marginLeft: "8px", display: "flex", alignItems: "flex-end", gap: "4px" }}>

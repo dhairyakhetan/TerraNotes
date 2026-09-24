@@ -4,6 +4,7 @@
 //   cover:    put the picture in public/articles/ and write its path, e.g. '/articles/wetlands.jpg'
 //   alt:      a few words describing the cover (also the placeholder label until there is one)
 //   author:   the writer's name (someone in src/data/team.js also gets their role under it)
+//   date:     the edition it came out in, e.g. 'Sep 2026' (one edition a month; the first is September 2026)
 //   readTime: minutes, e.g. '6'
 //   body:     the article, top to bottom. Each item is one block:
 //     'Some text.'                                         paragraph (the first one gets the drop cap)
@@ -49,7 +50,7 @@ export const ARTICLES = [
     cover: '',
     alt: 'exam season',
     author: 'Diti Shah',
-    date: '',
+    date: 'Sep 2026',
     readTime: '5',
     body: [
       'The syllabus is 14 chapters long. The exam is tomorrow. You have studied exactly… uhmm… precisely about two chapters. Suddenly, you’re hungry, your water bottle becomes fascinating, your room desperately needs cleaning, and your phone has never looked more interesting. Somehow, everything feels more urgent than actually opening your textbook. Welcome to exam season.',
@@ -82,7 +83,7 @@ export const ARTICLES = [
     cover: '',
     alt: 'lock-in',
     author: 'Pahal Sethi',
-    date: '20 Sep 2026',
+    date: 'Sep 2026',
     readTime: '2',
     body: [
       '“Lock in.” Two words. Infinite promises.',
@@ -105,7 +106,7 @@ export const ARTICLES = [
     cover: '',
     alt: 'fast fashion',
     author: 'Dhriti Agarwal',
-    date: '',
+    date: 'Sep 2026',
     readTime: '2',
     body: [
       'Have you ever noticed how scrolling through clothing sites or walking into an apparel store can sometimes feel strangely exhausting instead of fun?',
@@ -124,7 +125,7 @@ export const ARTICLES = [
     cover: '',
     alt: 'the river',
     author: '',
-    date: '',
+    date: 'Sep 2026',
     readTime: '1',
     body: [
       'I am on this side of the river.',
@@ -149,7 +150,7 @@ export const ARTICLES = [
     cover: '',
     alt: 'grandma',
     author: '',
-    date: '',
+    date: 'Sep 2026',
     readTime: '1',
     body: [
       'My grandmother’s daughter.',
@@ -176,7 +177,7 @@ export const ARTICLES = [
     cover: '',
     alt: 'ten years ago',
     author: '',
-    date: '',
+    date: 'Sep 2026',
     readTime: '2',
     body: [
       'Which is weird.',

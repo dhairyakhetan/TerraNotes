@@ -1,6 +1,7 @@
 // Site-wide copy. Leave a field '' and the design's placeholder shows instead.
 export const SITE = {
-  intro: '',                  // 2–3 lines under "Notes from where the land meets the water." on the home page
+  // 2–3 lines under "Notes from where the land meets the water." on the home page (the phone card fits 3, no more)
+  intro: 'TerraNotes is Aquaterra’s monthly magazine: stories, research, fashion, photos and art.',
   instagram: 'ngo.aquaterra', // handle without the @ (menu only; the footer links nowhere)
   footerNote: 'Kolkata · est. 2021 · 1,300+ members', // second footer line
 };
