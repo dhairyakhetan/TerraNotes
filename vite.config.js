@@ -36,6 +36,10 @@ const pages = () => ({
       const urls = paths.map((p) => `  <url><loc>${host}${p}</loc></url>`).join('\n');
       out('sitemap.xml', `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls}\n</urlset>\n`);
     }
+    // backstop: if a path ever misses the rewrite, the host's 404 is the app too (it shows the lost page)
+    let lost = base.replace(/<title>[^<]*<\/title>/, '<title>Aquaterra — not found</title>');
+    lost = lost.replace('</title>', '</title>\n    <meta name="robots" content="noindex" />');
+    out('404.html', lost);
     out('robots.txt', `User-agent: *\nAllow: /\n${host ? `Sitemap: ${host}/sitemap.xml\n` : ''}`);
   },
 });

@@ -1,10 +1,17 @@
 import { Link, useSearchParams } from 'react-router';
 import { ARTICLES } from '../data/articles.js';
+import { MEMBERS } from '../data/team.js';
 
-// /articles?by=<name> (the "Their articles" button on a writer's profile): their pieces first, marked.
+const firstOf = (name) => name.split(' ')[0].toLowerCase();
+// "Their articles" link for a writer: /articles?by=<first name>, e.g. /articles?by=diti
+export const byLink = (name) => `/articles?by=${firstOf(name)}`;
+
+// /articles?by=<first name> (the "Their articles" button on a writer's profile): their pieces first, marked.
+// A full name (?by=Diti Shah) works too. `by` comes back as the full name.
 export function useByWriter() {
   const [q] = useSearchParams();
-  const by = q.get('by') || '';
+  const key = (q.get('by') || '').trim().toLowerCase();
+  const by = (key && [...MEMBERS.map((m) => m.name), ...ARTICLES.map((a) => a.author)].find((n) => n && (firstOf(n) === key || n.toLowerCase() === key))) || '';
   const isMine = (a) => !!by && a.author === by;
   const mine = ARTICLES.filter(isMine);
   return { by, mine, isMine, list: by ? [...mine, ...ARTICLES.filter((a) => !isMine(a))] : ARTICLES };

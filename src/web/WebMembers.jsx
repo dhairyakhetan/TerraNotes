@@ -3,7 +3,7 @@ import { usePauseOffscreen } from '../lib/offscreen.js';
 import { Link } from 'react-router';
 import { Chair, NUMBER_WORDS, PhotoIcon } from '../components/home/Members.jsx';
 import { MEMBERS, TEAMS, teamsOf } from '../data/team.js';
-import { NoArticlesYet, articlesBy } from '../lib/byWriter.jsx';
+import { NoArticlesYet, articlesBy, byLink } from '../lib/byWriter.jsx';
 import { usePresence } from '../lib/presence.js';
 import { teamLinks, useFaceColors } from '../lib/team.js';
 import { instagramUrl, pad2 } from '../lib/format.js';
@@ -125,7 +125,7 @@ export default function WebMembers() {
               <p key={t} style={{ margin: "0", paddingLeft: "10px", borderLeft: `3px solid ${TEAMS[t].color}`, fontSize: "14px", lineHeight: "1.45", color: "#1E2723" }}><strong style={{ fontWeight: "600" }}>{TEAMS[t].label}</strong>{` ${TEAMS[t].made}.`}</p>
             ))}
             <div style={{ display: "flex", gap: "10px" }}>
-              {teamsOf(sel).includes('writing') && <Link className="btn" to={`/articles?by=${encodeURIComponent(sel.name)}`} onClick={(e) => { if (!articlesBy(sel.name).length) { e.preventDefault(); setEmpty(true); } else close(); }} style={{ minHeight: "44px", flexGrow: "1", display: "flex", alignItems: "center", justifyContent: "center", background: "#111111", color: "#FFFFFF", border: "2px solid #111111", fontFamily: "'Space Mono', monospace", fontWeight: "700", fontSize: "11px", letterSpacing: "1px", textDecoration: "none" }}>THEIR ARTICLES</Link>}
+              {teamsOf(sel).includes('writing') && <Link className="btn" to={byLink(sel.name)} onClick={(e) => { if (!articlesBy(sel.name).length) { e.preventDefault(); setEmpty(true); } else close(); }} style={{ minHeight: "44px", flexGrow: "1", display: "flex", alignItems: "center", justifyContent: "center", background: "#111111", color: "#FFFFFF", border: "2px solid #111111", fontFamily: "'Space Mono', monospace", fontWeight: "700", fontSize: "11px", letterSpacing: "1px", textDecoration: "none" }}>THEIR ARTICLES</Link>}
               {sel.instagram && <a className="btn" href={instagramUrl(sel.instagram)} target="_blank" rel="noreferrer" style={{ minHeight: "44px", padding: "0 14px", display: "flex", alignItems: "center", background: "#FFFFFF", color: "#111111", border: "2px solid #111111", boxShadow: "3px 3px 0 #111111", fontFamily: "'Space Mono', monospace", fontWeight: "700", fontSize: "11px", letterSpacing: "1px", textDecoration: "none" }}>{`@${sel.instagram} ↗`}</a>}
             </div>
           </div>
