@@ -11,7 +11,6 @@ import Members, { MEMBERS_HEIGHT } from '../components/home/Members.jsx';
 import PhotoViewer from '../components/home/PhotoViewer.jsx';
 import { SITE } from '../data/site.js';
 import Logo from '../components/Logo.jsx';
-import EditionPicker from '../components/EditionPicker.jsx';
 
 // Home. Everything below the sticky header is absolutely placed in a 390px-wide page.
 // motion={false} turns off the sway/float animations.
@@ -46,8 +45,6 @@ export default function Home({ motion = true }) {
             </svg>
           </button>
         </header>
-        {/* which edition this is, and the way to the others */}
-        <EditionPicker small style={{ position: "absolute", left: "20px", top: "76px", zIndex: "6" }} />
         {/* intro card; the red knot is where the "Articles" string is tied */}
         <section style={{ position: "absolute", left: "20px", top: "118px", width: "250px", transform: "rotate(-1deg)", zIndex: "3" }}>
           <div style={{ position: "absolute", left: "7px", top: "7px", width: "250px", height: "200px", background: "#111111" }} />

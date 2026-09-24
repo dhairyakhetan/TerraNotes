@@ -63,7 +63,7 @@ export default class MenuSheet extends React.Component {
           willChange: 'transform',
         }}
       >
-        <Menu current={current} onClose={this.close} />
+        <Menu open={this.props.open} current={current} onClose={this.close} />
       </div>
     );
   }
