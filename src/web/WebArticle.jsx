@@ -103,12 +103,12 @@ export default function WebArticle({ article: a, next }) {
         <Link className="nav-link" to="/articles" style={{ position: "absolute", left: "80px", top: "104px", fontFamily: "'Caveat', cursive", fontSize: "24px", color: "#111111" }}>← all write-ups</Link>
         <div style={{ position: "absolute", left: "0", top: "150px", width: "1440px", height: "2px", background: "#5B3A1E" }} />
         {/* hero: drops onto the wire when the page opens (or flies in from the card), then keeps swaying */}
-        <div ref={hero} className="hero-drop" style={{ position: "absolute", left: "80px", top: "190px", width: "620px", transformOrigin: "50% -38px" }}>
+        <div ref={hero} className="hero-drop" style={{ position: "absolute", left: "80px", top: "190px", width: a.cover ? "fit-content" : "620px", transformOrigin: "50% -38px" }}>
           <div className="hero-sway" style={{ transformOrigin: "50% -38px", transform: "rotate(-1deg)" }}>
-            <div style={{ position: "absolute", left: "309.3px", top: "-38px", width: "1.4px", height: "40px", background: "#5B3A1E" }} />
+            <div style={{ position: "absolute", left: "50%", marginLeft: "-0.7px", top: "-38px", width: "1.4px", height: "40px", background: "#5B3A1E" }} />
             <div style={{ position: "absolute", left: "50%", top: "-8px", marginLeft: "-20px", width: "40px", height: "10px", background: tag.color, border: "1.5px solid #111111", boxSizing: "border-box", zIndex: "2" }} />
             <div style={{ background: "#FFFFFF", border: "2px solid #111111", boxShadow: "12px 12px 0 #111111", padding: "14px" }}>
-              <Img src={a.cover} alt={a.alt} label={`${a.alt} — lead photo`} box={{ height: "420px" }} icon={22} font="12px" />
+              <Img src={a.cover} alt={a.alt} label={`${a.alt} — lead photo`} box={a.cover ? { height: "560px", width: "auto", maxWidth: "620px" } : { height: "420px" }} icon={22} font="12px" /> {/* a cover shows whole */}
             </div>
           </div>
         </div>
