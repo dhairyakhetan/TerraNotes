@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { usePresence } from '../lib/presence.js';
 import WebHeader from './WebHeader.jsx';
 import ArticleLine from './ArticleLine.jsx';
 import WebPhotoWall from './WebPhotoWall.jsx';
@@ -14,6 +15,7 @@ const DOT = <span style={{ color: "#3DA5F4" }}>.</span>;
 // Home, web layout. Everything below the sticky header is absolutely placed in a 1440px-wide page.
 export default function WebHome() {
   const [photo, setPhoto] = useState(null); // index open in the photo viewer
+  const [shownPhoto, photoLeaving] = usePresence(photo, 180); // stays mounted while it fades out
   useEffect(() => { document.title = 'Aquaterra'; }, []);
   const count = NUMBER_WORDS[ARTICLES.length] || String(ARTICLES.length);
 
@@ -45,7 +47,7 @@ export default function WebHome() {
         <WebWords />
         <WebMembers />
       </div>
-      {photo != null && <WebPhotoViewer start={photo} onClose={() => setPhoto(null)} />}
+      {shownPhoto != null && <WebPhotoViewer start={shownPhoto} closing={photoLeaving} onClose={() => setPhoto(null)} />}
     </div>
   );
 }

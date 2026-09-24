@@ -3,12 +3,14 @@ import { fitWord, useWordsGame } from '../lib/useWordsGame.js';
 
 const CLOUD = 'M26 104 H176 A24 24 0 0 0 178 56 A36 36 0 0 0 110 30 A30 30 0 0 0 56 42 A30 30 0 0 0 26 104 Z';
 
+// the answer they picked shakes if wrong; the right one bounces
+const mood = (o) => (o.mark === '✓' ? 'w-right' : o.mark === '✗' ? 'w-wrong' : '');
 // "Words we should bring back", web layout (logic: lib/useWordsGame.js). The word on a cloud, three meanings beside it.
 export default function WebWords() {
   const ref = useRef(null);
   const w = useWordsGame(ref);
   const option = (o) => (
-    <button className="w-opt btn" onClick={o.pick} disabled={w.locked} style={{ minHeight: "68px", width: "100%", boxSizing: "border-box", padding: "12px 20px", display: "flex", alignItems: "center", gap: "16px", textAlign: "left", background: o.bg, color: o.fg, border: "2px solid #111111", boxShadow: "5px 5px 0 #111111", opacity: o.op, fontFamily: "'Figtree', system-ui, sans-serif", fontSize: "19px", fontWeight: "500", lineHeight: "1.25", transition: "background-color 120ms ease, opacity 120ms ease, translate 160ms ease" }}>
+    <button className={`w-opt btn ${mood(o)}`} onClick={o.pick} disabled={w.locked} style={{ minHeight: "68px", width: "100%", boxSizing: "border-box", padding: "12px 20px", display: "flex", alignItems: "center", gap: "16px", textAlign: "left", background: o.bg, color: o.fg, border: "2px solid #111111", boxShadow: "5px 5px 0 #111111", opacity: o.op, fontFamily: "'Figtree', system-ui, sans-serif", fontSize: "19px", fontWeight: "500", lineHeight: "1.25", transition: "background-color 120ms ease, opacity 120ms ease, translate 160ms ease" }}>
       <span style={{ width: "34px", height: "34px", flexShrink: "0", border: "2px solid currentColor", boxSizing: "border-box", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "'Space Mono', monospace", fontWeight: "700", fontSize: "14px" }}>{o.mark}</span>
       <span style={{ flexGrow: "1" }}>{o.text}</span>
     </button>
@@ -25,13 +27,13 @@ export default function WebWords() {
         </svg>
         <div style={{ position: "absolute", left: "0", top: "128px", width: "620px", textAlign: "center" }}>
           <div style={{ fontFamily: "'Space Mono', monospace", fontSize: "11px", letterSpacing: "1.8px", color: "#4A4A45" }}>{`WORD ${w.n} / ${w.total}`}</div>
-          <div style={{ marginTop: "6px", fontFamily: "'Archivo Black', Impact, sans-serif", fontSize: fitWord(w.word, 68, 500), lineHeight: "1", textTransform: "uppercase", letterSpacing: "-1px", color: "#111111" }}>{w.word}</div>
+          <div key={w.word} className="word-pop" style={{ marginTop: "6px", fontFamily: "'Archivo Black', Impact, sans-serif", fontSize: fitWord(w.word, 68, 500), lineHeight: "1", textTransform: "uppercase", letterSpacing: "-1px", color: "#111111" }}>{w.word}</div>
           <div style={{ marginTop: "6px", fontFamily: "'Caveat', cursive", fontSize: "26px", color: "#5B3A1E" }}>what do you think it means?</div>
         </div>
       </div>
       {w.playing && (
         <>
-          <div style={{ position: "absolute", left: "760px", top: "110px", width: "600px", display: "flex", flexDirection: "column", gap: "18px" }}>
+          <div key={w.word} className="w-in" style={{ position: "absolute", left: "760px", top: "110px", width: "600px", display: "flex", flexDirection: "column", gap: "18px" }}>
             {option(w.o0)}
             {option(w.o1)}
             {option(w.o2)}

@@ -22,7 +22,7 @@ export default class ErrorBoundary extends React.Component {
     const btn = { minHeight: "44px", padding: "0 18px", display: "inline-flex", alignItems: "center", border: "2px solid #111111", fontFamily: "'Space Mono', monospace", fontWeight: "700", fontSize: "11px", letterSpacing: "1px", textTransform: "uppercase", textDecoration: "none", cursor: "pointer" };
     return (
       <div role="alert" style={{ minHeight: "70vh", display: "flex", alignItems: "center", justifyContent: "center", padding: "40px 20px", background: "#F3EEE4", color: "#111111" }}>
-        <div style={{ width: "340px", boxSizing: "border-box", background: "#FFFFFF", border: "2px solid #111111", boxShadow: "8px 8px 0 #F0442B", padding: "22px", transform: "rotate(-1.5deg)" }}>
+        <div className="card-drop" style={{ width: "340px", boxSizing: "border-box", background: "#FFFFFF", border: "2px solid #111111", boxShadow: "8px 8px 0 #F0442B", padding: "22px", transform: "rotate(-1.5deg)" }}>
           <div style={{ fontFamily: "'Space Mono', monospace", fontSize: "10px", letterSpacing: "1.4px" }}>SOMETHING SNAPPED</div>
           <h1 style={{ margin: "10px 0 8px", fontFamily: "'Archivo Black', Impact, sans-serif", fontWeight: "400", fontSize: "30px", lineHeight: "0.95", textTransform: "uppercase" }}>The line broke.</h1>
           <p style={{ margin: "0 0 18px", fontFamily: "'Caveat', cursive", fontSize: "21px", lineHeight: "1.15", color: "#5B3A1E" }}>this page tripped over itself. try again, or head home while we tie it back together.</p>

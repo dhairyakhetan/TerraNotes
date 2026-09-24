@@ -33,7 +33,7 @@ export default function Articles() {
         <div style={{ position: "absolute", left: "236px", top: "128px", width: "130px", fontFamily: "'Caveat', cursive", fontSize: "20px", lineHeight: "1.05", color: "#5B3A1E", transform: "rotate(-5deg)" }}>hung up to dry, one by one</div>
 
         {by && (
-          <div role="status" style={{ position: "absolute", left: "20px", top: "232px", width: "350px", display: "flex", alignItems: "center", gap: "8px" }}>
+          <div className="slide-in" role="status" style={{ position: "absolute", left: "20px", top: "232px", width: "350px", display: "flex", alignItems: "center", gap: "8px" }}>
             <span style={{ minWidth: "0", flexShrink: "1", background: "#F7C21A", border: "1.5px solid #111111", padding: "5px 10px", fontFamily: "'Space Mono', monospace", fontWeight: "700", fontSize: "10px", letterSpacing: "1px", textTransform: "uppercase", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{mine.length ? `By ${by} · ${pad2(mine.length)} first` : `Nothing by ${by} yet`}</span>
             <Link to="/articles" replace aria-label="Show all articles" style={{ flexShrink: "0", minWidth: "44px", minHeight: "32px", display: "flex", alignItems: "center", justifyContent: "center", border: "1.5px solid #111111", background: "#FFFFFF", fontFamily: "'Space Mono', monospace", fontWeight: "700", fontSize: "12px", textDecoration: "none", color: "#111111" }}>✕</Link>
           </div>

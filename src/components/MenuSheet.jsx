@@ -48,7 +48,7 @@ export default class MenuSheet extends React.Component {
     const d = this.state.mdx || 0, drag = this.state.mdrag;
     return (
       <div
-        className="menu-sheet"
+        className={open ? 'menu-sheet is-open' : 'menu-sheet'}
         aria-hidden={open ? 'false' : 'true'}
         onTouchStart={this.ts}
         onTouchMove={this.tm}

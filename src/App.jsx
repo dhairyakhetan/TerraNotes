@@ -25,6 +25,9 @@ if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
 // On navigation: Back/Forward (and reload) return to where you were; otherwise jump to the page's section
 // (or an old-style #section), or start at the top. key: clicking the same link again jumps again.
 let current = null; // the page whose scroll position is being recorded
+let lastPath = null;
+// the home page, under any of its section addresses (/articles is the home page on web only)
+const onHome = (p) => !!p && (p === '/' || (SECTIONS.includes(p.slice(1)) && (p !== '/articles' || document.documentElement.dataset.layout === 'web')));
 
 function ScrollManager() {
   const { pathname, hash, key } = useLocation();
@@ -32,12 +35,15 @@ function ScrollManager() {
   useLayoutEffect(() => {
     current = null; // stop recording the page we're leaving before anything scrolls
     persist();
+    // a section link on the page you're already on glides there; everything else lands instantly
+    const behavior = type === 'PUSH' && onHome(lastPath) && onHome(pathname) && !matchMedia('(prefers-reduced-motion: reduce)').matches ? 'smooth' : 'auto';
+    lastPath = pathname;
     if (type === 'POP' && saved[key] != null) window.scrollTo(0, saved[key]);
     else {
       const id = SECTIONS.find((s) => pathname === `/${s}`) || (hash && decodeURIComponent(hash.slice(1)));
       const target = id && document.getElementById(id);
-      if (target) target.scrollIntoView();
-      else window.scrollTo(0, 0);
+      if (target) target.scrollIntoView({ behavior });
+      else window.scrollTo({ top: 0, behavior });
     }
     current = key;
   }, [pathname, hash, key]);

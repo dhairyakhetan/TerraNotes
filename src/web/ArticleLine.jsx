@@ -305,7 +305,7 @@ export default function ArticleLine() {
       </div>
       <div style={{ position: "absolute", left: "300px", top: "1024px", width: "1060px", display: "flex", alignItems: "center", gap: "20px" }}>
         {by ? (
-          <div role="status" style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+          <div className="slide-in" role="status" style={{ display: "flex", alignItems: "center", gap: "8px" }}>
             <span style={{ background: "#F7C21A", border: "1.5px solid #111111", padding: "5px 10px", fontFamily: "'Space Mono', monospace", fontWeight: "700", fontSize: "11px", letterSpacing: "1px", textTransform: "uppercase", whiteSpace: "nowrap" }}>{mine.length ? `By ${by} · ${pad2(mine.length)} first` : `Nothing by ${by} yet`}</span>
             <Link className="btn" to="/articles" replace aria-label="Show all articles in order" style={{ minWidth: "32px", minHeight: "30px", display: "flex", alignItems: "center", justifyContent: "center", border: "1.5px solid #111111", background: "#FFFFFF", fontFamily: "'Space Mono', monospace", fontWeight: "700", fontSize: "12px", textDecoration: "none", color: "#111111" }}>✕</Link>
           </div>

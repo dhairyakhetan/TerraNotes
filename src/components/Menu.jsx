@@ -47,7 +47,7 @@ export default function Menu({ current = 'home', onClose }) {
               </svg>
             </SmartLink>
             {current === s.here && (
-              <div style={{ position: "absolute", zIndex: "2", left: s.note.left, top: s.note.top, fontFamily: "'Caveat', cursive", fontSize: "19px", color: s.color, transform: "rotate(-6deg)", whiteSpace: "nowrap" }}>you're here</div>
+              <div className="here-note" style={{ position: "absolute", zIndex: "2", left: s.note.left, top: s.note.top, fontFamily: "'Caveat', cursive", fontSize: "19px", color: s.color, transform: "rotate(-6deg)", whiteSpace: "nowrap" }}>you're here</div>
             )}
           </li>
         ))}

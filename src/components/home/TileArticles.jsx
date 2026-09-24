@@ -36,12 +36,12 @@ function Tile({ a, i }) {
           </div>
         </Link>
         <button onClick={() => setSaved(!saved)} aria-label={saved ? 'Remove bookmark' : 'Bookmark'} aria-pressed={saved ? 'true' : 'false'} style={{ position: "absolute", right: "20px", bottom: "22px", width: "40px", height: "40px", padding: "0", border: "0", background: "transparent", color: saved ? '#F7C21A' : '#F3EEE4', display: "flex", alignItems: "center", justifyContent: "center" }}>
-          <svg {...icon} fill={saved ? 'currentColor' : 'none'}><path d="M6 3 H18 V21 L12 16 L6 21 Z" /></svg>
+          <svg {...icon} key={saved ? 'on' : 'off'} className={saved ? 'icon-pop' : undefined} fill={saved ? 'currentColor' : 'none'}><path d="M6 3 H18 V21 L12 16 L6 21 Z" /></svg>
         </button>
       </div>
       <div style={{ display: "flex", alignItems: "center", gap: "20px", padding: "12px 6px 0", color: "#1E2723" }}>
         <button onClick={() => setLiked(!liked)} aria-label={liked ? 'Unlike' : 'Like'} aria-pressed={liked ? 'true' : 'false'} style={{ minHeight: "36px", padding: "0", border: "0", background: "transparent", display: "flex", alignItems: "center", gap: "6px", color: liked ? '#F0442B' : '#1E2723' }}>
-          <svg {...icon} fill={liked ? 'currentColor' : 'none'}><path d="M12 20 C5 15 3 12 3 8.5 A4.5 4.5 0 0 1 12 6 A4.5 4.5 0 0 1 21 8.5 C21 12 19 15 12 20 Z" /></svg>
+          <svg {...icon} key={liked ? 'on' : 'off'} className={liked ? 'icon-pop' : undefined} fill={liked ? 'currentColor' : 'none'}><path d="M12 20 C5 15 3 12 3 8.5 A4.5 4.5 0 0 1 12 6 A4.5 4.5 0 0 1 21 8.5 C21 12 19 15 12 20 Z" /></svg>
           <span style={count}>{likes + (liked ? 1 : 0)}</span>
         </button>
         <span style={{ display: "flex", alignItems: "center", gap: "6px" }}>

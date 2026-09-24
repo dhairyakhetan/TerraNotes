@@ -9,6 +9,7 @@ import './styles/articles.css';
 import './styles/article.css';
 import './styles/footer.css';
 import './web/web.css';
+import './styles/motion.css';
 
 sayHello();
 

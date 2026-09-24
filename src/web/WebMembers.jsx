@@ -4,6 +4,7 @@ import { Link } from 'react-router';
 import { Chair, NUMBER_WORDS, PhotoIcon } from '../components/home/Members.jsx';
 import { MEMBERS, TEAMS, teamsOf } from '../data/team.js';
 import { NoArticlesYet, articlesBy } from '../lib/byWriter.jsx';
+import { usePresence } from '../lib/presence.js';
 import { teamLinks, useFaceColors } from '../lib/team.js';
 import { instagramUrl, pad2 } from '../lib/format.js';
 
@@ -39,11 +40,13 @@ export default function WebMembers() {
   useEffect(() => setEmpty(false), [open]);
   const card = useRef(null);
   // a profile card opening off-screen scrolls itself into view
-  useEffect(() => { if (card.current) card.current.scrollIntoView({ block: 'nearest', behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' }); }, [open]);
+  useEffect(() => { if (open != null && card.current) card.current.scrollIntoView({ block: 'nearest', behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' }); }, [open]);
   const count = NUMBER_WORDS[MEMBERS.length] || String(MEMBERS.length);
-  const sel = open != null ? MEMBERS[open] : null;
+  const [shown, leaving] = usePresence(open, 170);     // stays on screen while it animates closed
+  const [emptyShown, emptyLeaving] = usePresence(empty ? true : null, 140);
+  const sel = shown != null ? MEMBERS[shown] : null;
   const color = sel ? colorFor(sel) : '#111111';
-  const spot = sel ? SPOTS[open] : null;
+  const spot = sel ? SPOTS[shown] : null;
   const r = spot ? spot.size / 2 : 0;
   const close = () => setOpen(null);
 
@@ -100,9 +103,9 @@ export default function WebMembers() {
       {/* profile card, beside the clicked face */}
       {sel && (
         <>
-          <button onClick={close} aria-label="Close profile" style={{ position: "absolute", left: "0", top: "0", width: "1440px", height: `${WEB_MEMBERS_HEIGHT}px`, border: "0", padding: "0", background: "rgba(17,17,17,.35)", cursor: "default" }} />
-          <div className="web-pop" ref={card} role="dialog" aria-label={`${sel.name} — profile`} style={{ position: "absolute", left: `${spot.cx < 1000 ? Math.round(spot.cx + r + 28) : Math.round(spot.cx - r - 28 - 360)}px`, top: `${Math.max(20, Math.min(Math.round(spot.cy - 150), WEB_MEMBERS_HEIGHT - 530))}px`, width: "360px", boxSizing: "border-box", background: "#FFFFFF", border: "2px solid #111111", boxShadow: `9px 9px 0 ${color}`, padding: "22px", display: "flex", flexDirection: "column", gap: "12px", transform: "rotate(-1deg)" }}>
-            {empty && <NoArticlesYet name={sel.name} onOk={() => setEmpty(false)} onAll={close} />}
+          <button className={leaving ? 'fade-out' : 'fade-in'} onClick={close} aria-label="Close profile" style={{ position: "absolute", left: "0", top: "0", width: "1440px", height: `${WEB_MEMBERS_HEIGHT}px`, border: "0", padding: "0", background: "rgba(17,17,17,.35)", cursor: "default" }} />
+          <div className={leaving ? 'card-lift' : 'card-drop'} ref={card} role="dialog" aria-label={`${sel.name} — profile`} style={{ position: "absolute", left: `${spot.cx < 1000 ? Math.round(spot.cx + r + 28) : Math.round(spot.cx - r - 28 - 360)}px`, top: `${Math.max(20, Math.min(Math.round(spot.cy - 150), WEB_MEMBERS_HEIGHT - 530))}px`, width: "360px", boxSizing: "border-box", background: "#FFFFFF", border: "2px solid #111111", boxShadow: `9px 9px 0 ${color}`, padding: "22px", display: "flex", flexDirection: "column", gap: "12px", transform: "rotate(-1deg)" }}>
+            {emptyShown && <NoArticlesYet name={sel.name} leaving={emptyLeaving} onOk={() => setEmpty(false)} onAll={close} />}
             <div style={{ position: "absolute", left: "50%", top: "-8px", marginLeft: "-18px", width: "36px", height: "11px", background: color, border: "1.5px solid #111111", boxSizing: "border-box" }} />
             <button className="btn" onClick={close} aria-label="Close profile" style={{ position: "absolute", right: "12px", top: "12px", width: "44px", height: "44px", background: "#FFFFFF", border: "2px solid #111111", boxShadow: "3px 3px 0 #111111", padding: "0", display: "flex", alignItems: "center", justifyContent: "center" }}>
               <svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="#111111" strokeWidth="2.6" strokeLinecap="square"><path d="M3 3 L17 17" /><path d="M17 3 L3 17" /></svg>
@@ -112,7 +115,7 @@ export default function WebMembers() {
             </div>
             <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
               <span style={{ background: color, color: "#FFFFFF", fontFamily: "'Space Mono', monospace", fontWeight: "700", fontSize: "10px", letterSpacing: "1px", textTransform: "uppercase", padding: "3px 10px", borderRadius: "999px", border: "1.5px solid #111111" }}>{teamsOf(sel).map((t) => TEAMS[t].label).join(' · ')}</span>
-              <span style={{ fontFamily: "'Space Mono', monospace", fontSize: "10px", letterSpacing: "1px" }}>{`${pad2(open + 1)} / ${pad2(MEMBERS.length)}`}</span>
+              <span style={{ fontFamily: "'Space Mono', monospace", fontSize: "10px", letterSpacing: "1px" }}>{`${pad2(shown + 1)} / ${pad2(MEMBERS.length)}`}</span>
             </div>
             <div style={{ fontFamily: "'Archivo Black', Impact, sans-serif", fontSize: "34px", lineHeight: "0.95", textTransform: "uppercase", color: "#111111" }}>{sel.name}</div>
             <div style={{ fontFamily: "'Caveat', cursive", fontSize: "23px", lineHeight: "1.1", color: "#5B3A1E" }}>{sel.role}</div>

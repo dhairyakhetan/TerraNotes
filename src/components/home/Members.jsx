@@ -3,6 +3,7 @@ import { usePauseOffscreen } from '../../lib/offscreen.js';
 import { Link } from 'react-router';
 import { MEMBERS, TEAMS, teamsOf } from '../../data/team.js';
 import { NoArticlesYet, articlesBy } from '../../lib/byWriter.jsx';
+import { usePresence } from '../../lib/presence.js';
 import { teamLinks, useFaceColors } from '../../lib/team.js';
 import { instagramUrl, pad2 } from '../../lib/format.js';
 
@@ -62,9 +63,11 @@ export default function Members() {
   useEffect(() => setEmpty(false), [open]);
   const card = useRef(null);
   // a profile card opening off-screen scrolls itself into view
-  useEffect(() => { if (card.current) card.current.scrollIntoView({ block: 'nearest', behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' }); }, [open]);
+  useEffect(() => { if (open != null && card.current) card.current.scrollIntoView({ block: 'nearest', behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' }); }, [open]);
   const count = NUMBER_WORDS[MEMBERS.length] || String(MEMBERS.length);
-  const sel = open != null ? MEMBERS[open] : null;
+  const [shown, leaving] = usePresence(open, 170);     // stays on screen while it animates closed
+  const [emptyShown, emptyLeaving] = usePresence(empty ? true : null, 140);
+  const sel = shown != null ? MEMBERS[shown] : null;
   const selColor = sel ? colorFor(sel) : "#111111";
   const close = () => setOpen(null);
 
@@ -123,9 +126,9 @@ export default function Members() {
       {/* profile pop-up, placed level with the tapped face */}
       {sel && (
         <>
-          <button onClick={close} aria-label="Close profile" style={{ position: "absolute", left: "0", top: "0", width: "390px", height: `${MEMBERS_HEIGHT}px`, border: "0", padding: "0", background: "rgba(17,17,17,.55)" }} />
-          <div ref={card} role="dialog" aria-label="Member profile" style={{ position: "absolute", left: "28px", top: `${Math.max(120, Math.min(SPOTS[open].top - 60, MEMBERS_HEIGHT - 540))}px`, width: "334px", boxSizing: "border-box", background: "#FFFFFF", border: "2px solid #111111", boxShadow: `8px 8px 0 ${selColor}`, padding: "18px", display: "flex", flexDirection: "column", gap: "12px", transform: "rotate(-1deg)" }}>
-            {empty && <NoArticlesYet name={sel.name} onOk={() => setEmpty(false)} onAll={close} />}
+          <button className={leaving ? 'fade-out' : 'fade-in'} onClick={close} aria-label="Close profile" style={{ position: "absolute", left: "0", top: "0", width: "390px", height: `${MEMBERS_HEIGHT}px`, border: "0", padding: "0", background: "rgba(17,17,17,.55)" }} />
+          <div ref={card} className={leaving ? 'card-lift' : 'card-drop'} role="dialog" aria-label="Member profile" style={{ position: "absolute", left: "28px", top: `${Math.max(120, Math.min(SPOTS[shown].top - 60, MEMBERS_HEIGHT - 540))}px`, width: "334px", boxSizing: "border-box", background: "#FFFFFF", border: "2px solid #111111", boxShadow: `8px 8px 0 ${selColor}`, padding: "18px", display: "flex", flexDirection: "column", gap: "12px", transform: "rotate(-1deg)" }}>
+            {emptyShown && <NoArticlesYet name={sel.name} leaving={emptyLeaving} onOk={() => setEmpty(false)} onAll={close} />}
             <div style={{ position: "absolute", left: "50%", top: "-7px", marginLeft: "-17px", width: "34px", height: "10px", background: selColor, border: "1.5px solid #111111", boxSizing: "border-box" }} />
             <button className="press" onClick={close} aria-label="Close profile" style={{ "--c": "#111111", position: "absolute", right: "10px", top: "10px", width: "44px", height: "44px", background: "#FFFFFF", border: "2px solid #111111", boxShadow: "3px 3px 0 #111111", padding: "0", display: "flex", alignItems: "center", justifyContent: "center" }}>
               <svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="#111111" strokeWidth="2.6" strokeLinecap="square">
@@ -138,7 +141,7 @@ export default function Members() {
             </div>
             <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
               <span style={{ background: selColor, color: "#FFFFFF", fontFamily: "'Space Mono', monospace", fontWeight: "700", fontSize: "10px", letterSpacing: "1px", textTransform: "uppercase", padding: "3px 9px", borderRadius: "999px", border: "1.5px solid #111111" }}>{teamsOf(sel).map((t) => TEAMS[t].label).join(' · ')}</span>
-              <span style={{ fontFamily: "'Space Mono', monospace", fontSize: "10px", letterSpacing: "1px" }}>{pad2(open + 1)} / {pad2(MEMBERS.length)}</span>
+              <span style={{ fontFamily: "'Space Mono', monospace", fontSize: "10px", letterSpacing: "1px" }}>{pad2(shown + 1)} / {pad2(MEMBERS.length)}</span>
             </div>
             <div style={{ fontFamily: "'Archivo Black', Impact, sans-serif", fontSize: "30px", lineHeight: "0.95", textTransform: "uppercase", color: "#111111" }}>{sel.name}</div>
             <div style={{ fontFamily: "'Caveat', cursive", fontSize: "20px", lineHeight: "1.1", color: "#5B3A1E" }}>{sel.role}</div>

@@ -10,7 +10,7 @@ const TILTS = ['-1.2deg', '1deg', '-0.6deg', '1.3deg', '-1deg'];
 
 // Full-screen "See every photo" viewer, web layout. Drag with mouse or finger, the arrows, or ← → keys; Esc closes.
 // No wrap-around: the ends rubber-band. --ph (web.css) is the photo height and shrinks on short screens.
-export default function WebPhotoViewer({ start = 0, onClose }) {
+export default function WebPhotoViewer({ start = 0, closing, onClose }) {
   const n = PHOTOS.length;
   const [cur, setCur] = useState(start);
   const [dx, setDx] = useState(0);            // live drag offset in px
@@ -56,13 +56,13 @@ export default function WebPhotoViewer({ start = 0, onClose }) {
   const arrow = { position: "absolute", top: "calc((var(--ph) + 170px) / 2 - 32px)", width: "64px", height: "64px", padding: "0", background: "#FFFFFF", border: "2px solid #F3EEE4", boxShadow: "5px 5px 0 #E9A23B", display: "flex", alignItems: "center", justifyContent: "center", zIndex: "3" };
 
   return (
-    <div className="web-viewer" role="dialog" aria-label="Photo highlights" style={{ position: "fixed", left: "0", right: "0", top: "0", margin: "0 auto", width: "1440px", zIndex: "90", background: "#111111", color: "#F3EEE4" }}>
+    <div className={`web-viewer ${closing ? 'viewer-out' : 'viewer-in'}`} role="dialog" aria-label="Photo highlights" style={{ position: "fixed", left: "0", right: "0", top: "0", margin: "0 auto", width: "1440px", zIndex: "90", background: "#111111", color: "#F3EEE4" }}>
       <div style={{ position: "absolute", left: "60px", top: "34px", fontFamily: "'Instrument Serif', Georgia, serif", fontSize: "44px", lineHeight: "1" }}>Photo wall</div>
       <div style={{ position: "absolute", left: "62px", top: "86px", fontFamily: "'Space Mono', monospace", fontSize: "11px", letterSpacing: "1.8px", color: "#BDB6A6" }}>HIGHLIGHTS ·{" "}<span style={{ color: "#F7C21A" }}>{pad2(cur + 1)}</span>{" "}{`/ ${pad2(n)}`}</div>
       <button className="btn" onClick={onClose} aria-label="Close photos" autoFocus style={{ position: "absolute", right: "60px", top: "30px", width: "56px", height: "56px", padding: "0", background: "#FFFFFF", border: "2px solid #F3EEE4", boxShadow: "5px 5px 0 #E9A23B", display: "flex", alignItems: "center", justifyContent: "center" }}>
         <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="#111111" strokeWidth="2.6" strokeLinecap="square"><path d="M3 3 L17 17" /><path d="M17 3 L3 17" /></svg>
       </button>
-      <div style={{ position: "absolute", left: "0", top: "120px", width: "1440px", height: "calc(var(--ph) + 170px)" }}>
+      <div className="viewer-stage" style={{ position: "absolute", left: "0", top: "120px", width: "1440px", height: "calc(var(--ph) + 170px)" }}>
         <div onPointerDown={onPointerDown} onPointerMove={onPointerMove} onPointerUp={onPointerUp} onPointerCancel={onPointerUp} style={{ position: "absolute", inset: "0", overflow: "hidden", touchAction: "pan-y", cursor: dragging ? "grabbing" : "grab", userSelect: "none" }}>
           <div className="gal-track" style={{ display: "flex", width: `${n * W}px`, height: "100%", transform: `translate3d(${-cur * W + dx}px, 0, 0)`, transition: tr, willChange: "transform" }}>
             {PHOTOS.map((p, i) => (
@@ -90,14 +90,14 @@ export default function WebPhotoViewer({ start = 0, onClose }) {
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#111111" strokeWidth="2.8" strokeLinecap="square"><path d="M9 4 L17 12 L9 20" /></svg>
         </button>
       </div>
-      <div aria-hidden="true" style={{ position: "absolute", left: "0", top: "calc(var(--ph) + 314px)", width: "1440px", display: "flex", justifyContent: "center", gap: "9px" }}>
+      <div className="viewer-bits" aria-hidden="true" style={{ position: "absolute", left: "0", top: "calc(var(--ph) + 314px)", width: "1440px", display: "flex", justifyContent: "center", gap: "9px" }}>
         {PHOTOS.map((p, i) => {
           const w = i === cur ? 26 - 17 * Math.abs(prog) : (i === nb ? 9 + 17 * Math.abs(prog) : 9);
           const lit = (i === cur && Math.abs(prog) < 0.5) || (i === nb && Math.abs(prog) >= 0.5);
           return <span key={i} style={{ display: "block", height: "8px", width: `${w}px`, borderRadius: "4px", background: lit ? '#F7C21A' : '#6B665C', transition: dragging ? 'none' : `width 420ms ${EASE}, background-color 200ms ease` }} />;
         })}
       </div>
-      <div style={{ position: "absolute", left: "0", top: "calc(var(--ph) + 346px)", width: "1440px", display: "flex", justifyContent: "center", gap: "14px" }}>
+      <div className="viewer-bits" style={{ position: "absolute", left: "0", top: "calc(var(--ph) + 346px)", width: "1440px", display: "flex", justifyContent: "center", gap: "14px" }}>
         {PHOTOS.map((p, i) => {
           const on = i === cur;
           return (

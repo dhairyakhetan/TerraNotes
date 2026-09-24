@@ -2,6 +2,9 @@ import { useRef } from 'react';
 import { fitWord, useWordsGame } from '../../lib/useWordsGame.js';
 
 // "Words we should bring back" mini game, phone layout (logic: lib/useWordsGame.js, words: src/data/words.js).
+// the answer they picked shakes if wrong; the right one bounces
+const mood = (o) => (o.mark === '✓' ? 'w-right' : o.mark === '✗' ? 'w-wrong' : '');
+
 export default function WordsGame() {
   const ref = useRef(null);
   const v = { w: useWordsGame(ref) };
@@ -19,23 +22,23 @@ export default function WordsGame() {
         </svg>
         <div style={{ position: "absolute", left: "0", top: "78px", width: "370px", textAlign: "center" }}>
           <div style={{ fontFamily: "'Space Mono', monospace", fontSize: "9.5px", letterSpacing: "1.6px", color: "#4A4A45" }}>WORD {v.w.n} / {v.w.total}</div>
-          <div style={{ marginTop: "4px", fontFamily: "'Archivo Black', Impact, sans-serif", fontSize: v.w.wordSize, lineHeight: "1", textTransform: "uppercase", letterSpacing: "-0.5px", color: "#111111" }}>{v.w.word}</div>
+          <div key={v.w.word} className="word-pop" style={{ marginTop: "4px", fontFamily: "'Archivo Black', Impact, sans-serif", fontSize: v.w.wordSize, lineHeight: "1", textTransform: "uppercase", letterSpacing: "-0.5px", color: "#111111" }}>{v.w.word}</div>
           <div style={{ marginTop: "4px", fontFamily: "'Caveat', cursive", fontSize: "20px", color: "#5B3A1E" }}>what do you think it means?</div>
         </div>
       </div>
       {/* options / result */}
       {v.w.playing && (
         <>
-          <div style={{ position: "absolute", left: "20px", top: "330px", width: "350px", display: "flex", flexDirection: "column", gap: "12px" }}>
-            <button className="w-opt" onClick={v.w.o0.pick} disabled={v.w.locked} style={{ minHeight: "52px", width: "100%", boxSizing: "border-box", padding: "10px 14px", display: "flex", alignItems: "center", gap: "12px", textAlign: "left", background: v.w.o0.bg, color: v.w.o0.fg, border: "2px solid #111111", boxShadow: "4px 4px 0 #111111", opacity: v.w.o0.op, fontFamily: "'Figtree', system-ui, sans-serif", fontSize: "15px", fontWeight: "500", lineHeight: "1.25", transition: "background-color 120ms ease, opacity 120ms ease" }}>
+          <div key={v.w.word} className="w-in" style={{ position: "absolute", left: "20px", top: "330px", width: "350px", display: "flex", flexDirection: "column", gap: "12px" }}>
+            <button className={`w-opt ${mood(v.w.o0)}`} onClick={v.w.o0.pick} disabled={v.w.locked} style={{ minHeight: "52px", width: "100%", boxSizing: "border-box", padding: "10px 14px", display: "flex", alignItems: "center", gap: "12px", textAlign: "left", background: v.w.o0.bg, color: v.w.o0.fg, border: "2px solid #111111", boxShadow: "4px 4px 0 #111111", opacity: v.w.o0.op, fontFamily: "'Figtree', system-ui, sans-serif", fontSize: "15px", fontWeight: "500", lineHeight: "1.25", transition: "background-color 120ms ease, opacity 120ms ease" }}>
               <span style={{ width: "26px", height: "26px", flexShrink: "0", border: "2px solid currentColor", boxSizing: "border-box", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "'Space Mono', monospace", fontWeight: "700", fontSize: "12px" }}>{v.w.o0.mark}</span>
               <span style={{ flexGrow: "1" }}>{v.w.o0.text}</span>
             </button>
-            <button className="w-opt" onClick={v.w.o1.pick} disabled={v.w.locked} style={{ minHeight: "52px", width: "100%", boxSizing: "border-box", padding: "10px 14px", display: "flex", alignItems: "center", gap: "12px", textAlign: "left", background: v.w.o1.bg, color: v.w.o1.fg, border: "2px solid #111111", boxShadow: "4px 4px 0 #111111", opacity: v.w.o1.op, fontFamily: "'Figtree', system-ui, sans-serif", fontSize: "15px", fontWeight: "500", lineHeight: "1.25", transition: "background-color 120ms ease, opacity 120ms ease" }}>
+            <button className={`w-opt ${mood(v.w.o1)}`} onClick={v.w.o1.pick} disabled={v.w.locked} style={{ minHeight: "52px", width: "100%", boxSizing: "border-box", padding: "10px 14px", display: "flex", alignItems: "center", gap: "12px", textAlign: "left", background: v.w.o1.bg, color: v.w.o1.fg, border: "2px solid #111111", boxShadow: "4px 4px 0 #111111", opacity: v.w.o1.op, fontFamily: "'Figtree', system-ui, sans-serif", fontSize: "15px", fontWeight: "500", lineHeight: "1.25", transition: "background-color 120ms ease, opacity 120ms ease" }}>
               <span style={{ width: "26px", height: "26px", flexShrink: "0", border: "2px solid currentColor", boxSizing: "border-box", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "'Space Mono', monospace", fontWeight: "700", fontSize: "12px" }}>{v.w.o1.mark}</span>
               <span style={{ flexGrow: "1" }}>{v.w.o1.text}</span>
             </button>
-            <button className="w-opt" onClick={v.w.o2.pick} disabled={v.w.locked} style={{ minHeight: "52px", width: "100%", boxSizing: "border-box", padding: "10px 14px", display: "flex", alignItems: "center", gap: "12px", textAlign: "left", background: v.w.o2.bg, color: v.w.o2.fg, border: "2px solid #111111", boxShadow: "4px 4px 0 #111111", opacity: v.w.o2.op, fontFamily: "'Figtree', system-ui, sans-serif", fontSize: "15px", fontWeight: "500", lineHeight: "1.25", transition: "background-color 120ms ease, opacity 120ms ease" }}>
+            <button className={`w-opt ${mood(v.w.o2)}`} onClick={v.w.o2.pick} disabled={v.w.locked} style={{ minHeight: "52px", width: "100%", boxSizing: "border-box", padding: "10px 14px", display: "flex", alignItems: "center", gap: "12px", textAlign: "left", background: v.w.o2.bg, color: v.w.o2.fg, border: "2px solid #111111", boxShadow: "4px 4px 0 #111111", opacity: v.w.o2.op, fontFamily: "'Figtree', system-ui, sans-serif", fontSize: "15px", fontWeight: "500", lineHeight: "1.25", transition: "background-color 120ms ease, opacity 120ms ease" }}>
               <span style={{ width: "26px", height: "26px", flexShrink: "0", border: "2px solid currentColor", boxSizing: "border-box", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "'Space Mono', monospace", fontWeight: "700", fontSize: "12px" }}>{v.w.o2.mark}</span>
               <span style={{ flexGrow: "1" }}>{v.w.o2.text}</span>
             </button>

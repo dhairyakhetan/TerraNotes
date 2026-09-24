@@ -49,8 +49,6 @@ html[data-layout="web"]{scroll-padding-top:calc(80px * var(--web-zoom,1))}
 .web .bub:hover{transform:scale(1.05)}
 .web .legend-chip{transition:background-color 160ms ease}
 .web .legend-chip:hover{background:#E6E0D3 !important;color:#111111 !important}
-.web-pop{animation:webPop 380ms cubic-bezier(0.32,0.72,0,1) both}
-@keyframes webPop{from{opacity:0;transform:translateY(20px) scale(.95) rotate(-2deg)}to{opacity:1;transform:rotate(-1deg)}}
 
 /* article page: the field log fades up keeping its tilt */
 .web aside.rise-in{animation-name:riseInTilt}
@@ -62,7 +60,7 @@ html[data-layout="web"]{scroll-padding-top:calc(80px * var(--web-zoom,1))}
 .web-viewer{--ph:clamp(240px, calc(var(--vh) / var(--web-zoom,1) - 430px), 470px)}
 
 @media (prefers-reduced-motion: reduce){
-.web-pop,.web aside.rise-in{animation:none}
+.web aside.rise-in{animation:none}
 .bulb-h,.spark-h{animation:none}
 .card-link article,.btn{transition:none}
 }

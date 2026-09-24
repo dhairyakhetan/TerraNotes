@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link, useLocation } from 'react-router';
 import PageHeader from '../components/PageHeader.jsx';
 import MenuSheet from '../components/MenuSheet.jsx';
@@ -14,27 +14,36 @@ const NOTES = [
 // The 404 itself: an empty peg on the wire, and the "404" card lying on the ground under it. Tap the card to hang it back up.
 function Lost() {
   const { pathname } = useLocation();
-  const [hung, setHung] = useState(false);
+  // the card starts on its peg, then falls off it ("uh oh."); with reduced motion it's already on the ground
+  const [hung, setHung] = useState(() => !matchMedia('(prefers-reduced-motion: reduce)').matches);
+  const [intro, setIntro] = useState(hung);
+  const fall = useRef(0);
+  useEffect(() => {
+    if (!intro) return;
+    fall.current = setTimeout(() => { setHung(false); setIntro(false); }, 650);
+    return () => clearTimeout(fall.current);
+  }, []);
+  const toggle = () => { clearTimeout(fall.current); setIntro(false); setHung(!hung); };
   const [note] = useState(() => NOTES[Math.floor(Math.random() * NOTES.length)]);
   return (
-    <div style={{ width: "350px", margin: "0 auto" }}>
+    <div className="cascade-in" style={{ width: "350px", margin: "0 auto" }}>
       <div style={{ position: "relative", height: "420px" }}>
         {/* the wire, and the peg the card fell off */}
         <div style={{ position: "absolute", left: "-20px", top: "24px", width: "390px", height: "2px", background: "#5B3A1E" }} />
         <div style={{ position: "absolute", left: "161px", top: "19px", width: "28px", height: "10px", background: "#F0442B", border: "1.5px solid #111111", boxSizing: "border-box", zIndex: "2" }} />
-        <div className="sway" style={{ position: "absolute", left: "174px", top: "28px", width: "2px", height: "34px", "--a": "9deg", "--d": "2.6s", opacity: hung ? 0 : 1, transition: "opacity .2s" }}>
+        <div className="sway" style={{ position: "absolute", left: "174px", top: "28px", width: "2px", height: "34px", "--a": "9deg", "--d": "2.6s", opacity: hung ? 0 : 1, transition: "opacity .2s .25s" }}>
           {/* the snapped string */}
           <svg width="2" height="34" viewBox="0 0 2 34" aria-hidden="true" style={{ display: "block" }}><path d="M1 0 V26 L0 30 M1 26 L2 33" stroke="#5B3A1E" strokeWidth="1.4" fill="none" /></svg>
         </div>
-        <div style={{ position: "absolute", left: "198px", top: "40px", width: "150px", fontFamily: "'Caveat', cursive", fontSize: "23px", lineHeight: "1.05", color: "#5B3A1E", transform: "rotate(-5deg)", opacity: hung ? 0 : 1, transition: "opacity .3s" }}>{note}</div>
+        <div style={{ position: "absolute", left: "198px", top: "40px", width: "150px", fontFamily: "'Caveat', cursive", fontSize: "23px", lineHeight: "1.05", color: "#5B3A1E", transform: "rotate(-5deg)", opacity: hung ? 0 : 1, transition: "opacity .3s .35s" }}>{note}</div>
 
         {/* the card: on the ground, or back on its peg */}
-        <button onClick={() => setHung(!hung)} aria-label={hung ? 'Drop the card' : 'Hang the card back up'} aria-pressed={hung ? 'true' : 'false'} style={{ position: "absolute", left: "95px", top: "29px", width: "160px", height: "210px", padding: "0", border: "0", background: "transparent", transformOrigin: "50% 0", transform: hung ? "none" : "translate(-46px, 146px) rotate(-14deg)", transition: hung ? "transform 700ms cubic-bezier(0.34, 1.56, 0.64, 1)" : "transform 480ms cubic-bezier(0.55, 0, 0.9, 0.45)", zIndex: "1" }}>
+        <button onClick={toggle} aria-label={hung ? 'Drop the card' : 'Hang the card back up'} aria-pressed={hung ? 'true' : 'false'} style={{ position: "absolute", left: "95px", top: "29px", width: "160px", height: "210px", padding: "0", border: "0", background: "transparent", transformOrigin: "50% 0", transform: hung ? "none" : "translate(-46px, 146px) rotate(-14deg)", transition: hung ? "transform 700ms cubic-bezier(0.34, 1.56, 0.64, 1)" : "transform 480ms cubic-bezier(0.55, 0, 0.9, 0.45)", zIndex: "1" }}>
           <div className={hung ? 'sway' : undefined} style={{ width: "100%", height: "100%", "--a": "1.6deg", "--d": "3.4s" }}>
             <div style={{ width: "100%", height: "100%", boxSizing: "border-box", background: "#FFFFFF", border: "2px solid #111111", boxShadow: "7px 7px 0 #111111", padding: "14px", display: "flex", flexDirection: "column", justifyContent: "space-between", textAlign: "left" }}>
               <span style={{ fontFamily: "'Space Mono', monospace", fontSize: "10px", letterSpacing: "1.4px", color: "#111111" }}>NOT ON THE LINE</span>
               <span style={{ fontFamily: "'Archivo Black', Impact, sans-serif", fontSize: "62px", lineHeight: "0.9", letterSpacing: "-2px", color: "#111111" }}>404</span>
-              <span style={{ fontFamily: "'Caveat', cursive", fontSize: "20px", lineHeight: "1.05", color: "#5B3A1E" }}>{hung ? 'there. much better.' : '(tap to hang it back up)'}</span>
+              <span style={{ fontFamily: "'Caveat', cursive", fontSize: "20px", lineHeight: "1.05", color: "#5B3A1E" }}>{intro ? 'uh oh.' : hung ? 'there. much better.' : '(tap to hang it back up)'}</span>
             </div>
           </div>
         </button>

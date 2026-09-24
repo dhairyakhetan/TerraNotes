@@ -9,7 +9,7 @@ const TILTS = ['-1.5deg', '1.2deg', '-0.8deg', '1.6deg', '-1.2deg'];
 
 // Full-screen "See every photo" viewer. Swipe or use the arrows; no wrap-around (ends rubber-band).
 // --ph (styles/home.css) is the photo height and shrinks on short screens.
-export default function PhotoViewer({ start = 0, onClose }) {
+export default function PhotoViewer({ start = 0, closing, onClose }) {
   const n = PHOTOS.length;
   const [cur, setCur] = useState(start);
   const [dx, setDx] = useState(0);            // live drag offset in px
@@ -45,7 +45,7 @@ export default function PhotoViewer({ start = 0, onClose }) {
   const arrow = { "--c": "#E9A23B", width: "48px", height: "48px", flexShrink: "0", padding: "0", background: "#FFFFFF", border: "2px solid #F3EEE4", boxShadow: "4px 4px 0 #E9A23B", display: "flex", alignItems: "center", justifyContent: "center", transition: "opacity 200ms ease" };
 
   return (
-    <div className="photo-viewer" role="dialog" aria-label="Photo highlights" style={{ position: "fixed", left: "0", right: "0", top: "0", margin: "0 auto", width: "390px", zIndex: "90", background: "#111111", color: "#F3EEE4" }}>
+    <div className={`photo-viewer ${closing ? 'viewer-out' : 'viewer-in'}`} role="dialog" aria-label="Photo highlights" style={{ position: "fixed", left: "0", right: "0", top: "0", margin: "0 auto", width: "390px", zIndex: "90", background: "#111111", color: "#F3EEE4" }}>
       <div style={{ position: "absolute", left: "20px", top: "24px", fontFamily: "'Instrument Serif', Georgia, serif", fontSize: "32px", lineHeight: "1" }}>Photo wall</div>
       <div style={{ position: "absolute", left: "22px", top: "64px", fontFamily: "'Space Mono', monospace", fontSize: "10px", letterSpacing: "1.6px", color: "#BDB6A6" }}>HIGHLIGHTS ·{" "}<span style={{ color: "#F7C21A" }}>{pad2(cur + 1)}</span>{" "}{`/ ${pad2(n)}`}</div>
       <button className="press" onClick={onClose} aria-label="Close photos" style={{ "--c": "#E9A23B", position: "absolute", right: "20px", top: "18px", width: "48px", height: "48px", padding: "0", background: "#FFFFFF", border: "2px solid #F3EEE4", boxShadow: "4px 4px 0 #E9A23B", display: "flex", alignItems: "center", justifyContent: "center" }}>
@@ -54,7 +54,7 @@ export default function PhotoViewer({ start = 0, onClose }) {
           <path d="M17 3 L3 17" />
         </svg>
       </button>
-      <div onTouchStart={onTouchStart} onTouchMove={onTouchMove} onTouchEnd={onTouchEnd} onTouchCancel={onTouchEnd} style={{ position: "absolute", left: "0", top: "104px", width: "390px", height: "calc(var(--ph) + 150px)", overflow: "hidden", touchAction: "pan-y" }}>
+      <div className="viewer-stage" onTouchStart={onTouchStart} onTouchMove={onTouchMove} onTouchEnd={onTouchEnd} onTouchCancel={onTouchEnd} style={{ position: "absolute", left: "0", top: "104px", width: "390px", height: "calc(var(--ph) + 150px)", overflow: "hidden", touchAction: "pan-y" }}>
         <div className="gal-track" style={{ display: "flex", width: `${n * W}px`, height: "100%", transform: `translate3d(${-cur * W + dx}px, 0, 0)`, transition: tr, willChange: "transform" }}>
           {PHOTOS.map((p, i) => (
             <div key={i} className="gal-slide" style={{ width: "390px", flexShrink: "0", boxSizing: "border-box", padding: "18px 30px 0", transform: `scale(${i === cur ? 1 : 0.9})`, opacity: i === cur ? 1 : 0.45, transition: tr }} aria-hidden={i === cur ? 'false' : 'true'}>
@@ -75,7 +75,7 @@ export default function PhotoViewer({ start = 0, onClose }) {
         </div>
       </div>
       {/* arrows + dots (the active dot is a pill that hands over to its neighbour while dragging) */}
-      <div style={{ position: "absolute", left: "20px", top: "calc(var(--ph) + 274px)", width: "350px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+      <div className="viewer-bits" style={{ position: "absolute", left: "20px", top: "calc(var(--ph) + 274px)", width: "350px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
         <button className="press" onClick={() => go(cur - 1)} disabled={cur === 0} aria-label="Previous photo" style={{ ...arrow, opacity: cur === 0 ? 0.3 : 1 }}>
           <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="#111111" strokeWidth="2.6" strokeLinecap="square">
             <path d="M13 3 L6 10 L13 17" />
@@ -94,7 +94,7 @@ export default function PhotoViewer({ start = 0, onClose }) {
           </svg>
         </button>
       </div>
-      <div style={{ position: "absolute", left: "0", top: "calc(var(--ph) + 360px)", width: "390px", display: "flex", justifyContent: "center", gap: "10px" }}>
+      <div className="viewer-bits" style={{ position: "absolute", left: "0", top: "calc(var(--ph) + 360px)", width: "390px", display: "flex", justifyContent: "center", gap: "10px" }}>
         {PHOTOS.map((p, i) => {
           const on = i === cur;
           return (

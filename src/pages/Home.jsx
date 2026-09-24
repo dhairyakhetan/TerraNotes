@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { usePresence } from '../lib/presence.js';
 import { Link } from 'react-router';
 import MenuSheet from '../components/MenuSheet.jsx';
 import HangingArticles from '../components/home/HangingArticles.jsx';
@@ -16,6 +17,7 @@ import Logo from '../components/Logo.jsx';
 export default function Home({ motion = true }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [photo, setPhoto] = useState(null); // index open in the photo viewer
+  const [shownPhoto, photoLeaving] = usePresence(photo, 180); // stays mounted while it fades out
   // TEMPORARY: header switch between the hanging articles, the sideways line and the tiles; remembered on this device
   const [view, setView] = useState(() => { try { return localStorage.getItem('aq-articles-view') || 'hang'; } catch { return 'hang'; } });
   const pick = (v) => { setView(v); try { localStorage.setItem('aq-articles-view', v); } catch { /* private mode */ } };
@@ -31,7 +33,7 @@ export default function Home({ motion = true }) {
           </Link>
           <span style={{ flexGrow: "1" }} />
           {/* TEMPORARY articles view switch */}
-          <div role="group" aria-label="Articles view (temporary)" style={{ display: "flex", padding: "2px", gap: "2px", border: "1.5px dashed #111111", borderRadius: "999px" }}>
+          <div className="view-switch" role="group" aria-label="Articles view (temporary)" style={{ display: "flex", padding: "2px", gap: "2px", border: "1.5px dashed #111111", borderRadius: "999px" }}>
             {[['hang', 'Hang'], ['scroll', 'Line'], ['tiles', 'Tiles']].map(([v, label]) => (
               <button key={v} onClick={() => pick(v)} aria-pressed={view === v ? 'true' : 'false'} style={{ minHeight: "30px", padding: "0 6px", border: "0", borderRadius: "999px", background: view === v ? '#111111' : 'transparent', color: view === v ? '#F3EEE4' : '#111111', fontFamily: "'Space Mono', monospace", fontWeight: "700", fontSize: "8px", letterSpacing: "0.5px", textTransform: "uppercase" }}>{label}</button>
             ))}
@@ -53,7 +55,10 @@ export default function Home({ motion = true }) {
           </div>
           <div style={{ position: "absolute", left: "68px", top: "194px", width: "14px", height: "14px", boxSizing: "border-box", borderRadius: "50%", background: "#F0442B", border: "2px solid #111111" }} />
         </section>
-        {view === 'scroll' ? <ScrollingArticles /> : view === 'tiles' ? <TileArticles /> : <HangingArticles />}
+        {/* zero-height box at the page's corner: the view keeps its page coordinates and fades in when switched */}
+        <div key={view} className="view-in" style={{ position: "absolute", left: "0", top: "0", width: "390px", height: "0" }}>
+          {view === 'scroll' ? <ScrollingArticles /> : view === 'tiles' ? <TileArticles /> : <HangingArticles />}
+        </div>
         <Link style={{ position: "absolute", right: "22px", top: "1122px", fontFamily: "'Caveat', cursive", fontSize: "22px", textDecoration: "none", display: "flex", alignItems: "center", gap: "6px", minHeight: "44px" }} to="/articles">all articles{" "}<svg width="30" height="12" viewBox="0 0 30 12" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round">
           <path d="M1 7 C10 4 18 8 28 6" />
           <path d="M23 2 L28 6 L23 10" />
@@ -63,7 +68,7 @@ export default function Home({ motion = true }) {
         <Members />
       </div>
       <MenuSheet open={menuOpen} onClose={() => setMenuOpen(false)} current="home" />
-      {photo != null && <PhotoViewer start={photo} onClose={() => setPhoto(null)} />}
+      {shownPhoto != null && <PhotoViewer start={shownPhoto} closing={photoLeaving} onClose={() => setPhoto(null)} />}
     </>
   );
 }
