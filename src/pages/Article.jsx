@@ -4,6 +4,7 @@ import PageHeader from '../components/PageHeader.jsx';
 import MenuSheet from '../components/MenuSheet.jsx';
 import ArticleCard from '../components/ArticleCard.jsx';
 import Img from '../components/Img.jsx';
+import Extra, { isExtra } from '../components/Extras.jsx';
 import { ARTICLES, TAGS } from '../data/articles.js';
 import { MEMBERS } from '../data/team.js';
 import { pad2 } from '../lib/format.js';
@@ -22,6 +23,7 @@ function Block({ b, first, a, tag }) {
     const draft = b.startsWith('[');
     return <p style={P}><span style={{ float: "left", fontFamily: "'Archivo Black', Impact, sans-serif", fontSize: "62px", lineHeight: "0.8", margin: "6px 10px 0 0", padding: "6px 8px", background: tag.color, color: tag.ink, border: "2px solid #111111" }}>{draft ? a.title[0] : cap(b)}</span>{draft ? b : b.slice(cap(b).length)}</p>;
   }
+  if (isExtra(b)) return <Extra b={b} tag={tag} />;
   if (b.h2 != null) {
     return <h2 style={{ margin: "10px 0 0", fontFamily: "'Archivo Black', Impact, sans-serif", fontWeight: "400", fontSize: "24px", lineHeight: "1", textTransform: "uppercase", display: "flex", alignItems: "center", gap: "10px" }}><span style={{ width: "14px", height: "14px", background: tag.color, border: "2px solid #111111", flexShrink: "0" }} />{b.h2}</h2>;
   }

@@ -66,7 +66,7 @@ export default function PhotoViewer({ start = 0, closing, onClose }) {
                     : <div style={{ height: "var(--ph)", background: p.tint, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "12px", color: "#F3EEE4" }}>{`[photo ${i + 1}]`}</div>}
                   <figcaption style={{ padding: "10px 2px 12px" }}>
                     <div style={{ fontFamily: "'Caveat', cursive", fontSize: "22px", lineHeight: "1.1", color: "#111111" }}>{p.caption || "[caption — what's happening here]"}</div>
-                    <div style={{ marginTop: "4px", fontFamily: "'Space Mono', monospace", fontSize: "9.5px", letterSpacing: "1.2px", textTransform: "uppercase", color: "#6B665C" }}>{`Highlight ${pad2(i + 1)} · ${p.place || '[place]'}`}</div>
+                    <div style={{ marginTop: "4px", fontFamily: "'Space Mono', monospace", fontSize: "9.5px", letterSpacing: "1.2px", textTransform: "uppercase", color: "#6B665C" }}>{`Highlight ${pad2(i + 1)}${p.place ? ` · ${p.place}` : ''}`}</div>
                   </figcaption>
                 </div>
               </figure>

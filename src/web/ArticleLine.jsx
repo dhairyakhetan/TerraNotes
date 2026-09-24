@@ -100,16 +100,16 @@ function runLine(r, pegs, width) {
     g.arm = [flutter.offsetLeft + flutter.offsetWidth / 2 - label.offsetWidth / 2, flutter.offsetTop];  // …the card wobbles about its own top middle…
     g.knot = [knot.offsetLeft + knot.offsetWidth / 2 - flutter.offsetWidth / 2, knot.offsetTop + knot.offsetHeight / 2]; // …and the knot rides on the card
     const cs = (n, v) => parseFloat(getComputedStyle(n).getPropertyValue(v)) || 0;
-    g.sway = { anim: label.getAnimations()[0], a: cs(label, '--a') };
-    g.wobble = { anim: flutter.getAnimations()[0], r: cs(flutter, '--r') };
+    g.sway = { anim: label.getAnimations()[0], a: cs(label, '--a') * (cs(label, '--wind') || 1) };
+    g.wobble = { anim: flutter.getAnimations()[0], r: cs(flutter, '--r'), flap: cs(flutter, '--flap') || 0.7 };
   };
-  // The two angles right now, from the running CSS animations (sway: -a → +a; flutter: r ∓ 0.7deg; both ease-in-out).
+  // The two angles right now, from the running CSS animations (sway: ∓a × wind; flutter: r ∓ flap; both ease-in-out).
   const angle = (x, lo, hi) => {
     const t = x.anim && x.anim.effect.getComputedTiming().progress;
     return t == null ? (lo + hi) / 2 : lo + (hi - lo) * easeInOut(t);
   };
   const knotAt = () => {
-    const ts = angle(g.sway, -g.sway.a, g.sway.a) * RAD, tf = angle(g.wobble, g.wobble.r - 0.7, g.wobble.r + 0.7) * RAD;
+    const ts = angle(g.sway, -g.sway.a, g.sway.a) * RAD, tf = angle(g.wobble, g.wobble.r - g.wobble.flap, g.wobble.r + g.wobble.flap) * RAD;
     const [kx, ky] = rot(g.knot, tf), [px, py] = rot([g.arm[0] + kx, g.arm[1] + ky], ts);
     return [g.pivot[0] + px, g.pivot[1] + py];
   };

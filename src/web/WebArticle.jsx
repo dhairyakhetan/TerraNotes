@@ -3,6 +3,7 @@ import { Link } from 'react-router';
 import WebHeader from './WebHeader.jsx';
 import WebCard from './WebCard.jsx';
 import Img from '../components/Img.jsx';
+import Extra, { isExtra } from '../components/Extras.jsx';
 import { PhotoIcon } from '../components/home/Members.jsx';
 import { ARTICLES, TAGS } from '../data/articles.js';
 import { MEMBERS } from '../data/team.js';
@@ -25,6 +26,7 @@ function Block({ b, first, a, tag }) {
     const draft = b.startsWith('[');
     return <p style={P}><span style={{ float: "left", fontFamily: "'Archivo Black', Impact, sans-serif", fontSize: "78px", lineHeight: "0.8", margin: "8px 14px 0 0", padding: "8px 10px", background: tag.color, color: tag.ink, border: "2px solid #111111" }}>{draft ? a.title[0] : cap(b)}</span>{draft ? b : b.slice(cap(b).length)}</p>;
   }
+  if (isExtra(b)) return <Extra b={b} tag={tag} web />;
   if (b.h2 != null) {
     return <h2 style={{ margin: "12px 0 0", fontFamily: "'Archivo Black', Impact, sans-serif", fontWeight: "400", fontSize: "32px", lineHeight: "1", textTransform: "uppercase", display: "flex", alignItems: "center", gap: "14px" }}><span style={{ width: "18px", height: "18px", background: tag.color, border: "2px solid #111111", flexShrink: "0" }} />{b.h2}</h2>;
   }

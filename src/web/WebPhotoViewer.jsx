@@ -75,7 +75,7 @@ export default function WebPhotoViewer({ start = 0, closing, onClose }) {
                       : <div style={{ height: "var(--ph)", background: p.tint, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "14px", color: "#F3EEE4" }}>{`[photo ${i + 1}]`}</div>}
                     <figcaption style={{ padding: "14px 4px 16px", display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: "20px" }}>
                       <div style={{ fontFamily: "'Caveat', cursive", fontSize: "28px", lineHeight: "1.1", color: "#111111" }}>{p.caption || "[caption — what's happening here]"}</div>
-                      <div style={{ fontFamily: "'Space Mono', monospace", fontSize: "11px", letterSpacing: "1.4px", textTransform: "uppercase", color: "#6B665C", whiteSpace: "nowrap" }}>{`Highlight ${pad2(i + 1)} · ${p.place || '[place]'}`}</div>
+                      <div style={{ fontFamily: "'Space Mono', monospace", fontSize: "11px", letterSpacing: "1.4px", textTransform: "uppercase", color: "#6B665C", whiteSpace: "nowrap" }}>{`Highlight ${pad2(i + 1)}${p.place ? ` · ${p.place}` : ''}`}</div>
                     </figcaption>
                   </div>
                 </figure>

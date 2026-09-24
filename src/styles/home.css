@@ -10,9 +10,11 @@
 .hang{pointer-events:none}
 .hang .card,.hang .label-card,.hang .card *{pointer-events:auto}
 .sway{transform-origin:50% 0;animation:sway var(--d,5s) ease-in-out infinite alternate}
-@keyframes sway{from{transform:rotate(calc(var(--a,1deg) * -1))}to{transform:rotate(var(--a,1deg))}}
+/* --wind scales every card's swing, --flap the wobble on its clip (lib: web/ArticleLine.jsx reads both for the string maths) */
+:root{--wind:1.5;--flap:1deg}
+@keyframes sway{from{transform:rotate(calc(var(--a,1deg) * var(--wind) * -1))}to{transform:rotate(calc(var(--a,1deg) * var(--wind)))}}
 .flutter{transform-origin:50% 0;animation:flutter 3.6s ease-in-out infinite alternate}
-@keyframes flutter{from{transform:rotate(calc(var(--r,0deg) - 0.7deg))}to{transform:rotate(calc(var(--r,0deg) + 0.7deg))}}
+@keyframes flutter{from{transform:rotate(calc(var(--r,0deg) - var(--flap)))}to{transform:rotate(calc(var(--r,0deg) + var(--flap)))}}
 
 /* Photo wall: .twist turns a photo on its peg now and then, .glint crosses it, fk1–fk4 flicker the bulbs, .spark pops glints */
 .twist{animation-name:twist;animation-timing-function:ease-in-out;animation-iteration-count:infinite}
