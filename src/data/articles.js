@@ -146,7 +146,7 @@ export const ARTICLES = [
     title: 'My grandma’s daughter',
     dek: 'a portrait of mom, by someone slowly turning into her',
     tag: 'Prose',
-    cover: '',
+    cover: '/articles/my-grandmas-daughter.jpg',
     alt: 'grandma',
     author: 'Ashwika Tripathi',
     date: 'Sep 2026',
