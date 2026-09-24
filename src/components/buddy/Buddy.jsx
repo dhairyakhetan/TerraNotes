@@ -5,7 +5,7 @@ import { callBuddy, openGames, useBuddy } from '../../lib/buddy.js';
 import '../../styles/buddy.css';
 
 // Buddy: a little ghost. Called from a hidden button in the web header's corner (he ropes down) or from the phone
-// menu's "click me" (he moves into a hut by the intro). He stays for the rest of the visit (sessionStorage).
+// menu's "click me" (he moves into a hut by the intro). He stays until the page is reloaded.
 // Tap him: he does a trick and asks if you want to play (Snake or Float, see Games.jsx).
 const TRICKS = ['spin', 'boing', 'flip', 'melt', 'boo', 'wobble'];
 const MONO = { fontFamily: "'Space Mono', monospace", fontWeight: "700", letterSpacing: "1.2px", textTransform: "uppercase" };
