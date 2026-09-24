@@ -39,7 +39,8 @@ export function useFaceColors(filter) {
   const colorFor = (m) => {
     const ts = teamsOf(m);
     if (ts.length < 2) return colorOf(m);
-    return TEAMS[ts.includes(filter) ? filter : ts[phase % ts.length]].color;
+    if (ts.includes(filter)) return TEAMS[filter].color;
+    return m.steady ? colorOf(m) : TEAMS[ts[phase % ts.length]].color; // steady: stays on their first team
   };
   return { colorFor, fade: mode.current === 'slow' ? '3s' : '0.8s' };
 }

@@ -1,6 +1,7 @@
 // The team, in the order their faces appear on the home page. The faces lay themselves out, so add or remove freely.
 //   photo:     put the picture in public/team/ and write its path, e.g. '/team/ananya.jpg'
-//   team:      one of the keys in TEAMS, or a list for someone in two, e.g. ['design', 'writing'] (the first sets their colour)
+//   team:      one of the keys in TEAMS, or a list for someone in two, e.g. ['design', 'writing'] (the first sets their colour;
+//              their face fades between the two every so often, or with steady: true keeps the first unless the legend picks the other)
 //   bio:       2 lines for the pop-up when someone taps the face
 //   instagram: handle without the @
 // Leave a field '' and the design's placeholder shows instead.
@@ -27,7 +28,7 @@ export const MEMBERS = [
   { name: 'Priyam Agarwal', role: 'Tech team', team: 'tech', photo: '', bio: 'Hey, I’m Priyam! I’m into tech, maths, and quant finance, and I like messing around with new ideas and building random stuff. Mostly just curious and figuring things out as I go :)', instagram: 'priyamagarwal3' },
   { name: 'Dhriti Agarwal', role: 'Writing team', team: 'writing', photo: '', bio: '', instagram: '' },
   { name: 'Divya Rathi', role: 'Design & writing team', team: ['design', 'writing'], photo: '', bio: '', instagram: '' },
-  { name: 'Ashwika Tripathi', role: 'Head of department', team: 'heads', photo: '', bio: '', instagram: '' },
+  { name: 'Ashwika Tripathi', role: 'Head of department', team: ['heads', 'writing'], steady: true, photo: '', bio: '', instagram: '' },
   { name: 'Diti Shah', role: 'Writing team', team: 'writing', photo: '', bio: 'Hii…this is Diti Shah', instagram: '_ditishah' },
   { name: 'Ayushi Khemka', role: 'Design team', team: 'design', photo: '', bio: 'Designing my life one questionable decision at a time.', instagram: '' },
   { name: 'Bhavishya Agarwal', role: 'Tech team', team: 'tech', photo: '', bio: 'I like Claude', instagram: 'bhavishya.idk' },

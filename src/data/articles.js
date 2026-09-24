@@ -124,7 +124,7 @@ export const ARTICLES = [
     tag: 'Prose',
     cover: '',
     alt: 'the river',
-    author: '',
+    author: 'Ashwika Tripathi',
     date: 'Sep 2026',
     readTime: '1',
     body: [
@@ -149,7 +149,7 @@ export const ARTICLES = [
     tag: 'Prose',
     cover: '',
     alt: 'grandma',
-    author: '',
+    author: 'Ashwika Tripathi',
     date: 'Sep 2026',
     readTime: '1',
     body: [
@@ -176,7 +176,7 @@ export const ARTICLES = [
     tag: 'Essay',
     cover: '',
     alt: 'ten years ago',
-    author: '',
+    author: 'Ashwika Tripathi',
     date: 'Sep 2026',
     readTime: '2',
     body: [
