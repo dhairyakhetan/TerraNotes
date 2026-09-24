@@ -153,7 +153,7 @@ export default function Members() {
             <div style={{ fontFamily: "'Caveat', cursive", fontSize: "20px", lineHeight: "1.1", color: "#5B3A1E" }}>{sel.role}</div>
             <p style={{ margin: "0", fontSize: "14px", lineHeight: "1.5", color: "#333333" }}>{sel.bio || '[Two lines about them: where they work from, what they write or shoot, what they care about.]'}</p>
             {/* what their team made; only writers have articles */}
-            {teamsOf(sel).filter((t) => t !== 'writing').map((t) => (
+            {teamsOf(sel).map((t) => (
               <p key={t} style={{ margin: "0", paddingLeft: "10px", borderLeft: `3px solid ${TEAMS[t].color}`, fontSize: "13px", lineHeight: "1.45", color: "#1E2723" }}><strong style={{ fontWeight: "600" }}>{TEAMS[t].label}</strong>{` ${TEAMS[t].made}.`}</p>
             ))}
             <div style={{ display: "flex", gap: "10px" }}>

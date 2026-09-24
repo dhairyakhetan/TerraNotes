@@ -6,11 +6,11 @@
 //   instagram: handle without the @
 // Leave a field '' and the design's placeholder shows instead.
 
-// label: the legend and profile tag. made: what the team made, shown on its members' profiles (writers get "their articles" instead).
+// label: the legend and profile tag. made: what the team made, shown on its members' profiles (writers also get "their articles").
 export const TEAMS = {
   heads: { label: 'Heads', color: '#1E7A4C', made: 'keep everyone on track' },
   design: { label: 'Design team', color: '#3DA5F4', made: 'made the layout and style of this website, along with its other design elements' },
-  writing: { label: 'Writing team', color: '#F0442B', made: 'writes the articles' },
+  writing: { label: 'Writing team', color: '#F0442B', made: 'wrote the articles on this website' },
   tech: { label: 'Tech team', color: '#7B5CE6', made: 'made this website' },
 };
 
