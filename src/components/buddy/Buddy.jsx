@@ -50,19 +50,42 @@ function TapGhost({ size, bubbleStyle }) {
   );
 }
 
+// The hidden call button. Invisible unless the pointer is right on it, but while the pointer is around this
+// corner he peeks out (fades in and back out) every 6.5 seconds, so it can be found.
+function CallButton() {
+  const btn = useRef(null);
+  const [peek, setPeek] = useState(false);
+  useEffect(() => {
+    let near = false, first = 0, every = 0, off = 0;
+    const show = () => { setPeek(true); clearTimeout(off); off = setTimeout(() => setPeek(false), 1800); };
+    const move = (e) => {
+      const b = btn.current?.getBoundingClientRect(); if (!b) return;
+      const d = Math.hypot(e.clientX - (b.left + b.width / 2), e.clientY - (b.top + b.height / 2));
+      const now = d < 220;
+      if (now === near) return;
+      near = now;
+      clearTimeout(first); clearInterval(every);
+      if (near) { first = setTimeout(show, 1200); every = setInterval(show, 6500); }
+    };
+    addEventListener('pointermove', move);
+    return () => { removeEventListener('pointermove', move); clearTimeout(first); clearInterval(every); clearTimeout(off); };
+  }, []);
+  return (
+    <div style={{ position: "absolute", left: "1250px", top: "92px", width: "140px", height: "30px", zIndex: "6" }}>
+      <button ref={btn} className={peek ? 'buddy-call buddy-peek' : 'buddy-call'} onClick={callBuddy} aria-label="Call buddy?" style={{ position: "absolute", right: "0", top: "0" }}>
+        <Ghost size={16} />
+      </button>
+      <span className="buddy-call-label" aria-hidden="true">Call buddy?</span>
+    </div>
+  );
+}
+
 // Web home, top right, under the Website / Instagram buttons.
 export function WebBuddy() {
   const { here, fresh } = useBuddy();
   return (
     <>
-      {!here && (
-        <div style={{ position: "absolute", left: "1250px", top: "92px", width: "140px", height: "30px", zIndex: "6" }}>
-          <button className="buddy-call" onClick={callBuddy} aria-label="Call buddy?" style={{ position: "absolute", right: "0", top: "0" }}>
-            <Ghost size={16} />
-          </button>
-          <span className="buddy-call-label" aria-hidden="true">Call buddy?</span>
-        </div>
-      )}
+      {!here && <CallButton />}
       {here && (
         <div className={fresh ? 'buddy-rope buddy-arrive' : 'buddy-rope'} style={{ position: "absolute", left: "1296px", top: "80px", width: "64px", zIndex: "6" }}>
           <div className="buddy-swing">

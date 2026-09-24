@@ -17,10 +17,10 @@ function setup(c, w, h) {
   const g = c.getContext('2d'); g.setTransform(dpr, 0, 0, dpr, 0, 0);
   return g;
 }
-const card = (g, w, h, lines) => {
+const card = (g, w, h, lines, shift = 0) => {
   g.fillStyle = 'rgba(17,17,17,.62)'; g.fillRect(0, 0, w, h);
   g.textAlign = 'center'; g.fillStyle = '#F3EEE4';
-  lines.forEach(([text, font, y]) => { g.font = font; g.fillText(text, w / 2, h / 2 + y); });
+  lines.forEach(([text, font, y]) => { g.font = font; g.fillText(text, w / 2, h / 2 + y + shift); });
 };
 
 // ---------------------------------------------------------------- Snake
@@ -28,7 +28,9 @@ const DIRS = { ArrowUp: [0, -1], ArrowDown: [0, 1], ArrowLeft: [-1, 0], ArrowRig
 function Snake({ W }) {
   const cv = useRef(null);
   const turn = useRef(null);
+  const again = useRef(null);
   const [score, setScore] = useState(0);
+  const [over, setOver] = useState(false);
   const [top, setTop] = useState(() => best('aq-snake-best'));
   useEffect(() => {
     const N = 15, C = W / N, g = setup(cv.current, W, W);
@@ -37,18 +39,19 @@ function Snake({ W }) {
     const reset = () => { snake = [[7, 7], [6, 7], [5, 7]]; dir = [1, 0]; queue = []; food = free(); pts = 0; setScore(0); };
     reset();
     const steer = (d) => {
-      if (state === 'over') { reset(); state = 'playing'; }
+      if (state === 'over') return; // only the Play again button restarts, so the score stays up
       if (state === 'ready') state = 'playing';
       const prev = queue.length ? queue[queue.length - 1] : dir;
       if (d[0] === -prev[0] && d[1] === -prev[1]) return; // no turning back on yourself
       if (d[0] !== prev[0] || d[1] !== prev[1]) queue.push(d);
     };
     turn.current = steer;
+    again.current = () => { reset(); state = 'ready'; setOver(false); };
     const tick = () => {
       if (queue.length) dir = queue.shift();
       const head = [snake[0][0] + dir[0], snake[0][1] + dir[1]];
       const hit = head[0] < 0 || head[1] < 0 || head[0] >= N || head[1] >= N || snake.some(([x, y], i) => i < snake.length - 1 && x === head[0] && y === head[1]);
-      if (hit) { state = 'over'; if (pts > best('aq-snake-best')) { keep('aq-snake-best', pts); setTop(pts); } return; }
+      if (hit) { state = 'over'; setOver(true); if (pts > best('aq-snake-best')) { keep('aq-snake-best', pts); setTop(pts); } return; }
       snake.unshift(head);
       if (head[0] === food[0] && head[1] === food[1]) { pts++; setScore(pts); food = free(); } else snake.pop();
     };
@@ -64,14 +67,14 @@ function Snake({ W }) {
       // tail: wisps that get smaller and fainter
       for (let i = snake.length - 1; i > 0; i--) {
         const [x, y] = snake[i], k = 1 - i / (snake.length + 2);
-        g.globalAlpha = 0.35 + 0.55 * k; g.fillStyle = '#FBF8F1'; g.strokeStyle = '#111111'; g.lineWidth = 1.5;
-        g.beginPath(); g.arc((x + 0.5) * C, (y + 0.5) * C, C * (0.24 + 0.16 * k), 0, Math.PI * 2); g.fill(); g.stroke();
+        g.globalAlpha = 0.3 + 0.6 * k; g.fillStyle = '#1E7A4C';
+        g.beginPath(); g.arc((x + 0.5) * C, (y + 0.5) * C, C * (0.24 + 0.16 * k), 0, Math.PI * 2); g.fill();
       }
       g.globalAlpha = 1;
       const [hx, hy] = snake[0];
-      drawGhost(g, (hx + 0.5) * C, (hy + 0.36) * C, C * 0.42, { look: dir, t: t / 1000, face: state === 'over' ? 'boo' : 'happy' });
+      drawGhost(g, (hx + 0.5) * C, (hy + 0.42) * C, C * 0.38, { look: dir, t: t / 1000, face: state === 'over' ? 'boo' : 'happy' });
       if (state === 'ready') card(g, W, W, [['SNAKE, BUT SPOOKY', `700 ${Math.round(W / 16)}px 'Space Mono', monospace`, -8], ['arrows, WASD or swipe to start', `${Math.round(W / 14)}px Caveat, cursive`, 24]]);
-      if (state === 'over') card(g, W, W, [[`BOO. ${pts} ${pts === 1 ? 'STAR' : 'STARS'}`, `700 ${Math.round(W / 14)}px 'Space Mono', monospace`, -8], ['any arrow or swipe to go again', `${Math.round(W / 14)}px Caveat, cursive`, 26]]);
+      if (state === 'over') card(g, W, W, [[`BOO. ${pts} ${pts === 1 ? 'STAR' : 'STARS'}`, `700 ${Math.round(W / 14)}px 'Space Mono', monospace`, -8], [`best ${Math.max(pts, best('aq-snake-best'))}`, `${Math.round(W / 14)}px Caveat, cursive`, 22]], -30);
     };
     const loop = (t) => {
       raf = requestAnimationFrame(loop);
@@ -103,7 +106,12 @@ function Snake({ W }) {
   return (
     <>
       <Scores score={score} top={top} unit="stars" />
-      <canvas ref={cv} style={{ display: "block", width: `${W}px`, height: `${W}px`, border: "2px solid #111111", touchAction: "none" }} />
+      <div style={{ position: "relative" }}>
+        <canvas ref={cv} style={{ display: "block", width: `${W}px`, height: `${W}px`, border: "2px solid #111111", touchAction: "none" }} />
+        {over && (
+          <button className="press card-drop" onClick={() => again.current?.()} style={{ "--c": "#111111", ...MONO, position: "absolute", left: "50%", top: "58%", marginLeft: "-70px", width: "140px", minHeight: "44px", fontSize: "12px", background: "#F7C21A", color: "#111111", border: "2px solid #111111", boxShadow: "4px 4px 0 #111111" }}>Play again</button>
+        )}
+      </div>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 52px)", gap: "6px", justifyContent: "center", marginTop: "12px" }}>
         <span />{pad('Up', [0, -1], 'M4 16 L12 8 L20 16')}<span />
         {pad('Left', [-1, 0], 'M16 4 L8 12 L16 20')}{pad('Down', [0, 1], 'M4 8 L12 16 L20 8')}{pad('Right', [1, 0], 'M8 4 L16 12 L8 20')}
@@ -146,10 +154,10 @@ function Float({ W, H }) {
       if (s.until <= 0) { s.until = EVERY; const gy = H * 0.2 + Math.random() * (H * 0.6 - GAP * 0.5); s.posts.push({ x: W + PW, gy, c: POSTS[Math.floor(Math.random() * POSTS.length)], passed: false }); }
       s.posts.forEach((p) => { p.x -= SPEED * dt; if (!p.passed && p.x + PW < X - R) { p.passed = true; s.pts++; setScore(s.pts); } });
       s.posts = s.posts.filter((p) => p.x > -PW * 2);
-      if (s.y - R < 0 || s.y + R * 1.2 > H) end();
+      if (s.y - R < 0 || s.y + R * 1.5 > H) end();
       for (const p of s.posts) {
         const inX = X + R * 0.85 > p.x && X - R * 0.85 < p.x + PW;
-        if (inX && (s.y - R * 0.9 < p.gy - GAP / 2 || s.y + R * 1.05 > p.gy + GAP / 2)) end();
+        if (inX && (s.y - R * 0.9 < p.gy - GAP / 2 || s.y + R * 1.4 > p.gy + GAP / 2)) end();
       }
     };
     const draw = () => {
