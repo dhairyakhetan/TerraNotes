@@ -50,17 +50,12 @@ html[data-layout="web"]{scroll-padding-top:calc(80px * var(--web-zoom,1))}
 .web .legend-chip{transition:background-color 160ms ease}
 .web .legend-chip:hover{background:#E6E0D3 !important;color:#111111 !important}
 
-/* article page: the field log fades up keeping its tilt */
-.web aside.rise-in{animation-name:riseInTilt}
-@keyframes riseInTilt{from{opacity:0;transform:translateY(18px) rotate(1.5deg)}to{opacity:1;transform:rotate(1.5deg)}}
-
 /* photo viewer: fills the visible screen; --ph = photo height, shrinks on short screens so everything fits */
 .web-viewer{--vh:100vh;height:calc(var(--vh) / var(--web-zoom,1));overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain}
 @supports (height:100dvh){.web-viewer{--vh:100dvh}}
 .web-viewer{--ph:clamp(240px, calc(var(--vh) / var(--web-zoom,1) - 430px), 470px)}
 
 @media (prefers-reduced-motion: reduce){
-.web aside.rise-in{animation:none}
 .bulb-h,.spark-h{animation:none}
 .card-link article,.btn{transition:none}
 }

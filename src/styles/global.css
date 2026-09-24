@@ -1,6 +1,8 @@
 /* Shared styles. Phone layout, 390px wide, centred on wider screens. Touch only: press states use :active, no :hover. */
 
 html,body{margin:0;background:#E6E0D3}
+/* the layouts are drawn to exact sizes: iPhones mustn't enlarge the text on their own (it would outgrow its cards) */
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
 body{font-family:'Figtree',system-ui,sans-serif;color:#1E2723}
 /* keep #section jumps clear of the sticky header */
 html{scroll-padding-top:64px}

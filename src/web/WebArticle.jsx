@@ -7,6 +7,7 @@ import { PhotoIcon } from '../components/home/Members.jsx';
 import { ARTICLES, TAGS } from '../data/articles.js';
 import { MEMBERS } from '../data/team.js';
 import { pad2 } from '../lib/format.js';
+import { useFitTitle } from '../lib/fit.js';
 import { takeCard } from '../lib/fly.js';
 import { webZoom } from '../lib/layout.js';
 
@@ -91,6 +92,7 @@ export default function WebArticle({ article: a, next }) {
   const author = MEMBERS.find((m) => m.name === a.author);
   const firstText = a.body.findIndex((b) => typeof b === 'string');
   const log = a.body.find((b) => b.log)?.log;
+  const title = useFitTitle(a.title, 76, 54, 5); // a long title gets smaller rather than taller than five lines
 
   return (
     <div className="web">
@@ -108,12 +110,13 @@ export default function WebArticle({ article: a, next }) {
             </div>
           </div>
         </div>
-        <div className="rise-in" style={{ position: "absolute", left: "780px", top: "200px", width: "580px", display: "flex", flexDirection: "column", gap: "22px" }}>
+        {/* title, dek and byline: in the page's flow, so a long title pushes the text down instead of running into it */}
+        <div className="rise-in" style={{ position: "relative", margin: "120px 0 0 780px", width: "580px", minHeight: "560px", display: "flex", flexDirection: "column", gap: "22px" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
             <span style={{ ...MONO, background: tag.color, color: tag.ink, fontWeight: "700", fontSize: "12px", padding: "3px 9px", borderRadius: "999px", lineHeight: "1.3" }}>{a.tag}</span>
             <span style={{ fontFamily: "'Space Mono', monospace", fontSize: "13px", letterSpacing: "1px" }}>{`${pad2(ARTICLES.indexOf(a) + 1)} / ${pad2(ARTICLES.length)}`}</span>
           </div>
-          <h1 style={{ margin: "0", fontFamily: "'Archivo Black', Impact, sans-serif", fontWeight: "400", fontSize: "76px", lineHeight: "0.92", letterSpacing: "-1.5px", textTransform: "uppercase" }}>{a.title}</h1>
+          <h1 ref={title} style={{ margin: "0", fontFamily: "'Archivo Black', Impact, sans-serif", fontWeight: "400", fontSize: "76px", lineHeight: "0.92", letterSpacing: "-1.5px", textTransform: "uppercase" }}>{a.title}</h1>
           <p style={{ margin: "0", fontFamily: "'Caveat', cursive", fontSize: "32px", lineHeight: "1.1", color: "#5B4630" }}>{a.dek}</p>
           <div style={{ ...MONO, display: "flex", border: "2px solid #111111", background: "#FFFFFF", fontSize: "12px", alignSelf: "flex-start" }}>
             <div style={{ padding: "12px 16px", borderRight: "2px solid #111111" }}>{`By ${a.author || '[Author]'}`}</div>
@@ -121,19 +124,20 @@ export default function WebArticle({ article: a, next }) {
             <div style={{ padding: "12px 16px", background: tag.color, color: tag.ink }}>{`${a.readTime || '[x]'} min read`}</div>
           </div>
         </div>
-        {log && (
-          <aside className="rise-in" style={{ position: "absolute", left: "1110px", top: "830px", width: "260px", boxSizing: "border-box", transform: "rotate(1.5deg)", background: "#F7C21A", border: "2px solid #111111", boxShadow: "7px 7px 0 #111111", padding: "16px 18px", display: "flex", flexDirection: "column", gap: "9px", fontFamily: "'Space Mono', monospace", fontSize: "12px", lineHeight: "1.4" }}>
-            <div style={{ fontFamily: "'Archivo Black', Impact, sans-serif", fontSize: "20px", textTransform: "uppercase" }}>Field log</div>
-            {log.map(([label, value], i) => (
-              <div key={i} style={{ display: "flex", justifyContent: "space-between", gap: "10px", borderTop: "1.5px solid #111111", paddingTop: "7px" }}>
-                <span>{label}</span>
-                <span style={{ textAlign: "right" }}>{value}</span>
-              </div>
-            ))}
-          </aside>
-        )}
-        {/* body: the reading column starts at y 800 and the page grows with it */}
-        <div className="rise-in" style={{ position: "relative", margin: "720px 0 0 370px", width: "700px", display: "flex", flexDirection: "column", gap: "28px" }}>
+        {/* body: the reading column starts at y 800 (lower under a long title) and the page grows with it */}
+        <div className="rise-in" style={{ position: "relative", margin: "40px 0 0 370px", width: "700px", display: "flex", flexDirection: "column", gap: "28px" }}>
+          {/* field log, in the right margin beside the start of the text */}
+          {log && (
+            <aside style={{ position: "absolute", left: "740px", top: "30px", width: "260px", boxSizing: "border-box", transform: "rotate(1.5deg)", background: "#F7C21A", border: "2px solid #111111", boxShadow: "7px 7px 0 #111111", padding: "16px 18px", display: "flex", flexDirection: "column", gap: "9px", fontFamily: "'Space Mono', monospace", fontSize: "12px", lineHeight: "1.4" }}>
+              <div style={{ fontFamily: "'Archivo Black', Impact, sans-serif", fontSize: "20px", textTransform: "uppercase" }}>Field log</div>
+              {log.map(([label, value], i) => (
+                <div key={i} style={{ display: "flex", justifyContent: "space-between", gap: "10px", borderTop: "1.5px solid #111111", paddingTop: "7px" }}>
+                  <span>{label}</span>
+                  <span style={{ textAlign: "right" }}>{value}</span>
+                </div>
+              ))}
+            </aside>
+          )}
           {a.body.map((b, i) => <Block key={i} b={b} first={i === firstText} a={a} tag={tag} />)}
           <div style={{ width: "18px", height: "18px", background: "#111111" }} />
           {/* author */}

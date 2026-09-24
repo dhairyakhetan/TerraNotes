@@ -8,6 +8,7 @@ import { ARTICLES, COMING_SOON, TAGS } from '../data/articles.js';
 import { SoonCard } from '../web/ArticleLine.jsx';
 import { pad2 } from '../lib/format.js';
 import { ByTape, useByWriter } from '../lib/byWriter.jsx';
+import { coverFloor, useFitTitle } from '../lib/fit.js';
 
 const string = (left, top, height) => (
   <div style={{ position: "absolute", left: `${left}px`, top: `${top}px`, width: "1.4px", height: `${height}px`, background: "#5B3A1E" }} />
@@ -18,11 +19,13 @@ const num = (a) => `${pad2(ARTICLES.indexOf(a) + 1)} / ${pad2(ARTICLES.length)}`
 
 // All articles, each hanging in its own hand-placed spot (articles 01–06 in order).
 // Spots 04 and 05 show the coming-soon cards until there are articles for them; spot 06 appears with article 06.
+// Long titles shrink to fit their card (lib/fit.js); the covers above them give up some height first.
 export default function Articles() {
   const [menuOpen, setMenuOpen] = useState(false);
   useEffect(() => { document.title = 'Aquaterra — All articles'; }, []);
   const { by, mine, isMine, list } = useByWriter(); // ?by=<name>: that writer's pieces first, marked
   const [a1, a2, a3, a4, a5, a6] = list;
+  const fit1 = useFitTitle(a1.title, 32, 22), fit4 = useFitTitle(a4?.title, 21, 15), fit5 = useFitTitle(a5?.title, 28, 20);
 
   return (
     <>
@@ -46,14 +49,14 @@ export default function Articles() {
             {isMine(a1) && <ByTape name={by} />}
           <div style={{ position: "absolute", left: "50%", top: "-7px", marginLeft: "-15px", width: "30px", height: "9px", background: TAGS[a1.tag].color, border: "1.5px solid #111111", boxSizing: "border-box", zIndex: "2" }} />
           <article style={{ width: "100%", height: "100%", boxSizing: "border-box", background: "#FFFFFF", border: "2px solid #111111", boxShadow: "8px 8px 0 #111111", padding: "10px", display: "flex", flexDirection: "column", gap: "10px" }}>
-            <Img src={a1.cover} alt={a1.alt} box={{ height: "200px" }} />
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <Img src={a1.cover} alt={a1.alt} box={{ height: "200px", minHeight: coverFloor(200) }} />
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexShrink: "0" }}>
               <span style={pill(a1.tag, "10px")}>{a1.tag}</span>
               <span style={{ fontFamily: "'Space Mono', monospace", fontSize: "11px", letterSpacing: "1px", color: "#111111" }}>{num(a1)}</span>
             </div>
-            <h2 style={{ margin: "0", fontFamily: "'Archivo Black', Impact, sans-serif", fontWeight: "400", fontSize: "32px", lineHeight: "0.95", letterSpacing: "-0.3px", textTransform: "uppercase", color: "#111111" }}>{a1.title}</h2>
-            <p style={{ margin: "0", fontFamily: "'Caveat', cursive", fontSize: "19px", lineHeight: "1.1", color: "#5B4630" }}>{a1.dek}</p>
-            <div style={{ marginTop: "auto", display: "flex", justifyContent: "space-between", fontFamily: "'Space Mono', monospace", fontSize: "10px", letterSpacing: "1px", textTransform: "uppercase" }}>
+            <h2 ref={fit1} style={{ flexShrink: "0", margin: "0", fontFamily: "'Archivo Black', Impact, sans-serif", fontWeight: "400", fontSize: "32px", lineHeight: "0.95", letterSpacing: "-0.3px", textTransform: "uppercase", color: "#111111" }}>{a1.title}</h2>
+            <p style={{ flexShrink: "0", margin: "0", fontFamily: "'Caveat', cursive", fontSize: "19px", lineHeight: "1.1", color: "#5B4630" }}>{a1.dek}</p>
+            <div style={{ flexShrink: "0", marginTop: "auto", display: "flex", justifyContent: "space-between", fontFamily: "'Space Mono', monospace", fontSize: "10px", letterSpacing: "1px", textTransform: "uppercase" }}>
               <span style={isMine(a1) ? { background: "#F7C21A", padding: "0 4px" } : undefined}>{a1.author || '[Author]'}</span>
               <span>{`${a1.readTime || '[x]'} min read →`}</span>
             </div>
@@ -75,12 +78,12 @@ export default function Articles() {
             {isMine(a4) && <ByTape name={by} />}
             <article style={{ width: "100%", height: "100%", boxSizing: "border-box", background: "#FFFFFF", border: "2px solid #111111", boxShadow: `7px 7px 0 ${TAGS[a4.tag].color}`, padding: "8px", display: "flex", gap: "12px" }}>
               <div style={{ display: "flex", flexDirection: "column", gap: "8px", padding: "4px 0 0 4px", flexGrow: "1" }}>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexShrink: "0" }}>
                   <span style={pill(a4.tag, "8.5px")}>{a4.tag}</span>
                   <span style={{ fontFamily: "'Space Mono', monospace", fontSize: "9px", letterSpacing: "1px", color: "#111111" }}>{num(a4)}</span>
                 </div>
-                <h3 style={{ margin: "0", fontFamily: "'Archivo Black', Impact, sans-serif", fontWeight: "400", fontSize: "21px", lineHeight: "0.95", letterSpacing: "-0.3px", textTransform: "uppercase", color: "#111111" }}>{a4.title}</h3>
-                <p style={{ margin: "0", fontFamily: "'Caveat', cursive", fontSize: "16px", lineHeight: "1.1", color: "#5B4630" }}>{a4.dek}</p>
+                <h3 ref={fit4} style={{ flexShrink: "0", margin: "0", fontFamily: "'Archivo Black', Impact, sans-serif", fontWeight: "400", fontSize: "21px", lineHeight: "0.95", letterSpacing: "-0.3px", textTransform: "uppercase", color: "#111111" }}>{a4.title}</h3>
+                <p style={{ flexShrink: "0", margin: "0", fontFamily: "'Caveat', cursive", fontSize: "16px", lineHeight: "1.1", color: "#5B4630" }}>{a4.dek}</p>
               </div>
               <Img src={a4.cover} alt={a4.alt} box={{ width: "124px", flexShrink: "0", height: "170px" }} />
             </article>
@@ -94,13 +97,13 @@ export default function Articles() {
             {isMine(a5) && <ByTape name={by} />}
             <div style={{ position: "absolute", left: "50%", top: "-7px", marginLeft: "-15px", width: "30px", height: "9px", background: TAGS[a5.tag].color, border: "1.5px solid #111111", boxSizing: "border-box", zIndex: "2" }} />
             <article style={{ width: "100%", height: "100%", boxSizing: "border-box", background: "#111111", border: "2px solid #111111", boxShadow: `8px 8px 0 ${TAGS[a5.tag].color}`, padding: "10px", display: "flex", flexDirection: "column", gap: "10px" }}>
-              <Img src={a5.cover} alt={a5.alt} box={{ height: "160px" }} dark />
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <Img src={a5.cover} alt={a5.alt} box={{ height: "160px", minHeight: coverFloor(160) }} dark />
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexShrink: "0" }}>
                 <span style={pill(a5.tag, "9.5px")}>{a5.tag}</span>
                 <span style={{ fontFamily: "'Space Mono', monospace", fontSize: "10px", letterSpacing: "1px", color: "#FFFFFF" }}>{num(a5)}</span>
               </div>
-              <h3 style={{ margin: "0", fontFamily: "'Archivo Black', Impact, sans-serif", fontWeight: "400", fontSize: "28px", lineHeight: "0.95", letterSpacing: "-0.3px", textTransform: "uppercase", color: "#FFFFFF" }}>{a5.title}</h3>
-              <p style={{ margin: "0", fontFamily: "'Caveat', cursive", fontSize: "18px", lineHeight: "1.1", color: TAGS[a5.tag].color }}>{a5.dek}</p>
+              <h3 ref={fit5} style={{ flexShrink: "0", margin: "0", fontFamily: "'Archivo Black', Impact, sans-serif", fontWeight: "400", fontSize: "28px", lineHeight: "0.95", letterSpacing: "-0.3px", textTransform: "uppercase", color: "#FFFFFF" }}>{a5.title}</h3>
+              <p style={{ flexShrink: "0", margin: "0", fontFamily: "'Caveat', cursive", fontSize: "18px", lineHeight: "1.1", color: TAGS[a5.tag].color }}>{a5.dek}</p>
             </article>
           </Link>
         ) : <SoonCard text={COMING_SOON[1]} w={310} h={330} font="30px" style={{ left: "52px", top: "1380px", transform: "rotate(-1.8deg)" }} />}

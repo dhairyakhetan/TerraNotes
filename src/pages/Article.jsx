@@ -7,6 +7,7 @@ import Img from '../components/Img.jsx';
 import { ARTICLES, TAGS } from '../data/articles.js';
 import { MEMBERS } from '../data/team.js';
 import { pad2 } from '../lib/format.js';
+import { useFitTitle } from '../lib/fit.js';
 
 const P = { fontFamily: "'Newsreader', Georgia, serif", fontSize: "18px", lineHeight: "1.6", color: "#1E2723", margin: "0" };
 
@@ -80,14 +81,16 @@ export default function Article({ article: a, next }) {
   const tag = TAGS[a.tag];
   const author = MEMBERS.find((m) => m.name === a.author);
   const firstText = a.body.findIndex((b) => typeof b === 'string');
+  const title = useFitTitle(a.title, 42, 30, 4); // a long title gets smaller rather than taller than four lines
 
   return (
     <>
       <div className="page-article" style={{ position: "relative", width: "390px", margin: "0 auto", overflow: "clip", background: "#F3EEE4", fontFamily: "'Figtree', system-ui, sans-serif", color: "#111111" }}>
         <PageHeader backTo="/articles" backLabel="Back to all articles" menuOpen={menuOpen} onOpenMenu={() => setMenuOpen(true)} />
         <div style={{ position: "absolute", left: "0", top: "100px", width: "390px", height: "2px", background: "#5B3A1E" }} />
-        {/* hero: drops onto the wire when the page opens, then keeps swaying (styles/article.css) */}
-        <div className="hero-drop" style={{ position: "absolute", left: "16px", top: "134px", width: "358px", transformOrigin: "50% -32px" }}>
+        {/* hero: drops onto the wire when the page opens, then keeps swaying (styles/article.css).
+            The hero, byline and body are in the page's flow: a taller hero pushes the rest down instead of running under it. */}
+        <div className="hero-drop" style={{ position: "relative", margin: "70px 0 0 16px", width: "358px", minHeight: "484px", transformOrigin: "50% -32px" }}>
           <div className="hero-sway" style={{ transformOrigin: "50% -32px", transform: "rotate(-0.8deg)" }}>
             <div style={{ position: "absolute", left: "178.3px", top: "-32px", width: "1.4px", height: "34px", background: "#5B3A1E" }} />
             <div style={{ position: "absolute", left: "50%", top: "-7px", marginLeft: "-17px", width: "34px", height: "9px", background: tag.color, border: "1.5px solid #111111", boxSizing: "border-box", zIndex: "2" }} />
@@ -97,18 +100,18 @@ export default function Article({ article: a, next }) {
                 <span style={{ background: tag.color, color: tag.ink, fontFamily: "'Space Mono', monospace", fontWeight: "700", fontSize: "10px", letterSpacing: "1px", textTransform: "uppercase", padding: "3px 8px", borderRadius: "999px", lineHeight: "1.2" }}>{a.tag}</span>
                 <span style={{ fontFamily: "'Space Mono', monospace", fontSize: "11px", letterSpacing: "1px", color: "#111111" }}>{`${pad2(ARTICLES.indexOf(a) + 1)} / ${pad2(ARTICLES.length)}`}</span>
               </div>
-              <h1 style={{ margin: "0", fontFamily: "'Archivo Black', Impact, sans-serif", fontWeight: "400", fontSize: "42px", lineHeight: "0.95", letterSpacing: "-0.3px", textTransform: "uppercase", color: "#111111" }}>{a.title}</h1>
+              <h1 ref={title} style={{ margin: "0", fontFamily: "'Archivo Black', Impact, sans-serif", fontWeight: "400", fontSize: "42px", lineHeight: "0.95", letterSpacing: "-0.3px", textTransform: "uppercase", color: "#111111" }}>{a.title}</h1>
               <p style={{ margin: "0", fontFamily: "'Caveat', cursive", fontSize: "22px", lineHeight: "1.1", color: "#5B4630" }}>{a.dek}</p>
             </article>
           </div>
         </div>
-        <div className="rise-in" style={{ position: "absolute", left: "20px", top: "646px", width: "350px", display: "flex", border: "2px solid #111111", background: "#FFFFFF", fontFamily: "'Space Mono', monospace", fontSize: "10px", letterSpacing: "1px", textTransform: "uppercase" }}>
+        <div className="rise-in" style={{ position: "relative", margin: "28px 0 0 20px", width: "350px", display: "flex", border: "2px solid #111111", background: "#FFFFFF", fontFamily: "'Space Mono', monospace", fontSize: "10px", letterSpacing: "1px", textTransform: "uppercase" }}>
           <div style={{ flexGrow: "1", padding: "10px", borderRight: "2px solid #111111" }}>{`By ${a.author || '[Author]'}`}</div>
           <div style={{ padding: "10px", borderRight: "2px solid #111111" }}>{a.date || '[Date]'}</div>
           <div style={{ padding: "10px", background: tag.color, color: tag.ink }}>{`${a.readTime || '[x]'} min`}</div>
         </div>
         {/* body: the blocks stack with 22px gaps; the page grows with them */}
-        <div className="rise-in" style={{ position: "relative", margin: "660px 0 0 24px", width: "342px", minHeight: "2606px", display: "flex", flexDirection: "column", gap: "22px" }}>
+        <div className="rise-in" style={{ position: "relative", margin: "39px 0 0 24px", width: "342px", minHeight: "2606px", display: "flex", flexDirection: "column", gap: "22px" }}>
           {a.body.map((b, i) => <Block key={i} b={b} first={i === firstText} a={a} tag={tag} />)}
           <div style={{ width: "16px", height: "16px", background: "#111111" }} />
           {/* author */}

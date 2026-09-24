@@ -4,6 +4,7 @@ import Img from '../Img.jsx';
 import { ARTICLES, COMING_SOON, TAGS } from '../../data/articles.js';
 import { SoonCard } from '../../web/ArticleLine.jsx';
 import { pad2 } from '../../lib/format.js';
+import { useFitTitle } from '../../lib/fit.js';
 
 // Articles hanging on strings from the intro card. Shows articles 01, 02, 03 and 05 (a coming-soon card until there is a 05).
 // A card nested inside another card's box hangs from it and moves with it.
@@ -11,6 +12,7 @@ import { pad2 } from '../../lib/format.js';
 export default function HangingArticles() {
   const [a1, a2, a3, , a5] = ARTICLES;
   const tag5 = a5 && TAGS[a5.tag];
+  const fit5 = useFitTitle(a5?.title, 22, 15); // a long title shrinks to fit the wide card
   return (
     <>
       {/* wide card: hangs from both card 02 and card 03; painted first so its strings tuck behind them */}
@@ -24,12 +26,12 @@ export default function HangingArticles() {
             <article style={{ width: "100%", height: "100%", boxSizing: "border-box", background: "#FFFFFF", border: "2px solid #111111", boxShadow: "7px 7px 0 #111111", padding: "8px", display: "flex", gap: "12px" }}>
               <Img src={a5.cover} alt={a5.alt} box={{ width: "122px", flexShrink: "0", height: "176px" }} />
               <div style={{ display: "flex", flexDirection: "column", gap: "8px", paddingTop: "4px", flexGrow: "1" }}>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexShrink: "0" }}>
                   <span style={{ background: tag5.color, color: tag5.ink, fontFamily: "'Space Mono', monospace", fontWeight: "700", fontSize: "8.5px", letterSpacing: "1px", textTransform: "uppercase", padding: "3px 8px", borderRadius: "999px", lineHeight: "1.2" }}>{a5.tag}</span>
                   <span style={{ fontFamily: "'Space Mono', monospace", fontSize: "9px", letterSpacing: "1px", color: "#111111" }}>{`${pad2(ARTICLES.indexOf(a5) + 1)} / ${pad2(ARTICLES.length)}`}</span>
                 </div>
-                <h3 style={{ margin: "0", fontFamily: "'Archivo Black', Impact, sans-serif", fontWeight: "400", fontSize: "22px", lineHeight: "0.95", letterSpacing: "-0.3px", textTransform: "uppercase", color: "#111111" }}>{a5.title}</h3>
-                <p style={{ margin: "0", fontFamily: "'Caveat', cursive", fontSize: "16px", lineHeight: "1.1", color: "#5B4630" }}>{a5.dek}</p>
+                <h3 ref={fit5} style={{ flexShrink: "0", margin: "0", fontFamily: "'Archivo Black', Impact, sans-serif", fontWeight: "400", fontSize: "22px", lineHeight: "0.95", letterSpacing: "-0.3px", textTransform: "uppercase", color: "#111111" }}>{a5.title}</h3>
+                <p style={{ flexShrink: "0", margin: "0", fontFamily: "'Caveat', cursive", fontSize: "16px", lineHeight: "1.1", color: "#5B4630" }}>{a5.dek}</p>
               </div>
             </article>
           </Link>
