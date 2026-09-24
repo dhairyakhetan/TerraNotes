@@ -55,7 +55,7 @@ Leave a field `''` and the design's bracketed placeholder shows instead.
 ## Built in
 
 - **404 page** (`src/pages/NotFound.jsx`) for any address that isn't a page or an article.
-- **Link previews per article:** the build writes `articles/<slug>.html` with that article's title and line, so shared links preview the article (served at `/articles/<slug>` via `cleanUrls` in `vercel.json`). It also writes `sitemap.xml` (when the site's address is known) and `robots.txt`.
+- **Link previews per article:** the build writes `articles/<slug>.html` with that article's title and line, so shared links preview the article (served at `/articles/<slug>` via `cleanUrls` in `vercel.json`). It also writes `sitemap.xml` (when the site's address is known), `robots.txt`, `404.html`, and `llms.txt` / `llms-full.txt` (the site and every article as plain text for AI assistants). All of them come from `src/data`, so a new article shows up in each on the next deploy.
 - **Back/Forward** return to where you were on the page.
 - **If a page crashes** (say, a typo in a data file) visitors get a "the line broke" card instead of a blank screen; the error is in the browser console.
 - **Console hello** for anyone who opens dev tools (`src/lib/hello.js`), printed once the page has loaded. Easter egg: `aquaterra.wind()` sends a gust down the article line (web).

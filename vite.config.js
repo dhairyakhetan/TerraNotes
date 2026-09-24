@@ -3,6 +3,7 @@ import react from '@vitejs/plugin-react';
 import fs from 'node:fs';
 import path from 'node:path';
 import { ARTICLES } from './src/data/articles.js';
+import { SITE } from './src/data/site.js';
 
 // Link previews need absolute URLs. On Vercel this is the production domain; locally it stays relative.
 const host = process.env.SITE_URL || (process.env.VERCEL_PROJECT_PRODUCTION_URL && `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`) || '';
@@ -11,7 +12,8 @@ const esc = (t) => String(t).replace(/&/g, '&amp;').replace(/"/g, '&quot;').repl
 const setMeta = (html, attr, name, value) => html.replace(new RegExp(`(<meta ${attr}="${name}" content=")[^"]*(")`), `$1${esc(value)}$2`);
 
 // At build: one page per article (articles/<slug>.html, served at /articles/<slug>) so shared links preview that
-// article's own title and line; plus sitemap.xml and robots.txt. The app itself is the same on every page.
+// article's own title and line; plus sitemap.xml, robots.txt, and llms.txt / llms-full.txt (the site and its
+// articles as plain text, for AI assistants). The app itself is the same on every page.
 const pages = () => ({
   name: 'article-pages',
   apply: 'build',
@@ -31,7 +33,7 @@ const pages = () => ({
       html = html.replace('</title>', `</title>\n    <link rel="canonical" href="${esc(url)}" />`);
       out(`articles/${a.slug}.html`, html);
     }
-    const paths = ['/', '/articles', ...ARTICLES.map((a) => `/articles/${a.slug}`)];
+    const paths = ['/', '/articles', '/photos', '/words', '/members', ...ARTICLES.map((a) => `/articles/${a.slug}`)];
     if (host) {
       const urls = paths.map((p) => `  <url><loc>${host}${p}</loc></url>`).join('\n');
       out('sitemap.xml', `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls}\n</urlset>\n`);
@@ -40,7 +42,55 @@ const pages = () => ({
     let lost = base.replace(/<title>[^<]*<\/title>/, '<title>Aquaterra — not found</title>');
     lost = lost.replace('</title>', '</title>\n    <meta name="robots" content="noindex" />');
     out('404.html', lost);
-    out('robots.txt', `User-agent: *\nAllow: /\n${host ? `Sitemap: ${host}/sitemap.xml\n` : ''}`);
+    out('robots.txt', [
+      '# TerraNotes by Aquaterra: every page is open to crawlers.',
+      '# A plain-text guide to the site and its articles, for AI assistants: /llms.txt (full text: /llms-full.txt)',
+      'User-agent: *',
+      'Allow: /',
+      ...(host ? ['', `Sitemap: ${host}/sitemap.xml`] : []),
+      '',
+    ].join('\n'));
+
+    // llms.txt (llmstxt.org): what the site is and where everything is; llms-full.txt: every article in full
+    const url = (p) => `${host}${p}`;
+    const line = (a) => `${a.dek}${a.author ? ` (by ${a.author}` : ' ('}${a.date ? `${a.author ? ', ' : ''}${a.date}` : ''}, ${a.readTime} min read)`;
+    const intro = [
+      '# TerraNotes by Aquaterra',
+      '',
+      `> ${SITE.intro} Notes from where the land meets the water.`,
+      '',
+      'TerraNotes is the digital magazine of Aquaterra, a community in Kolkata (est. 2021). It comes out once a month and is written, photographed and designed by its members. Each article has its own page; the home page also holds the photo wall, a words mini game and the team.',
+      '',
+    ];
+    const list = ARTICLES.map((a) => `- [${a.title}](${url(`/articles/${a.slug}`)}): ${line(a)}`);
+    out('llms.txt', [
+      ...intro,
+      '## Articles',
+      '',
+      ...list,
+      '',
+      '## Pages',
+      '',
+      `- [Home](${url('/')}): the latest articles, photo wall, words game and team`,
+      `- [All articles](${url('/articles')}): every article; add ?by=<first name> for one writer's pieces first (e.g. ?by=diti)`,
+      `- [Photo wall](${url('/photos')}): photos from the community, with captions`,
+      `- [Words we should bring back](${url('/words')}): a mini game about forgotten words`,
+      `- [Meet the team](${url('/members')}): the heads, design, writing and tech teams`,
+      '',
+      '## Optional',
+      '',
+      `- [Full text of every article](${url('/llms-full.txt')})`,
+      ...(host ? [`- [Sitemap](${url('/sitemap.xml')})`] : []),
+      '',
+    ].join('\n'));
+    const full = ARTICLES.map((a) => [
+      `## ${a.title}`,
+      '',
+      `${url(`/articles/${a.slug}`)} · ${a.tag} · ${line(a)}`,
+      '',
+      ...a.body.flatMap((b) => (typeof b === 'string' ? [b, ''] : b.h2 ? [`### ${b.h2}`, ''] : [])),
+    ].join('\n'));
+    out('llms-full.txt', [...intro, ...full].join('\n'));
   },
 });
 
