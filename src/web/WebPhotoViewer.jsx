@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { usePhotoShapes } from '../lib/photoShape.js';
 import { PHOTOS } from '../data/photos.js';
 import { pad2 } from '../lib/format.js';
 import { webZoom } from '../lib/layout.js';
@@ -11,6 +12,7 @@ const TILTS = ['-1.2deg', '1deg', '-0.6deg', '1.3deg', '-1deg'];
 // Full-screen "See every photo" viewer, web layout. Drag with mouse or finger, the arrows, or ← → keys; Esc closes.
 // No wrap-around: the ends rubber-band. --ph (web.css) is the photo height and shrinks on short screens.
 export default function WebPhotoViewer({ start = 0, closing, onClose }) {
+  const shapes = usePhotoShapes(0.2, 5); // each photo whole, at its own shape, no taller than --ph
   const n = PHOTOS.length;
   const [cur, setCur] = useState(start);
   const [dx, setDx] = useState(0);            // live drag offset in px
@@ -67,13 +69,13 @@ export default function WebPhotoViewer({ start = 0, closing, onClose }) {
           <div className="gal-track" style={{ display: "flex", width: `${n * W}px`, height: "100%", transform: `translate3d(${-cur * W + dx}px, 0, 0)`, transition: tr, willChange: "transform" }}>
             {PHOTOS.map((p, i) => (
               <div key={i} className="gal-slide" aria-hidden={i === cur ? 'false' : 'true'} style={{ width: "1440px", flexShrink: "0", boxSizing: "border-box", paddingTop: "24px", display: "flex", justifyContent: "center", transform: `scale(${i === cur ? 1 : 0.88})`, opacity: i === cur ? 1 : 0.35, transition: tr }}>
-                <figure style={{ position: "relative", margin: "0", width: "760px", transform: `rotate(${TILTS[i % TILTS.length]})` }}>
+                <figure style={{ position: "relative", margin: "0", width: p.photo ? "fit-content" : "760px", maxWidth: "1000px", transform: `rotate(${TILTS[i % TILTS.length]})` }}>
                   <div style={{ position: "absolute", left: "50%", top: "-14px", marginLeft: "-10px", width: "20px", height: "30px", background: "#C9A57A", border: "1.5px solid #111111", boxSizing: "border-box", zIndex: "2" }} />
                   <div style={{ background: "#FFFFFF", border: "2px solid #111111", boxShadow: "10px 10px 0 #E9A23B", padding: "14px 14px 0" }}>
                     {p.photo
-                      ? <img src={p.photo} alt={p.caption} draggable="false" style={{ display: "block", width: "100%", height: "var(--ph)", objectFit: "cover" }} />
+                      ? <img src={p.photo} alt={p.caption} draggable="false" style={{ display: "block", ...(shapes[i] ? { width: `min(1000px, calc(var(--ph) * ${shapes[i]}))`, height: "auto", aspectRatio: String(shapes[i]) } : { width: "auto", height: "var(--ph)", maxWidth: "100%" }), objectFit: "contain" }} />
                       : <div style={{ height: "var(--ph)", background: p.tint, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "14px", color: "#F3EEE4" }}>{`[photo ${i + 1}]`}</div>}
-                    <figcaption style={{ padding: "14px 4px 16px", display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: "20px" }}>
+                    <figcaption style={{ width: "0", minWidth: "100%", boxSizing: "border-box", padding: "14px 4px 16px", display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "baseline", gap: "20px" }}>
                       <div style={{ fontFamily: "'Caveat', cursive", fontSize: "28px", lineHeight: "1.1", color: "#111111" }}>{p.caption || "[caption — what's happening here]"}</div>
                       <div style={{ fontFamily: "'Space Mono', monospace", fontSize: "11px", letterSpacing: "1.4px", textTransform: "uppercase", color: "#6B665C", whiteSpace: "nowrap" }}>{`Highlight ${pad2(i + 1)}${p.place ? ` · ${p.place}` : ''}`}</div>
                     </figcaption>

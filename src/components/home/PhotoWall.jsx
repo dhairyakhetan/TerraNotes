@@ -1,5 +1,6 @@
 import { useRef } from 'react';
 import { usePauseOffscreen } from '../../lib/offscreen.js';
+import { fitFrame, usePhotoShapes } from '../../lib/photoShape.js';
 import { PHOTOS } from '../../data/photos.js';
 
 // Where each photo hangs on the wall (PHOTOS[0] → first spot). r = tilt; dur/delay = its occasional turn on the peg.
@@ -19,6 +20,7 @@ const BULBS = [
 const SPARKS = [[130, 130, 9, 'sp1'], [266, 76, 8, 'sp2'], [207, 376, 11, 'sp3'], [352, 347, 8, 'sp1 sp-late'], [25, 112.5, 7, 'sp2 sp-late']];
 
 export default function PhotoWall({ onOpen }) {
+  const shapes = usePhotoShapes(0.2, 5); // frames take each photo's own shape (fitFrame)
   const self = useRef(null);
   usePauseOffscreen(self);
   return (
@@ -52,11 +54,12 @@ export default function PhotoWall({ onOpen }) {
       {SPOTS.map((s, i) => {
         const p = PHOTOS[i];
         if (!p) return null;
+        const slot = parseFloat(s.width), f = fitFrame(p.photo && shapes[i], slot - 18, 118, 86), fw = f.w + 18; // 18 = mat + border
         return (
-          <figure key={i} className="twist" style={{ position: "absolute", left: s.left, top: s.top, width: s.width, margin: "0", "--r": s.r, transform: `rotate(${s.r})`, transformOrigin: "50% 0", animationDuration: s.dur, animationDelay: s.delay }}>
-            <div style={{ position: "absolute", left: s.peg, top: "-10px", width: "9px", height: "18px", background: "#C9A57A", borderRadius: "2px" }} />
+          <figure key={i} className="twist" style={{ position: "absolute", left: `${parseFloat(s.left) + (slot - fw) / 2}px`, top: s.top, width: `${fw}px`, margin: "0", "--r": s.r, transform: `rotate(${s.r})`, transformOrigin: "50% 0", animationDuration: s.dur, animationDelay: s.delay }}>
+            <div style={{ position: "absolute", left: "50%", marginLeft: "-4.5px", top: "-10px", width: "9px", height: "18px", background: "#C9A57A", borderRadius: "2px" }} />
             <div style={{ background: "#FFFFFF", padding: "7px 7px 0", border: "2px solid #111111", boxShadow: "5px 5px 0 #E9A23B" }}>
-              <div style={{ position: "relative", overflow: "hidden", height: s.height, background: p.tint, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "11px", color: s.ink }}>
+              <div style={{ position: "relative", overflow: "hidden", height: p.photo ? `${f.h}px` : s.height, background: p.tint, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "11px", color: s.ink }}>
                 {p.photo ? <img src={p.photo} alt={p.caption} style={{ position: "absolute", inset: "0", width: "100%", height: "100%", objectFit: "cover" }} /> : '[photo]'}
                 <div className="glint" style={{ animationDuration: s.dur, animationDelay: s.delay }} />
               </div>

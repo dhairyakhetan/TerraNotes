@@ -1,5 +1,6 @@
 import { useRef } from 'react';
 import { usePauseOffscreen } from '../lib/offscreen.js';
+import { fitFrame, usePhotoShapes } from '../lib/photoShape.js';
 import { PHOTOS } from '../data/photos.js';
 
 // Where each photo hangs (PHOTOS[0] → first spot): top-left, tilt, and the glint's clock.
@@ -23,6 +24,7 @@ const SPARKS = [[262, 198, 'sp1'], [817, 207, 'sp2'], [502, 489, 'sp3'], [1069, 
 
 // Web photo wall: click a photo (or the hanging tag) to open the viewer at that photo.
 export default function WebPhotoWall({ onOpen }) {
+  const shapes = usePhotoShapes(0.2, 5); // frames take each photo's own shape (fitFrame)
   const self = useRef(null);
   usePauseOffscreen(self);
   return (
@@ -41,11 +43,12 @@ export default function WebPhotoWall({ onOpen }) {
       {SPOTS.map((s, i) => {
         const p = PHOTOS[i];
         if (!p) return null;
+        const f = fitFrame(p.photo && shapes[i], 188, 172, 140), fw = f.w + 22; // 22 = mat + border
         return (
-          <figure key={i} className="twist" style={{ position: "absolute", left: `${s.left}px`, top: `${s.top}px`, width: "210px", margin: "0", "--r": `${s.r}deg`, transform: `rotate(${s.r}deg)`, transformOrigin: "50% 0", animationDuration: `${s.dur}s`, animationDelay: `${s.delay}s` }}>
-            <div style={{ position: "absolute", left: "99px", top: "-12px", width: "12px", height: "22px", background: "#C9A57A", border: "1.5px solid #111111", boxSizing: "border-box", zIndex: "2" }} />
+          <figure key={i} className="twist" style={{ position: "absolute", left: `${s.left + (210 - fw) / 2}px`, top: `${s.top}px`, width: `${fw}px`, margin: "0", "--r": `${s.r}deg`, transform: `rotate(${s.r}deg)`, transformOrigin: "50% 0", animationDuration: `${s.dur}s`, animationDelay: `${s.delay}s` }}>
+            <div style={{ position: "absolute", left: "50%", marginLeft: "-6px", top: "-12px", width: "12px", height: "22px", background: "#C9A57A", border: "1.5px solid #111111", boxSizing: "border-box", zIndex: "2" }} />
             <div style={{ padding: "9px 9px 0", border: "2px solid #111111", boxShadow: "6px 6px 0 #E9A23B", background: "#FFFFFF" }}>
-              <div style={{ position: "relative", overflow: "hidden", height: "170px", background: p.tint, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "12px", color: "#EDE9DD" }}>
+              <div style={{ position: "relative", overflow: "hidden", height: p.photo ? `${f.h}px` : "170px", background: p.tint, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "12px", color: "#EDE9DD" }}>
                 {p.photo ? <img src={p.photo} alt={p.caption} style={{ position: "absolute", inset: "0", width: "100%", height: "100%", objectFit: "cover" }} /> : '[photo]'}
                 <div className="glint" style={{ animationDuration: `${s.dur}s`, animationDelay: `${s.delay}s` }} />
               </div>
