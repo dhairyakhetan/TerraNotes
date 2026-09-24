@@ -4,6 +4,7 @@ import { SITE } from '../data/site.js';
 import { instagramUrl } from '../lib/format.js';
 import Logo from './Logo.jsx';
 import { GlobeIcon, InstagramIcon } from './LinkIcons.jsx';
+import { MenuCall } from './buddy/Buddy.jsx';
 
 // Stops on the wire. left = card x; string = x of its string on the card; rot = tilt; here = the page where its card says "you're here".
 const STOPS = [
@@ -44,6 +45,7 @@ export default function Menu({ current = 'home', open, onClose }) {
           <Logo globe={36} word={21} sub={13} dark />
         </SmartLink>
       </div>
+      <MenuCall onClose={close} />
       <button className="press" onClick={close} aria-label="Close menu" style={{ "--c": "#F0442B", position: "absolute", right: "20px", top: "18px", width: "48px", height: "48px", background: "#FFFFFF", border: "2px solid #F3EEE4", boxShadow: "4px 4px 0 #F0442B", padding: "0", display: "flex", alignItems: "center", justifyContent: "center" }}>
         <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="#111111" strokeWidth="2.6" strokeLinecap="square">
           <path d="M3 3 L17 17" />

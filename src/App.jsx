@@ -12,6 +12,8 @@ import Footer from './components/Footer.jsx';
 import { ALL_ARTICLES } from './data/articles.js';
 import { EditionPage, Editions } from './pages/Editions.jsx';
 import { useIsWeb } from './lib/layout.js';
+import Games from './components/buddy/Games.jsx';
+import './styles/buddy.css';
 
 // Home page sections, each with its own clean address: /photos opens the home page at the photo wall.
 // (/articles is the phone's All articles page; on web it's the article line on the home page.)
@@ -74,6 +76,20 @@ function ArticleRoute({ web }) {
   return <Page key={slug} article={a} next={same[(same.indexOf(a) + 1) % same.length]} />;
 }
 
+// "Skip to main content": hidden until it gets keyboard focus; jumps past the page's header.
+function SkipLink() {
+  const skip = (e) => {
+    e.preventDefault();
+    const header = document.querySelector('#root header');
+    const main = header?.nextElementSibling || document.querySelector('#root main');
+    if (!main) return;
+    if (!main.hasAttribute('tabindex')) main.setAttribute('tabindex', '-1');
+    main.style.outline = 'none';
+    main.focus();
+  };
+  return <a className="skip-link" href="#main" onClick={skip}>Skip to main content</a>;
+}
+
 export default function App() {
   const { pathname, search } = useLocation();
   const web = useIsWeb(); // 900px and up: the 1440px web layout (src/web/); below: the phone layout (src/pages/)
@@ -81,6 +97,7 @@ export default function App() {
   const toWriter = pathname !== '/articles' && new URLSearchParams(search).get('by');
   return (
     <>
+      <SkipLink />
       <ScrollManager />
       <ErrorBoundary resetKey={pathname}>
         {toWriter ? <Navigate to={{ pathname: '/articles', search }} replace /> : <Routes>
@@ -97,6 +114,7 @@ export default function App() {
       {/* outside the routes so the banner's one <video> survives navigation */}
       <OrbitBanner />
       <Footer />
+      <Games />
     </>
   );
 }

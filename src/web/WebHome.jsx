@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { usePresence } from '../lib/presence.js';
 import WebHeader from './WebHeader.jsx';
+import { WebBuddy } from '../components/buddy/Buddy.jsx';
 import ArticleLine from './ArticleLine.jsx';
 import WebPhotoWall from './WebPhotoWall.jsx';
 import WebWords from './WebWords.jsx';
@@ -39,6 +40,7 @@ export default function WebHome() {
           <div style={{ paddingLeft: "20px" }}>City{DOT}</div>
         </div>
         <div style={{ position: "absolute", left: "1150px", top: "380px", width: "220px", fontFamily: "'Caveat', cursive", fontSize: "26px", lineHeight: "1.05", color: "#5B3A1E", transform: "rotate(-4deg)" }}>{"write-ups, fresh off the line ↓"}</div>
+        <WebBuddy />
         <ArticleLine />
         <WebPhotoWall onOpen={setPhoto} />
         <WebWords />

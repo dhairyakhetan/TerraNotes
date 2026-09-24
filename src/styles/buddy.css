@@ -1,0 +1,54 @@
+/* Buddy the ghost (components/buddy/). */
+
+/* the hidden call button: invisible until the pointer is right on it (or it has keyboard focus) */
+.buddy-call{width:24px;height:24px;padding:0;display:flex;align-items:center;justify-content:center;background:#FBF8F1;border:1.5px solid #111111;border-radius:50%;cursor:pointer;opacity:0;transition:opacity .25s ease,transform .25s ease}
+.buddy-call:hover,.buddy-call:focus-visible{opacity:1;transform:rotate(-8deg) scale(1.08)}
+.buddy-call-label{position:absolute;right:32px;top:-4px;font-family:'Caveat',cursive;font-size:24px;line-height:1;color:#7B5CE6;white-space:nowrap;pointer-events:none;opacity:0;transform:translateX(6px) rotate(-3deg);transition:opacity .25s ease,transform .25s ease}
+.buddy-call:hover+.buddy-call-label,.buddy-call:focus-visible+.buddy-call-label{opacity:1;transform:translateX(0) rotate(-3deg)}
+
+/* the ghost himself: a plain button */
+.buddy-ghost{display:block;padding:0;border:0;background:transparent;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.buddy-ghost:focus-visible{outline:2px dashed #7B5CE6;outline-offset:4px}
+.buddy-trick{display:block;transform-origin:50% 60%}
+
+/* roping down from under the header */
+.buddy-swing{transform-origin:32px 0;animation:buddySwing 3.4s ease-in-out infinite alternate}
+.buddy-arrive .buddy-line{transform-origin:50% 0;animation:buddyRope 1.9s cubic-bezier(.3,.1,.3,1) both}
+.buddy-arrive .buddy-hang{animation:buddyDrop 1.9s cubic-bezier(.3,.1,.3,1) both}
+.buddy-arrive .buddy-swing{animation:buddySwing 3.4s ease-in-out 1.9s infinite alternate}
+@keyframes buddyRope{from{transform:scaleY(0)}to{transform:scaleY(1)}}
+@keyframes buddyDrop{0%{transform:translateY(-108px);opacity:0}8%{opacity:1}84%{transform:translateY(6px)}92%{transform:translateY(-3px)}100%{transform:translateY(0)}}
+@keyframes buddySwing{from{transform:rotate(-3deg)}to{transform:rotate(3deg)}}
+
+/* the hut */
+.buddy-bob{animation:buddyBob 2.4s ease-in-out infinite}
+.buddy-float-in{animation:buddyIn .9s cubic-bezier(.3,1.4,.5,1) .35s both,buddyBob 2.4s ease-in-out 1.25s infinite}
+@keyframes buddyBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+@keyframes buddyIn{from{transform:translate(18px,14px) scale(.3);opacity:0}to{transform:none;opacity:1}}
+
+/* tricks */
+.buddy-spin{animation:bSpin .8s cubic-bezier(.5,0,.3,1)}
+.buddy-boing{animation:bBoing .9s ease-out}
+.buddy-flip{animation:bFlip 1s ease-in-out}
+.buddy-melt{animation:bMelt 1.3s ease-in-out}
+.buddy-boo{animation:bBoo .9s ease-out}
+.buddy-wobble{animation:bWobble .8s ease-in-out}
+@keyframes bSpin{0%{transform:none}40%{transform:translateY(-14px) rotate(200deg) scale(1.1)}100%{transform:rotate(360deg)}}
+@keyframes bBoing{0%{transform:none}20%{transform:scale(1.3,.65) translateY(10px)}45%{transform:scale(.8,1.25) translateY(-22px)}65%{transform:scale(1.12,.9)}80%{transform:scale(.96,1.04)}100%{transform:none}}
+@keyframes bFlip{0%{transform:none}35%{transform:translateY(-18px) rotate(180deg)}65%{transform:translateY(-18px) rotate(180deg)}100%{transform:rotate(360deg)}}
+@keyframes bMelt{0%{transform:none}35%,60%{transform:translateY(22%) scale(1.25,.35)}100%{transform:none}}
+@keyframes bBoo{0%{transform:none}25%{transform:scale(1.45)}35%{transform:scale(1.4) rotate(-7deg)}45%{transform:scale(1.4) rotate(7deg)}55%{transform:scale(1.4) rotate(-5deg)}100%{transform:none}}
+@keyframes bWobble{0%,100%{transform:none}20%{transform:rotate(-16deg) translateX(-6px)}40%{transform:rotate(12deg) translateX(5px)}60%{transform:rotate(-8deg)}80%{transform:rotate(4deg)}}
+
+/* phone menu: under the logo */
+.buddy-menu-call{position:absolute;left:60px;top:calc(60px + var(--lift) * .4);display:flex;align-items:center;gap:6px;min-height:30px;padding:0 6px 0 2px;background:transparent;border:0;color:#F7C21A;font-family:'Caveat',cursive;font-size:19px;line-height:1;cursor:pointer}
+.buddy-menu-call svg{animation:buddyBob 2s ease-in-out infinite}
+
+/* skip link: off screen until it has keyboard focus */
+.skip-link{position:fixed;left:12px;top:12px;z-index:1000;padding:12px 16px;background:#111111;color:#F3EEE4;border:2px solid #F3EEE4;box-shadow:4px 4px 0 #F7C21A;font-family:'Space Mono',monospace;font-weight:700;font-size:12px;letter-spacing:1.2px;text-transform:uppercase;text-decoration:none;transform:translateY(-200%);transition:transform .15s ease}
+.skip-link:focus{transform:none;outline:2px solid #F7C21A;outline-offset:2px}
+
+@media (prefers-reduced-motion: reduce){
+  .buddy-swing,.buddy-bob,.buddy-float-in,.buddy-menu-call svg,.buddy-arrive .buddy-line,.buddy-arrive .buddy-hang,.buddy-arrive .buddy-swing,.buddy-trick{animation:none!important}
+  .buddy-call,.buddy-call-label,.skip-link{transition:none}
+}
