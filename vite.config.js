@@ -4,6 +4,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { ARTICLES } from './src/data/articles.js';
 import { SITE } from './src/data/site.js';
+import { articleHtml, pageHtml, withContent } from './build/static-html.js';
 
 // Link previews need absolute URLs. On Vercel this is the production domain; locally it stays relative.
 const host = process.env.SITE_URL || (process.env.VERCEL_PROJECT_PRODUCTION_URL && `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`) || '';
@@ -31,7 +32,15 @@ const pages = () => ({
       html = setMeta(html, 'property', 'og:url', url);
       if (a.cover) { html = setMeta(html, 'property', 'og:image', host + a.cover); html = setMeta(html, 'name', 'twitter:image', host + a.cover); }
       html = html.replace('</title>', `</title>\n    <link rel="canonical" href="${esc(url)}" />`);
-      out(`articles/${a.slug}.html`, html);
+      out(`articles/${a.slug}.html`, withContent(html, articleHtml(a))); // readable without JavaScript too
+    }
+    // the other pages, each with its own title and its content in the HTML (served at /photos etc. by cleanUrls)
+    const TITLES = { '/': '', '/articles': 'All articles', '/photos': 'Photo wall', '/words': 'Words we should bring back', '/members': 'Meet the team' };
+    for (const [p, name] of Object.entries(TITLES)) {
+      let html = name ? base.replace(/<title>[^<]*<\/title>/, `<title>${esc(`Aquaterra — ${name}`)}</title>`) : base;
+      if (name) html = setMeta(html, 'property', 'og:title', `${name} · TerraNotes`);
+      html = setMeta(html, 'property', 'og:url', `${host}${p}`);
+      out(p === '/' ? 'index.html' : `${p.slice(1)}.html`, withContent(html, pageHtml[p]()));
     }
     const paths = ['/', '/articles', '/photos', '/words', '/members', ...ARTICLES.map((a) => `/articles/${a.slug}`)];
     if (host) {

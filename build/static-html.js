@@ -1,0 +1,52 @@
+// What each page says, as plain HTML, written into the page at build time (inside #root). The app replaces it the
+// moment it starts, so people see the real page; chatbots, search engines and link readers that don't run
+// JavaScript read this instead, so every address shows its content straight away.
+import { ARTICLES } from '../src/data/articles.js';
+import { PHOTOS } from '../src/data/photos.js';
+import { SITE } from '../src/data/site.js';
+import { MEMBERS, TEAMS, teamsOf } from '../src/data/team.js';
+import { WORDS } from '../src/data/words.js';
+
+const esc = (t) => String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+const byline = (a) => [a.author && `By ${esc(a.author)}`, a.date && esc(a.date), a.readTime && `${esc(a.readTime)} min read`].filter(Boolean).join(' · ');
+
+const shell = (inner) => `<div style="max-width:680px;margin:0 auto;padding:24px 18px 48px;background:#F3EEE4;color:#1E2723;font:17px/1.6 Georgia,serif">
+<nav aria-label="Pages" style="font:13px/1.8 monospace;text-transform:uppercase;letter-spacing:1px"><a href="/">TerraNotes by Aquaterra</a> · <a href="/articles">Articles</a> · <a href="/photos">Photo wall</a> · <a href="/words">Words</a> · <a href="/members">Team</a></nav>
+<main>${inner}</main>
+</div>`;
+
+const articleList = () => `<ul>${ARTICLES.map((a) => `<li><a href="/articles/${a.slug}"><strong>${esc(a.title)}</strong></a> (${esc(a.tag)}): ${esc(a.dek)}. ${byline(a)}</li>`).join('')}</ul>`;
+
+export function articleHtml(a) {
+  const body = a.body.map((b) => {
+    if (typeof b === 'string') return `<p>${esc(b)}</p>`;
+    if (b.h2) return `<h2>${esc(b.h2)}</h2>`;
+    return '';
+  }).join('\n');
+  const i = ARTICLES.indexOf(a), next = ARTICLES[(i + 1) % ARTICLES.length];
+  return shell(`<article>
+<p style="font:13px monospace;text-transform:uppercase">${esc(a.tag)} · ${String(i + 1).padStart(2, '0')} / ${String(ARTICLES.length).padStart(2, '0')}</p>
+<h1>${esc(a.title)}</h1>
+<p><em>${esc(a.dek)}</em></p>
+<p>${byline(a)}</p>
+${body}
+</article>
+<p>Next: <a href="/articles/${next.slug}">${esc(next.title)}</a> · <a href="/articles">All articles</a></p>`);
+}
+
+export const pageHtml = {
+  '/': () => shell(`<h1>TerraNotes by Aquaterra</h1>
+<p><strong>Notes from where the land meets the water.</strong> ${esc(SITE.intro)}</p>
+<h2>Articles</h2>${articleList()}
+<h2><a href="/photos">Photo wall</a></h2><p>${PHOTOS.filter((p) => p.caption).map((p) => esc(p.caption)).join(' · ')}</p>
+<h2><a href="/words">Words we should bring back</a></h2><p>A mini game: guess what an old, forgotten word means.</p>
+<h2><a href="/members">Meet the team</a></h2><p>${MEMBERS.length} people across the heads, design, writing and tech teams.</p>
+<p>${esc(SITE.footerNote)}</p>`),
+  '/articles': () => shell(`<h1>All articles</h1><p>${ARTICLES.length} pieces, hung up to dry, one by one.</p>${articleList()}`),
+  '/photos': () => shell(`<h1>Photo wall</h1><p>Moments, strung up.</p><ul>${PHOTOS.filter((p) => p.photo).map((p, i) => `<li><img src="${esc(p.photo)}" alt="${esc(p.caption)}" width="240" style="max-width:100%;height:auto"><br>Highlight ${String(i + 1).padStart(2, '0')}: ${esc(p.caption)}${p.place ? `, ${esc(p.place)}` : ''}</li>`).join('')}</ul>`),
+  '/words': () => shell(`<h1>Words we should bring back</h1><p>A mini game: each round shows an old word and three meanings; pick the right one. Some of the words:</p><ul>${WORDS.map((w) => `<li>${esc(w.meaning)}</li>`).join('')}</ul>`),
+  '/members': () => shell(`<h1>Meet the team</h1><p>${Object.values(TEAMS).map((t) => `<strong>${esc(t.label)}</strong>: ${esc(t.credit)}.`).join(' ')}</p><ul>${MEMBERS.map((m) => `<li><strong>${esc(m.name)}</strong>, ${esc(m.role)} (${teamsOf(m).map((t) => esc(TEAMS[t].label)).join(', ')})${m.bio ? `: ${esc(m.bio)}` : ''}${m.instagram ? ` · Instagram <a href="https://instagram.com/${esc(m.instagram)}">@${esc(m.instagram)}</a>` : ''}${teamsOf(m).includes('writing') ? ` · <a href="/articles?by=${esc(m.name.split(' ')[0].toLowerCase())}">their articles</a>` : ''}</li>`).join('')}</ul>`),
+};
+
+// Put a page's content into the built HTML (index.html has an empty <div id="root"></div>).
+export const withContent = (html, inner) => html.replace('<div id="root"></div>', `<div id="root">${inner}</div>`);
