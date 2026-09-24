@@ -128,11 +128,12 @@ export default function WebMembers() {
               <span style={{ fontFamily: "'Space Mono', monospace", fontSize: "10px", letterSpacing: "1px" }}>{`${pad2(shown + 1)} / ${pad2(MEMBERS.length)}`}</span>
             </div>
             <div style={{ fontFamily: "'Archivo Black', Impact, sans-serif", fontSize: "34px", lineHeight: "0.95", textTransform: "uppercase", color: "#111111" }}>{sel.name}</div>
-            <div style={{ fontFamily: "'Caveat', cursive", fontSize: "23px", lineHeight: "1.1", color: "#5B3A1E" }}>{sel.role}</div>
+            {/* the role line only when it says more than the team tag (e.g. Head of department) */}
+            {!/team/i.test(sel.role) && <div style={{ fontFamily: "'Caveat', cursive", fontSize: "23px", lineHeight: "1.1", color: "#5B3A1E" }}>{sel.role}</div>}
             <p style={{ margin: "0", fontSize: "15px", lineHeight: "1.5", color: "#333333" }}>{sel.bio || '[Two lines about them: where they work from, what they write or shoot, what they care about.]'}</p>
             {/* what their team made; only writers have articles */}
             {teamsOf(sel).map((t) => (
-              <p key={t} style={{ margin: "0", paddingLeft: "10px", borderLeft: `3px solid ${TEAMS[t].color}`, fontSize: "14px", lineHeight: "1.45", color: "#1E2723" }}><strong style={{ fontWeight: "600" }}>{TEAMS[t].label}</strong>{` ${TEAMS[t].made}.`}</p>
+              <p key={t} style={{ margin: "0", paddingLeft: "10px", borderLeft: `3px solid ${TEAMS[t].color}`, fontSize: "14px", lineHeight: "1.45", color: "#1E2723" }}>{`${TEAMS[t].credit}.`}</p>
             ))}
             <div style={{ display: "flex", gap: "10px" }}>
               {teamsOf(sel).includes('writing') && <Link className="btn" to={byLink(sel.name)} onClick={(e) => { if (!articlesBy(sel.name).length) { e.preventDefault(); setEmpty(true); } else close(); }} style={{ minHeight: "44px", flexGrow: "1", display: "flex", alignItems: "center", justifyContent: "center", background: "#111111", color: "#FFFFFF", border: "2px solid #111111", fontFamily: "'Space Mono', monospace", fontWeight: "700", fontSize: "11px", letterSpacing: "1px", textDecoration: "none" }}>THEIR ARTICLES</Link>}
