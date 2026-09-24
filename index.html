@@ -13,6 +13,10 @@
         land.addEventListener('change', fit);
       }
     </script>
+    <!-- Each page's text is also written into the HTML for chatbots and search engines (build/static-html.js).
+         Browsers that run the app never show it: this hides it before anything is drawn, and the app replaces it. -->
+    <script>document.documentElement.classList.add('js')</script>
+    <style>.js .static-copy{display:none}</style>
     <meta name="theme-color" content="#F3EEE4" />
     <meta name="description" content="Terranotes by Aquaterra: notes from where the land meets the water." />
     <title>Aquaterra</title>

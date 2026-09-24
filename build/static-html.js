@@ -10,7 +10,7 @@ import { WORDS } from '../src/data/words.js';
 const esc = (t) => String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 const byline = (a) => [a.author && `By ${esc(a.author)}`, a.date && esc(a.date), a.readTime && `${esc(a.readTime)} min read`].filter(Boolean).join(' · ');
 
-const shell = (inner) => `<div style="max-width:680px;margin:0 auto;padding:24px 18px 48px;background:#F3EEE4;color:#1E2723;font:17px/1.6 Georgia,serif">
+const shell = (inner) => `<div class="static-copy" style="max-width:680px;margin:0 auto;padding:24px 18px 48px;background:#F3EEE4;color:#1E2723;font:17px/1.6 Georgia,serif">
 <nav aria-label="Pages" style="font:13px/1.8 monospace;text-transform:uppercase;letter-spacing:1px"><a href="/">TerraNotes by Aquaterra</a> · <a href="/articles">Articles</a> · <a href="/photos">Photo wall</a> · <a href="/words">Words</a> · <a href="/members">Team</a></nav>
 <main>${inner}</main>
 </div>`;
