@@ -1,11 +1,11 @@
 import { useRef } from 'react';
 import ArticleCard from '../ArticleCard.jsx';
 import { DURATION, SoonCard, SWING, TILT, wirePath } from '../../web/ArticleLine.jsx';
-import { ARTICLES, COMING_SOON } from '../../data/articles.js';
+import { ARTICLES } from '../../data/articles.js';
 import { pad2 } from '../../lib/format.js';
 
 // TEMPORARY: the phone's "scroll" view of the articles (switch in the header), to compare with the hanging view.
-// Every write-up on one sideways line, like the web home page, then the COMING_SOON pegs.
+// Every write-up on one sideways line, like the web home page.
 const PITCH = 196;
 const CARD_TOP = [62, 104, 74, 112, 68, 96, 100, 70, 84, 110, 76, 98]; // where each card's clip sits
 const peg = (i) => {
@@ -15,7 +15,7 @@ const peg = (i) => {
 
 export default function ScrollingArticles() {
   const scroller = useRef(null), bar = useRef(null), prev = useRef(null), next = useRef(null);
-  const items = [...ARTICLES.map((a) => ({ a })), ...COMING_SOON.map((text) => ({ text }))];
+  const items = ARTICLES.map((a) => ({ a }));
   const pegs = items.map((_, i) => peg(i));
   const width = pegs[pegs.length - 1].x + 150;
   // progress bar and arrows are written directly, so swiping never re-renders the cards

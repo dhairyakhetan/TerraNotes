@@ -2,7 +2,7 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import fs from 'node:fs';
 import path from 'node:path';
-import { ARTICLES } from './src/data/articles.js';
+import { ALL_ARTICLES as ARTICLES } from './src/data/articles.js'; // every edition's
 import { SITE } from './src/data/site.js';
 import { articleHtml, pageHtml, withContent } from './build/static-html.js';
 
@@ -35,14 +35,14 @@ const pages = () => ({
       out(`articles/${a.slug}.html`, withContent(html, articleHtml(a))); // readable without JavaScript too
     }
     // the other pages, each with its own title and its content in the HTML (served at /photos etc. by cleanUrls)
-    const TITLES = { '/': '', '/articles': 'All articles', '/photos': 'Photo wall', '/words': 'Words we should bring back', '/members': 'Meet the team' };
+    const TITLES = { '/': '', '/articles': 'All articles', '/photos': 'Photo wall', '/words': 'Words we should bring back', '/members': 'Meet the team', '/editions': 'Editions' };
     for (const [p, name] of Object.entries(TITLES)) {
       let html = name ? base.replace(/<title>[^<]*<\/title>/, `<title>${esc(`Aquaterra — ${name}`)}</title>`) : base;
       if (name) html = setMeta(html, 'property', 'og:title', `${name} · TerraNotes`);
       html = setMeta(html, 'property', 'og:url', `${host}${p}`);
       out(p === '/' ? 'index.html' : `${p.slice(1)}.html`, withContent(html, pageHtml[p]()));
     }
-    const paths = ['/', '/articles', '/photos', '/words', '/members', ...ARTICLES.map((a) => `/articles/${a.slug}`)];
+    const paths = ['/', '/articles', '/photos', '/words', '/members', '/editions', ...ARTICLES.map((a) => `/articles/${a.slug}`)];
     if (host) {
       const urls = paths.map((p) => `  <url><loc>${host}${p}</loc></url>`).join('\n');
       out('sitemap.xml', `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls}\n</urlset>\n`);
@@ -85,6 +85,7 @@ const pages = () => ({
       `- [Photo wall](${url('/photos')}): photos from the community, with captions`,
       `- [Words we should bring back](${url('/words')}): a mini game about forgotten words`,
       `- [Meet the team](${url('/members')}): the heads, design, writing and tech teams`,
+      `- [Editions](${url('/editions')}): every monthly edition; the latest is on the home page`,
       '',
       '## Optional',
       '',

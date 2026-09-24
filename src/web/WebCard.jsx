@@ -1,6 +1,6 @@
 import { Link } from 'react-router';
 import Img from '../components/Img.jsx';
-import { ARTICLES, TAGS } from '../data/articles.js';
+import { placeOf, TAGS } from '../data/articles.js';
 import { pad2 } from '../lib/format.js';
 import { rememberCard } from '../lib/fly.js';
 import { ByTape } from '../lib/byWriter.jsx';
@@ -26,7 +26,7 @@ export default function WebCard({ article: a, size = 'line', mark }) {
         <Img src={a.cover} alt={a.alt} box={{ height: `${z.img}px`, minHeight: coverFloor(z.img) }} icon={22} font="12px" />
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexShrink: "0" }}>
           <span style={{ background: tag.color, color: tag.ink, fontFamily: "'Space Mono', monospace", fontWeight: "700", fontSize: z.pill, letterSpacing: "1px", textTransform: "uppercase", padding: "3px 9px", borderRadius: "999px", lineHeight: "1.3", whiteSpace: "nowrap" }}>{a.tag}</span>
-          <span style={{ fontFamily: "'Space Mono', monospace", fontSize: z.num, letterSpacing: "1px", color: "#111111", whiteSpace: "nowrap" }}>{`${pad2(ARTICLES.indexOf(a) + 1)}${z.slash}${pad2(ARTICLES.length)}`}</span>
+          <span style={{ fontFamily: "'Space Mono', monospace", fontSize: z.num, letterSpacing: "1px", color: "#111111", whiteSpace: "nowrap" }}>{`${pad2(placeOf(a).i + 1)}${z.slash}${pad2(placeOf(a).n)}`}</span>
         </div>
         <h3 ref={title} style={{ flexShrink: "0", margin: "0", fontFamily: "'Archivo Black', Impact, sans-serif", fontWeight: "400", fontSize: z.title, lineHeight: "0.95", letterSpacing: "-0.3px", textTransform: "uppercase", color: "#111111" }}>{a.title}</h3>
         <p style={{ flexShrink: "0", margin: "0", fontFamily: "'Caveat', cursive", fontSize: z.dek, lineHeight: "1.1", color: "#5B4630" }}>{a.dek}</p>

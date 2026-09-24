@@ -5,7 +5,7 @@ import WebCard from './WebCard.jsx';
 import Img from '../components/Img.jsx';
 import Extra, { isExtra } from '../components/Extras.jsx';
 import { PhotoIcon } from '../components/home/Members.jsx';
-import { ARTICLES, TAGS } from '../data/articles.js';
+import { placeOf, TAGS } from '../data/articles.js';
 import { MEMBERS } from '../data/team.js';
 import { pad2 } from '../lib/format.js';
 import { useFitTitle } from '../lib/fit.js';
@@ -116,7 +116,7 @@ export default function WebArticle({ article: a, next }) {
         <div className="rise-in" style={{ position: "relative", margin: "120px 0 0 780px", width: "580px", minHeight: "560px", display: "flex", flexDirection: "column", gap: "22px" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
             <span style={{ ...MONO, background: tag.color, color: tag.ink, fontWeight: "700", fontSize: "12px", padding: "3px 9px", borderRadius: "999px", lineHeight: "1.3" }}>{a.tag}</span>
-            <span style={{ fontFamily: "'Space Mono', monospace", fontSize: "13px", letterSpacing: "1px" }}>{`${pad2(ARTICLES.indexOf(a) + 1)} / ${pad2(ARTICLES.length)}`}</span>
+            <span style={{ fontFamily: "'Space Mono', monospace", fontSize: "13px", letterSpacing: "1px" }}>{`${pad2(placeOf(a).i + 1)} / ${pad2(placeOf(a).n)}`}</span>
           </div>
           <h1 ref={title} style={{ margin: "0", fontFamily: "'Archivo Black', Impact, sans-serif", fontWeight: "400", fontSize: "76px", lineHeight: "0.92", letterSpacing: "-1.5px", textTransform: "uppercase" }}>{a.title}</h1>
           <p style={{ margin: "0", fontFamily: "'Caveat', cursive", fontSize: "32px", lineHeight: "1.1", color: "#5B4630" }}>{a.dek}</p>

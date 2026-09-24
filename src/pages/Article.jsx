@@ -5,7 +5,7 @@ import MenuSheet from '../components/MenuSheet.jsx';
 import ArticleCard from '../components/ArticleCard.jsx';
 import Img from '../components/Img.jsx';
 import Extra, { isExtra } from '../components/Extras.jsx';
-import { ARTICLES, TAGS } from '../data/articles.js';
+import { placeOf, TAGS } from '../data/articles.js';
 import { MEMBERS } from '../data/team.js';
 import { pad2 } from '../lib/format.js';
 import { useFitTitle } from '../lib/fit.js';
@@ -100,7 +100,7 @@ export default function Article({ article: a, next }) {
               <Img src={a.cover} alt={a.alt} label={`${a.alt} — lead photo`} box={a.cover ? { height: "auto" } : { height: "240px" }} /> {/* a cover shows whole, at its own shape */}
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                 <span style={{ background: tag.color, color: tag.ink, fontFamily: "'Space Mono', monospace", fontWeight: "700", fontSize: "10px", letterSpacing: "1px", textTransform: "uppercase", padding: "3px 8px", borderRadius: "999px", lineHeight: "1.2" }}>{a.tag}</span>
-                <span style={{ fontFamily: "'Space Mono', monospace", fontSize: "11px", letterSpacing: "1px", color: "#111111" }}>{`${pad2(ARTICLES.indexOf(a) + 1)} / ${pad2(ARTICLES.length)}`}</span>
+                <span style={{ fontFamily: "'Space Mono', monospace", fontSize: "11px", letterSpacing: "1px", color: "#111111" }}>{`${pad2(placeOf(a).i + 1)} / ${pad2(placeOf(a).n)}`}</span>
               </div>
               <h1 ref={title} style={{ margin: "0", fontFamily: "'Archivo Black', Impact, sans-serif", fontWeight: "400", fontSize: "42px", lineHeight: "0.95", letterSpacing: "-0.3px", textTransform: "uppercase", color: "#111111" }}>{a.title}</h1>
               <p style={{ margin: "0", fontFamily: "'Caveat', cursive", fontSize: "22px", lineHeight: "1.1", color: "#5B4630" }}>{a.dek}</p>

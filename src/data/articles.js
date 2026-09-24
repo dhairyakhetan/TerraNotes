@@ -1,10 +1,13 @@
+import { LATEST } from './editions.js';
+
 // Articles, in order: this order sets the numbers (01, 02…) and the "next on the line" chain.
 //   slug:     the address, /articles/<slug>
 //   tag:      one of the keys in TAGS (sets the colours)
 //   cover:    put the picture in public/articles/ and write its path, e.g. '/articles/wetlands.jpg'
 //   alt:      a few words describing the cover (also the placeholder label until there is one)
 //   author:   the writer's name (someone in src/data/team.js also gets their role under it)
-//   date:     the edition it came out in, e.g. 'Sep 2026' (one edition a month; the first is September 2026)
+//   edition:  which edition it's in (src/data/editions.js); the home page shows the latest edition's
+//   date:     the edition's month, e.g. 'Sep 2026'
 //   readTime: minutes, e.g. '6'
 //   body:     the article, top to bottom. Each item is one block:
 //     'Some text.'                                         paragraph (the first one gets the drop cap)
@@ -41,7 +44,8 @@ const DRAFT = [
   '[Closing paragraph. End on an image, not a summary.]',
 ];
 
-export const ARTICLES = [
+// Every article, in every edition.
+export const ALL_ARTICLES = [
   {
     slug: 'exam-stress',
     title: 'Exam stress: the academic plot twist nobody asked for',
@@ -50,6 +54,7 @@ export const ARTICLES = [
     cover: '/articles/exam-stress.jpg',
     alt: 'exam season',
     author: 'Diti Shah',
+    edition: 1,
     date: 'Sep 2026',
     readTime: '5',
     body: [
@@ -83,6 +88,7 @@ export const ARTICLES = [
     cover: '/articles/locked-in-or-logged-on.jpg',
     alt: 'lock-in',
     author: 'Pahal Sethi',
+    edition: 1,
     date: 'Sep 2026',
     readTime: '2',
     body: [
@@ -106,6 +112,7 @@ export const ARTICLES = [
     cover: '/articles/fast-fashion-and-anxiety.jpg',
     alt: 'fast fashion',
     author: 'Dhriti Agarwal',
+    edition: 1,
     date: 'Sep 2026',
     readTime: '2',
     body: [
@@ -125,6 +132,7 @@ export const ARTICLES = [
     cover: '/articles/this-side-of-the-river.jpg',
     alt: 'the river',
     author: 'Ashwika Tripathi',
+    edition: 1,
     date: 'Sep 2026',
     readTime: '1',
     body: [
@@ -149,6 +157,7 @@ export const ARTICLES = [
     cover: '/articles/my-grandmas-daughter.jpg',
     alt: 'grandma',
     author: 'Ashwika Tripathi',
+    edition: 1,
     date: 'Sep 2026',
     readTime: '1',
     body: [
@@ -175,6 +184,7 @@ export const ARTICLES = [
     cover: '/articles/which-is-weird.jpg',
     alt: 'ten years ago',
     author: 'Ashwika Tripathi',
+    edition: 1,
     date: 'Sep 2026',
     readTime: '2',
     body: [
@@ -195,9 +205,12 @@ export const ARTICLES = [
   },
 ];
 
-// The empty peg after the real articles on the sideways line (web home, and the phone's line view). One peg per line.
+// The latest edition's articles: what the home page, All articles and the line show.
+export const ARTICLES = ALL_ARTICLES.filter((a) => a.edition === LATEST);
+// An article's place in its own edition: { i: 0-based position, n: how many }.
+export const placeOf = (a) => { const list = ALL_ARTICLES.filter((x) => x.edition === a.edition); return { i: list.indexOf(a), n: list.length, list }; };
+
+// Shown in the All articles page's spots 04–05 only while an edition has fewer articles than spots.
 export const COMING_SOON = [
   "this peg's saving a spot for the next one",
 ];
-// The phone's tiles view has no pegs: its last tile just says more is coming.
-export const COMING_SOON_TILE = 'more stories on the way.';

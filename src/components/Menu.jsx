@@ -62,6 +62,11 @@ export default function Menu({ current = 'home', onClose }) {
             <path d="M4 2 H10 V8" />
           </svg>
         </a>
+        {/* Aquaterra's main site, and every edition */}
+        <a href={SITE.website} target="_blank" rel="noreferrer" style={{ position: "absolute", right: "20px", top: "52px", minHeight: "40px", display: "flex", alignItems: "center", gap: "6px", fontFamily: "'Space Mono', monospace", fontSize: "12px", textDecoration: "none", color: "#F3EEE4" }}>{SITE.website.replace(/^https?:\/\//, '')}{" "}
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true"><path d="M2 10 L10 2" /><path d="M4 2 H10 V8" /></svg>
+        </a>
+        <SmartLink href="/editions" onClick={close} style={{ position: "absolute", right: "20px", top: "92px", minHeight: "40px", display: "flex", alignItems: "center", fontFamily: "'Space Mono', monospace", fontSize: "12px", letterSpacing: "1px", textTransform: "uppercase", color: "#F7C21A", textDecoration: "underline", textUnderlineOffset: "4px" }}>All editions →</SmartLink>
         <div style={{ position: "absolute", left: "20px", bottom: "36px", fontFamily: "'Space Mono', monospace", fontSize: "10px", letterSpacing: "1.4px", color: "#8E8A7A" }}>TERRANOTES · © {new Date().getFullYear()}</div>
       </div>
     </nav>

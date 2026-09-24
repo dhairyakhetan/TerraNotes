@@ -9,7 +9,8 @@ import WebHome from './web/WebHome.jsx';
 import WebArticle from './web/WebArticle.jsx';
 import OrbitBanner from './components/OrbitBanner.jsx';
 import Footer from './components/Footer.jsx';
-import { ARTICLES } from './data/articles.js';
+import { ALL_ARTICLES } from './data/articles.js';
+import { EditionPage, Editions } from './pages/Editions.jsx';
 import { useIsWeb } from './lib/layout.js';
 
 // Home page sections, each with its own clean address: /photos opens the home page at the photo wall.
@@ -65,11 +66,12 @@ function SectionRoute({ web }) {
 
 function ArticleRoute({ web }) {
   const { slug } = useParams();
-  const i = ARTICLES.findIndex((a) => a.slug === slug);
-  if (i === -1) return <NotFound web={web} />;
+  const a = ALL_ARTICLES.find((x) => x.slug === slug);
+  if (!a) return <NotFound web={web} />;
   const Page = web ? WebArticle : Article;
+  const same = ALL_ARTICLES.filter((x) => x.edition === a.edition); // "next on the line" stays in the article's edition
   // key: remount per article so the hero drop animation replays
-  return <Page key={slug} article={ARTICLES[i]} next={ARTICLES[(i + 1) % ARTICLES.length]} />;
+  return <Page key={slug} article={a} next={same[(same.indexOf(a) + 1) % same.length]} />;
 }
 
 export default function App() {
@@ -85,6 +87,8 @@ export default function App() {
           <Route path="/" element={web ? <WebHome /> : <Home />} />
           {/* on web every write-up is on the home page's line */}
           <Route path="/articles" element={web ? <WebHome /> : <Articles />} />
+          <Route path="/editions" element={<Editions web={web} />} />
+          <Route path="/editions/:n" element={<EditionPage web={web} />} />
           <Route path="/:section" element={<SectionRoute web={web} />} />
           <Route path="/articles/:slug" element={<ArticleRoute web={web} />} />
           <Route path="*" element={<NotFound web={web} />} />

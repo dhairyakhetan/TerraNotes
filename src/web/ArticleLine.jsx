@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 import WebCard from './WebCard.jsx';
 import { webZoom } from '../lib/layout.js';
-import { ARTICLES, COMING_SOON } from '../data/articles.js';
+import { ARTICLES } from '../data/articles.js';
 import { pad2 } from '../lib/format.js';
 import { ByTape, useByWriter } from '../lib/byWriter.jsx';
 import { Link } from 'react-router';
@@ -226,7 +226,7 @@ export function SoonCard({ text, w = 172, h = 272, font = '27px', clips = [w / 2
 export default function ArticleLine() {
   const refs = useRef({ hangs: [], kicks: [] }).current;
   const { by, mine, isMine, list } = useByWriter(); // ?by=<name>: that writer's pieces first, marked
-  const items = [...list.map((a) => ({ a })), ...COMING_SOON.map((text) => ({ text }))];
+  const items = list.map((a) => ({ a }));
   const pegs = items.map((_, i) => peg(i));
   const width = pegs[pegs.length - 1].x + 224;
   useEffect(() => runLine(refs, pegs, width), []);

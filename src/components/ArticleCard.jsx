@@ -1,6 +1,6 @@
 import { Link } from 'react-router';
 import Img from './Img.jsx';
-import { ARTICLES, TAGS } from '../data/articles.js';
+import { placeOf, TAGS } from '../data/articles.js';
 import { pad2 } from '../lib/format.js';
 import { ByTape } from '../lib/byWriter.jsx';
 import { coverFloor, useFitTitle } from '../lib/fit.js';
@@ -19,7 +19,7 @@ export default function ArticleCard({ article: a, className, style, imgH, titleS
         <Img src={a.cover} alt={a.alt} box={{ height: imgH, minHeight: coverFloor(imgH) }} />
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexShrink: "0" }}>
           <span style={{ background: tag.color, color: tag.ink, fontFamily: "'Space Mono', monospace", fontWeight: "700", fontSize: "8.5px", letterSpacing: "1px", textTransform: "uppercase", padding: "3px 8px", borderRadius: "999px", lineHeight: "1.2" }}>{a.tag}</span>
-          <span style={{ fontFamily: "'Space Mono', monospace", fontSize: "9px", letterSpacing: "1px", color: "#111111" }}>{`${pad2(ARTICLES.indexOf(a) + 1)} / ${pad2(ARTICLES.length)}`}</span>
+          <span style={{ fontFamily: "'Space Mono', monospace", fontSize: "9px", letterSpacing: "1px", color: "#111111" }}>{`${pad2(placeOf(a).i + 1)} / ${pad2(placeOf(a).n)}`}</span>
         </div>
         <h3 ref={title} style={{ flexShrink: "0", margin: "0", fontFamily: "'Archivo Black', Impact, sans-serif", fontWeight: "400", fontSize: titleSize, lineHeight: "0.95", letterSpacing: "-0.3px", textTransform: "uppercase", color: "#111111" }}>{a.title}</h3>
         <p style={{ flexShrink: "0", margin: "0", fontFamily: "'Caveat', cursive", fontSize: dekSize, lineHeight: "1.1", color: "#5B4630" }}>{a.dek}</p>
