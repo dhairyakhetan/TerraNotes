@@ -1,5 +1,5 @@
 import { useEffect, useLayoutEffect } from 'react';
-import { Route, Routes, useLocation, useNavigationType, useParams } from 'react-router';
+import { Navigate, Route, Routes, useLocation, useNavigationType, useParams } from 'react-router';
 import Home from './pages/Home.jsx';
 import Articles from './pages/Articles.jsx';
 import Article from './pages/Article.jsx';
@@ -73,20 +73,22 @@ function ArticleRoute({ web }) {
 }
 
 export default function App() {
-  const { pathname } = useLocation();
+  const { pathname, search } = useLocation();
   const web = useIsWeb(); // 900px and up: the 1440px web layout (src/web/); below: the phone layout (src/pages/)
+  // any address with ?by=<name> goes to that writer's articles: /?by=diti, /members?by=diti… → /articles?by=diti
+  const toWriter = pathname !== '/articles' && new URLSearchParams(search).get('by');
   return (
     <>
       <ScrollManager />
       <ErrorBoundary resetKey={pathname}>
-        <Routes>
+        {toWriter ? <Navigate to={{ pathname: '/articles', search }} replace /> : <Routes>
           <Route path="/" element={web ? <WebHome /> : <Home />} />
           {/* on web every write-up is on the home page's line */}
           <Route path="/articles" element={web ? <WebHome /> : <Articles />} />
           <Route path="/:section" element={<SectionRoute web={web} />} />
           <Route path="/articles/:slug" element={<ArticleRoute web={web} />} />
           <Route path="*" element={<NotFound web={web} />} />
-        </Routes>
+        </Routes>}
       </ErrorBoundary>
       {/* outside the routes so the banner's one <video> survives navigation */}
       <OrbitBanner />
