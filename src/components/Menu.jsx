@@ -45,7 +45,6 @@ export default function Menu({ current = 'home', open, onClose }) {
           <Logo globe={36} word={21} sub={13} dark />
         </SmartLink>
       </div>
-      <MenuCall onClose={close} />
       <button className="press" onClick={close} aria-label="Close menu" style={{ "--c": "#F0442B", position: "absolute", right: "20px", top: "18px", width: "48px", height: "48px", background: "#FFFFFF", border: "2px solid #F3EEE4", boxShadow: "4px 4px 0 #F0442B", padding: "0", display: "flex", alignItems: "center", justifyContent: "center" }}>
         <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="#111111" strokeWidth="2.6" strokeLinecap="square">
           <path d="M3 3 L17 17" />
@@ -77,6 +76,7 @@ export default function Menu({ current = 'home', open, onClose }) {
         <a href={SITE.website} target="_blank" rel="noreferrer" aria-label="Aquaterra website (ngoaquaterra.com)" style={{ position: "absolute", right: "20px", top: "12px", minHeight: "40px", display: "flex", alignItems: "center", gap: "8px", fontFamily: "'Space Mono', monospace", fontSize: "12px", letterSpacing: "1px", textTransform: "uppercase", textDecoration: "none", color: "#F3EEE4" }}><GlobeIcon />Website ↗</a>
         <a href={instagramUrl(SITE.instagram)} target="_blank" rel="noreferrer" aria-label={`Aquaterra on Instagram (@${SITE.instagram})`} style={{ position: "absolute", right: "20px", top: "54px", minHeight: "40px", display: "flex", alignItems: "center", gap: "8px", fontFamily: "'Space Mono', monospace", fontSize: "12px", letterSpacing: "1px", textTransform: "uppercase", textDecoration: "none", color: "#F3EEE4" }}><InstagramIcon />Instagram ↗</a>
         <div style={{ position: "absolute", left: "20px", bottom: "36px", fontFamily: "'Space Mono', monospace", fontSize: "10px", letterSpacing: "1.4px", color: "#8E8A7A" }}>TERRANOTES · © {new Date().getFullYear()}</div>
+        <MenuCall onClose={close} />
       </div>
     </nav>
   );

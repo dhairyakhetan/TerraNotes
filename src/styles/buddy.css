@@ -13,37 +13,35 @@
 .buddy-ghost:focus-visible{outline:2px dashed #7B5CE6;outline-offset:4px}
 .buddy-trick{display:block;transform-origin:50% 60%}
 
-/* roping down from under the header */
-.buddy-swing{transform-origin:32px 0;animation:buddySwing 3.4s ease-in-out infinite alternate}
-.buddy-arrive .buddy-line{transform-origin:50% 0;animation:buddyRope 1.9s cubic-bezier(.3,.1,.3,1) both}
-.buddy-arrive .buddy-hang{animation:buddyDrop 1.9s cubic-bezier(.3,.1,.3,1) both}
-.buddy-arrive .buddy-swing{animation:buddySwing 3.4s ease-in-out 1.9s infinite alternate}
-@keyframes buddyRope{from{transform:scaleY(0)}to{transform:scaleY(1)}}
-@keyframes buddyDrop{0%{transform:translateY(-108px);opacity:0}8%{opacity:1}84%{transform:translateY(6px)}92%{transform:translateY(-3px)}100%{transform:translateY(0)}}
-@keyframes buddySwing{from{transform:rotate(-3deg)}to{transform:rotate(3deg)}}
+/* roping down from under the header, then the rope pulls back up and he floats */
+.buddy-bob{animation:buddyBob 2.6s ease-in-out infinite}
+.buddy-arrive .buddy-line{transform-origin:50% 0;animation:buddyRope 2.9s cubic-bezier(.3,.1,.3,1) both}
+.buddy-arrive .buddy-hang{animation:buddyDrop 1.8s cubic-bezier(.3,.1,.3,1) both}
+.buddy-arrive .buddy-bob{animation:buddyBob 2.6s ease-in-out 2.9s infinite}
+@keyframes buddyRope{0%{transform:scaleY(0)}62%{transform:scaleY(1);animation-timing-function:ease-in}72%{transform:scaleY(1);animation-timing-function:ease-in}100%{transform:scaleY(0)}}
+@keyframes buddyDrop{from{transform:translateY(-108px)}to{transform:none}}
+@keyframes buddyBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
 
-/* the hut */
-.buddy-bob{animation:buddyBob 2.4s ease-in-out infinite}
-.buddy-float-in{animation:buddyIn .9s cubic-bezier(.3,1.4,.5,1) .35s both,buddyBob 2.4s ease-in-out 1.25s infinite}
-@keyframes buddyBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
-@keyframes buddyIn{from{transform:translate(18px,14px) scale(.3);opacity:0}to{transform:none;opacity:1}}
+/* phone: floats in from the side */
+.buddy-float-in{animation:buddyIn 1s cubic-bezier(.3,1.3,.5,1) .3s both}
+@keyframes buddyIn{from{transform:translate(60px,-20px) rotate(20deg);opacity:0}to{transform:none;opacity:1}}
 
 /* tricks */
 .buddy-spin{animation:bSpin .8s cubic-bezier(.5,0,.3,1)}
-.buddy-boing{animation:bBoing .9s ease-out}
+.buddy-hop{animation:bHop .8s cubic-bezier(.3,0,.3,1)}
 .buddy-flip{animation:bFlip 1s ease-in-out}
-.buddy-melt{animation:bMelt 1.3s ease-in-out}
+.buddy-vanish{animation:bVanish 1.4s ease-in-out}
 .buddy-boo{animation:bBoo .9s ease-out}
 .buddy-wobble{animation:bWobble .8s ease-in-out}
-@keyframes bSpin{0%{transform:none}40%{transform:translateY(-14px) rotate(200deg) scale(1.1)}100%{transform:rotate(360deg)}}
-@keyframes bBoing{0%{transform:none}20%{transform:scale(1.3,.65) translateY(10px)}45%{transform:scale(.8,1.25) translateY(-22px)}65%{transform:scale(1.12,.9)}80%{transform:scale(.96,1.04)}100%{transform:none}}
+@keyframes bSpin{0%{transform:none}40%{transform:translateY(-14px) rotate(200deg)}100%{transform:rotate(360deg)}}
+@keyframes bHop{0%,100%{transform:none}30%{transform:translateY(-24px) rotate(-10deg)}55%{transform:translateY(-30px) rotate(8deg)}80%{transform:translateY(0) rotate(0)}90%{transform:translateY(-5px)}}
 @keyframes bFlip{0%{transform:none}35%{transform:translateY(-18px) rotate(180deg)}65%{transform:translateY(-18px) rotate(180deg)}100%{transform:rotate(360deg)}}
-@keyframes bMelt{0%{transform:none}35%,60%{transform:translateY(22%) scale(1.25,.35)}100%{transform:none}}
-@keyframes bBoo{0%{transform:none}25%{transform:scale(1.45)}35%{transform:scale(1.4) rotate(-7deg)}45%{transform:scale(1.4) rotate(7deg)}55%{transform:scale(1.4) rotate(-5deg)}100%{transform:none}}
+@keyframes bVanish{0%,100%{opacity:1;transform:none}35%,55%{opacity:0;transform:translateY(-10px)}70%{opacity:.6;transform:translateX(4px)}}
+@keyframes bBoo{0%{transform:none}25%{transform:scale(1.4)}35%{transform:scale(1.4) rotate(-7deg)}45%{transform:scale(1.4) rotate(7deg)}55%{transform:scale(1.4) rotate(-5deg)}100%{transform:none}}
 @keyframes bWobble{0%,100%{transform:none}20%{transform:rotate(-16deg) translateX(-6px)}40%{transform:rotate(12deg) translateX(5px)}60%{transform:rotate(-8deg)}80%{transform:rotate(4deg)}}
 
-/* phone menu: under the logo */
-.buddy-menu-call{position:absolute;left:60px;top:calc(60px + var(--lift) * .4);display:flex;align-items:center;gap:6px;min-height:30px;padding:0 6px 0 2px;background:transparent;border:0;color:#F7C21A;font-family:'Caveat',cursive;font-size:19px;line-height:1;cursor:pointer}
+/* phone menu: the bottom, under "TerraNotes" */
+.buddy-menu-call{position:absolute;left:14px;bottom:0;display:flex;align-items:center;gap:6px;min-height:34px;padding:0 6px;background:transparent;border:0;color:#F7C21A;font-family:'Caveat',cursive;font-size:19px;line-height:1;cursor:pointer}
 .buddy-menu-call svg{animation:buddyBob 2s ease-in-out infinite}
 
 /* skip link: off screen until it has keyboard focus */
@@ -51,7 +49,7 @@
 .skip-link:focus{transform:none;outline:2px solid #F7C21A;outline-offset:2px}
 
 @media (prefers-reduced-motion: reduce){
-  .buddy-swing,.buddy-bob,.buddy-float-in,.buddy-menu-call svg,.buddy-arrive .buddy-line,.buddy-arrive .buddy-hang,.buddy-arrive .buddy-swing,.buddy-trick{animation:none!important}
+  .buddy-bob,.buddy-float-in,.buddy-menu-call svg,.buddy-arrive .buddy-line,.buddy-arrive .buddy-hang,.buddy-trick{animation:none!important}
   .buddy-call,.buddy-call-label,.skip-link{transition:none}
   .buddy-peek:not(:hover){animation:buddyPeekStill 1.8s linear}
   @keyframes buddyPeekStill{0%,100%{opacity:0}20%,80%{opacity:.9}}

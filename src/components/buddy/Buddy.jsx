@@ -5,9 +5,9 @@ import { callBuddy, openGames, useBuddy } from '../../lib/buddy.js';
 import '../../styles/buddy.css';
 
 // Buddy: a little ghost. Called from a hidden button in the web header's corner (he ropes down) or from the phone
-// menu's "click me" (he moves into a hut by the intro). He stays until the page is reloaded.
+// menu's "click me" (he floats in by the intro). He stays until the page is reloaded.
 // Tap him: he does a trick and asks if you want to play (Snake or Float, see Games.jsx).
-const TRICKS = ['spin', 'boing', 'flip', 'melt', 'boo', 'wobble'];
+const TRICKS = ['spin', 'hop', 'flip', 'vanish', 'boo', 'wobble'];
 const MONO = { fontFamily: "'Space Mono', monospace", fontWeight: "700", letterSpacing: "1.2px", textTransform: "uppercase" };
 
 function TapGhost({ size, bubbleStyle }) {
@@ -83,14 +83,15 @@ function CallButton() {
 // Web home, top right, under the Website / Instagram buttons.
 export function WebBuddy() {
   const { here, fresh } = useBuddy();
+  const [rope, setRope] = useState(true); // the rope lowers him, then pulls back up and leaves him floating
   return (
     <>
       {!here && <CallButton />}
       {here && (
-        <div className={fresh ? 'buddy-rope buddy-arrive' : 'buddy-rope'} style={{ position: "absolute", left: "1296px", top: "80px", width: "64px", zIndex: "6" }}>
-          <div className="buddy-swing">
-            <div className="buddy-line" style={{ marginLeft: "31px", width: "2px", height: "108px", background: "#8E7A5E" }} />
-            <div className="buddy-hang">
+        <div className={fresh ? 'buddy-arrive' : undefined} style={{ position: "absolute", left: "1296px", top: "80px", width: "64px", zIndex: "6" }}>
+          {fresh && rope && <div className="buddy-line" onAnimationEnd={() => setRope(false)} style={{ position: "absolute", left: "31px", top: "0", width: "2px", height: "114px", background: "#8E7A5E" }} />}
+          <div className="buddy-hang" style={{ paddingTop: "108px" }}>
+            <div className="buddy-bob">
               <TapGhost size={64} bubbleStyle={{ right: "0", top: "84px" }} />
             </div>
           </div>
@@ -100,29 +101,21 @@ export function WebBuddy() {
   );
 }
 
-// Phone home: his hut, next to the intro card.
-export function HutBuddy() {
+// Phone home: he floats next to the intro card.
+export function PhoneBuddy() {
   const { here, fresh } = useBuddy();
   if (!here) return null;
   return (
-    <div className={fresh ? 'buddy-hut card-drop' : 'buddy-hut'} style={{ position: "absolute", left: "284px", top: "196px", width: "92px", height: "96px", zIndex: "5" }}>
-      <svg width="92" height="96" viewBox="0 0 92 96" aria-hidden="true" style={{ position: "absolute", left: "0", top: "0" }}>
-        <rect x="12" y="40" width="68" height="52" fill="#FBF8F1" stroke="#111111" strokeWidth="2.5" />
-        <path d="M34 92 V64 a12 12 0 0 1 24 0 V92 Z" fill="#1E2723" stroke="#111111" strokeWidth="2.5" />
-        <path d="M4 44 L46 8 L88 44 Z" fill="#F0442B" stroke="#111111" strokeWidth="2.5" strokeLinejoin="round" />
-        <path d="M20 46 h8 v8 h-8 Z" fill="#F7C21A" stroke="#111111" strokeWidth="2" />
-        <path d="M64 18 v-10 h8 v17" fill="#8E7A5E" stroke="#111111" strokeWidth="2" />
-        <path d="M0 94 H92" stroke="#111111" strokeWidth="2.5" />
-      </svg>
-      <div className={fresh ? 'buddy-bob buddy-float-in' : 'buddy-bob'} style={{ position: "absolute", left: "30px", top: "46px" }}>
-        <TapGhost size={34} bubbleStyle={{ right: "-6px", top: "50px" }} />
+    <div className={fresh ? 'buddy-float-in' : undefined} style={{ position: "absolute", left: "298px", top: "170px", width: "70px", zIndex: "5" }}>
+      <div style={{ fontFamily: "'Caveat', cursive", fontSize: "18px", color: "#5B3A1E", transform: "rotate(6deg)", whiteSpace: "nowrap", pointerEvents: "none", textAlign: "center", marginBottom: "4px" }}>tap him</div>
+      <div className="buddy-bob" style={{ display: "flex", justifyContent: "center" }}>
+        <TapGhost size={46} bubbleStyle={{ right: "0", top: "60px" }} />
       </div>
-      <div style={{ position: "absolute", right: "-4px", top: "-20px", fontFamily: "'Caveat', cursive", fontSize: "17px", color: "#5B3A1E", transform: "rotate(6deg)", whiteSpace: "nowrap", pointerEvents: "none" }}>tap him</div>
     </div>
   );
 }
 
-// Phone menu, under the logo: "click me". Calls him, closes the menu and heads home to the hut.
+// Phone menu, at the bottom under "TerraNotes": "click me". Calls him, closes the menu and heads home.
 export function MenuCall({ onClose }) {
   const nav = useNavigate();
   const { pathname } = useLocation();
