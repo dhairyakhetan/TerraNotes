@@ -30,7 +30,7 @@ nav[aria-label="Main menu"] .wordmark{-webkit-text-stroke:1px #F3EEE4;filter:dro
 /* Menu sheet: fills the visible screen. --s = how much shorter than 844px it is; gaps, cards and footer shrink by it. Below 612px it scrolls. */
 .menu-sheet{--vh:100vh;height:var(--vh);overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain;touch-action:pan-y}
 @supports (height:100dvh){.menu-sheet{--vh:100dvh}}
-.main-menu{--s:clamp(0px, calc(844px - var(--vh)), 232px);--lift:calc(var(--s) * -0.1);--gap:calc(16px - var(--s) * 0.04);--card:calc(60px - var(--s) * 0.06);--title:calc(27px - var(--s) * 0.02);--foot:calc(144px - var(--s) * 0.1);height:100%;min-height:612px;box-sizing:border-box}
+.main-menu{--s:clamp(0px, calc(844px - var(--vh)), 232px);--lift:calc(var(--s) * -0.1);--gap:calc(20px - var(--s) * 0.05);--card:calc(68px - var(--s) * 0.08);--title:calc(30px - var(--s) * 0.024);--foot:calc(144px - var(--s) * 0.1);height:100%;min-height:612px;box-sizing:border-box}
 .menu-card:active{translate:4px 4px;box-shadow:2px 2px 0 var(--c) !important}
 @media (prefers-reduced-motion: reduce){.menu-sheet{transition:none !important}}
 

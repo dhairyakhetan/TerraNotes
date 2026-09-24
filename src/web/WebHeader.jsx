@@ -1,6 +1,7 @@
 import Logo from '../components/Logo.jsx';
 import SmartLink from '../components/SmartLink.jsx';
 import EditionPicker from '../components/EditionPicker.jsx';
+import { GlobeIcon, InstagramIcon } from '../components/LinkIcons.jsx';
 import { SITE } from '../data/site.js';
 import { instagramUrl } from '../lib/format.js';
 
@@ -22,16 +23,11 @@ export default function WebHeader() {
       </nav>
       {/* links that leave the site: boxed buttons after a divider (the section links above stay in the page) */}
       <span aria-hidden="true" style={{ width: "2px", height: "32px", background: "#111111", opacity: ".25" }} />
-      <a className="btn" href={SITE.website} target="_blank" rel="noreferrer" style={{ display: "flex", alignItems: "center", gap: "8px", minHeight: "44px", padding: "0 16px", background: "#FFFFFF", border: "2px solid #111111", boxShadow: "4px 4px 0 #111111", fontFamily: "'Space Mono', monospace", fontSize: "12px", textDecoration: "none", color: "#111111" }}>
-        {SITE.website.replace(/^https?:\/\//, '')}
-        <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true"><path d="M2 10 L10 2" /><path d="M4 2 H10 V8" /></svg>
+      <a className="btn" href={SITE.website} target="_blank" rel="noreferrer" aria-label="Aquaterra website (ngoaquaterra.com)" style={{ display: "flex", alignItems: "center", gap: "8px", minHeight: "44px", padding: "0 16px", background: "#FFFFFF", border: "2px solid #111111", boxShadow: "4px 4px 0 #111111", fontFamily: "'Space Mono', monospace", fontSize: "12px", textDecoration: "none", color: "#111111" }}>
+        <GlobeIcon />Website
       </a>
-      <a className="btn" href={instagramUrl(SITE.instagram)} target="_blank" rel="noreferrer" style={{ display: "flex", alignItems: "center", gap: "8px", minHeight: "44px", padding: "0 16px", background: "#FFFFFF", border: "2px solid #111111", boxShadow: "4px 4px 0 #111111", fontFamily: "'Space Mono', monospace", fontSize: "12px", textDecoration: "none", color: "#111111" }}>
-        {`@${SITE.instagram}`}
-        <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
-          <path d="M2 10 L10 2" />
-          <path d="M4 2 H10 V8" />
-        </svg>
+      <a className="btn" href={instagramUrl(SITE.instagram)} target="_blank" rel="noreferrer" aria-label={`Aquaterra on Instagram (@${SITE.instagram})`} style={{ display: "flex", alignItems: "center", gap: "8px", minHeight: "44px", padding: "0 16px", background: "#FFFFFF", border: "2px solid #111111", boxShadow: "4px 4px 0 #111111", fontFamily: "'Space Mono', monospace", fontSize: "12px", textDecoration: "none", color: "#111111" }}>
+        <InstagramIcon />Instagram
       </a>
     </header>
   );
