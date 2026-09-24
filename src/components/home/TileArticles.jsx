@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router';
 import Img from '../Img.jsx';
-import { ARTICLES, COMING_SOON, TAGS } from '../../data/articles.js';
+import { ARTICLES, COMING_SOON_TILE, TAGS } from '../../data/articles.js';
 import { MEMBERS } from '../../data/team.js';
 import { pad2 } from '../../lib/format.js';
 
@@ -62,7 +62,7 @@ function Tile({ a, i }) {
 function SoonTile({ text }) {
   return (
     <div style={{ flexShrink: "0", width: "328px", height: "430px", scrollSnapAlign: "start", boxSizing: "border-box", borderRadius: "22px", border: "2px dashed #8E7A5E", background: "#FBF8F1", padding: "20px", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
-      <span style={{ fontFamily: "'Space Mono', monospace", fontSize: "11px", letterSpacing: "1.4px", color: "#8E7A5E" }}>ON THE LINE SOON</span>
+      <span style={{ fontFamily: "'Space Mono', monospace", fontSize: "11px", letterSpacing: "1.4px", color: "#8E7A5E" }}>COMING SOON</span>
       <p style={{ margin: "0", fontFamily: "'Caveat', cursive", fontSize: "38px", lineHeight: "1.05", color: "#5B3A1E", transform: "rotate(-2deg)" }}>{text}</p>
       <svg width="44" height="16" viewBox="0 0 34 14" fill="none" stroke="#8E7A5E" strokeWidth="1.6" strokeLinecap="round" aria-hidden="true"><path d="M1 8 C8 3 14 12 21 7 S30 4 33 7" /></svg>
     </div>
@@ -86,7 +86,7 @@ export default function TileArticles() {
       <div style={{ position: "absolute", left: "196px", top: "420px", width: "170px", fontFamily: "'Caveat', cursive", fontSize: "22px", lineHeight: "1.05", color: "#5B3A1E", transform: "rotate(-4deg)" }}>swipe through them →</div>
       <div className="tiles" aria-label="All write-ups, swipe sideways" style={{ position: "absolute", left: "0", top: "540px", width: "390px", display: "flex", gap: "12px", overflowX: "auto", overflowY: "hidden", scrollSnapType: "x mandatory", scrollPaddingLeft: "16px", padding: "0 16px 8px", boxSizing: "border-box", scrollbarWidth: "none", overscrollBehaviorX: "contain" }}>
         {ARTICLES.map((a, i) => <Tile key={a.slug} a={a} i={i} />)}
-        {COMING_SOON.map((text, i) => <SoonTile key={i} text={text} />)}
+        <SoonTile text={COMING_SOON_TILE} />
         <span style={{ flexShrink: "0", width: "6px" }} />
       </div>
     </>

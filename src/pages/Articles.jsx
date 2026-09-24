@@ -106,7 +106,7 @@ export default function Articles() {
               <p style={{ flexShrink: "0", margin: "0", fontFamily: "'Caveat', cursive", fontSize: "18px", lineHeight: "1.1", color: TAGS[a5.tag].color }}>{a5.dek}</p>
             </article>
           </Link>
-        ) : <SoonCard text={COMING_SOON[1]} w={310} h={330} font="30px" style={{ left: "52px", top: "1380px", transform: "rotate(-1.8deg)" }} />}
+        ) : <SoonCard text={COMING_SOON[COMING_SOON.length - 1]} w={310} h={330} font="30px" style={{ left: "52px", top: "1380px", transform: "rotate(-1.8deg)" }} />}
 
         {/* row 5: last card + margin note */}
         {a6 && (

@@ -195,8 +195,9 @@ export const ARTICLES = [
   },
 ];
 
-// Empty pegs after the real articles on the sideways line (web home, and the phone's scroll view). One peg per line.
+// The empty peg after the real articles on the sideways line (web home, and the phone's line view). One peg per line.
 export const COMING_SOON = [
   "this peg's saving a spot for the next one",
-  'still drying. check back soon.',
 ];
+// The phone's tiles view has no pegs: its last tile just says more is coming.
+export const COMING_SOON_TILE = 'more stories on the way.';
