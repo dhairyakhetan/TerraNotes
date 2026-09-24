@@ -20,7 +20,7 @@ export default function Home({ motion = true }) {
   const [photo, setPhoto] = useState(null); // index open in the photo viewer
   const [shownPhoto, photoLeaving] = usePresence(photo, 180); // stays mounted while it fades out
   // TEMPORARY: header switch between the hanging articles, the sideways line and the tiles; remembered on this device
-  const [view, setView] = useState(() => { try { return localStorage.getItem('aq-articles-view') || 'hang'; } catch { return 'hang'; } });
+  const [view, setView] = useState(() => { try { return localStorage.getItem('aq-articles-view') || 'tiles'; } catch { return 'tiles'; } }); // tiles unless they picked another
   const pick = (v) => { setView(v); try { localStorage.setItem('aq-articles-view', v); } catch { /* private mode */ } };
   useEffect(() => { document.title = 'Aquaterra'; }, []);
 

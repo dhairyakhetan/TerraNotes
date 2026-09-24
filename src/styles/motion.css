@@ -48,8 +48,10 @@
 .menu-sheet.is-open li:nth-child(3) .menu-card{animation-delay:210ms}
 .menu-sheet.is-open li:nth-child(4) .menu-card{animation-delay:260ms}
 .menu-sheet.is-open li:nth-child(5) .menu-card{animation-delay:310ms}
+.menu-sheet.is-open li:nth-child(6) .menu-card{animation-delay:360ms}
+.menu-sheet.is-open li:nth-child(7) .menu-card{animation-delay:410ms}
 @keyframes menuDrop{0%{opacity:0;translate:0 -22px}60%{opacity:1;translate:0 4px}100%{translate:0 0}}
-.menu-sheet.is-open .here-note{animation:fadeIn 300ms ease-out 480ms backwards}
+.menu-sheet.is-open .here-note{animation:fadeIn 300ms ease-out 560ms backwards}
 
 /* words game: the new word pops onto the cloud, options cascade in, the right one bounces, a wrong one shakes */
 .word-pop{animation:wordPop 380ms var(--spring) backwards}

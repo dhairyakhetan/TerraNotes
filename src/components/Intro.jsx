@@ -18,6 +18,8 @@ export default function Intro() {
 
   useEffect(() => {
     introSeen();
+    window.aqIntro = true; // the footer video starts downloading now too (OrbitBanner)
+    dispatchEvent(new Event('aq-intro'));
     // fetch what the pages will need while the notebook plays
     for (const src of ['/logo.png', ...ARTICLES.map((a) => a.cover), ...PHOTOS.map((p) => p.photo)].filter(Boolean)) {
       const img = new Image();

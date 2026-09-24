@@ -87,6 +87,10 @@ export default function OrbitBanner() {
       if (!loaded && entries[entries.length - 1].isIntersecting) { loaded = true; v.preload = 'auto'; v.load(); }
     }, { rootMargin: '600px 0px' });
     near.observe(stage.current);
+    // while the opening notebook plays (components/Intro.jsx), fetch it straight away instead
+    const early = () => { if (!loaded) { loaded = true; v.preload = 'auto'; v.load(); } };
+    if (window.aqIntro) early();
+    addEventListener('aq-intro', early);
     // a fling can deliver several crossings, so read the last one
     const onScreen = new IntersectionObserver((entries) => { seen = entries[entries.length - 1].isIntersecting; update(); });
     onScreen.observe(stage.current);
@@ -95,7 +99,7 @@ export default function OrbitBanner() {
     addEventListener('pageshow', onVisibility); // back/forward cache restores
 
     return () => {
-      near.disconnect(); onScreen.disconnect();
+      near.disconnect(); onScreen.disconnect(); removeEventListener('aq-intro', early);
       document.removeEventListener('visibilitychange', onVisibility);
       removeEventListener('pageshow', onVisibility);
       disarm();
