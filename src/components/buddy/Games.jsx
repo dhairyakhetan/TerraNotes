@@ -25,7 +25,8 @@ const card = (g, w, h, lines, shift = 0) => {
 
 // ---------------------------------------------------------------- Snake
 const DIRS = { ArrowUp: [0, -1], ArrowDown: [0, 1], ArrowLeft: [-1, 0], ArrowRight: [1, 0], w: [0, -1], s: [0, 1], a: [-1, 0], d: [1, 0] };
-function Snake({ W }) {
+function Snake({ W, small }) {
+  const [held, setHeld] = useState(null); // big screens: the on-screen key lights up while its key is held
   const cv = useRef(null);
   const turn = useRef(null);
   const again = useRef(null);
@@ -83,7 +84,9 @@ function Snake({ W }) {
       last = t; draw(t);
     };
     raf = requestAnimationFrame(loop);
-    const key = (e) => { const d = DIRS[e.key] || DIRS[e.key.toLowerCase?.()]; if (d) { e.preventDefault(); steer(d); } };
+    const key = (e) => { const d = DIRS[e.key] || DIRS[e.key.toLowerCase?.()]; if (d) { e.preventDefault(); setHeld(d.join()); steer(d); } };
+    const lift = (e) => { const d = DIRS[e.key] || DIRS[e.key.toLowerCase?.()]; if (d) setHeld((h) => (h === d.join() ? null : h)); };
+    addEventListener('keyup', lift);
     addEventListener('keydown', key);
     // swipes
     let sx = null, sy = null;
@@ -96,13 +99,16 @@ function Snake({ W }) {
       steer(Math.abs(dx) > Math.abs(dy) ? [Math.sign(dx), 0] : [0, Math.sign(dy)]);
     };
     c.addEventListener('pointerdown', down); c.addEventListener('pointerup', up);
-    return () => { cancelAnimationFrame(raf); removeEventListener('keydown', key); c.removeEventListener('pointerdown', down); c.removeEventListener('pointerup', up); };
+    return () => { cancelAnimationFrame(raf); removeEventListener('keydown', key); removeEventListener('keyup', lift); c.removeEventListener('pointerdown', down); c.removeEventListener('pointerup', up); };
   }, [W]);
-  const pad = (label, d, path) => (
-    <button className="press" aria-label={label} onClick={() => turn.current?.(d)} style={{ "--c": "#111111", width: "52px", height: "44px", padding: "0", background: "#FFFFFF", border: "2px solid #111111", boxShadow: "3px 3px 0 #111111", display: "flex", alignItems: "center", justifyContent: "center" }}>
+  const pad = (label, d, path) => {
+    const on = !small && held === d.join();
+    return (
+    <button className="press" aria-label={label} onClick={() => turn.current?.(d)} style={{ "--c": "#111111", width: "52px", height: "44px", padding: "0", background: on ? "#F7C21A" : "#FFFFFF", border: "2px solid #111111", boxShadow: on ? "1px 1px 0 #111111" : "3px 3px 0 #111111", transform: on ? "translate(2px, 2px)" : "none", display: "flex", alignItems: "center", justifyContent: "center" }}>
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#111111" strokeWidth="2.8"><path d={path} /></svg>
     </button>
-  );
+    );
+  };
   return (
     <>
       <Scores score={score} top={top} unit="stars" />
@@ -240,7 +246,7 @@ export default function Games() {
             <svg width="14" height="14" viewBox="0 0 20 20" fill="none" stroke="#111111" strokeWidth="2.8" strokeLinecap="square"><path d="M3 3 L17 17" /><path d="M17 3 L3 17" /></svg>
           </button>
         </div>
-        <div className="no-cascade" key={shown}>{shown === 'snake' ? <Snake W={W} /> : <Float W={W} H={H} />}</div>
+        <div className="no-cascade" key={shown}>{shown === 'snake' ? <Snake W={W} small={small} /> : <Float W={W} H={H} />}</div>
       </div>
     </div>
   );
