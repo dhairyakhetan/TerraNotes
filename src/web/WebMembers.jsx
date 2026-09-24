@@ -82,7 +82,8 @@ export default function WebMembers() {
             </button>
             <div style={{ textAlign: "center", lineHeight: "1.1", padding: "2px 8px", background: "#F3EEE4" }}>
               <div style={{ fontFamily: "'Archivo Black', Impact, sans-serif", fontSize: "15px", textTransform: "uppercase", color: "#111111" }}>{m.name}</div>
-              <div style={{ marginTop: "4px", fontFamily: "'Space Mono', monospace", fontSize: "10px", letterSpacing: "1.2px", textTransform: "uppercase", color: "#4A4A45" }}>{m.role}</div>
+              {/* the team tag hides while a team is picked in the legend (they'd all say the same) */}
+              {team == null && <div className="fade-in" style={{ marginTop: "4px", fontFamily: "'Space Mono', monospace", fontSize: "10px", letterSpacing: "1.2px", textTransform: "uppercase", color: "#4A4A45" }}>{m.role}</div>}
             </div>
           </div>
         );
