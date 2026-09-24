@@ -17,12 +17,14 @@ export default function WebHeader() {
       </SmartLink>
       <EditionPicker />
       <span style={{ flexGrow: "1" }} />
-      <nav aria-label="Main" style={{ display: "flex", alignItems: "center", gap: "26px" }}>
+      <nav aria-label="Main" style={{ display: "flex", alignItems: "center", gap: "24px" }}>
         {NAV.map(([id, label]) => <SmartLink key={id} className="nav-link" href={`/${id}`} style={navText}>{label}</SmartLink>)}
       </nav>
-      <a className="nav-link" href={SITE.website} target="_blank" rel="noreferrer" style={{ ...navText, display: "flex", alignItems: "center", gap: "6px", minHeight: "44px", textDecoration: "none" }}>
+      {/* links that leave the site: boxed buttons after a divider (the section links above stay in the page) */}
+      <span aria-hidden="true" style={{ width: "2px", height: "32px", background: "#111111", opacity: ".25" }} />
+      <a className="btn" href={SITE.website} target="_blank" rel="noreferrer" style={{ display: "flex", alignItems: "center", gap: "8px", minHeight: "44px", padding: "0 16px", background: "#FFFFFF", border: "2px solid #111111", boxShadow: "4px 4px 0 #111111", fontFamily: "'Space Mono', monospace", fontSize: "12px", textDecoration: "none", color: "#111111" }}>
         {SITE.website.replace(/^https?:\/\//, '')}
-        <svg width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true"><path d="M2 10 L10 2" /><path d="M4 2 H10 V8" /></svg>
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true"><path d="M2 10 L10 2" /><path d="M4 2 H10 V8" /></svg>
       </a>
       <a className="btn" href={instagramUrl(SITE.instagram)} target="_blank" rel="noreferrer" style={{ display: "flex", alignItems: "center", gap: "8px", minHeight: "44px", padding: "0 16px", background: "#FFFFFF", border: "2px solid #111111", boxShadow: "4px 4px 0 #111111", fontFamily: "'Space Mono', monospace", fontSize: "12px", textDecoration: "none", color: "#111111" }}>
         {`@${SITE.instagram}`}
