@@ -6,8 +6,6 @@ import WebPhotoWall from './WebPhotoWall.jsx';
 import WebWords from './WebWords.jsx';
 import WebMembers, { WEB_MEMBERS_HEIGHT } from './WebMembers.jsx';
 import WebPhotoViewer from './WebPhotoViewer.jsx';
-import { NUMBER_WORDS } from '../components/home/Members.jsx';
-import { ARTICLES } from '../data/articles.js';
 import { SITE } from '../data/site.js';
 
 const DOT = <span style={{ color: "#3DA5F4" }}>.</span>;
@@ -17,7 +15,6 @@ export default function WebHome() {
   const [photo, setPhoto] = useState(null); // index open in the photo viewer
   const [shownPhoto, photoLeaving] = usePresence(photo, 180); // stays mounted while it fades out
   useEffect(() => { document.title = 'Aquaterra'; }, []);
-  const count = NUMBER_WORDS[ARTICLES.length] || String(ARTICLES.length);
 
   return (
     <div className="web">
@@ -41,7 +38,7 @@ export default function WebHome() {
           <div style={{ paddingLeft: "70px" }}>Water{DOT}</div>
           <div style={{ paddingLeft: "20px" }}>City{DOT}</div>
         </div>
-        <div style={{ position: "absolute", left: "1150px", top: "380px", width: "220px", fontFamily: "'Caveat', cursive", fontSize: "26px", lineHeight: "1.05", color: "#5B3A1E", transform: "rotate(-4deg)" }}>{`${count} write-ups, fresh off the line ↓`}</div>
+        <div style={{ position: "absolute", left: "1150px", top: "380px", width: "220px", fontFamily: "'Caveat', cursive", fontSize: "26px", lineHeight: "1.05", color: "#5B3A1E", transform: "rotate(-4deg)" }}>{"write-ups, fresh off the line ↓"}</div>
         <ArticleLine />
         <WebPhotoWall onOpen={setPhoto} />
         <WebWords />
