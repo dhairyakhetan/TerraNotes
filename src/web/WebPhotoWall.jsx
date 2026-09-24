@@ -55,9 +55,8 @@ export default function WebPhotoWall({ onOpen }) {
           </figure>
         );
       })}
-      {/* the hanging tag is the "see every photo" button */}
-      <div style={{ position: "absolute", left: "1249px", top: "444px", width: "1.4px", height: "40px", background: "#8E8A7A" }} />
-      <button className="btn" onClick={() => onOpen(0)} style={{ position: "absolute", left: "1150px", top: "484px", width: "200px", minHeight: "64px", padding: "12px 16px", background: "#F7C21A", border: "2px solid #111111", boxShadow: "6px 6px 0 #E9A23B", transform: "rotate(3deg)", fontFamily: "'Archivo Black', Impact, sans-serif", fontSize: "18px", lineHeight: "1", textTransform: "uppercase", textAlign: "left", color: "#111111" }}>See every photo →</button>
+      {/* the photos open when clicked; a handwritten nudge says so */}
+      <div style={{ position: "absolute", left: "1130px", top: "500px", width: "220px", fontFamily: "'Caveat', cursive", fontSize: "30px", lineHeight: "1.05", color: "#F3EEE4", transform: "rotate(-4deg)", pointerEvents: "none" }}>click a photo to see it up close<div style={{ marginTop: "6px" }}><svg width="48" height="30" viewBox="0 0 34 22" fill="none" stroke="#F7C21A" strokeWidth="1.6" strokeLinecap="round" aria-hidden="true" style={{ flexShrink: "0" }}><path d="M2 19 C10 18 22 14 30 4" /><path d="M24 4 L30 4 L30 10" /></svg></div></div>
     </section>
   );
 }

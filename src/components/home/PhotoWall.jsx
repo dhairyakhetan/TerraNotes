@@ -66,13 +66,8 @@ export default function PhotoWall({ onOpen }) {
           </figure>
         );
       })}
-      <button onClick={() => onOpen(0)} style={{ position: "absolute", left: "22px", bottom: "16px", minHeight: "44px", padding: "0", background: "transparent", border: "0", color: "#F3EEE4", fontFamily: "'Figtree', system-ui, sans-serif", fontSize: "13px", letterSpacing: "1.4px", textTransform: "uppercase", display: "flex", alignItems: "center", gap: "8px" }}>
-        <span style={{ borderBottom: "1px solid #8E8A7A", paddingBottom: "3px" }}>See every photo</span>
-        <svg width="16" height="12" viewBox="0 0 16 12" fill="none" stroke="#F7C21A" strokeWidth="2">
-          <path d="M1 6 H14" />
-          <path d="M9 1 L14 6 L9 11" />
-        </svg>
-      </button>
+      {/* the photos open when tapped; a handwritten nudge says so */}
+      <div style={{ position: "absolute", right: "18px", bottom: "16px", width: "178px", display: "flex", alignItems: "flex-end", gap: "6px", fontFamily: "'Caveat', cursive", fontSize: "22px", lineHeight: "1", color: "#F3EEE4", transform: "rotate(-3deg)", pointerEvents: "none" }}>tap a photo to see it up close<svg width="34" height="22" viewBox="0 0 34 22" fill="none" stroke="#F7C21A" strokeWidth="1.6" strokeLinecap="round" aria-hidden="true" style={{ flexShrink: "0" }}><path d="M2 19 C10 18 22 14 30 4" /><path d="M24 4 L30 4 L30 10" /></svg></div>
     </section>
   );
 }
