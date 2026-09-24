@@ -3,6 +3,8 @@ import WebCard from './WebCard.jsx';
 import { webZoom } from '../lib/layout.js';
 import { ARTICLES, COMING_SOON } from '../data/articles.js';
 import { pad2 } from '../lib/format.js';
+import { ByTape, useByWriter } from '../lib/byWriter.jsx';
+import { Link } from 'react-router';
 
 // Peg i hangs from x = 164 + 208·i on the wire; these repeat every 12 pegs.
 const PITCH = 208;
@@ -223,7 +225,8 @@ export function SoonCard({ text, w = 172, h = 272, font = '27px', clips = [w / 2
 // No snapping: the line only moves when you move it.
 export default function ArticleLine() {
   const refs = useRef({ hangs: [], kicks: [] }).current;
-  const items = [...ARTICLES.map((a) => ({ a })), ...COMING_SOON.map((text) => ({ text }))];
+  const { by, mine, isMine, list } = useByWriter(); // ?by=<name>: that writer's pieces first, marked
+  const items = [...list.map((a) => ({ a })), ...COMING_SOON.map((text) => ({ text }))];
   const pegs = items.map((_, i) => peg(i));
   const width = pegs[pegs.length - 1].x + 224;
   useEffect(() => runLine(refs, pegs, width), []);
@@ -292,7 +295,7 @@ export default function ArticleLine() {
                 <div ref={(n) => { refs.kicks[i] = n; }} style={{ position: "absolute", inset: "0", transformOrigin: "50% 0" }}>
                   <div style={{ position: "absolute", left: "85.3px", top: "0", width: "1.4px", height: `${p.drop + 2}px`, background: "#5B3A1E" }} />
                   <div style={{ position: "absolute", left: "0", top: `${p.drop}px`, width: "172px", height: "272px", transform: `rotate(${p.tilt}deg)`, transformOrigin: "50% 0" }}>
-                    {item.a ? <WebCard article={item.a} /> : <SoonCard text={item.text} />}
+                    {item.a ? <WebCard article={item.a} mark={isMine(item.a) && by} /> : <SoonCard text={item.text} />}
                   </div>
                 </div>
               </div>
@@ -301,6 +304,12 @@ export default function ArticleLine() {
         </div>
       </div>
       <div style={{ position: "absolute", left: "300px", top: "1024px", width: "1060px", display: "flex", alignItems: "center", gap: "20px" }}>
+        {by ? (
+          <div role="status" style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+            <span style={{ background: "#F7C21A", border: "1.5px solid #111111", padding: "5px 10px", fontFamily: "'Space Mono', monospace", fontWeight: "700", fontSize: "11px", letterSpacing: "1px", textTransform: "uppercase", whiteSpace: "nowrap" }}>{mine.length ? `By ${by} · ${pad2(mine.length)} first` : `Nothing by ${by} yet`}</span>
+            <Link className="btn" to="/articles" replace aria-label="Show all articles in order" style={{ minWidth: "32px", minHeight: "30px", display: "flex", alignItems: "center", justifyContent: "center", border: "1.5px solid #111111", background: "#FFFFFF", fontFamily: "'Space Mono', monospace", fontWeight: "700", fontSize: "12px", textDecoration: "none", color: "#111111" }}>✕</Link>
+          </div>
+        ) : null}
         <div style={{ fontFamily: "'Space Mono', monospace", fontSize: "11px", letterSpacing: "1.6px", whiteSpace: "nowrap" }}>{`${pad2(ARTICLES.length)} WRITE-UPS · SCROLL SIDEWAYS`}</div>
         <div style={{ flexGrow: "1", height: "4px", background: "#D9D1BF", position: "relative" }}>
           <div ref={(n) => { refs.bar = n; }} style={{ position: "absolute", left: "0", top: "0", height: "4px", width: "6%", background: "#111111", transition: "width 120ms linear" }} />

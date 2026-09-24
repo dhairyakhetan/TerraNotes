@@ -7,6 +7,7 @@ import Img from '../components/Img.jsx';
 import { ARTICLES, COMING_SOON, TAGS } from '../data/articles.js';
 import { SoonCard } from '../web/ArticleLine.jsx';
 import { pad2 } from '../lib/format.js';
+import { ByTape, useByWriter } from '../lib/byWriter.jsx';
 
 const string = (left, top, height) => (
   <div style={{ position: "absolute", left: `${left}px`, top: `${top}px`, width: "1.4px", height: `${height}px`, background: "#5B3A1E" }} />
@@ -20,7 +21,8 @@ const num = (a) => `${pad2(ARTICLES.indexOf(a) + 1)} / ${pad2(ARTICLES.length)}`
 export default function Articles() {
   const [menuOpen, setMenuOpen] = useState(false);
   useEffect(() => { document.title = 'Aquaterra — All articles'; }, []);
-  const [a1, a2, a3, a4, a5, a6] = ARTICLES;
+  const { by, mine, isMine, list } = useByWriter(); // ?by=<name>: that writer's pieces first, marked
+  const [a1, a2, a3, a4, a5, a6] = list;
 
   return (
     <>
@@ -30,10 +32,18 @@ export default function Articles() {
         <h1 style={{ position: "absolute", left: "18px", top: "116px", margin: "0", fontFamily: "'Archivo Black', Impact, sans-serif", fontWeight: "400", fontSize: "60px", lineHeight: "0.9", letterSpacing: "-1.5px", textTransform: "uppercase" }}>All<br />articles</h1>
         <div style={{ position: "absolute", left: "236px", top: "128px", width: "130px", fontFamily: "'Caveat', cursive", fontSize: "20px", lineHeight: "1.05", color: "#5B3A1E", transform: "rotate(-5deg)" }}>hung up to dry, one by one</div>
 
+        {by && (
+          <div role="status" style={{ position: "absolute", left: "20px", top: "232px", width: "350px", display: "flex", alignItems: "center", gap: "8px" }}>
+            <span style={{ minWidth: "0", flexShrink: "1", background: "#F7C21A", border: "1.5px solid #111111", padding: "5px 10px", fontFamily: "'Space Mono', monospace", fontWeight: "700", fontSize: "10px", letterSpacing: "1px", textTransform: "uppercase", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{mine.length ? `By ${by} · ${pad2(mine.length)} first` : `Nothing by ${by} yet`}</span>
+            <Link to="/articles" replace aria-label="Show all articles" style={{ flexShrink: "0", minWidth: "44px", minHeight: "32px", display: "flex", alignItems: "center", justifyContent: "center", border: "1.5px solid #111111", background: "#FFFFFF", fontFamily: "'Space Mono', monospace", fontWeight: "700", fontSize: "12px", textDecoration: "none", color: "#111111" }}>✕</Link>
+          </div>
+        )}
+
         {/* row 1: featured */}
         {wire(270)}
         {string(194, 272, 34)}
         <Link to={`/articles/${a1.slug}`} style={{ position: "absolute", left: "20px", top: "308px", width: "350px", height: "396px", transform: "rotate(-1deg)", display: "block", textDecoration: "none", color: "#111111" }}>
+            {isMine(a1) && <ByTape name={by} />}
           <div style={{ position: "absolute", left: "50%", top: "-7px", marginLeft: "-15px", width: "30px", height: "9px", background: TAGS[a1.tag].color, border: "1.5px solid #111111", boxSizing: "border-box", zIndex: "2" }} />
           <article style={{ width: "100%", height: "100%", boxSizing: "border-box", background: "#FFFFFF", border: "2px solid #111111", boxShadow: "8px 8px 0 #111111", padding: "10px", display: "flex", flexDirection: "column", gap: "10px" }}>
             <Img src={a1.cover} alt={a1.alt} box={{ height: "200px" }} />
@@ -44,7 +54,7 @@ export default function Articles() {
             <h2 style={{ margin: "0", fontFamily: "'Archivo Black', Impact, sans-serif", fontWeight: "400", fontSize: "32px", lineHeight: "0.95", letterSpacing: "-0.3px", textTransform: "uppercase", color: "#111111" }}>{a1.title}</h2>
             <p style={{ margin: "0", fontFamily: "'Caveat', cursive", fontSize: "19px", lineHeight: "1.1", color: "#5B4630" }}>{a1.dek}</p>
             <div style={{ marginTop: "auto", display: "flex", justifyContent: "space-between", fontFamily: "'Space Mono', monospace", fontSize: "10px", letterSpacing: "1px", textTransform: "uppercase" }}>
-              <span>{a1.author || '[Author]'}</span>
+              <span style={isMine(a1) ? { background: "#F7C21A", padding: "0 4px" } : undefined}>{a1.author || '[Author]'}</span>
               <span>{`${a1.readTime || '[x]'} min read →`}</span>
             </div>
           </article>
@@ -54,14 +64,15 @@ export default function Articles() {
         {wire(740)}
         {string(112, 742, 32)}
         {string(296, 742, 82)}
-        <ArticleCard article={a2} style={{ position: "absolute", left: "16px", top: "776px", width: "194px", height: "280px", transform: "rotate(-2deg)" }} imgH="112px" titleSize="18px" dekSize="16px" />
-        <ArticleCard article={a3} style={{ position: "absolute", left: "216px", top: "826px", width: "158px", height: "262px", transform: "rotate(2.6deg)" }} imgH="100px" titleSize="15.5px" dekSize="15px" />
+        <ArticleCard article={a2} mark={isMine(a2) && by} style={{ position: "absolute", left: "16px", top: "776px", width: "194px", height: "280px", transform: "rotate(-2deg)" }} imgH="112px" titleSize="18px" dekSize="16px" />
+        <ArticleCard article={a3} mark={isMine(a3) && by} style={{ position: "absolute", left: "216px", top: "826px", width: "158px", height: "262px", transform: "rotate(2.6deg)" }} imgH="100px" titleSize="15.5px" dekSize="15px" />
 
         {/* row 3: wide card strung from both cards above */}
         {string(110, 1054, 82)}
         {string(292, 1086, 50)}
         {a4 ? (
           <Link to={`/articles/${a4.slug}`} style={{ position: "absolute", left: "22px", top: "1136px", width: "346px", height: "190px", transform: "rotate(1deg)", display: "block", textDecoration: "none", color: "#111111" }}>
+            {isMine(a4) && <ByTape name={by} />}
             <article style={{ width: "100%", height: "100%", boxSizing: "border-box", background: "#FFFFFF", border: "2px solid #111111", boxShadow: `7px 7px 0 ${TAGS[a4.tag].color}`, padding: "8px", display: "flex", gap: "12px" }}>
               <div style={{ display: "flex", flexDirection: "column", gap: "8px", padding: "4px 0 0 4px", flexGrow: "1" }}>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
@@ -80,6 +91,7 @@ export default function Articles() {
         {string(200, 1324, 56)}
         {a5 ? (
           <Link to={`/articles/${a5.slug}`} style={{ position: "absolute", left: "52px", top: "1380px", width: "310px", height: "330px", transform: "rotate(-1.8deg)", display: "block", textDecoration: "none", color: "#FFFFFF" }}>
+            {isMine(a5) && <ByTape name={by} />}
             <div style={{ position: "absolute", left: "50%", top: "-7px", marginLeft: "-15px", width: "30px", height: "9px", background: TAGS[a5.tag].color, border: "1.5px solid #111111", boxSizing: "border-box", zIndex: "2" }} />
             <article style={{ width: "100%", height: "100%", boxSizing: "border-box", background: "#111111", border: "2px solid #111111", boxShadow: `8px 8px 0 ${TAGS[a5.tag].color}`, padding: "10px", display: "flex", flexDirection: "column", gap: "10px" }}>
               <Img src={a5.cover} alt={a5.alt} box={{ height: "160px" }} dark />
@@ -98,7 +110,7 @@ export default function Articles() {
           <>
           {wire(1760)}
           {string(128, 1762, 32)}
-          <ArticleCard article={a6} style={{ position: "absolute", left: "18px", top: "1796px", width: "226px", height: "300px", transform: "rotate(2deg)" }} imgH="130px" titleSize="21px" dekSize="17px" />
+          <ArticleCard article={a6} mark={isMine(a6) && by} style={{ position: "absolute", left: "18px", top: "1796px", width: "226px", height: "300px", transform: "rotate(2deg)" }} imgH="130px" titleSize="21px" dekSize="17px" />
           <div style={{ position: "absolute", left: "262px", top: "1860px", width: "110px", fontFamily: "'Caveat', cursive", fontSize: "20px", lineHeight: "1.05", color: "#5B3A1E", transform: "rotate(4deg)" }}>that's all of them, for now.</div>
           <svg width="60" height="40" viewBox="0 0 60 40" style={{ position: "absolute", left: "272px", top: "1932px" }} fill="none" stroke="#5B3A1E" strokeWidth="1.4" strokeLinecap="round" aria-hidden="true">
             <path d="M50 4 C40 30 20 34 6 24" />

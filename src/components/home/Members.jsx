@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { usePauseOffscreen } from '../../lib/offscreen.js';
 import { Link } from 'react-router';
 import { MEMBERS, TEAMS, teamsOf } from '../../data/team.js';
@@ -57,6 +57,9 @@ export default function Members() {
   const [team, setTeam] = useState(null);
   const { colorFor, fade } = useFaceColors(team); // people in two teams switch colours     // legend filter, null = everyone
   const [open, setOpen] = useState(null);     // index of the member whose profile is open
+  const card = useRef(null);
+  // a profile card opening off-screen scrolls itself into view
+  useEffect(() => { if (card.current) card.current.scrollIntoView({ block: 'nearest', behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' }); }, [open]);
   const count = NUMBER_WORDS[MEMBERS.length] || String(MEMBERS.length);
   const sel = open != null ? MEMBERS[open] : null;
   const selColor = sel ? colorFor(sel) : "#111111";
@@ -118,7 +121,7 @@ export default function Members() {
       {sel && (
         <>
           <button onClick={close} aria-label="Close profile" style={{ position: "absolute", left: "0", top: "0", width: "390px", height: `${MEMBERS_HEIGHT}px`, border: "0", padding: "0", background: "rgba(17,17,17,.55)" }} />
-          <div role="dialog" aria-label="Member profile" style={{ position: "absolute", left: "28px", top: `${Math.max(120, Math.min(SPOTS[open].top - 60, MEMBERS_HEIGHT - 540))}px`, width: "334px", boxSizing: "border-box", background: "#FFFFFF", border: "2px solid #111111", boxShadow: `8px 8px 0 ${selColor}`, padding: "18px", display: "flex", flexDirection: "column", gap: "12px", transform: "rotate(-1deg)" }}>
+          <div ref={card} role="dialog" aria-label="Member profile" style={{ position: "absolute", left: "28px", top: `${Math.max(120, Math.min(SPOTS[open].top - 60, MEMBERS_HEIGHT - 540))}px`, width: "334px", boxSizing: "border-box", background: "#FFFFFF", border: "2px solid #111111", boxShadow: `8px 8px 0 ${selColor}`, padding: "18px", display: "flex", flexDirection: "column", gap: "12px", transform: "rotate(-1deg)" }}>
             <div style={{ position: "absolute", left: "50%", top: "-7px", marginLeft: "-17px", width: "34px", height: "10px", background: selColor, border: "1.5px solid #111111", boxSizing: "border-box" }} />
             <button className="press" onClick={close} aria-label="Close profile" style={{ "--c": "#111111", position: "absolute", right: "10px", top: "10px", width: "44px", height: "44px", background: "#FFFFFF", border: "2px solid #111111", boxShadow: "3px 3px 0 #111111", padding: "0", display: "flex", alignItems: "center", justifyContent: "center" }}>
               <svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="#111111" strokeWidth="2.6" strokeLinecap="square">
@@ -141,8 +144,8 @@ export default function Members() {
               <p key={t} style={{ margin: "0", paddingLeft: "10px", borderLeft: `3px solid ${TEAMS[t].color}`, fontSize: "13px", lineHeight: "1.45", color: "#1E2723" }}><strong style={{ fontWeight: "600" }}>{TEAMS[t].label}</strong>{` ${TEAMS[t].made}.`}</p>
             ))}
             <div style={{ display: "flex", gap: "10px" }}>
-              {teamsOf(sel).includes('writing') && <Link to="/articles" style={{ minHeight: "44px", flexGrow: "1", display: "flex", alignItems: "center", justifyContent: "center", background: "#111111", color: "#FFFFFF", border: "2px solid #111111", fontFamily: "'Space Mono', monospace", fontWeight: "700", fontSize: "11px", letterSpacing: "1px", textDecoration: "none" }}>THEIR ARTICLES</Link>}
-              <a href={instagramUrl(sel.instagram)} target="_blank" rel="noreferrer" style={{ minHeight: "44px", padding: "0 14px", display: "flex", alignItems: "center", background: "#FFFFFF", color: "#111111", border: "2px solid #111111", boxShadow: "3px 3px 0 #111111", fontFamily: "'Space Mono', monospace", fontWeight: "700", fontSize: "11px", letterSpacing: "1px", textDecoration: "none" }}>{`${sel.instagram ? `@${sel.instagram}` : '[@HANDLE]'} ↗`}</a>
+              {teamsOf(sel).includes('writing') && <Link to={`/articles?by=${encodeURIComponent(sel.name)}`} style={{ minHeight: "44px", flexGrow: "1", display: "flex", alignItems: "center", justifyContent: "center", background: "#111111", color: "#FFFFFF", border: "2px solid #111111", fontFamily: "'Space Mono', monospace", fontWeight: "700", fontSize: "11px", letterSpacing: "1px", textDecoration: "none" }}>THEIR ARTICLES</Link>}
+              {sel.instagram && <a href={instagramUrl(sel.instagram)} target="_blank" rel="noreferrer" style={{ minHeight: "44px", padding: "0 14px", display: "flex", alignItems: "center", background: "#FFFFFF", color: "#111111", border: "2px solid #111111", boxShadow: "3px 3px 0 #111111", fontFamily: "'Space Mono', monospace", fontWeight: "700", fontSize: "11px", letterSpacing: "1px", textDecoration: "none" }}>{`@${sel.instagram} ↗`}</a>}
             </div>
           </div>
         </>
