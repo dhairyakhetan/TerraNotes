@@ -1,11 +1,14 @@
 """Link-preview pictures for the articles: public/og/<slug>.jpg, 1200x630 (the shape WhatsApp, Instagram, iMessage…
-show big). The cover, whole, in the middle, over a soft blurred copy of itself.
+show big). The cover, whole, in the middle, over a soft blurred copy of itself, with the Aquaterra / TerraNotes logo card
+(tools/og-badge.png, the header logo on a cream card) small in the top-left corner.
 Run after adding or changing a cover:  python3 tools/make-og.py   (needs Pillow: pip install pillow)"""
 import glob, os
 from PIL import Image, ImageFilter, ImageEnhance
 
 W, H = 1200, 630
 os.makedirs('public/og', exist_ok=True)
+badge = Image.open(os.path.join(os.path.dirname(__file__), 'og-badge.png')).convert('RGBA')
+badge = badge.resize((264, round(badge.height * 264 / badge.width)), Image.LANCZOS)
 for src in sorted(glob.glob('public/articles/*.jpg')):
     slug = os.path.splitext(os.path.basename(src))[0]
     cover = Image.open(src).convert('RGB')
@@ -23,5 +26,6 @@ for src in sorted(glob.glob('public/articles/*.jpg')):
     bg.paste(shadow, (x - 12 + 12, y - 12 + 12))
     bg.paste(Image.new('RGB', (cw + 24, ch + 24), (255, 255, 255)), (x - 12, y - 12))
     bg.paste(art, (x, y))
+    bg.paste(badge, (26, 24), badge)
     bg.save(f'public/og/{slug}.jpg', quality=86, optimize=True, progressive=True)
     print(slug, os.path.getsize(f'public/og/{slug}.jpg') // 1024, 'KB')
