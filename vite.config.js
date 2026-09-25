@@ -31,7 +31,14 @@ const pages = () => ({
       html = setMeta(html, 'property', 'og:title', a.title);
       html = setMeta(html, 'property', 'og:description', desc);
       html = setMeta(html, 'property', 'og:url', url);
-      if (a.cover) { html = setMeta(html, 'property', 'og:image', host + a.cover); html = setMeta(html, 'name', 'twitter:image', host + a.cover); }
+      // link preview: its wide card from tools/make-og.py (public/og/<slug>.jpg, 1200x630); else the cover itself
+      const og = fs.existsSync(`public/og/${a.slug}.jpg`) ? `/og/${a.slug}.jpg` : a.cover;
+      if (og) {
+        html = setMeta(html, 'property', 'og:image', host + og);
+        html = setMeta(html, 'name', 'twitter:image', host + og);
+        if (og === a.cover) { html = html.replace(/\s*<meta property="og:image:width"[^>]*>/, '').replace(/\s*<meta property="og:image:height"[^>]*>/, ''); } // its real size isn't 1200x630
+        html = html.replace('<meta property="og:image:height"', `<meta property="og:image:alt" content="${esc(a.alt || a.title)}" />\n    <meta property="og:image:height"`);
+      }
       html = html.replace('</title>', `</title>\n    <link rel="canonical" href="${esc(url)}" />`);
       out(`articles/${a.slug}.html`, withContent(html, articleHtml(a))); // readable without JavaScript too
     }
