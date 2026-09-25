@@ -1,31 +1,43 @@
-import { useState } from 'react';
-import { Link } from 'react-router';
+import { useRef, useState } from 'react';
+import { Link, useNavigate } from 'react-router';
 import Img from '../Img.jsx';
 import { ARTICLES, TAGS } from '../../data/articles.js';
 import { MEMBERS } from '../../data/team.js';
 import { pad2 } from '../../lib/format.js';
 
 // TEMPORARY: the phone's "tiles" view of the articles (switch in the header), to compare with the other two.
-// Big rounded tiles in a sideways row, the next one peeking in; title panel over the picture, reactions under it.
-// Reaction counts are SAMPLE numbers for the look only; they aren't stored anywhere.
-const SAMPLE = [[61, 7, 4], [48, 3, 2], [93, 12, 9], [27, 2, 1], [35, 5, 3], [52, 6, 5]]; // likes, comments, reposts
+// Big rounded tiles in a sideways row, the next one peeking in; title panel over the picture, a like button under it.
+// Tap a tile to open it; double-tap it to like it. Likes are remembered on this device only.
+const LIKES = 'aq-liked';
+const likedSet = () => { try { return new Set(JSON.parse(localStorage.getItem(LIKES) || '[]')); } catch { return new Set(); } };
+const keepLike = (slug, on) => { try { const s = likedSet(); if (on) s.add(slug); else s.delete(slug); localStorage.setItem(LIKES, JSON.stringify([...s])); } catch { /* private mode */ } };
 const icon = { width: "22", height: "22", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "1.8", strokeLinecap: "round", strokeLinejoin: "round", "aria-hidden": "true" };
-const count = { fontFamily: "'Space Mono', monospace", fontSize: "13px" };
 
 function Tile({ a, i }) {
-  const [liked, setLiked] = useState(false);
-  const [saved, setSaved] = useState(false);
+  const [liked, setLikedState] = useState(() => likedSet().has(a.slug));
+  const [burst, setBurst] = useState(0);
+  const nav = useNavigate();
+  const wait = useRef(null);
   const tag = TAGS[a.tag];
   const author = MEMBERS.find((m) => m.name === a.author);
-  const [likes, comments, reposts] = SAMPLE[i % SAMPLE.length];
+  const to = `/articles/${a.slug}`;
+  const setLiked = (on) => { setLikedState(on); keepLike(a.slug, on); };
+  // one tap opens the article (after a moment, in case a second tap is coming); a double tap likes it
+  const onTap = (e) => {
+    if (e.metaKey || e.ctrlKey || e.shiftKey || e.button > 0) return; // new tab etc. as usual
+    e.preventDefault();
+    if (e.detail === 0) { nav(to); return; } // keyboard Enter
+    if (wait.current) { clearTimeout(wait.current); wait.current = null; setLiked(true); setBurst((n) => n + 1); return; }
+    wait.current = setTimeout(() => { wait.current = null; nav(to); }, 260);
+  };
   return (
     <div style={{ flexShrink: "0", width: "328px", scrollSnapAlign: "start" }}>
       <div style={{ position: "relative" }}>
-        <Link className="tile" to={`/articles/${a.slug}`} style={{ position: "relative", display: "block", height: "430px", borderRadius: "22px", overflow: "hidden", border: "2px solid #111111", boxSizing: "border-box", textDecoration: "none" }}>
+        <Link className="tile" to={to} onClick={onTap} style={{ touchAction: "manipulation", position: "relative", display: "block", height: "430px", borderRadius: "22px", overflow: "hidden", border: "2px solid #111111", boxSizing: "border-box", textDecoration: "none" }}>
           <Img src={a.cover} alt={a.alt} box={{ height: "100%", border: "0" }} icon={24} font="12px" />
           <span style={{ position: "absolute", left: "12px", top: "12px", background: tag.color, color: tag.ink, fontFamily: "'Space Mono', monospace", fontWeight: "700", fontSize: "10.5px", letterSpacing: "1px", textTransform: "uppercase", padding: "5px 10px", borderRadius: "999px", border: "1.5px solid #111111" }}>{a.tag}</span>
           <span style={{ position: "absolute", right: "12px", top: "12px", background: "#FFFFFF", fontFamily: "'Space Mono', monospace", fontSize: "10.5px", letterSpacing: "1px", color: "#111111", padding: "5px 9px", borderRadius: "999px", border: "1.5px solid #111111" }}>{`${pad2(i + 1)} / ${pad2(ARTICLES.length)}`}</span>
-          <div style={{ position: "absolute", left: "10px", right: "10px", bottom: "10px", boxSizing: "border-box", padding: "14px 54px 16px 16px", borderRadius: "16px", background: "#1E2723", color: "#FFFFFF", WebkitFontSmoothing: "antialiased" }}>
+          <div style={{ position: "absolute", left: "10px", right: "10px", bottom: "10px", boxSizing: "border-box", padding: "14px 16px 16px", borderRadius: "16px", background: "#1E2723", color: "#FFFFFF", WebkitFontSmoothing: "antialiased" }}>
             <div style={{ display: "flex", alignItems: "center", gap: "9px", fontSize: "15px", color: "#D9D4C7" }}>
               <span style={{ width: "26px", height: "26px", flexShrink: "0", borderRadius: "7px", overflow: "hidden", background: tag.color, color: tag.ink, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "'Archivo Black', Impact, sans-serif", fontSize: "13px" }}>
                 {author && author.photo ? <img src={author.photo} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} /> : (a.author || '?')[0]}
@@ -34,24 +46,17 @@ function Tile({ a, i }) {
             </div>
             <div style={{ marginTop: "9px", fontSize: "22px", fontWeight: "600", lineHeight: "1.2", letterSpacing: "-0.2px" }}>{a.title.toLowerCase()}</div>
           </div>
+          {burst > 0 && (
+            <svg key={burst} className="heart-burst" width="110" height="110" viewBox="0 0 24 24" aria-hidden="true" style={{ position: "absolute", left: "50%", top: "40%", margin: "-55px 0 0 -55px", pointerEvents: "none" }}>
+              <path d="M12 20 C5 15 3 12 3 8.5 A4.5 4.5 0 0 1 12 6 A4.5 4.5 0 0 1 21 8.5 C21 12 19 15 12 20 Z" fill="#F0442B" stroke="#111111" strokeWidth="1.2" strokeLinejoin="round" />
+            </svg>
+          )}
         </Link>
-        <button onClick={() => setSaved(!saved)} aria-label={saved ? 'Remove bookmark' : 'Bookmark'} aria-pressed={saved ? 'true' : 'false'} style={{ position: "absolute", right: "20px", bottom: "22px", width: "40px", height: "40px", padding: "0", border: "0", background: "transparent", color: saved ? '#F7C21A' : '#F3EEE4', display: "flex", alignItems: "center", justifyContent: "center" }}>
-          <svg {...icon} key={saved ? 'on' : 'off'} className={saved ? 'icon-pop' : undefined} fill={saved ? 'currentColor' : 'none'}><path d="M6 3 H18 V21 L12 16 L6 21 Z" /></svg>
-        </button>
       </div>
       <div style={{ display: "flex", alignItems: "center", gap: "20px", padding: "12px 6px 0", color: "#1E2723" }}>
         <button onClick={() => setLiked(!liked)} aria-label={liked ? 'Unlike' : 'Like'} aria-pressed={liked ? 'true' : 'false'} style={{ minHeight: "36px", padding: "0", border: "0", background: "transparent", display: "flex", alignItems: "center", gap: "6px", color: liked ? '#F0442B' : '#1E2723' }}>
           <svg {...icon} key={liked ? 'on' : 'off'} className={liked ? 'icon-pop' : undefined} fill={liked ? 'currentColor' : 'none'}><path d="M12 20 C5 15 3 12 3 8.5 A4.5 4.5 0 0 1 12 6 A4.5 4.5 0 0 1 21 8.5 C21 12 19 15 12 20 Z" /></svg>
-          <span style={count}>{likes + (liked ? 1 : 0)}</span>
         </button>
-        <span style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-          <svg {...icon}><path d="M4 5 H20 V16 H11 L6 20 V16 H4 Z" /></svg>
-          <span style={count}>{comments}</span>
-        </span>
-        <span style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-          <svg {...icon}><path d="M4 11 V9 A3 3 0 0 1 7 6 H19 L16 3 M20 13 V15 A3 3 0 0 1 17 18 H5 L8 21" /></svg>
-          <span style={count}>{reposts}</span>
-        </span>
         <span style={{ marginLeft: "auto", fontFamily: "'Space Mono', monospace", fontSize: "12px", letterSpacing: "1px", textTransform: "uppercase" }}>{`${a.readTime || '[x]'} min`}</span>
       </div>
     </div>

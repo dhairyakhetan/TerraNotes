@@ -89,3 +89,8 @@
 .menu-sheet.is-open .menu-card,.menu-sheet.is-open .here-note,.word-pop,.w-in > *,.w-right,.w-wrong,.w-reveal,.view-in,.icon-pop,.slide-in,.tape-slap,.cascade-in > *{animation:none !important}
 .legend-chip,.view-switch button{transition:none}
 }
+
+/* phone tiles: the big heart when a tile is double-tapped */
+.heart-burst{animation:heartBurst 900ms var(--spring) both}
+@keyframes heartBurst{0%{opacity:0;transform:scale(.2) rotate(-12deg)}25%{opacity:1;transform:scale(1.15) rotate(6deg)}45%{transform:scale(.95) rotate(-3deg)}70%{opacity:1;transform:scale(1) rotate(0)}100%{opacity:0;transform:scale(1.1) translateY(-18px)}}
+@media (prefers-reduced-motion: reduce){.heart-burst{animation:heartBurstStill 700ms linear both}@keyframes heartBurstStill{0%,70%{opacity:1}100%{opacity:0}}}

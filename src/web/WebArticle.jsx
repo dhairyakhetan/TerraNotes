@@ -150,7 +150,6 @@ export default function WebArticle({ article: a, next }) {
             <div style={{ display: "flex", flexDirection: "column", gap: "5px" }}>
               <div style={{ fontFamily: "'Space Mono', monospace", fontSize: "11px", letterSpacing: "1px" }}>WORDS BY</div>
               <div style={{ fontFamily: "'Archivo Black', Impact, sans-serif", fontSize: "24px", textTransform: "uppercase", lineHeight: "1" }}>{a.author || '[Name]'}</div>
-              <div style={{ fontFamily: "'Caveat', cursive", fontSize: "21px", color: "#5B3A1E" }}>{author ? author.role : a.author ? '' : '[role / one line about them]'}</div>
             </div>
           </div>
           {/* next on the line */}
