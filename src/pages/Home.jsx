@@ -65,7 +65,7 @@ export default function Home({ motion = true }) {
         {/* /articles lands here (just above the "Articles" card) */}
         <div id="articles" aria-hidden="true" style={{ position: "absolute", left: "0", top: "236px", width: "1px", height: "1px" }} />
         {/* zero-height box at the page's corner: the view keeps its page coordinates and fades in when switched */}
-        <div key={view} className="view-in" style={{ position: "absolute", left: "0", top: "0", width: "390px", height: "0" }}>
+        <div key={view} className={SHOW_SWITCH ? "view-in" : undefined} style={{ position: "absolute", left: "0", top: "0", width: "390px", height: "0" }}>
           {view === 'scroll' ? <ScrollingArticles /> : view === 'tiles' ? <TileArticles /> : <HangingArticles />}
         </div>
         {/* the photo wall, words and team, moved down by the hanging view's extra height */}

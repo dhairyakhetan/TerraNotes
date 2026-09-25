@@ -95,27 +95,12 @@
 header.site-header{view-transition-name:site-header}
 ::view-transition-group(site-header){animation-duration:320ms}
 ::view-transition-old(root),::view-transition-new(root){animation-duration:420ms;animation-fill-mode:both}
-/* into an article: home sinks back and fades; the article comes up (its cover then drops in / flies from the card) */
-html[data-nav=into]::view-transition-old(root){animation:vtSink 360ms cubic-bezier(0.4,0,1,1) both}
-html[data-nav=into]::view-transition-new(root){animation:vtFadeUp 380ms cubic-bezier(0.2,0.8,0.2,1) both}
-/* article to article: slides along, like the next card on the line */
-html[data-nav=next]::view-transition-old(root){animation:vtOutLeft 380ms cubic-bezier(0.4,0,0.9,0.6) both}
-html[data-nav=next]::view-transition-new(root){animation:vtInRight 520ms cubic-bezier(0.2,0.9,0.25,1) both}
-html[data-nav=prev]::view-transition-old(root){animation:vtOutRight 380ms cubic-bezier(0.4,0,0.9,0.6) both}
-html[data-nav=prev]::view-transition-new(root){animation:vtInLeft 520ms cubic-bezier(0.2,0.9,0.25,1) both}
-/* back home: the way in, reversed. The article sinks away, home comes forward, its card flies back into place */
-html[data-nav=back]::view-transition-old(root){animation:vtFadeDown 340ms cubic-bezier(0.4,0,0.6,1) both}
-html[data-nav=back]::view-transition-new(root){animation:vtRiseIn 440ms cubic-bezier(0.2,0.8,0.2,1) both}
-html[data-nav=page]::view-transition-old(root){animation:vtSink 320ms ease-in both}
-html[data-nav=page]::view-transition-new(root){animation:vtFadeUp 420ms cubic-bezier(0.2,0.8,0.2,1) both}
-@keyframes vtSink{to{opacity:0;transform:scale(0.96)}}
-@keyframes vtFadeUp{from{opacity:0;transform:translateY(28px)}}
-@keyframes vtOutLeft{to{opacity:0;transform:translateX(-14%) rotate(-1deg)}}
-@keyframes vtInRight{from{opacity:0;transform:translateX(18%) rotate(1deg)}}
-@keyframes vtOutRight{to{opacity:0;transform:translateX(14%) rotate(1deg)}}
-@keyframes vtInLeft{from{opacity:0;transform:translateX(-18%) rotate(-1deg)}}
-@keyframes vtFadeDown{to{opacity:0;transform:translateY(28px)}}
-@keyframes vtRiseIn{from{opacity:0;transform:scale(0.96)}}
+/* The swap itself is only a crossfade: each page brings its own motion (the article's cover drops in or flies out of
+   its card and the text rises; home's card flies back), so moving the whole page as well played everything twice. */
+html[data-nav]::view-transition-old(root){animation:vtOut 220ms ease-out both}
+html[data-nav]::view-transition-new(root){animation:vtIn 260ms ease-out both}
+@keyframes vtOut{to{opacity:0}}
+@keyframes vtIn{from{opacity:0}}
 /* while pages swap, the looping decorations hold still: otherwise the incoming page (the home page especially) has to
    be redrawn every frame of the transition, which is what made going back stutter on phones */
 html[data-nav] :is(.sway,.flutter,.hero-sway,.fl1,.fl2,.fl3,.fl4,.fl5,.fl6,.fk1,.fk2,.fk3,.fk4,.glint,.spark,.twist,.orbit-bubble,.buddy-bob){animation-play-state:paused}
