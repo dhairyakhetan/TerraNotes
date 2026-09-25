@@ -32,7 +32,7 @@ Two separate layouts, chosen by window width (`lib/layoutMode.js`, `useIsWeb()`)
 | | Phone (`src/phone/`) | Web (`src/web/`) |
 |---|---|---|
 | Width | fixed **390px**. Phones and upright tablets are pinned to it by the viewport tag in `index.html` | fixed **1440px**, drawn with CSS `zoom: var(--web-zoom)` to fit narrower windows (900px and up) |
-| Header | `PhoneHeader` (64px, sticky) + slide-in `PhoneMenu` | `WebHeader` (80px, sticky) |
+| Header | `PhoneHeader` (64px, sticky) + slide-in `PhoneMenu` | `WebHeader` (80px, sticky; inner pages: "← back to home" left, logo + edition picker centred, gliding over when that changes) |
 
 - **Home pages are artboards.** Everything under the header is `position: absolute` at design coordinates (px).
   - Sections export their heights so the page grows with the data: `HANG_EXTRA` (PhoneHangingArticles) and `TEAM_HEIGHT` (TeamSection).

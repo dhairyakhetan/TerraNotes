@@ -2,7 +2,6 @@ import { useEffect, useLayoutEffect, useRef } from 'react';
 import WebHeader from './WebHeader.jsx';
 import ArticleCard, { TagPill } from '../shared/ArticleCard.jsx';
 import ArticleBody, { AuthorBox, FieldLog } from '../shared/ArticleBody.jsx';
-import BackHome from '../shared/BackHome.jsx';
 import ImageSlot from '../shared/ImageSlot.jsx';
 import { Clip, FeaturedTape } from '../shared/Tapes.jsx';
 import { placeOf, TAGS } from '../data/articles.js';
@@ -30,7 +29,6 @@ export default function WebArticle({ article: a, next }) {
     <div className="web">
       <div style={{ position: "relative", width: "1440px", margin: "0 auto", overflow: "clip", background: "#F3EEE4", fontFamily: FONT.body, color: "#111111" }}>
         <WebHeader />
-        <BackHome className="lift-link" style={{ position: "absolute", left: "80px", top: "96px", minHeight: "44px", display: "flex", alignItems: "center", fontFamily: FONT.hand, fontSize: "24px", color: "#111111", textDecoration: "none" }}>← back to home</BackHome>
         <div style={{ position: "absolute", left: "0", top: "150px", width: "1440px", height: "2px", background: "#5B3A1E" }} />
         <div ref={hero} className="hero-drop" style={{ position: "absolute", left: "80px", top: "190px", width: a.cover ? "fit-content" : "620px", transformOrigin: "50% -38px" }}>
           <div className="hero-sway" style={{ transformOrigin: "50% -38px", transform: "rotate(-1deg)" }}>
