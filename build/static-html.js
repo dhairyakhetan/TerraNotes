@@ -7,7 +7,6 @@ import { PHOTOS } from '../src/data/photos.js';
 import { SITE } from '../src/data/site.js';
 import { MEMBERS, TEAMS, teamsOf } from '../src/data/team.js';
 import { WORDS } from '../src/data/words.js';
-import { LABS } from '../src/data/labs.js';
 
 const esc = (t) => String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 const byline = (a) => [a.author && `By ${esc(a.author)}`, a.date && esc(a.date), a.readTime && `${esc(a.readTime)} min read`].filter(Boolean).join(' · ');
@@ -43,7 +42,6 @@ export const pageHtml = {
 <h2><a href="/photos">Photo wall</a></h2><p>${PHOTOS.filter((p) => p.caption).map((p) => esc(p.caption)).join(' · ')}</p>
 <h2><a href="/words">Words we should bring back</a></h2><p>A mini game: guess what an old, forgotten word means.</p>
 <h2><a href="/members">Meet the team</a></h2><p>${MEMBERS.length} people across the heads, design, writing and tech teams.</p>
-<h2>Under Aquaterra: ${esc(LABS.name)}</h2><p>${LABS.intro.map(esc).join(' ')} ${esc(LABS.shipped)}</p><ul>${LABS.projects.map((x) => `<li><strong>${esc(x.name)}</strong>, ${esc(x.what)}</li>`).join('')}</ul><p>${esc(LABS.closing)} ${esc(LABS.quote)}</p>
 <p>${esc(SITE.footerNote)}</p>`),
   '/editions': () => shell(`<h1>Editions</h1><p>TerraNotes comes out once a month.</p><ul>${[...EDITIONS].reverse().map((e) => `<li><strong>${editionName(e.number)}</strong>, ${esc(e.month)}${e.number === LATEST ? ' (latest)' : ''}: ${ALL_ARTICLES.filter((a) => a.edition === e.number).map((a) => `<a href="/articles/${a.slug}">${esc(a.title)}</a>`).join(', ')}</li>`).join('')}</ul>`),
   '/articles': () => shell(`<h1>All articles</h1><p>${ARTICLES.length} pieces, hung up to dry, one by one.</p>${articleList()}`),
