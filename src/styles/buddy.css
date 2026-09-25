@@ -54,3 +54,8 @@
   .buddy-peek:not(:hover){animation:buddyPeekStill 1.8s linear}
   @keyframes buddyPeekStill{0%,100%{opacity:0}20%,80%{opacity:.9}}
 }
+
+/* web: "tap him →" beside the ghost, fading in once he's arrived */
+.buddy-note-late{animation:buddyNote 500ms ease-out 2.9s both}
+@keyframes buddyNote{from{opacity:0;transform:translateX(8px) rotate(-6deg)}to{opacity:1;transform:rotate(-6deg)}}
+@media (prefers-reduced-motion: reduce){.buddy-note-late{animation:none}}

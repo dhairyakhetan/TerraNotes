@@ -79,7 +79,7 @@ function Snake({ W, small }) {
     };
     const loop = (t) => {
       raf = requestAnimationFrame(loop);
-      const step = Math.max(75, 150 - pts * 4);
+      const step = Math.max(120, 230 - pts * 4); // ms per move: gentle at first, a little quicker with every star
       if (state === 'playing') { acc += t - last; while (acc >= step && state === 'playing') { acc -= step; tick(); } } else acc = 0;
       last = t; draw(t);
     };

@@ -94,6 +94,7 @@ export function WebBuddy() {
             <div className="buddy-bob">
               <TapGhost size={64} bubbleStyle={{ right: "0", top: "84px" }} />
             </div>
+            <div className={fresh ? 'buddy-note buddy-note-late' : 'buddy-note'} style={{ position: "absolute", right: "74px", top: "118px", fontFamily: "'Caveat', cursive", fontSize: "21px", color: "#5B3A1E", transform: "rotate(-6deg)", whiteSpace: "nowrap", pointerEvents: "none" }}>tap him →</div>
           </div>
         </div>
       )}
