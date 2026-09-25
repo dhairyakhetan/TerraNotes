@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { Link } from 'react-router';
 import { BackHome } from '../lib/backHome.jsx';
 import PageHeader from '../components/PageHeader.jsx';
@@ -10,6 +10,7 @@ import { placeOf, TAGS } from '../data/articles.js';
 import { MEMBERS } from '../data/team.js';
 import { pad2 } from '../lib/format.js';
 import { useFitTitle } from '../lib/fit.js';
+import { flyInFromCard } from '../lib/fly.js';
 
 const P = { fontFamily: "'Newsreader', Georgia, serif", fontSize: "18px", lineHeight: "1.6", color: "#1E2723", margin: "0" };
 
@@ -79,6 +80,8 @@ function Block({ b, first, a, tag }) {
 
 // One article (data: src/data/articles.js). `next` hangs on the "next on the line" wire.
 export default function Article({ article: a, next }) {
+  const hero = useRef(null);
+  useLayoutEffect(() => { flyInFromCard(hero.current); }, []); // the cover flies out of the tapped card
   const [menuOpen, setMenuOpen] = useState(false);
   useEffect(() => { document.title = `Aquaterra — ${a.title}`; }, [a.title]);
   const tag = TAGS[a.tag];
@@ -93,7 +96,7 @@ export default function Article({ article: a, next }) {
         <div style={{ position: "absolute", left: "0", top: "100px", width: "390px", height: "2px", background: "#5B3A1E" }} />
         {/* hero: drops onto the wire when the page opens, then keeps swaying (styles/article.css).
             The hero, byline and body are in the page's flow: a taller hero pushes the rest down instead of running under it. */}
-        <div className="hero-drop" style={{ position: "relative", margin: "70px 0 0 16px", width: "358px", minHeight: "484px", transformOrigin: "50% -32px" }}>
+        <div ref={hero} className="hero-drop" style={{ position: "relative", margin: "70px 0 0 16px", width: "358px", minHeight: "484px", transformOrigin: "50% -32px" }}>
           <div className="hero-sway" style={{ transformOrigin: "50% -32px", transform: "rotate(-0.8deg)" }}>
             <div style={{ position: "absolute", left: "178.3px", top: "-32px", width: "1.4px", height: "34px", background: "#5B3A1E" }} />
             <div style={{ position: "absolute", left: "50%", top: "-7px", marginLeft: "-17px", width: "34px", height: "9px", background: tag.color, border: "1.5px solid #111111", boxSizing: "border-box", zIndex: "2" }} />

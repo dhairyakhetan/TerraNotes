@@ -10,8 +10,7 @@ import { MEMBERS } from '../data/team.js';
 import { pad2 } from '../lib/format.js';
 import { useFitTitle } from '../lib/fit.js';
 import { BackHome } from '../lib/backHome.jsx';
-import { takeCard } from '../lib/fly.js';
-import { webZoom } from '../lib/layout.js';
+import { flyInFromCard } from '../lib/fly.js';
 
 const P = { fontFamily: "'Newsreader', Georgia, serif", fontSize: "21px", lineHeight: "1.65", color: "#1E2723", margin: "0" };
 const MONO = { fontFamily: "'Space Mono', monospace", letterSpacing: "1px", textTransform: "uppercase" };
@@ -67,29 +66,13 @@ function Block({ b, first, a, tag }) {
   return null;
 }
 
-// The tapped card's box → the cover: it starts where the card was, lifts into place, then drops onto its wire.
-const flyFrom = (el, f) => {
-  el.getAnimations().forEach((an) => an.cancel()); // instead of the usual drop-in
-  const r = el.getBoundingClientRect();
-  if (!r.width) return;
-  const z = webZoom(), s = f.w / r.width, dx = (f.x - r.left) / z, dy = (f.y - r.top) / z;
-  el.style.transformOrigin = '0 0';
-  el.animate([
-    { transform: `translate(${dx}px, ${dy}px) scale(${s}) rotate(-2deg)`, easing: 'cubic-bezier(0.32, 0.72, 0, 1)' },
-    { transform: 'translate(0px, -46px) scale(1) rotate(-3deg)', easing: 'cubic-bezier(0.55, 0, 0.9, 0.45)', offset: 0.5 },
-    { transform: 'translate(0px, 8px) rotate(1.6deg)', easing: 'ease-out', offset: 0.72 },
-    { transform: 'translate(0px, -3px) rotate(-0.8deg)', easing: 'ease-in-out', offset: 0.87 },
-    { transform: 'translate(0px, 0px) rotate(0deg)' },
-  ], { duration: 900 });
-};
 
 // One article, web layout: cover on the left, title on the right, a 700px reading column, the field log in the margin.
 export default function WebArticle({ article: a, next }) {
   const hero = useRef(null);
   useEffect(() => { document.title = `Aquaterra — ${a.title}`; }, [a.title]);
   useLayoutEffect(() => {
-    const f = takeCard();
-    if (f && hero.current.animate && !matchMedia('(prefers-reduced-motion: reduce)').matches) flyFrom(hero.current, f);
+    flyInFromCard(hero.current);
   }, []);
   const tag = TAGS[a.tag];
   const author = MEMBERS.find((m) => m.name === a.author);

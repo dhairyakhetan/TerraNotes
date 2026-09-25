@@ -1,6 +1,7 @@
 import { flushSync } from 'react-dom';
 import { UNSAFE_createBrowserHistory as createBrowserHistory } from 'react-router';
 import { webZoom } from './layout.js';
+import { rememberBox } from './fly.js';
 
 // Page-to-page motion. Every navigation (links, navigate(), the browser's Back/Forward) goes through this history,
 // which wraps the page swap in a view transition: the old page is snapshotted, the new one rendered, and the CSS in
@@ -53,6 +54,9 @@ function swap(from, to, update, backwards = false) {
   // coming back from an article: where its cover is now, so its card can fly back from there
   const slug = kind === 'back' && slugOf(from);
   const cover = slug && document.querySelector('.hero-drop img')?.getBoundingClientRect();
+  // opening an article from its card: note the card's box so the article's cover can fly out of it
+  const into = (kind === 'into' || kind === 'next') && document.querySelector(`a[href="/articles/${slugOf(to)}"]`);
+  if (into) { const r = into.getBoundingClientRect(); if (r.width && r.bottom > 0 && r.top < innerHeight) rememberBox(r); }
   root.dataset.nav = kind;
   const t = document.startViewTransition(async () => {
     flushSync(update);
