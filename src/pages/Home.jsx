@@ -20,8 +20,10 @@ export default function Home({ motion = true }) {
   const [photo, setPhoto] = useState(null); // index open in the photo viewer
   const [shownPhoto, photoLeaving] = usePresence(photo, 180); // stays mounted while it fades out
   // TEMPORARY: header switch between the hanging articles, the sideways line and the tiles; remembered on this device
-  const [view, setView] = useState(() => { try { return localStorage.getItem('aq-articles-view') || 'tiles'; } catch { return 'tiles'; } }); // tiles unless they picked another
-  const pick = (v) => { setView(v); try { localStorage.setItem('aq-articles-view', v); } catch { /* private mode */ } };
+  // the switch is hidden: everyone gets the hanging articles (the other two views stay in the code, unused)
+  const [view, setView] = useState('hang');
+  const pick = (v) => setView(v);
+  const SHOW_SWITCH = false;
   useEffect(() => { document.title = 'Aquaterra'; }, []);
   const shift = view === 'hang' ? HANG_EXTRA : 0; // the hanging view is taller (all six cards), so everything below moves down
 
@@ -34,12 +36,14 @@ export default function Home({ motion = true }) {
             <Logo globe={38} word={22} sub={14} />
           </Link>
           <span style={{ flexGrow: "1" }} />
+          {SHOW_SWITCH && (<>
           {/* TEMPORARY articles view switch */}
           <div className="view-switch" role="group" aria-label="Articles view (temporary)" style={{ display: "flex", padding: "2px", gap: "2px", border: "1.5px dashed #111111", borderRadius: "999px" }}>
             {[['hang', 'Hang'], ['scroll', 'Line'], ['tiles', 'Tiles']].map(([v, label]) => (
               <button key={v} onClick={() => pick(v)} aria-pressed={view === v ? 'true' : 'false'} style={{ minHeight: "30px", padding: "0 6px", border: "0", borderRadius: "999px", background: view === v ? '#111111' : 'transparent', color: view === v ? '#F3EEE4' : '#111111', fontFamily: "'Space Mono', monospace", fontWeight: "700", fontSize: "8px", letterSpacing: "0.5px", textTransform: "uppercase" }}>{label}</button>
             ))}
           </div>
+          </>)}
           <button onClick={() => setMenuOpen(true)} aria-label="Open menu" aria-expanded={menuOpen ? 'true' : 'false'} style={{ width: "44px", height: "44px", flexShrink: "0", border: "0", background: "transparent", padding: "0", display: "flex", alignItems: "center", justifyContent: "center" }}>
             <svg width="26" height="18" viewBox="0 0 26 18" fill="none" stroke="#1E2723" strokeWidth="1.8" strokeLinecap="round">
               <path d="M2 5 C9 3 17 6 24 4" />
