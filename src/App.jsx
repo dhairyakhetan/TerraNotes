@@ -1,7 +1,6 @@
 import { useEffect, useLayoutEffect } from 'react';
 import { Navigate, Route, Routes, useLocation, useNavigationType, useParams } from 'react-router';
 import Home from './pages/Home.jsx';
-import Articles from './pages/Articles.jsx';
 import Article from './pages/Article.jsx';
 import NotFound from './pages/NotFound.jsx';
 import ErrorBoundary from './components/ErrorBoundary.jsx';
@@ -12,11 +11,12 @@ import Footer from './components/Footer.jsx';
 import { ALL_ARTICLES } from './data/articles.js';
 import { EditionPage, Editions } from './pages/Editions.jsx';
 import { useIsWeb } from './lib/layout.js';
+import { noteFrom } from './lib/backHome.jsx';
 import Games from './components/buddy/Games.jsx';
 import './styles/buddy.css';
 
 // Home page sections, each with its own clean address: /photos opens the home page at the photo wall.
-// (/articles is the phone's All articles page; on web it's the article line on the home page.)
+// (/articles is the articles on the home page. The phone's old All articles page, pages/Articles.jsx, is kept but unused.)
 const SECTIONS = ['articles', 'photos', 'words', 'members'];
 
 // Where each visited page was scrolled to, so Back/Forward return you there (kept for the tab's session).
@@ -30,7 +30,7 @@ if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
 let current = null; // the page whose scroll position is being recorded
 let lastPath = null;
 // the home page, under any of its section addresses (/articles is the home page on web only)
-const onHome = (p) => !!p && (p === '/' || (SECTIONS.includes(p.slice(1)) && (p !== '/articles' || document.documentElement.dataset.layout === 'web')));
+const onHome = (p) => !!p && (p === '/' || SECTIONS.includes(p.slice(1)));
 
 function ScrollManager() {
   const { pathname, hash, key, search } = useLocation();
@@ -40,8 +40,10 @@ function ScrollManager() {
     persist();
     // a section link on the page you're already on glides there; everything else lands instantly
     const behavior = type === 'PUSH' && onHome(lastPath) && onHome(pathname) && !matchMedia('(prefers-reduced-motion: reduce)').matches ? 'smooth' : 'auto';
+    if (type === 'PUSH') noteFrom(key, lastPath);
     lastPath = pathname;
-    if (type === 'POP' && saved[key] != null) window.scrollTo(0, saved[key]);
+    const spot = `${key}:${pathname}`; // a fresh load's key is always "default", so the page is part of it
+    if (type === 'POP' && saved[spot] != null) window.scrollTo(0, saved[spot]);
     else {
       const id = SECTIONS.find((s) => pathname === `/${s}`) || (hash && decodeURIComponent(hash.slice(1)));
       const target = id && document.getElementById(id);
@@ -52,7 +54,7 @@ function ScrollManager() {
     if (type === 'PUSH' && new URLSearchParams(search).get('by')) {
       requestAnimationFrame(() => document.querySelectorAll('.art-scroller, .tiles').forEach((el) => el.scrollTo({ left: 0, behavior })));
     }
-    current = key;
+    current = spot;
   }, [pathname, hash, key]);
   useEffect(() => {
     const remember = () => { if (current != null) saved[current] = Math.round(scrollY); };
@@ -107,7 +109,6 @@ export default function App() {
         {toWriter ? <Navigate to={{ pathname: '/articles', search }} replace /> : <Routes>
           <Route path="/" element={web ? <WebHome /> : <Home />} />
           {/* on web every write-up is on the home page's line */}
-          <Route path="/articles" element={web ? <WebHome /> : <Articles />} />
           <Route path="/editions" element={<Editions web={web} />} />
           <Route path="/editions/:n" element={<EditionPage web={web} />} />
           <Route path="/:section" element={<SectionRoute web={web} />} />

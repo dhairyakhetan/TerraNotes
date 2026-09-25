@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router';
+import { BackHome } from '../lib/backHome.jsx';
 import PageHeader from '../components/PageHeader.jsx';
 import MenuSheet from '../components/MenuSheet.jsx';
 import ArticleCard from '../components/ArticleCard.jsx';
@@ -88,7 +89,7 @@ export default function Article({ article: a, next }) {
   return (
     <>
       <div className="page-article" style={{ position: "relative", width: "390px", margin: "0 auto", overflow: "clip", background: "#F3EEE4", fontFamily: "'Figtree', system-ui, sans-serif", color: "#111111" }}>
-        <PageHeader backTo="/articles" backLabel="Back to all articles" menuOpen={menuOpen} onOpenMenu={() => setMenuOpen(true)} />
+        <PageHeader menuOpen={menuOpen} onOpenMenu={() => setMenuOpen(true)} />
         <div style={{ position: "absolute", left: "0", top: "100px", width: "390px", height: "2px", background: "#5B3A1E" }} />
         {/* hero: drops onto the wire when the page opens, then keeps swaying (styles/article.css).
             The hero, byline and body are in the page's flow: a taller hero pushes the rest down instead of running under it. */}
@@ -137,7 +138,7 @@ export default function Article({ article: a, next }) {
             <div style={{ position: "absolute", left: "0", top: "30px", width: "390px", height: "2px", background: "#5B3A1E" }} />
             <div style={{ position: "absolute", left: "200px", top: "32px", width: "1.4px", height: "36px", background: "#5B3A1E" }} />
             <ArticleCard article={next} style={{ position: "absolute", left: "70px", top: "70px", width: "250px", height: "330px", transform: "rotate(-2deg)" }} imgH="150px" titleSize="22px" dekSize="18px" />
-            <Link style={{ position: "absolute", left: "20px", top: "420px", minHeight: "44px", display: "flex", alignItems: "center", fontFamily: "'Caveat', cursive", fontSize: "21px", textDecoration: "none" }} to="/articles">← back to all articles</Link>
+            <BackHome className="lift-link" style={{ position: "absolute", left: "20px", top: "420px", minHeight: "44px", display: "flex", alignItems: "center", fontFamily: "'Caveat', cursive", fontSize: "21px", textDecoration: "none" }}>← back to home</BackHome>
           </div>
         </div>
       </div>

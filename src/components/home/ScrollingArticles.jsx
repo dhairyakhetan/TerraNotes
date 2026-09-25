@@ -3,6 +3,7 @@ import ArticleCard from '../ArticleCard.jsx';
 import { DURATION, SoonCard, SWING, TILT, wirePath } from '../../web/ArticleLine.jsx';
 import { ARTICLES } from '../../data/articles.js';
 import { pad2 } from '../../lib/format.js';
+import { useByWriter } from '../../lib/byWriter.jsx';
 
 // TEMPORARY: the phone's "scroll" view of the articles (switch in the header), to compare with the hanging view.
 // Every write-up on one sideways line, like the web home page.
@@ -15,7 +16,8 @@ const peg = (i) => {
 
 export default function ScrollingArticles() {
   const scroller = useRef(null), bar = useRef(null), prev = useRef(null), next = useRef(null);
-  const items = ARTICLES.map((a) => ({ a }));
+  const { by, isMine, list } = useByWriter(); // ?by=<writer>: their pieces first, taped
+  const items = list.map((a) => ({ a }));
   const pegs = items.map((_, i) => peg(i));
   const width = pegs[pegs.length - 1].x + 150;
   // progress bar and arrows are written directly, so swiping never re-renders the cards
@@ -57,7 +59,7 @@ export default function ScrollingArticles() {
                 <div className="string" style={{ position: "absolute", left: "87.3px", top: "0", width: "1.4px", height: `${p.drop + 2}px`, background: "#5B3A1E" }} />
                 <div className="flutter" style={{ position: "absolute", left: "0", top: `${p.drop}px`, width: "176px", height: "240px", "--r": `${p.tilt}deg`, transform: `rotate(${p.tilt}deg)`, animationDelay: `${(-0.7 - 0.9 * i).toFixed(1)}s` }}>
                   {item.a
-                    ? <ArticleCard article={item.a} className="card" style={{ position: "absolute", left: "0", top: "0", width: "176px", height: "240px" }} imgH="92px" titleSize="15.5px" dekSize="15px" />
+                    ? <ArticleCard article={item.a} mark={isMine(item.a) ? by : undefined} className="card" style={{ position: "absolute", left: "0", top: "0", width: "176px", height: "240px" }} imgH="92px" titleSize="15.5px" dekSize="15px" />
                     : <SoonCard text={item.text} w={176} h={240} font="24px" />}
                 </div>
               </div>

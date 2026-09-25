@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { usePresence } from '../lib/presence.js';
 import { Link } from 'react-router';
 import MenuSheet from '../components/MenuSheet.jsx';
-import HangingArticles from '../components/home/HangingArticles.jsx';
+import HangingArticles, { HANG_EXTRA } from '../components/home/HangingArticles.jsx';
 import ScrollingArticles from '../components/home/ScrollingArticles.jsx';
 import TileArticles from '../components/home/TileArticles.jsx';
 import PhotoWall from '../components/home/PhotoWall.jsx';
@@ -23,10 +23,11 @@ export default function Home({ motion = true }) {
   const [view, setView] = useState(() => { try { return localStorage.getItem('aq-articles-view') || 'tiles'; } catch { return 'tiles'; } }); // tiles unless they picked another
   const pick = (v) => { setView(v); try { localStorage.setItem('aq-articles-view', v); } catch { /* private mode */ } };
   useEffect(() => { document.title = 'Aquaterra'; }, []);
+  const shift = view === 'hang' ? HANG_EXTRA : 0; // the hanging view is taller (all six cards), so everything below moves down
 
   return (
     <>
-      <div id="top" className={motion ? 'page-home' : 'page-home no-motion'} style={{ position: "relative", width: "390px", height: `${2480 + MEMBERS_HEIGHT}px`, margin: "0 auto", overflow: "clip", background: "#F3EEE4", fontFamily: "'Figtree', system-ui, sans-serif", color: "#1E2723" }}>
+      <div id="top" className={motion ? 'page-home' : 'page-home no-motion'} style={{ position: "relative", width: "390px", height: `${2480 + MEMBERS_HEIGHT + shift}px`, margin: "0 auto", overflow: "clip", background: "#F3EEE4", fontFamily: "'Figtree', system-ui, sans-serif", color: "#1E2723" }}>
         {/* sticky header: the page root must stay overflow: clip (not hidden) for sticky to work */}
         <header className="site-header" style={{ position: "sticky", top: "0", zIndex: "50", width: "390px", height: "64px", boxSizing: "border-box", padding: "0 10px 0 16px", background: "#F3EEE4", borderBottom: "2px solid #111111", display: "flex", alignItems: "center", gap: "4px" }}>
           <Link aria-label="Aquaterra — home" style={{ display: "flex", alignItems: "center", gap: "6px", minHeight: "44px", textDecoration: "none" }} to="/">
@@ -57,17 +58,18 @@ export default function Home({ motion = true }) {
           </div>
           <div style={{ position: "absolute", left: "68px", top: "194px", width: "14px", height: "14px", boxSizing: "border-box", borderRadius: "50%", background: "#F0442B", border: "2px solid #111111" }} />
         </section>
+        {/* /articles lands here (just above the "Articles" card) */}
+        <div id="articles" aria-hidden="true" style={{ position: "absolute", left: "0", top: "236px", width: "1px", height: "1px" }} />
         {/* zero-height box at the page's corner: the view keeps its page coordinates and fades in when switched */}
         <div key={view} className="view-in" style={{ position: "absolute", left: "0", top: "0", width: "390px", height: "0" }}>
           {view === 'scroll' ? <ScrollingArticles /> : view === 'tiles' ? <TileArticles /> : <HangingArticles />}
         </div>
-        <Link style={{ position: "absolute", right: "22px", top: "1122px", fontFamily: "'Caveat', cursive", fontSize: "22px", textDecoration: "none", display: "flex", alignItems: "center", gap: "6px", minHeight: "44px" }} to="/articles">all articles{" "}<svg width="30" height="12" viewBox="0 0 30 12" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round">
-          <path d="M1 7 C10 4 18 8 28 6" />
-          <path d="M23 2 L28 6 L23 10" />
-        </svg></Link>
-        <PhotoWall onOpen={setPhoto} />
-        <WordsGame />
-        <Members />
+        {/* the photo wall, words and team, moved down by the hanging view's extra height */}
+        <div style={{ position: "absolute", left: "0", top: `${shift}px`, width: "390px", height: "0" }}>
+          <PhotoWall onOpen={setPhoto} />
+          <WordsGame />
+          <Members />
+        </div>
       </div>
       <MenuSheet open={menuOpen} onClose={() => setMenuOpen(false)} current="home" />
       {shownPhoto != null && <PhotoViewer start={shownPhoto} closing={photoLeaving} onClose={() => setPhoto(null)} />}

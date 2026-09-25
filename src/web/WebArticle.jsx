@@ -9,6 +9,7 @@ import { placeOf, TAGS } from '../data/articles.js';
 import { MEMBERS } from '../data/team.js';
 import { pad2 } from '../lib/format.js';
 import { useFitTitle } from '../lib/fit.js';
+import { BackHome } from '../lib/backHome.jsx';
 import { takeCard } from '../lib/fly.js';
 import { webZoom } from '../lib/layout.js';
 
@@ -100,7 +101,7 @@ export default function WebArticle({ article: a, next }) {
     <div className="web">
       <div style={{ position: "relative", width: "1440px", margin: "0 auto", overflow: "clip", background: "#F3EEE4", fontFamily: "'Figtree', system-ui, sans-serif", color: "#111111" }}>
         <WebHeader />
-        <Link className="nav-link" to="/articles" style={{ position: "absolute", left: "80px", top: "104px", fontFamily: "'Caveat', cursive", fontSize: "24px", color: "#111111" }}>← all write-ups</Link>
+        <BackHome className="lift-link" style={{ position: "absolute", left: "80px", top: "96px", minHeight: "44px", display: "flex", alignItems: "center", fontFamily: "'Caveat', cursive", fontSize: "24px", color: "#111111", textDecoration: "none" }}>← back to home</BackHome>
         <div style={{ position: "absolute", left: "0", top: "150px", width: "1440px", height: "2px", background: "#5B3A1E" }} />
         {/* hero: drops onto the wire when the page opens (or flies in from the card), then keeps swaying */}
         <div ref={hero} className="hero-drop" style={{ position: "absolute", left: "80px", top: "190px", width: a.cover ? "fit-content" : "620px", transformOrigin: "50% -38px" }}>

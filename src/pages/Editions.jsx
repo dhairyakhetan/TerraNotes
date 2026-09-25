@@ -31,7 +31,7 @@ function Frame({ web, title, children }) {
   return (
     <>
       <div style={{ position: "relative", width: "390px", margin: "0 auto", overflow: "clip", background: "#F3EEE4", color: "#111111", fontFamily: "'Figtree', system-ui, sans-serif", paddingBottom: "70px" }}>
-        <PageHeader backTo="/" backLabel="Back to home" menuOpen={menuOpen} onOpenMenu={() => setMenuOpen(true)} />
+        <PageHeader menuOpen={menuOpen} onOpenMenu={() => setMenuOpen(true)} />
         <div style={{ padding: "30px 20px 0" }}>{children}</div>
       </div>
       <MenuSheet open={menuOpen} onClose={() => setMenuOpen(false)} current="editions" />

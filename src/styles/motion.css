@@ -90,7 +90,37 @@
 .legend-chip,.view-switch button{transition:none}
 }
 
-/* phone tiles: the big heart when a tile is double-tapped */
-.heart-burst{animation:heartBurst 900ms var(--spring) both}
-@keyframes heartBurst{0%{opacity:0;transform:scale(.2) rotate(-12deg)}25%{opacity:1;transform:scale(1.15) rotate(6deg)}45%{transform:scale(.95) rotate(-3deg)}70%{opacity:1;transform:scale(1) rotate(0)}100%{opacity:0;transform:scale(1.1) translateY(-18px)}}
-@media (prefers-reduced-motion: reduce){.heart-burst{animation:heartBurstStill 700ms linear both}@keyframes heartBurstStill{0%,70%{opacity:1}100%{opacity:0}}}
+/* Page to page (lib/pageTransition.js sets html[data-nav] to into / next / back / page for the swap).
+   The header is its own layer, so it holds still while the pages move under it. */
+header.site-header{view-transition-name:site-header}
+::view-transition-group(site-header){animation-duration:320ms}
+::view-transition-old(root),::view-transition-new(root){animation-duration:420ms;animation-fill-mode:both}
+/* into an article: home sinks back and fades; the article comes up (its cover then drops in / flies from the card) */
+html[data-nav=into]::view-transition-old(root){animation:vtSink 360ms cubic-bezier(0.4,0,1,1) both}
+html[data-nav=into]::view-transition-new(root){animation:vtFadeUp 380ms cubic-bezier(0.2,0.8,0.2,1) both}
+/* article to article: slides along, like the next card on the line */
+html[data-nav=next]::view-transition-old(root){animation:vtOutLeft 380ms cubic-bezier(0.4,0,0.9,0.6) both}
+html[data-nav=next]::view-transition-new(root){animation:vtInRight 520ms cubic-bezier(0.2,0.9,0.25,1) both}
+html[data-nav=prev]::view-transition-old(root){animation:vtOutRight 380ms cubic-bezier(0.4,0,0.9,0.6) both}
+html[data-nav=prev]::view-transition-new(root){animation:vtInLeft 520ms cubic-bezier(0.2,0.9,0.25,1) both}
+/* back home: the article drops away, home comes forward, and the cover flies back to its card */
+html[data-nav=back]::view-transition-old(root){animation:vtDropAway 420ms cubic-bezier(0.5,0,0.9,0.4) both}
+html[data-nav=back]::view-transition-new(root){animation:vtComeForward 560ms cubic-bezier(0.2,0.9,0.25,1) 60ms both}
+html[data-nav=page]::view-transition-old(root){animation:vtSink 320ms ease-in both}
+html[data-nav=page]::view-transition-new(root){animation:vtFadeUp 420ms cubic-bezier(0.2,0.8,0.2,1) both}
+::view-transition-group(cover){animation-duration:620ms;animation-timing-function:cubic-bezier(0.3,0.9,0.3,1);z-index:5}
+::view-transition-old(cover),::view-transition-new(cover){height:100%;object-fit:cover;animation-duration:620ms}
+@keyframes vtSink{to{opacity:0;transform:scale(0.96)}}
+@keyframes vtFadeUp{from{opacity:0;transform:translateY(28px)}}
+@keyframes vtOutLeft{to{opacity:0;transform:translateX(-14%) rotate(-1deg)}}
+@keyframes vtInRight{from{opacity:0;transform:translateX(18%) rotate(1deg)}}
+@keyframes vtOutRight{to{opacity:0;transform:translateX(14%) rotate(1deg)}}
+@keyframes vtInLeft{from{opacity:0;transform:translateX(-18%) rotate(-1deg)}}
+@keyframes vtDropAway{to{opacity:0;transform:translateY(90px) rotate(1.5deg) scale(0.97)}}
+@keyframes vtComeForward{from{opacity:0;transform:scale(0.94) translateY(-18px)}}
+@media (prefers-reduced-motion: reduce){::view-transition-group(*),::view-transition-old(*),::view-transition-new(*){animation:none !important}}
+
+/* "back to home": no underline; it lifts a little when hovered */
+.lift-link{display:inline-flex;transition:transform 200ms var(--settle)}
+.lift-link:hover,.lift-link:focus-visible{transform:translateY(-4px)}
+@media (prefers-reduced-motion: reduce){.lift-link{transition:none}}

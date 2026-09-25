@@ -88,7 +88,7 @@ export default function NotFound({ web }) {
   return (
     <>
       <div style={{ position: "relative", width: "390px", margin: "0 auto", overflow: "clip", background: "#F3EEE4", color: "#111111", paddingBottom: "60px" }}>
-        <PageHeader backTo="/" backLabel="Back to home" menuOpen={menuOpen} onOpenMenu={() => setMenuOpen(true)} />
+        <PageHeader menuOpen={menuOpen} onOpenMenu={() => setMenuOpen(true)} />
         <div style={{ paddingTop: "36px" }}><Lost /></div>
       </div>
       <MenuSheet open={menuOpen} onClose={() => setMenuOpen(false)} current="lost" />

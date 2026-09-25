@@ -8,9 +8,8 @@ html[data-layout="web"]{scroll-padding-top:calc(80px * var(--web-zoom,1))}
 .web :is(a,button):active{opacity:1}
 
 /* nav: underline slides in on hover */
-.nav-link{position:relative;text-decoration:none;padding:12px 0}
-.nav-link::after{content:"";position:absolute;left:0;right:0;bottom:6px;height:3px;background:currentColor;transform:scaleX(0);transform-origin:left;transition:transform 260ms cubic-bezier(0.32,0.72,0,1)}
-.nav-link:hover::after{transform:scaleX(1)}
+.nav-link{position:relative;text-decoration:none;padding:12px 0;background:linear-gradient(currentColor,currentColor) left bottom 6px/0% 3px no-repeat;transition:background-size 260ms cubic-bezier(0.32,0.72,0,1)}
+.nav-link:hover{background-size:100% 3px}
 
 /* cards and buttons: lift on hover, drop into the shadow on press (`translate` keeps any tilt) */
 .card-link article{transition:translate 200ms cubic-bezier(0.32,0.72,0,1),box-shadow 200ms cubic-bezier(0.32,0.72,0,1)}

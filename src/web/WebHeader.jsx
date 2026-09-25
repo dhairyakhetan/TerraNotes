@@ -12,7 +12,7 @@ const navText = { fontFamily: "'Space Mono', monospace", fontWeight: "700", font
 // main site and Instagram.
 export default function WebHeader() {
   return (
-    <header style={{ position: "sticky", top: "0", zIndex: "50", width: "1440px", height: "80px", boxSizing: "border-box", padding: "0 48px", background: "#F3EEE4", borderBottom: "2px solid #111111", display: "flex", alignItems: "center", gap: "24px" }}>
+    <header className="site-header" style={{ position: "sticky", top: "0", zIndex: "50", width: "1440px", height: "80px", boxSizing: "border-box", padding: "0 48px", background: "#F3EEE4", borderBottom: "2px solid #111111", display: "flex", alignItems: "center", gap: "24px" }}>
       <SmartLink href="/" aria-label="Aquaterra — home" style={{ display: "flex", alignItems: "center", gap: "8px", textDecoration: "none" }}>
         <Logo globe={46} word={27} sub={15} />
       </SmartLink>
