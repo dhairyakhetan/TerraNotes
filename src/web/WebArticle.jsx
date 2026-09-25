@@ -10,6 +10,7 @@ import { MEMBERS } from '../data/team.js';
 import { pad2 } from '../lib/format.js';
 import { useFitTitle } from '../lib/fit.js';
 import { BackHome } from '../lib/backHome.jsx';
+import { FeaturedTape } from '../lib/byWriter.jsx';
 import { flyInFromCard } from '../lib/fly.js';
 
 const P = { fontFamily: "'Newsreader', Georgia, serif", fontSize: "21px", lineHeight: "1.65", color: "#1E2723", margin: "0" };
@@ -91,7 +92,8 @@ export default function WebArticle({ article: a, next }) {
           <div className="hero-sway" style={{ transformOrigin: "50% -38px", transform: "rotate(-1deg)" }}>
             <div style={{ position: "absolute", left: "50%", marginLeft: "-0.7px", top: "-38px", width: "1.4px", height: "40px", background: "#5B3A1E" }} />
             <div style={{ position: "absolute", left: "50%", top: "-8px", marginLeft: "-20px", width: "40px", height: "10px", background: tag.color, border: "1.5px solid #111111", boxSizing: "border-box", zIndex: "2" }} />
-            <div style={{ background: "#FFFFFF", border: "2px solid #111111", boxShadow: "12px 12px 0 #111111", padding: "14px" }}>
+            {a.featured && <FeaturedTape style={{ left: "-10px", top: "-12px", fontSize: "12px" }} />}
+            <div style={{ background: "#FFFFFF", border: "2px solid #111111", boxShadow: `12px 12px 0 ${a.featured ? "#F7C21A" : "#111111"}`, padding: "14px" }}>
               <Img src={a.cover} alt={a.alt} label={`${a.alt} — lead photo`} box={a.cover ? { height: "560px", width: "auto", maxWidth: "620px" } : { height: "420px" }} icon={22} font="12px" /> {/* a cover shows whole */}
             </div>
           </div>
@@ -105,7 +107,7 @@ export default function WebArticle({ article: a, next }) {
           <h1 ref={title} style={{ margin: "0", fontFamily: "'Archivo Black', Impact, sans-serif", fontWeight: "400", fontSize: "76px", lineHeight: "0.92", letterSpacing: "-1.5px", textTransform: "uppercase" }}>{a.title}</h1>
           <p style={{ margin: "0", fontFamily: "'Caveat', cursive", fontSize: "32px", lineHeight: "1.1", color: "#5B4630" }}>{a.dek}</p>
           <div style={{ ...MONO, display: "flex", border: "2px solid #111111", background: "#FFFFFF", fontSize: "12px", alignSelf: "flex-start" }}>
-            <div style={{ padding: "12px 16px", borderRight: "2px solid #111111" }}>{`By ${a.author || '[Author]'}`}</div>
+            {a.author !== null && <div style={{ padding: "12px 16px", borderRight: "2px solid #111111" }}>{`By ${a.author || '[Author]'}`}</div>}
             <div style={{ padding: "12px 16px", borderRight: "2px solid #111111" }}>{a.date || '[Date]'}</div>
             <div style={{ padding: "12px 16px", background: tag.color, color: tag.ink }}>{`${a.readTime || '[x]'} min read`}</div>
           </div>
@@ -126,7 +128,8 @@ export default function WebArticle({ article: a, next }) {
           )}
           {a.body.map((b, i) => <Block key={i} b={b} first={i === firstText} a={a} tag={tag} />)}
           <div style={{ width: "18px", height: "18px", background: "#111111" }} />
-          {/* author */}
+          {/* author (none for pieces from Aquaterra itself) */}
+          {a.author !== null && (
           <div style={{ marginTop: "20px", boxSizing: "border-box", background: "#FFFFFF", border: "2px solid #111111", boxShadow: "7px 7px 0 #111111", padding: "18px", display: "flex", gap: "18px", alignItems: "center" }}>
             <div style={{ width: "88px", height: "88px", flexShrink: "0", boxSizing: "border-box", borderRadius: "50%", border: "2px solid #111111", background: "#F2F1ED", overflow: "hidden", display: "flex", alignItems: "center", justifyContent: "center" }}>
               {author && author.photo ? <img src={author.photo} alt="" style={{ display: "block", width: "100%", height: "100%", objectFit: "cover" }} /> : <PhotoIcon size={22} />}
@@ -136,6 +139,7 @@ export default function WebArticle({ article: a, next }) {
               <div style={{ fontFamily: "'Archivo Black', Impact, sans-serif", fontSize: "24px", textTransform: "uppercase", lineHeight: "1" }}>{a.author || '[Name]'}</div>
             </div>
           </div>
+          )}
           {/* next on the line */}
           <div style={{ position: "relative", margin: "30px -370px 0", width: "1440px", height: "620px" }}>
             <div style={{ position: "absolute", left: "80px", top: "0", fontFamily: "'Space Mono', monospace", fontSize: "12px", letterSpacing: "1.8px" }}>NEXT ON THE LINE</div>

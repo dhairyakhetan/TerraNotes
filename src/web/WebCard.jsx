@@ -3,7 +3,7 @@ import Img from '../components/Img.jsx';
 import { placeOf, TAGS } from '../data/articles.js';
 import { pad2 } from '../lib/format.js';
 import { rememberCard } from '../lib/fly.js';
-import { ByTape } from '../lib/byWriter.jsx';
+import { ByTape, FeaturedTape } from '../lib/byWriter.jsx';
 import { coverFloor, useFitTitle } from '../lib/fit.js';
 
 // Web article card. 'line' = the small card on the home page's line; 'next' = the big "next on the line" card.
@@ -21,8 +21,9 @@ export default function WebCard({ article: a, size = 'line', mark }) {
   return (
     <Link className="card-link" to={`/articles/${a.slug}`} onClick={rememberCard} style={{ position: "absolute", left: "0", top: "0", width: `${z.w}px`, height: `${z.h}px`, display: "block", textDecoration: "none", color: "#111111" }}>
       {mark && <ByTape name={mark} />}
+      {a.featured && <FeaturedTape />}
       <div style={{ position: "absolute", left: "50%", top: "-7px", marginLeft: `-${z.clip / 2}px`, width: `${z.clip}px`, height: "10px", background: tag.color, border: "1.5px solid #111111", boxSizing: "border-box", zIndex: "2" }} />
-      <article style={{ width: "100%", height: "100%", boxSizing: "border-box", background: "#FFFFFF", border: "2px solid #111111", boxShadow: `${z.shadow}px ${z.shadow}px 0 #111111`, padding: `${z.pad}px`, display: "flex", flexDirection: "column", gap: `${z.gap}px`, overflow: "hidden" }}>
+      <article style={{ width: "100%", height: "100%", boxSizing: "border-box", background: "#FFFFFF", border: "2px solid #111111", boxShadow: `${z.shadow}px ${z.shadow}px 0 ${a.featured ? "#F7C21A" : "#111111"}`, padding: `${z.pad}px`, display: "flex", flexDirection: "column", gap: `${z.gap}px`, overflow: "hidden" }}>
         <Img src={a.cover} alt={a.alt} box={{ height: `${z.img}px`, minHeight: coverFloor(z.img) }} icon={22} font="12px" />
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexShrink: "0" }}>
           <span style={{ background: tag.color, color: tag.ink, fontFamily: "'Space Mono', monospace", fontWeight: "700", fontSize: z.pill, letterSpacing: "1px", textTransform: "uppercase", padding: "3px 9px", borderRadius: "999px", lineHeight: "1.3", whiteSpace: "nowrap" }}>{a.tag}</span>
@@ -32,7 +33,7 @@ export default function WebCard({ article: a, size = 'line', mark }) {
         <p style={{ flexShrink: "0", margin: "0", fontFamily: "'Caveat', cursive", fontSize: z.dek, lineHeight: "1.1", color: "#5B4630" }}>{a.dek}</p>
         {size === 'next' && (
           <div style={{ flexShrink: "0", marginTop: "auto", display: "flex", justifyContent: "space-between", fontFamily: "'Space Mono', monospace", fontSize: "11px", letterSpacing: "1px", textTransform: "uppercase" }}>
-            <span>{a.author || '[Author]'}</span>
+            <span>{a.author === null ? 'Aquaterra' : a.author || '[Author]'}</span>
             <span>{`${a.readTime || '[x]'} min read →`}</span>
           </div>
         )}

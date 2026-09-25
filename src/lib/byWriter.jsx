@@ -25,3 +25,10 @@ export function ByTape({ name, style }) {
 }
 
 export const articlesBy = (name) => ARTICLES.filter((a) => a.author === name);
+
+// The yellow "★ featured" tape on a highlighted article's cards (featured: true in data/articles.js).
+export function FeaturedTape({ style }) {
+  return (
+    <span className="tape-slap" style={{ position: "absolute", zIndex: "3", left: "-10px", top: "-12px", background: "#F7C21A", color: "#111111", border: "1.5px solid #111111", padding: "2px 10px", fontFamily: "'Space Mono', monospace", fontWeight: "700", fontSize: "10px", letterSpacing: "1.2px", textTransform: "uppercase", lineHeight: "1.6", transform: "rotate(-5deg)", whiteSpace: "nowrap", boxShadow: "2px 2px 0 #111111", pointerEvents: "none", ...style }}>★ featured</span>
+  );
+}
