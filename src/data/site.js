@@ -5,7 +5,7 @@ export const SITE = {
   intro: 'TerraNotes is Aquaterra’s monthly magazine: stories, research, fashion, photos and art.',
   instagram: 'ngo.aquaterra', // Aquaterra's handle, without the @ (web header, phone menu; the footer links nowhere)
   url: 'https://terranotes-aq.vercel.app', // this site's address: link previews, sitemap, llms.txt (env SITE_URL overrides it at build)
-  website: 'https://ngoaquaterra.com', // Aquaterra's main site (web header, phone menu)
+  website: 'https://ngoaquaterra.com', // Aquaterra's main site (llms.txt)
   footerNote: 'Kolkata · est. 2021 · 1,300+ members', // second footer line (also llms.txt)
 };
 

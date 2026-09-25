@@ -1,17 +1,16 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { Link } from 'react-router';
 import Logo from '../shared/Logo.jsx';
-import { CloseIcon, GlobeIcon, InstagramIcon } from '../shared/Icons.jsx';
+import { CloseIcon } from '../shared/Icons.jsx';
 import { MenuCall } from '../shared/buddy/Buddy.jsx';
-import { SITE } from '../data/site.js';
-import { instagramUrl, pad2 } from '../lib/format.js';
+import { pad2 } from '../lib/format.js';
 import { lockScroll, unlockScroll } from '../lib/scrollLock.js';
 import { FONT } from '../styles/fonts.js';
 
 // The phone's full-screen menu (opened from PhoneHeader): slides in from the right, swipe right (or ✕) to close.
 // Six cards hang from a wire, one per stop; the card for the page you're on says "you're here" (on the home page:
 // the section in the upper part of the screen). Sized to fit any screen height by CSS variables (styles/phone.css).
-// Bottom: Aquaterra's website + Instagram, and Buddy's "click me".
+// Bottom: Buddy's "click me".
 const EASE = 'cubic-bezier(0.32, 0.72, 0, 1)';
 // left = card x; string = x of its string on the card; rot = tilt
 const STOPS = [
@@ -22,7 +21,6 @@ const STOPS = [
   { label: 'Members', to: '/members', here: 'members', left: '22px', string: '228px', rot: '-1.2deg', color: '#EE4E8A' },
   { label: 'Editions', to: '/editions', here: 'editions', left: '44px', string: '96px', rot: '1deg', color: '#7B5CE6' },
 ];
-const OUT = { position: "absolute", right: "20px", minHeight: "40px", display: "flex", alignItems: "center", gap: "8px", fontFamily: FONT.mono, fontSize: "12px", letterSpacing: "1px", textTransform: "uppercase", textDecoration: "none", color: "#F3EEE4" };
 
 // On the home page: the section in the upper 40% of the screen right now.
 function homeSection() {
@@ -93,8 +91,6 @@ export default function PhoneMenu({ open, onClose, current = 'home', edge = '#F0
         <div style={{ position: "relative", marginTop: "auto", height: "var(--foot)", flexShrink: "0" }}>
           <div style={{ position: "absolute", left: "20px", top: "0", width: "350px", height: "1.5px", background: "#3A3A36" }} />
           <div style={{ position: "absolute", left: "20px", top: "16px", width: "200px", fontFamily: FONT.hand, fontSize: "22px", lineHeight: "1.05", color: "#F7C21A", transform: "rotate(-2deg)" }}>notes from where the land meets the water.</div>
-          <a href={SITE.website} target="_blank" rel="noreferrer" aria-label={`Aquaterra website (${new URL(SITE.website).host})`} style={{ ...OUT, top: "12px" }}><GlobeIcon />Website ↗</a>
-          <a href={instagramUrl(SITE.instagram)} target="_blank" rel="noreferrer" aria-label={`Aquaterra on Instagram (@${SITE.instagram})`} style={{ ...OUT, top: "54px" }}><InstagramIcon />Instagram ↗</a>
           <div style={{ position: "absolute", left: "20px", bottom: "36px", fontFamily: FONT.mono, fontSize: "10px", letterSpacing: "1.4px", color: "#8E8A7A" }}>TERRANOTES · © {new Date().getFullYear()}</div>
           <MenuCall onClose={close} />
         </div>
