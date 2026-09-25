@@ -118,7 +118,7 @@ html[data-nav=page]::view-transition-new(root){animation:vtFadeUp 420ms cubic-be
 @keyframes vtRiseIn{from{opacity:0;transform:scale(0.96)}}
 /* while pages swap, the looping decorations hold still: otherwise the incoming page (the home page especially) has to
    be redrawn every frame of the transition, which is what made going back stutter on phones */
-html[data-nav] :is(.sway,.flutter,.hero-sway,.fl1,.fl2,.fl3,.fl4,.fl5,.fl6,.fk1,.fk2,.fk3,.fk4,.glint,.spark,.twist,.orbit-bubble,.buddy-bob,.wordmark){animation-play-state:paused}
+html[data-nav] :is(.sway,.flutter,.hero-sway,.fl1,.fl2,.fl3,.fl4,.fl5,.fl6,.fk1,.fk2,.fk3,.fk4,.glint,.spark,.twist,.orbit-bubble,.buddy-bob){animation-play-state:paused}
 @media (prefers-reduced-motion: reduce){::view-transition-group(*),::view-transition-old(*),::view-transition-new(*){animation:none !important}}
 
 /* "back to home": no underline; it lifts a little when hovered */

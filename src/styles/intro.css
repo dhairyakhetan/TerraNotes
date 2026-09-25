@@ -39,7 +39,7 @@
 @keyframes nbLogo{from{opacity:0;transform:scale(.4) rotate(-50deg)}}
 .nb-word{animation:nbRise 420ms cubic-bezier(.22,1,.36,1) 2350ms both}
 @keyframes nbRise{from{opacity:0;transform:translateY(8px)}}
-.nb-wordmark{font:400 calc(var(--pw) * .118)/1 'Archivo Black',Impact,sans-serif;text-transform:uppercase}
+.nb-wordmark{display:block;height:calc(var(--pw) * .11);width:auto;max-width:100%}
 
 /* the first page: lined, with a margin; "TerraNotes" is written in, then the stamp comes down on it */
 .nb-right{position:absolute;inset:0;box-sizing:border-box;border:2px solid #111111;border-radius:3px 9px 9px 3px;

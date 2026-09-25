@@ -78,7 +78,7 @@ export default function Intro() {
                 </div>
                 <div className="nb-face nb-back">
                   <img src="/logo.png" alt="" className="nb-logo" />
-                  <div className="nb-word"><span className="wordmark nb-wordmark">Aquaterra</span></div>
+                  <div className="nb-word"><img className="nb-wordmark" src="/wordmark.webp" alt="Aquaterra" /></div>
                 </div>
               </div>
             </div>

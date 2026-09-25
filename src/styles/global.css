@@ -19,13 +19,6 @@ html,a,button{touch-action:manipulation}
 /* no sideways jump on desktop when a sheet locks scrolling */
 html{scrollbar-gutter:stable}
 
-/* AQUATERRA wordmark: gradient caps with gloss, outline and hard shadow */
-.wordmark{background:linear-gradient(180deg,rgba(255,255,255,.6) 0%,rgba(255,255,255,.25) 40%,rgba(255,255,255,0) 55%),linear-gradient(90deg,#2336A8 0%,#2A3DB4 15%,#2464D2 21%,#46B9EE 26%,#B4F4F2 31%,#94F5CB 37%,#5FE3A0 44%,#48CF8C 50%,#5FE3A0 56%,#94F5CB 63%,#B4F4F2 69%,#46B9EE 74%,#2464D2 79%,#2A3DB4 85%,#2336A8 100%);background-size:100% 100%,200% 100%;background-position:0 0,0% 0;animation:wordmarkShift 16s ease-in-out infinite alternate;-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent;-webkit-text-stroke:0.9px #0B1330;filter:drop-shadow(1.5px 1.8px 0 #0B1330);letter-spacing:-0.3px !important}
-/* the colours drift slowly: blue→green one way, green→blue the other (the gloss stays put) */
-@keyframes wordmarkShift{to{background-position:0 0,100% 0}}
-@media (prefers-reduced-motion: reduce){.wordmark{animation:none}}
-/* cream outline on the dark menu */
-nav[aria-label="Main menu"] .wordmark{-webkit-text-stroke:1px #F3EEE4;filter:drop-shadow(1.5px 1.8px 0 #F3EEE4)}
 
 /* Menu sheet: fills the visible screen. --s = how much shorter than 844px it is; gaps, cards and footer shrink by it. Below 612px it scrolls. */
 .menu-sheet{--vh:100vh;height:var(--vh);overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain;touch-action:pan-y}
@@ -39,3 +32,6 @@ nav[aria-label="Main menu"] .wordmark{-webkit-text-stroke:1px #F3EEE4;filter:dro
 
 /* keyboard focus: a clear ring (mouse and touch don't show it) */
 :focus-visible{outline:3px solid #3DA5F4;outline-offset:3px}
+
+/* the wordmark on the dark menu: a thin cream edge so the dark blue letters still read */
+.wordmark-img.on-dark{filter:drop-shadow(1px 0 0 #F3EEE4) drop-shadow(-1px 0 0 #F3EEE4) drop-shadow(0 1px 0 #F3EEE4) drop-shadow(0 -1px 0 #F3EEE4)}
