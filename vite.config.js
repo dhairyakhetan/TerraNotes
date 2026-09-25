@@ -32,7 +32,7 @@ const pages = () => ({
       html = setMeta(html, 'property', 'og:title', a.title);
       html = setMeta(html, 'property', 'og:description', desc);
       html = setMeta(html, 'property', 'og:url', url);
-      // link preview: its wide card from tools/make-og.py (public/og/<slug>.jpg, 1200x630); else the cover itself
+      // link preview: its wide card from tools/make-og.mjs (public/og/<slug>.jpg, 1200x630); else the cover itself
       // (?v=<content hash>: a changed picture gets a new address, so WhatsApp & co. don't keep showing the old one)
       const ogFile = `public/og/${a.slug}.jpg`;
       const og = fs.existsSync(ogFile) ? `/og/${a.slug}.jpg?v=${crypto.createHash('md5').update(fs.readFileSync(ogFile)).digest('hex').slice(0, 8)}` : a.cover;

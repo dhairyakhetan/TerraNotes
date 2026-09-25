@@ -1,0 +1,63 @@
+// Link-preview pictures for the articles: public/og/<slug>.jpg, 1200x630 (the shape WhatsApp, Instagram, iMessage…
+// show big). Drawn like the site: the whole cover, uncropped, full height on the left (white mount, hard shadow), and
+// on the right the logo, the tag, the title big enough to read in a small chat bubble, the dek and the byline.
+// Run after adding or changing an article:  node tools/make-og.mjs   (uses Playwright: npm i -D playwright)
+import fs from 'node:fs';
+import path from 'node:path';
+import { chromium } from 'playwright';
+import { ALL_ARTICLES, TAGS } from '../src/data/articles.js';
+import { editionName } from '../src/data/editions.js';
+
+const root = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..');
+const pub = (f) => path.join(root, 'public', f);
+const data = (f, type) => `data:${type};base64,${fs.readFileSync(pub(f)).toString('base64')}`;
+const esc = (t) => String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+const FONTS = 'https://fonts.googleapis.com/css2?family=Archivo+Black&family=Caveat:wght@600&family=Instrument+Serif:ital@1&family=Space+Mono:wght@700&display=block';
+
+const page = (a, coverSrc, w, h) => {
+  const tag = TAGS[a.tag] || { color: '#F7C21A', ink: '#111111' };
+  const ch = 530, cw = Math.min(530, Math.round((w / h) * ch)), cht = Math.round((h / w) * cw);
+  return `<!doctype html><html><head><link rel="stylesheet" href="${FONTS}"><style>
+  *{box-sizing:border-box} body{margin:0;width:1200px;height:630px;background:#F3EEE4;overflow:hidden;position:relative;font-family:'Space Mono',monospace}
+  .wire{position:absolute;left:0;right:0;top:30px;height:3px;background:#8E7A5E}
+  .cover{position:absolute;left:56px;top:${Math.round((630 - cht - 30) / 2) + 4}px;background:#fff;border:3px solid #111;box-shadow:12px 12px 0 #111;padding:12px;transform:rotate(-2deg)}
+  .cover img{display:block;width:${cw}px;height:${cht}px;object-fit:cover}
+  .peg{position:absolute;left:50%;top:-14px;width:44px;height:18px;margin-left:-22px;background:${tag.color};border:2.5px solid #111}
+  .right{position:absolute;left:${56 + cw + 24 + 70}px;right:56px;top:64px;bottom:52px;display:flex;flex-direction:column}
+  .logo{display:flex;align-items:center;gap:10px}
+  .logo img.g{width:52px;height:52px} .logo img.w{height:30px;display:block} .logo span{font:italic 400 20px/1 'Instrument Serif',serif;color:#1E2723;display:block;margin-top:4px}
+  .tag{align-self:flex-start;margin-top:34px;background:${tag.color};color:${tag.ink};border:2.5px solid #111;border-radius:999px;padding:6px 16px;font-size:18px;letter-spacing:2px;text-transform:uppercase}
+  h1{margin:18px 0 0;font:400 64px/0.98 'Archivo Black',Impact,sans-serif;text-transform:uppercase;color:#111;letter-spacing:-1px}
+  .dek{margin-top:16px;font:600 34px/1.05 'Caveat',cursive;color:#5B3A1E}
+  .by{margin-top:auto;font-size:17px;letter-spacing:2px;text-transform:uppercase;color:#111}
+  </style></head><body>
+  <div class="wire"></div>
+  <div class="cover"><div class="peg"></div><img src="${coverSrc}"></div>
+  <div class="right">
+    <div class="logo"><img class="g" src="${data('logo.png', 'image/png')}"><div><img class="w" src="${data('wordmark.webp', 'image/webp')}"><span>TerraNotes</span></div></div>
+    <div class="tag">${esc(a.tag)}</div>
+    <h1 id="t">${esc(a.title)}</h1>
+    <div class="dek">${esc(a.dek)}</div>
+    <div class="by">${a.author ? `By ${esc(a.author)} · ` : ''}${editionName(a.edition)}</div>
+  </div></body></html>`;
+};
+
+const browser = await chromium.launch(process.env.CHROMIUM ? { executablePath: process.env.CHROMIUM } : {});
+const ctx = await browser.newContext({ viewport: { width: 1200, height: 630 }, deviceScaleFactor: 1 });
+if (process.env.FONTS_DIR) { // offline: serve Google Fonts from a local folder (fonts.css + files named after their URL)
+  const css = fs.readFileSync(path.join(process.env.FONTS_DIR, 'fonts.css'), 'utf8');
+  await ctx.route(/fonts\.googleapis\.com/, (r) => r.fulfill({ body: css, contentType: 'text/css' }));
+  await ctx.route(/fonts\.gstatic\.com/, (r) => r.fulfill({ path: path.join(process.env.FONTS_DIR, r.request().url().replace('https://fonts.gstatic.com/', '').replace(/\//g, '_')), contentType: 'font/woff2' }));
+}
+const p = await ctx.newPage();
+fs.mkdirSync(pub('og'), { recursive: true });
+for (const a of ALL_ARTICLES.filter((x) => x.cover)) {
+  const size = await p.evaluate((src) => new Promise((ok) => { const i = new Image(); i.onload = () => ok([i.naturalWidth, i.naturalHeight]); i.src = src; }), data(a.cover.slice(1), 'image/jpeg'));
+  await p.setContent(page(a, data(a.cover.slice(1), 'image/jpeg'), ...size), { waitUntil: 'load' });
+  await p.evaluate(() => document.fonts.ready);
+  // the title shrinks until it fits in four lines
+  await p.evaluate(() => { const t = document.getElementById('t'); let s = 64; while (t.getBoundingClientRect().height > s * 0.98 * 4 + 4 && s > 34) { s -= 2; t.style.fontSize = `${s}px`; } });
+  await p.screenshot({ path: pub(`og/${a.slug}.jpg`), type: 'jpeg', quality: 90 });
+  console.log(a.slug, Math.round(fs.statSync(pub(`og/${a.slug}.jpg`)).size / 1024), 'KB');
+}
+await browser.close();
