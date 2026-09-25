@@ -33,7 +33,7 @@ let lastPath = null;
 const onHome = (p) => !!p && (p === '/' || (SECTIONS.includes(p.slice(1)) && (p !== '/articles' || document.documentElement.dataset.layout === 'web')));
 
 function ScrollManager() {
-  const { pathname, hash, key } = useLocation();
+  const { pathname, hash, key, search } = useLocation();
   const type = useNavigationType();
   useLayoutEffect(() => {
     current = null; // stop recording the page we're leaving before anything scrolls
@@ -47,6 +47,10 @@ function ScrollManager() {
       const target = id && document.getElementById(id);
       if (target) target.scrollIntoView({ behavior });
       else window.scrollTo({ top: 0, behavior });
+    }
+    // "Their articles" (?by=<name>) puts that writer's pieces first, so the sideways line starts back at its beginning
+    if (type === 'PUSH' && new URLSearchParams(search).get('by')) {
+      requestAnimationFrame(() => document.querySelectorAll('.art-scroller, .tiles').forEach((el) => el.scrollTo({ left: 0, behavior })));
     }
     current = key;
   }, [pathname, hash, key]);
