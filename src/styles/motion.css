@@ -33,10 +33,6 @@
 .card-drop > :nth-child(8){animation-delay:220ms}
 .card-drop > :nth-child(n+9){animation-delay:250ms}
 
-/* small notes that pop up over a card: swing down like a hanging tag */
-.note-swing{transform-origin:50% 0;animation:noteSwing 460ms var(--settle) backwards}
-@keyframes noteSwing{0%{opacity:0;translate:0 -18px;rotate:-12deg;scale:.94}55%{opacity:1;translate:0 3px;rotate:3deg;scale:1}80%{rotate:-1deg}100%{translate:0 0;rotate:0deg}}
-
 /* photo viewers: fade in, the photo drops into place, the controls rise after; fade out to close */
 .viewer-in{animation:fadeIn 220ms ease-out both}
 .viewer-in .viewer-stage{animation:stageDrop 460ms var(--settle) 40ms backwards}
@@ -89,7 +85,7 @@
 .cascade-in > :nth-child(n+3){animation-delay:120ms}
 
 @media (prefers-reduced-motion: reduce){
-.fade-in,.fade-out,.card-drop,.card-drop > *,.card-lift,.note-swing,.viewer-in,.viewer-in .viewer-stage,.viewer-in .viewer-bits,.viewer-out,.viewer-out .viewer-stage,
+.fade-in,.fade-out,.card-drop,.card-drop > *,.card-lift,.viewer-in,.viewer-in .viewer-stage,.viewer-in .viewer-bits,.viewer-out,.viewer-out .viewer-stage,
 .menu-sheet.is-open .menu-card,.menu-sheet.is-open .here-note,.word-pop,.w-in > *,.w-right,.w-wrong,.w-reveal,.w-hint,.slide-in,.tape-slap,.cascade-in > *,.hero-drop,.rise-in{animation:none !important}
 .legend-chip{transition:none}
 }

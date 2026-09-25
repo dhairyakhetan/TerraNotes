@@ -1,6 +1,6 @@
 // The team ("Meet the team", shared/TeamSection.jsx), in the order their faces appear. The faces lay themselves out,
 // so add or remove freely.
-//   name, role: shown under the face; role also under an author's byline
+//   name, role: shown under the face and on the profile card
 //   photo:     put the picture in public/team/ and write its path, e.g. '/team/ananya.webp' (square, ~400px, WebP: faces
 //              show small, so a big original only slows the page down)
 //   team:      one of the keys in TEAMS, or a list for someone in two, e.g. ['design', 'writing'] (the first sets their colour;

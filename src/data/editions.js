@@ -1,6 +1,6 @@
-// TerraNotes comes out once a month; each edition is a set of articles (their `edition` in src/data/articles.js).
-// Newest last. The newest is the "latest": it's what the home page and All articles show; older ones open at
-// /editions/<number>. To start a new edition: add it here, then give its articles that edition number.
+// TerraNotes comes out once a month; each edition is a set of articles (their `edition` in data/articles.js).
+// Newest last. The newest is the "latest": the home page shows it; older ones open at /editions/<number>.
+// To start a new edition: add it here, then give its articles that edition number.
 export const EDITIONS = [
   { number: 1, month: 'September 2026' },
 ];

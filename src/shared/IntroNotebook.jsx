@@ -10,7 +10,7 @@ import { calm } from '../lib/motion.js';
 // the footer video start downloading. All timings: styles/intro.css.
 const PLAY = 4300, REDUCED = 1800, LEAVE = 450;
 
-export default function Intro() {
+export default function IntroNotebook() {
   const [leaving, setLeaving] = useState(false);
   const [gone, setGone] = useState(false);
   const skip = useRef(null);

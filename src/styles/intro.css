@@ -1,7 +1,7 @@
 /* The opening notebook (shared/IntroNotebook.jsx). Every piece's own style is how it ends up (open, logo in, stamped);
    the animations play into that, so with reduced motion it simply shows the open notebook.
    --pw / --ph: one page of the notebook. Timeline (ms): 0 slides in spinning · 1300 opens · 2150 logo · 2500
-   "TerraNotes" is written · 3250 stamp · 4300 lifts away (Intro.jsx). */
+   "TerraNotes" is written · 3250 stamp · 4300 lifts away (IntroNotebook.jsx). */
 .intro{position:fixed;inset:0;z-index:1000;display:flex;align-items:center;justify-content:center;overflow:hidden;
   background:radial-gradient(ellipse at 50% 45%,#F3EEE4 0%,#E6E0D3 100%);transition:opacity 450ms ease;
   --pw:min(45vw,34vh,300px);--ph:calc(var(--pw) * 1.36)}

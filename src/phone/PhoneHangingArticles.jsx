@@ -10,7 +10,7 @@ import { rememberCard } from '../lib/cardFlight.js';
 import { FONT } from '../styles/fonts.js';
 
 // The phone home page's articles: every card of the latest edition hangs on a string, in page coordinates (the
-// parent is a zero-size box at the page's top-left). The chain:
+// parent box starts at the page's top-left). The chain:
 //   "Articles" label (tied to the intro card's knot) → 02 → 04          01 (string from above the screen) → 03 → 05
 //   06: the wide card, hanging from both 04 and 05        07 onwards: in pairs below it, a row each
 // A card nested inside another card's box hangs from it and swings with it. .sway = swinging on the string (--a

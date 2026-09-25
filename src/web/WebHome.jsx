@@ -7,6 +7,7 @@ import PhotoViewer from '../shared/PhotoViewer.jsx';
 import WordsGameSection from '../shared/WordsGameSection.jsx';
 import TeamSection, { TEAM_HEIGHT } from '../shared/TeamSection.jsx';
 import { WebBuddy } from '../shared/buddy/Buddy.jsx';
+import { ARTICLES } from '../data/articles.js';
 import { usePresence } from '../lib/usePresence.js';
 import { FONT } from '../styles/fonts.js';
 
@@ -33,7 +34,7 @@ export default function WebHome() {
         </div>
         <div style={{ position: "absolute", left: "1150px", top: "380px", width: "220px", fontFamily: FONT.hand, fontSize: "26px", lineHeight: "1.05", color: "#5B3A1E", transform: "rotate(-4deg)" }}>write-ups, fresh off the line ↓</div>
         <WebBuddy />
-        <WebArticleLine />
+        {ARTICLES.length > 0 && <WebArticleLine />}
         <PhotoWallSection web onOpen={setPhoto} />
         <WordsGameSection web />
         <TeamSection web />

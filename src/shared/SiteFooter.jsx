@@ -95,7 +95,7 @@ function OrbitBanner() {
       if (!loaded && entries[entries.length - 1].isIntersecting) { loaded = true; v.preload = 'auto'; v.load(); }
     }, { rootMargin: '600px 0px' });
     near.observe(stage.current);
-    // while the opening notebook plays (components/Intro.jsx), and always on phones, fetch it straight away instead
+    // while the opening notebook plays (shared/IntroNotebook.jsx), and always on phones, fetch it straight away instead
     const early = () => { if (!loaded) { loaded = true; v.preload = 'auto'; v.load(); } };
     if (window.aqIntro || document.documentElement.dataset.layout === 'phone') early();
     addEventListener('aq-intro', early);

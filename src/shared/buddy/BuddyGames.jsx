@@ -220,7 +220,7 @@ function Scores({ score, top, unit }) {
 }
 
 // The popup. Esc, the ✕ or a click outside closes it (it lifts away).
-export default function Games() {
+export default function BuddyGames() {
   const [game, setGame] = useState(null);
   const [shown, leaving] = usePresence(game, 200);
   useEffect(() => {

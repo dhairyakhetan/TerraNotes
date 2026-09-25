@@ -5,7 +5,7 @@ import { LATEST } from './editions.js';
 //   tag:      one of the keys in TAGS (sets the colours)
 //   cover:    put the picture in public/articles/ and write its path, e.g. '/articles/wetlands.jpg'
 //   alt:      a few words describing the cover (also the placeholder label until there is one)
-//   author:   the writer's name (someone in src/data/team.js also gets their role under it); null = no writer
+//   author:   the writer's name (a member in data/team.js also gets their photo in the "words by" box); null = no writer
 //             (no byline, no "words by" box), for pieces from Aquaterra itself
 //   featured: true = highlighted: a yellow "★ featured" tape on its cards and a yellow shadow
 //   edition:  which edition it's in (src/data/editions.js); the home page shows the latest edition's
