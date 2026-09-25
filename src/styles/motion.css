@@ -103,21 +103,22 @@ html[data-nav=next]::view-transition-old(root){animation:vtOutLeft 380ms cubic-b
 html[data-nav=next]::view-transition-new(root){animation:vtInRight 520ms cubic-bezier(0.2,0.9,0.25,1) both}
 html[data-nav=prev]::view-transition-old(root){animation:vtOutRight 380ms cubic-bezier(0.4,0,0.9,0.6) both}
 html[data-nav=prev]::view-transition-new(root){animation:vtInLeft 520ms cubic-bezier(0.2,0.9,0.25,1) both}
-/* back home: the article drops away, home comes forward, and the cover flies back to its card */
-html[data-nav=back]::view-transition-old(root){animation:vtDropAway 420ms cubic-bezier(0.5,0,0.9,0.4) both}
-html[data-nav=back]::view-transition-new(root){animation:vtComeForward 560ms cubic-bezier(0.2,0.9,0.25,1) 60ms both}
+/* back home: the way in, reversed. The article sinks away, home comes forward, its card flies back into place */
+html[data-nav=back]::view-transition-old(root){animation:vtFadeDown 340ms cubic-bezier(0.4,0,0.6,1) both}
+html[data-nav=back]::view-transition-new(root){animation:vtRiseIn 440ms cubic-bezier(0.2,0.8,0.2,1) both}
 html[data-nav=page]::view-transition-old(root){animation:vtSink 320ms ease-in both}
 html[data-nav=page]::view-transition-new(root){animation:vtFadeUp 420ms cubic-bezier(0.2,0.8,0.2,1) both}
-::view-transition-group(cover){animation-duration:620ms;animation-timing-function:cubic-bezier(0.3,0.9,0.3,1);z-index:5}
-::view-transition-old(cover),::view-transition-new(cover){height:100%;object-fit:cover;animation-duration:620ms}
 @keyframes vtSink{to{opacity:0;transform:scale(0.96)}}
 @keyframes vtFadeUp{from{opacity:0;transform:translateY(28px)}}
 @keyframes vtOutLeft{to{opacity:0;transform:translateX(-14%) rotate(-1deg)}}
 @keyframes vtInRight{from{opacity:0;transform:translateX(18%) rotate(1deg)}}
 @keyframes vtOutRight{to{opacity:0;transform:translateX(14%) rotate(1deg)}}
 @keyframes vtInLeft{from{opacity:0;transform:translateX(-18%) rotate(-1deg)}}
-@keyframes vtDropAway{to{opacity:0;transform:translateY(90px) rotate(1.5deg) scale(0.97)}}
-@keyframes vtComeForward{from{opacity:0;transform:scale(0.94) translateY(-18px)}}
+@keyframes vtFadeDown{to{opacity:0;transform:translateY(28px)}}
+@keyframes vtRiseIn{from{opacity:0;transform:scale(0.96)}}
+/* while pages swap, the looping decorations hold still: otherwise the incoming page (the home page especially) has to
+   be redrawn every frame of the transition, which is what made going back stutter on phones */
+html[data-nav] :is(.sway,.flutter,.hero-sway,.fl1,.fl2,.fl3,.fl4,.fl5,.fl6,.fk1,.fk2,.fk3,.fk4,.glint,.spark,.twist,.orbit-bubble,.buddy-bob,.wordmark){animation-play-state:paused}
 @media (prefers-reduced-motion: reduce){::view-transition-group(*),::view-transition-old(*),::view-transition-new(*){animation:none !important}}
 
 /* "back to home": no underline; it lifts a little when hovered */
