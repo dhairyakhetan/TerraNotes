@@ -2,6 +2,7 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import fs from 'node:fs';
 import path from 'node:path';
+import crypto from 'node:crypto';
 import { ALL_ARTICLES as ARTICLES } from './src/data/articles.js'; // every edition's
 import { SITE } from './src/data/site.js';
 import { articleHtml, pageHtml, withContent } from './build/static-html.js';
@@ -32,7 +33,9 @@ const pages = () => ({
       html = setMeta(html, 'property', 'og:description', desc);
       html = setMeta(html, 'property', 'og:url', url);
       // link preview: its wide card from tools/make-og.py (public/og/<slug>.jpg, 1200x630); else the cover itself
-      const og = fs.existsSync(`public/og/${a.slug}.jpg`) ? `/og/${a.slug}.jpg` : a.cover;
+      // (?v=<content hash>: a changed picture gets a new address, so WhatsApp & co. don't keep showing the old one)
+      const ogFile = `public/og/${a.slug}.jpg`;
+      const og = fs.existsSync(ogFile) ? `/og/${a.slug}.jpg?v=${crypto.createHash('md5').update(fs.readFileSync(ogFile)).digest('hex').slice(0, 8)}` : a.cover;
       if (og) {
         html = setMeta(html, 'property', 'og:image', host + og);
         html = setMeta(html, 'name', 'twitter:image', host + og);
