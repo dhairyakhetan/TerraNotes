@@ -125,3 +125,12 @@ html[data-nav] :is(.sway,.flutter,.hero-sway,.fl1,.fl2,.fl3,.fl4,.fl5,.fl6,.fk1,
 .lift-link{display:inline-flex;transition:transform 200ms var(--settle)}
 .lift-link:hover,.lift-link:focus-visible{transform:translateY(-4px)}
 @media (prefers-reduced-motion: reduce){.lift-link{transition:none}}
+
+/* member card badge: a small crest in the bottom-right corner; its line slides out beside it on hover / tap */
+.card-badge{position:absolute;right:14px;bottom:16px;z-index:2;display:flex;align-items:center;gap:6px;padding:4px;border:0;background:transparent;cursor:default;-webkit-tap-highlight-color:transparent}
+.card-badge img{display:block;width:24px;height:auto;transition:transform 220ms var(--spring)}
+.card-badge span{font-family:'Federant','Caveat',serif;font-size:19px;line-height:1;color:#111111;white-space:nowrap;opacity:0;transform:translateX(8px) rotate(-4deg);transition:opacity 200ms ease,transform 260ms var(--settle);pointer-events:none}
+.card-badge:hover span,.card-badge:focus span{opacity:1;transform:rotate(-4deg)}
+.card-badge:hover img,.card-badge:focus img{transform:scale(1.15) rotate(-6deg)}
+.card-badge:focus-visible{outline:2px dashed #7B5CE6;outline-offset:2px}
+@media (prefers-reduced-motion: reduce){.card-badge span,.card-badge img{transition:none}}

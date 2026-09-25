@@ -30,12 +30,12 @@ const LINKS = teamLinks(SPOTS, 24);
 const photoFill = { width: "100%", height: "100%", objectFit: "cover", display: "block" };
 
 // "Meet the team", web layout: click a team to fade the others, click a face for a profile card beside it.
-// a little extra on one card (badge in data/team.js): a picture and a line in its own lettering
+// a little extra on one card (badge in data/team.js): a small picture in the card's corner; its line shows on hover (or tap)
 const Badge = ({ b }) => (
-  <div className="badge-stick" style={{ position: "absolute", left: "calc(100% + 16px)", top: "50%", marginTop: "-26px", display: "flex", alignItems: "center", gap: "7px", transform: "rotate(-5deg)", whiteSpace: "nowrap", pointerEvents: "none" }}>
-    <img src={b.img} alt="" width="34" height="35" style={{ display: "block", width: "34px", height: "auto" }} />
-    <span style={{ fontFamily: "'Federant', 'Caveat', serif", fontSize: "21px", lineHeight: "1", color: "#111111" }}>{b.text}</span>
-  </div>
+  <button type="button" className="card-badge" aria-label={b.text}>
+    <span>{b.text}</span>
+    <img src={b.img} alt="" width="24" height="24" />
+  </button>
 );
 
 // a crown for the one card that asks for it (crown: true in data/team.js)
@@ -132,6 +132,7 @@ export default function WebMembers() {
         <>
           <button className={leaving ? 'fade-out' : 'fade-in'} onClick={close} aria-label="Close profile" style={{ position: "absolute", left: "0", top: "0", width: "1440px", height: `${WEB_MEMBERS_HEIGHT}px`, border: "0", padding: "0", background: "rgba(17,17,17,.35)", cursor: "default" }} />
           <div className={leaving ? 'card-lift' : 'card-drop'} ref={card} role="dialog" aria-label={`${sel.name} — profile`} style={{ position: "absolute", left: `${cardAt ? cardAt.left : spot.cx < 1000 ? Math.round(spot.cx + r + 28) : Math.round(spot.cx - r - 28 - 360)}px`, top: `${cardAt ? cardAt.top : Math.max(20, Math.min(Math.round(spot.cy - 150), WEB_MEMBERS_HEIGHT - 530))}px`, width: "360px", boxSizing: "border-box", background: "#FFFFFF", border: "2px solid #111111", boxShadow: `9px 9px 0 ${color}`, padding: "22px", display: "flex", flexDirection: "column", gap: "12px", transform: "rotate(-1deg)" }}>
+            {sel.badge && <Badge b={sel.badge} />}
             {emptyShown && <NoArticlesYet name={sel.name} leaving={emptyLeaving} onOk={() => setEmpty(false)} onAll={close} />}
             <div style={{ position: "absolute", left: "50%", top: "-8px", marginLeft: "-18px", width: "36px", height: "11px", background: color, border: "1.5px solid #111111", boxSizing: "border-box" }} />
             <button className="btn" onClick={close} aria-label="Close profile" style={{ position: "absolute", right: "12px", top: "12px", width: "44px", height: "44px", background: "#FFFFFF", border: "2px solid #111111", boxShadow: "3px 3px 0 #111111", padding: "0", display: "flex", alignItems: "center", justifyContent: "center" }}>
@@ -139,7 +140,6 @@ export default function WebMembers() {
             </button>
             <div style={{ position: "relative", alignSelf: "flex-start" }}>
               {sel.crown && <Crown />}
-              {sel.badge && <Badge b={sel.badge} />}
               <div style={{ width: "108px", height: "108px", borderRadius: "50%", border: "2px solid #111111", background: "#F2F1ED", boxShadow: `6px 5px 0 ${color}`, display: "flex", alignItems: "center", justifyContent: "center", overflow: sel.photo ? "hidden" : undefined }}>
               {sel.photo ? <img src={sel.photo} alt={sel.name} style={photoFill} /> : <PhotoIcon size="22" />}
             </div>
