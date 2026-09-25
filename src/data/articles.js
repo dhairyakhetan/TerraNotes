@@ -7,7 +7,7 @@ import { LATEST } from './editions.js';
 //   alt:      a few words describing the cover (also the placeholder label until there is one)
 //   author:   the writer's name (someone in src/data/team.js also gets their role under it); null = no writer
 //             (no byline, no "words by" box), for pieces from Aquaterra itself
-//   featured: true = highlighted: a yellow star tape on its cards and a yellow shadow
+//   featured: true = highlighted: a yellow "★ featured" tape on its cards and a yellow shadow
 //   edition:  which edition it's in (src/data/editions.js); the home page shows the latest edition's
 //   date:     the edition's month, e.g. 'Sep 2026'
 //   readTime: minutes, e.g. '6'
@@ -17,8 +17,14 @@ import { LATEST } from './editions.js';
 //     { quote: 'The line.', by: 'who said it' }            pull quote
 //     { photo: '/articles/x.jpg', caption: '' }            pinned photo
 //     { photos: [{ photo, caption }, { photo, caption }] } two small photos
-//     { log: [['PLACE', 'Kolkata'], ['VISITS', '3']] }     yellow field log box
-// Leave a field '' and the design's placeholder shows instead.
+//     { log: [['PLACE', 'Kolkata'], ['VISITS', '3']] }     yellow field log box (web: in the margin)
+//     { numbers: [['label', 'value'], …], title }         yellow tally card
+//     { checklist: [['item', done], …], title }           to-do note, ticked or not
+//     { loop: ['step', …], title }                         steps that go round and round
+//     { then: [['then', 'now'], …], title, labels }        two-column then / now card
+//     { projects: [{ name, what, meta, color, ink }, …] }  numbered coloured project bars (AQ Labs)
+// Blocks render in shared/ArticleBody.jsx. Leave a field '' and the design's placeholder shows instead.
+// After adding or changing an article's cover, run tools/make-link-previews.mjs for its link-preview image.
 
 export const TAGS = {
   'Field notes': { color: '#F0442B', ink: '#FFFFFF' },
@@ -30,25 +36,6 @@ export const TAGS = {
   Prose: { color: '#1E7A4C', ink: '#FFFFFF' },
   'Under Aquaterra': { color: '#F7C21A', ink: '#111111' },
 };
-
-// A card's tag pill gives way before it runs into the card number: long tags set tighter, then ellipsis as a last resort.
-export const PILL_FIT = { minWidth: '0', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' };
-
-// Placeholder body from the design, until an article is written.
-const DRAFT = [
-  '[Opening paragraph. Set the scene: where you were, what time it was, what it felt like. Two or three sentences that pull the reader straight in before any explanation.]',
-  '[Second paragraph. Why this matters, and why you kept going back. Keep it plain and specific — a detail only someone who was there would notice.]',
-  { log: [['PLACE', '[Location]'], ['VISITS', '[x]'], ['DATES', '[Dates]'], ['KIT', '[what you carried]']] },
-  '[Third paragraph. The first morning: what you saw, who you met, what surprised you.]',
-  '[Fourth paragraph. Let the story turn — something changed, or something was already gone.]',
-  { quote: '[A line from the piece worth pulling out.]', by: '[WHO SAID IT]' },
-  { photo: '', caption: '' },
-  '[Fifth paragraph. The second morning. Pick up where the photo leaves off.]',
-  { h2: '[Section heading]' },
-  '[Sixth paragraph. What the numbers, the people, or the place itself are saying now.]',
-  { photos: [{ photo: '', caption: '' }, { photo: '', caption: '' }] },
-  '[Closing paragraph. End on an image, not a summary.]',
-];
 
 // Every article, in every edition.
 export const ALL_ARTICLES = [
@@ -257,12 +244,7 @@ export const ALL_ARTICLES = [
   },
 ];
 
-// The latest edition's articles: what the home page, All articles and the line show.
+// The latest edition's articles: what the home page shows.
 export const ARTICLES = ALL_ARTICLES.filter((a) => a.edition === LATEST);
 // An article's place in its own edition: { i: 0-based position, n: how many }.
 export const placeOf = (a) => { const list = ALL_ARTICLES.filter((x) => x.edition === a.edition); return { i: list.indexOf(a), n: list.length, list }; };
-
-// Shown on an empty peg (the phone's hanging view, the web line) while an edition has fewer articles than spots.
-export const COMING_SOON = [
-  "this peg's saving a spot for the next one",
-];

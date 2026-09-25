@@ -1,21 +1,23 @@
-// Site-wide copy. Leave a field '' and the design's placeholder shows instead.
+// Site-wide settings and copy: the one place for the site's own address and its outside links.
+// Leave a text field '' and the design's placeholder shows instead.
 export const SITE = {
   // 2–3 lines under "Notes from where the land meets the water." on the home page (the phone card fits 3, no more)
   intro: 'TerraNotes is Aquaterra’s monthly magazine: stories, research, fashion, photos and art.',
-  instagram: 'ngo.aquaterra', // handle without the @ (menu only; the footer links nowhere)
-  url: 'https://terranotes-aq.vercel.app', // this site's own address (link previews, sitemap); change it if the address changes
-  website: 'https://ngoaquaterra.com', // Aquaterra's main site (web header and the phone menu)
-  footerNote: 'Kolkata · est. 2021 · 1,300+ members', // second footer line
+  instagram: 'ngo.aquaterra', // Aquaterra's handle, without the @ (web header, phone menu; the footer links nowhere)
+  url: 'https://terranotes-aq.vercel.app', // this site's address: link previews, sitemap, llms.txt (env SITE_URL overrides it at build)
+  website: 'https://ngoaquaterra.com', // Aquaterra's main site (web header, phone menu)
+  footerNote: 'Kolkata · est. 2021 · 1,300+ members', // second footer line (also llms.txt)
 };
 
-// Footer banner video: a strip of 8 square panels side by side (8:1, e.g. 2560×320), one per bubble.
-// Replace the file in place (same name) and update `description` to match the new footage.
+// Footer banner video (shared/SiteFooter.jsx): a strip of 8 square panels side by side (8:1, e.g. 2560×320, H.264, no
+// audio, under 3 MB), one per bubble. Replace the file in place and update `description` to match the new footage.
 export const FOOTER_VIDEO = {
-  src: '/footer-vid.mp4',
+  src: '/video/footer-bubbles.mp4',
   description: 'Students and kids from AquaTerra drives waving hello',
 };
 
-// The eight team colours, in roster order: one per banner bubble. Approximate; check against the parent site.
+// The footer bubbles' colours (shown before the video plays, and instead of it with reduced motion / LITE): Aquaterra's
+// eight team colours, in roster order.
 export const ROSTER_COLORS = [
   '#1b7a4b', // welfare
   '#8b5cf6', // social

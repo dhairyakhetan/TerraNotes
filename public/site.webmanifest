@@ -8,6 +8,6 @@
   "theme_color": "#F3EEE4",
   "icons": [
     { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" },
-    { "src": "/logo.png", "sizes": "512x512", "type": "image/png" }
+    { "src": "/brand/aquaterra-globe.png", "sizes": "512x512", "type": "image/png" }
   ]
 }

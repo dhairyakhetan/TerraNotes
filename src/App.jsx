@@ -1,93 +1,47 @@
-import { useEffect, useLayoutEffect } from 'react';
-import { Navigate, Route, Routes, useLocation, useNavigationType, useParams } from 'react-router';
-import Home from './pages/Home.jsx';
-import Article from './pages/Article.jsx';
-import NotFound from './pages/NotFound.jsx';
-import ErrorBoundary from './components/ErrorBoundary.jsx';
+import { Navigate, Route, Routes, useLocation, useParams } from 'react-router';
+import PhoneHome from './phone/PhoneHome.jsx';
+import PhoneArticle from './phone/PhoneArticle.jsx';
 import WebHome from './web/WebHome.jsx';
 import WebArticle from './web/WebArticle.jsx';
-import OrbitBanner from './components/OrbitBanner.jsx';
-import Footer from './components/Footer.jsx';
+import { EditionPage, EditionsPage } from './pages/EditionsPage.jsx';
+import NotFoundPage from './pages/NotFoundPage.jsx';
+import ErrorBoundary from './shared/ErrorBoundary.jsx';
+import SiteFooter from './shared/SiteFooter.jsx';
+import BuddyGames from './shared/buddy/BuddyGames.jsx';
 import { ALL_ARTICLES } from './data/articles.js';
-import { EditionPage, Editions } from './pages/Editions.jsx';
-import { useIsWeb } from './lib/layout.js';
-import { noteFrom } from './lib/backHome.jsx';
-import Games from './components/buddy/Games.jsx';
-import './styles/buddy.css';
+import { useIsWeb } from './lib/layoutMode.js';
+import { SECTIONS } from './lib/routes.js';
+import { ScrollMemory } from './lib/scrollMemory.js';
 
-// Home page sections, each with its own clean address: /photos opens the home page at the photo wall.
-// (/articles is the articles on the home page. The phone's old All articles page is in src/unused/archive.jsx, unused.)
-const SECTIONS = ['articles', 'photos', 'words', 'members'];
+// The routes, per layout (lib/layoutMode.js: 900px+ wide = web, else phone):
+//   /                         home (PhoneHome / WebHome)
+//   /articles /photos /words /members   the home page, opened at that section (lib/scrollMemory.js scrolls)
+//   /articles/<slug>          one article (PhoneArticle / WebArticle); `next` = the following one in its edition
+//   /editions, /editions/<n>  every edition / a previous one (pages/EditionsPage.jsx)
+//   anything else             404 (pages/NotFoundPage.jsx)
+// Any address with ?by=<writer> goes to /articles?by=<writer> (that writer's articles first, lib/byWriter.js).
+// Around them: the skip link, the crash card, the footer and Buddy's games popup (these last two outlive navigation).
 
-// Where each visited page was scrolled to, so Back/Forward return you there (kept for the tab's session).
-const SAVED = 'aq-scroll';
-const saved = (() => { try { return JSON.parse(sessionStorage.getItem(SAVED)) || {}; } catch { return {}; } })();
-const persist = () => { try { sessionStorage.setItem(SAVED, JSON.stringify(saved)); } catch { /* private mode */ } };
-if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
-
-// On navigation: Back/Forward (and reload) return to where you were; otherwise jump to the page's section
-// (or an old-style #section), or start at the top. key: clicking the same link again jumps again.
-let current = null; // the page whose scroll position is being recorded
-let lastPath = null;
-// the home page, under any of its section addresses (/articles is the home page on web only)
-const onHome = (p) => !!p && (p === '/' || SECTIONS.includes(p.slice(1)));
-
-function ScrollManager() {
-  const { pathname, hash, key, search } = useLocation();
-  const type = useNavigationType();
-  useLayoutEffect(() => {
-    current = null; // stop recording the page we're leaving before anything scrolls
-    persist();
-    // a section link on the page you're already on glides there; everything else lands instantly
-    const behavior = type === 'PUSH' && onHome(lastPath) && onHome(pathname) && !matchMedia('(prefers-reduced-motion: reduce)').matches ? 'smooth' : 'auto';
-    if (type === 'PUSH') noteFrom(key, lastPath);
-    lastPath = pathname;
-    const spot = `${key}:${pathname}`; // a fresh load's key is always "default", so the page is part of it
-    if (type === 'POP' && saved[spot] != null) window.scrollTo(0, saved[spot]);
-    else {
-      const id = SECTIONS.find((s) => pathname === `/${s}`) || (hash && decodeURIComponent(hash.slice(1)));
-      const target = id && document.getElementById(id);
-      if (target) target.scrollIntoView({ behavior });
-      else window.scrollTo({ top: 0, behavior });
-    }
-    // "Their articles" (?by=<name>) puts that writer's pieces first, so the sideways line starts back at its beginning
-    if (type === 'PUSH' && new URLSearchParams(search).get('by')) {
-      requestAnimationFrame(() => document.querySelectorAll('.art-scroller, .tiles').forEach((el) => el.scrollTo({ left: 0, behavior })));
-    }
-    current = spot;
-  }, [pathname, hash, key]);
-  useEffect(() => {
-    const remember = () => { if (current != null) saved[current] = Math.round(scrollY); };
-    addEventListener('scroll', remember, { passive: true });
-    addEventListener('pagehide', persist);
-    return () => { removeEventListener('scroll', remember); removeEventListener('pagehide', persist); };
-  }, []);
-  return null;
-}
-
-// /photos, /words, /members: the home page, scrolled to that section
 function SectionRoute({ web }) {
   const { section } = useParams();
-  if (!SECTIONS.includes(section)) return <NotFound web={web} />;
-  return web ? <WebHome /> : <Home />;
+  if (!SECTIONS.includes(section)) return <NotFoundPage web={web} />;
+  return web ? <WebHome /> : <PhoneHome />;
 }
 
 function ArticleRoute({ web }) {
   const { slug } = useParams();
   const a = ALL_ARTICLES.find((x) => x.slug === slug);
-  if (!a) return <NotFound web={web} />;
-  const Page = web ? WebArticle : Article;
-  const same = ALL_ARTICLES.filter((x) => x.edition === a.edition); // "next on the line" stays in the article's edition
-  // key: remount per article so the hero drop animation replays
-  return <Page key={slug} article={a} next={same[(same.indexOf(a) + 1) % same.length]} />;
+  if (!a) return <NotFoundPage web={web} />;
+  const Page = web ? WebArticle : PhoneArticle;
+  const same = ALL_ARTICLES.filter((x) => x.edition === a.edition);
+  return <Page key={slug} article={a} next={same[(same.indexOf(a) + 1) % same.length]} />; // key: remount per article so its entrance replays
 }
 
-// "Skip to main content": hidden until it gets keyboard focus; jumps past the page's header.
+// "Skip to main content": hidden until focused with the keyboard; moves focus past the page's header.
 function SkipLink() {
   const skip = (e) => {
     e.preventDefault();
-    const header = document.querySelector('#root header');
-    const main = header?.nextElementSibling || document.querySelector('#root main');
+    const main = document.querySelector('#root header')?.nextElementSibling || document.querySelector('#root main');
     if (!main) return;
     if (!main.hasAttribute('tabindex')) main.setAttribute('tabindex', '-1');
     main.style.outline = 'none';
@@ -98,28 +52,26 @@ function SkipLink() {
 
 export default function App() {
   const { pathname, search } = useLocation();
-  const web = useIsWeb(); // 900px and up: the 1440px web layout (src/web/); below: the phone layout (src/pages/)
-  // any address with ?by=<name> goes to that writer's articles: /?by=diti, /members?by=diti… → /articles?by=diti
+  const web = useIsWeb();
   const toWriter = pathname !== '/articles' && new URLSearchParams(search).get('by');
   return (
     <>
       <SkipLink />
-      <ScrollManager />
+      <ScrollMemory />
       <ErrorBoundary resetKey={pathname}>
-        {toWriter ? <Navigate to={{ pathname: '/articles', search }} replace /> : <Routes>
-          <Route path="/" element={web ? <WebHome /> : <Home />} />
-          {/* on web every write-up is on the home page's line */}
-          <Route path="/editions" element={<Editions web={web} />} />
-          <Route path="/editions/:n" element={<EditionPage web={web} />} />
-          <Route path="/:section" element={<SectionRoute web={web} />} />
-          <Route path="/articles/:slug" element={<ArticleRoute web={web} />} />
-          <Route path="*" element={<NotFound web={web} />} />
-        </Routes>}
+        {toWriter ? <Navigate to={{ pathname: '/articles', search }} replace /> : (
+          <Routes>
+            <Route path="/" element={web ? <WebHome /> : <PhoneHome />} />
+            <Route path="/editions" element={<EditionsPage web={web} />} />
+            <Route path="/editions/:n" element={<EditionPage web={web} />} />
+            <Route path="/:section" element={<SectionRoute web={web} />} />
+            <Route path="/articles/:slug" element={<ArticleRoute web={web} />} />
+            <Route path="*" element={<NotFoundPage web={web} />} />
+          </Routes>
+        )}
       </ErrorBoundary>
-      {/* outside the routes so the banner's one <video> survives navigation */}
-      <OrbitBanner />
-      <Footer />
-      <Games />
+      <SiteFooter />
+      <BuddyGames />
     </>
   );
 }

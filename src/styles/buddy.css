@@ -1,4 +1,5 @@
-/* Buddy the ghost (components/buddy/). */
+/* Buddy the ghost (shared/buddy/Buddy.jsx): the hidden call button and its peek, his arrival (rope / float-in),
+   his idle bob, his tricks, and the phone menu's "click me". */
 
 /* the hidden call button: invisible until the pointer is right on it (or it has keyboard focus) */
 .buddy-call{width:24px;height:24px;padding:0;display:flex;align-items:center;justify-content:center;background:#FBF8F1;border:1.5px solid #111111;border-radius:50%;cursor:pointer;opacity:0;transition:opacity .25s ease,transform .25s ease}
@@ -44,13 +45,9 @@
 .buddy-menu-call{position:absolute;left:14px;bottom:0;display:flex;align-items:center;gap:6px;min-height:34px;padding:0 6px;background:transparent;border:0;color:#F7C21A;font-family:'Caveat',cursive;font-size:19px;line-height:1;cursor:pointer}
 .buddy-menu-call svg{animation:buddyBob 2s ease-in-out infinite}
 
-/* skip link: off screen until it has keyboard focus */
-.skip-link{position:fixed;left:12px;top:12px;z-index:1000;padding:12px 16px;background:#111111;color:#F3EEE4;border:2px solid #F3EEE4;box-shadow:4px 4px 0 #F7C21A;font-family:'Space Mono',monospace;font-weight:700;font-size:12px;letter-spacing:1.2px;text-transform:uppercase;text-decoration:none;transform:translateY(-200%);transition:transform .15s ease}
-.skip-link:focus{transform:none;outline:2px solid #F7C21A;outline-offset:2px}
-
 @media (prefers-reduced-motion: reduce){
   .buddy-bob,.buddy-float-in,.buddy-menu-call svg,.buddy-arrive .buddy-line,.buddy-arrive .buddy-hang,.buddy-trick{animation:none!important}
-  .buddy-call,.buddy-call-label,.skip-link{transition:none}
+  .buddy-call,.buddy-call-label{transition:none}
   .buddy-peek:not(:hover){animation:buddyPeekStill 1.8s linear}
   @keyframes buddyPeekStill{0%,100%{opacity:0}20%,80%{opacity:.9}}
 }

@@ -1,6 +1,6 @@
-/* How things open, close and change, site-wide. Everything here is off under reduced motion (bottom).
-   Entrances animate `translate`/`rotate`/`scale` (not `transform`), so each element keeps its own tilt,
-   and use fill-mode backwards, so press/hover nudges work again as soon as the entrance ends. */
+/* One-off motion, site-wide: how things arrive, open, close and change (the endless loops are in loops.css).
+   Entrances animate `translate` / `rotate` / `scale` (not `transform`), so each element keeps its own tilt, and use
+   fill-mode backwards, so press / hover nudges work again as soon as the entrance ends. All off under reduced motion. */
 :root{--settle:cubic-bezier(0.32,0.72,0,1);--spring:cubic-bezier(0.34,1.56,0.64,1)}
 
 @keyframes fadeIn{from{opacity:0}}
@@ -10,6 +10,12 @@
 /* backdrops behind popups */
 .fade-in{animation:fadeIn 200ms ease-out both}
 .fade-out{animation:fadeOut 160ms ease-in both}
+
+/* an article's cover drops onto its wire (unless it flies in from its card, lib/cardFlight.js); the text rises after */
+.hero-drop{animation:heroDrop 800ms cubic-bezier(0.22,1,0.36,1) both}
+@keyframes heroDrop{0%{transform:translateY(-160px) rotate(-7deg);opacity:0}45%{opacity:1}62%{transform:translateY(6px) rotate(2deg)}82%{transform:translateY(-2px) rotate(-1deg)}100%{transform:translateY(0) rotate(0)}}
+.rise-in{animation:articleRise 450ms cubic-bezier(0.22,1,0.36,1) 150ms both}
+@keyframes articleRise{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
 
 /* profile cards (and other hanging cards that open): drop onto the clip, bounce, settle; lift off to close */
 .card-drop{transform-origin:50% 0;animation:cardDrop 440ms var(--settle) backwards}
@@ -52,7 +58,12 @@
 @keyframes menuDrop{0%{opacity:0;translate:0 -22px}60%{opacity:1;translate:0 4px}100%{translate:0 0}}
 .menu-sheet.is-open .here-note{animation:fadeIn 300ms ease-out 560ms backwards}
 
-/* words game: the new word pops onto the cloud, options cascade in, the right one bounces, a wrong one shakes */
+/* words game: the new word pops onto the cloud, options cascade in, the right one bounces, a wrong one shakes;
+   the verdict / score fade up, the "psst." hint fades in slower */
+.w-reveal{animation:wordsRise 260ms var(--settle) both}
+@keyframes wordsRise{from{opacity:0;translate:0 12px}to{opacity:1;translate:0 0}}
+.w-hint{animation:hintIn 900ms ease-out both}
+@keyframes hintIn{from{opacity:0;translate:0 10px}to{opacity:1;translate:0 0}}
 .word-pop{animation:wordPop 380ms var(--spring) backwards}
 @keyframes wordPop{from{opacity:0;scale:.8}}
 .w-in > *{animation:cascade 300ms var(--settle) backwards}
@@ -79,11 +90,11 @@
 
 @media (prefers-reduced-motion: reduce){
 .fade-in,.fade-out,.card-drop,.card-drop > *,.card-lift,.note-swing,.viewer-in,.viewer-in .viewer-stage,.viewer-in .viewer-bits,.viewer-out,.viewer-out .viewer-stage,
-.menu-sheet.is-open .menu-card,.menu-sheet.is-open .here-note,.word-pop,.w-in > *,.w-right,.w-wrong,.w-reveal,.slide-in,.tape-slap,.cascade-in > *{animation:none !important}
+.menu-sheet.is-open .menu-card,.menu-sheet.is-open .here-note,.word-pop,.w-in > *,.w-right,.w-wrong,.w-reveal,.w-hint,.slide-in,.tape-slap,.cascade-in > *,.hero-drop,.rise-in{animation:none !important}
 .legend-chip{transition:none}
 }
 
-/* Page to page (lib/pageTransition.js sets html[data-nav] to into / next / back / page for the swap).
+/* Page to page (lib/animatedHistory.js sets html[data-nav] to into / next / prev / back / page during the swap).
    The header is its own layer, so it holds still while the pages move under it. */
 header.site-header{view-transition-name:site-header}
 ::view-transition-group(site-header){animation-duration:320ms}
@@ -94,9 +105,6 @@ html[data-nav]::view-transition-old(root){animation:vtOut 220ms ease-out both}
 html[data-nav]::view-transition-new(root){animation:vtIn 260ms ease-out both}
 @keyframes vtOut{to{opacity:0}}
 @keyframes vtIn{from{opacity:0}}
-/* while pages swap, the looping decorations hold still: otherwise the incoming page (the home page especially) has to
-   be redrawn every frame of the transition, which is what made going back stutter on phones */
-html[data-nav] :is(.sway,.flutter,.hero-sway,.fl1,.fl2,.fl3,.fl4,.fl5,.fl6,.fk1,.fk2,.fk3,.fk4,.glint,.spark,.twist,.orbit-bubble,.buddy-bob){animation-play-state:paused}
 @media (prefers-reduced-motion: reduce){::view-transition-group(*),::view-transition-old(*),::view-transition-new(*){animation:none !important}}
 
 /* "back to home": no underline; it lifts a little when hovered */
