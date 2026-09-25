@@ -22,7 +22,7 @@ const kindOf = (from, to, backwards) => {
   return 'page';
 };
 
-// The card, from the cover's box back into place: starts cover-sized where the cover was, lifts, and settles.
+// The card, from the cover's box back into place: starts cover-sized where the cover was and settles straight in.
 const flyBack = (card, from) => {
   const r = card.getBoundingClientRect();
   if (!r.width || r.bottom < 0 || r.top > innerHeight) return; // not on screen: nothing to see
@@ -32,11 +32,10 @@ const flyBack = (card, from) => {
   card.style.transformOrigin = '0 0';
   card.style.zIndex = '30';
   const an = card.animate([
-    { transform: `translate(${dx}px, ${dy}px) scale(${s})${rest}`, easing: 'cubic-bezier(0.32, 0.72, 0, 1)' },
-    { transform: `translate(0px, -18px) scale(1) rotate(-2deg)${rest}`, offset: 0.62, easing: 'cubic-bezier(0.5, 0, 0.5, 1)' },
-    { transform: `translate(0px, 3px) rotate(0.8deg)${rest}`, offset: 0.84, easing: 'ease-in-out' },
+    { transform: `translate(${dx}px, ${dy}px) scale(${s})${rest}`, easing: 'cubic-bezier(0.25, 0.8, 0.3, 1)' },
+    { transform: `translate(0px, 3px) rotate(0.8deg)${rest}`, offset: 0.8, easing: 'ease-in-out' },
     { transform: `translate(0px, 0px)${rest}` },
-  ], { duration: 720 });
+  ], { duration: 620 });
   an.onfinish = an.oncancel = () => { card.style.transformOrigin = was.origin; card.style.zIndex = was.z; };
 };
 const settle = (ms) => new Promise((ok) => setTimeout(ok, ms));

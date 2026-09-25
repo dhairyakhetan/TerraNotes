@@ -81,7 +81,7 @@ function Block({ b, first, a, tag }) {
 // One article (data: src/data/articles.js). `next` hangs on the "next on the line" wire.
 export default function Article({ article: a, next }) {
   const hero = useRef(null);
-  useLayoutEffect(() => { flyInFromCard(hero.current); }, []); // the cover flies out of the tapped card
+  useLayoutEffect(() => { flyInFromCard(hero.current, true); }, []); // the cover flies straight out of the tapped card
   const [menuOpen, setMenuOpen] = useState(false);
   useEffect(() => { document.title = `Aquaterra — ${a.title}`; }, [a.title]);
   const tag = TAGS[a.tag];
