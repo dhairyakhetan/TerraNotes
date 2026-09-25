@@ -69,7 +69,7 @@ function Tile({ a, mark }) {
           <div style={{ position: "absolute", left: "10px", right: "10px", bottom: "10px", boxSizing: "border-box", padding: "14px 16px 16px", borderRadius: "16px", background: "#1E2723", color: "#FFFFFF", WebkitFontSmoothing: "antialiased" }}>
             <div style={{ display: "flex", alignItems: "center", gap: "9px", fontSize: "15px", color: "#D9D4C7" }}>
               <span style={{ width: "26px", height: "26px", flexShrink: "0", borderRadius: "7px", overflow: "hidden", background: tag.color, color: tag.ink, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "'Archivo Black', Impact, sans-serif", fontSize: "13px" }}>
-                {author && author.photo ? <img src={author.photo} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} /> : (a.author || '?')[0]}
+                {author && author.photo ? <img src={author.photo} alt="" decoding="async" style={{ width: "100%", height: "100%", objectFit: "cover" }} /> : (a.author || '?')[0]}
               </span>
               {(a.author || '[author]').toLowerCase()}
             </div>

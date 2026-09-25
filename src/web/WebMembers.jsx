@@ -96,7 +96,7 @@ export default function WebMembers() {
         return (
           <div key={i} className={`${s.float} face`} style={{ position: "absolute", left: `${s.cx - 66}px`, top: `${s.cy - s.size / 2}px`, width: "132px", display: "flex", flexDirection: "column", alignItems: "center", gap: "10px", opacity: team == null || teamsOf(m).includes(team) ? 1 : 0.18, transition: "opacity .25s" }}>
             <button className="bub" onClick={() => setOpen(i)} aria-label={`${m.name}, ${m.role} — open profile`} style={{ width: `${s.size}px`, height: `${s.size}px`, padding: "0", borderRadius: "50%", border: "2px solid #111111", background: "#F2F1ED", boxShadow: `8px 6px 0 ${colorFor(m)}`, transition: `box-shadow ${fade} ease, transform 180ms cubic-bezier(0.32, 0.72, 0, 1)`, overflow: "hidden", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "4px", fontSize: "13px", color: "#444" }}>
-              {m.photo ? <img src={m.photo} alt="" style={photoFill} /> : <><PhotoIcon size="22" /><span>{m.name.split(' ')[0].toLowerCase()}</span></>}
+              {m.photo ? <img src={m.photo} alt="" loading="lazy" decoding="async" width="400" height="400" style={photoFill} /> : <><PhotoIcon size="22" /><span>{m.name.split(' ')[0].toLowerCase()}</span></>}
             </button>
             <div style={{ textAlign: "center", lineHeight: "1.1", padding: "2px 8px", background: "#F3EEE4" }}>
               <div style={{ fontFamily: "'Archivo Black', Impact, sans-serif", fontSize: "15px", textTransform: "uppercase", color: "#111111" }}>{m.name}</div>

@@ -1,5 +1,6 @@
 // The team, in the order their faces appear on the home page. The faces lay themselves out, so add or remove freely.
-//   photo:     put the picture in public/team/ and write its path, e.g. '/team/ananya.jpg'
+//   photo:     put the picture in public/team/ and write its path, e.g. '/team/ananya.webp' (square, ~400px, WebP: faces show
+//              small, so a big original only slows the page down)
 //   team:      one of the keys in TEAMS, or a list for someone in two, e.g. ['design', 'writing'] (the first sets their colour;
 //              their face fades between the two every so often, or with steady: true keeps the first unless the legend picks the other)
 //   bio:       2 lines for the pop-up when someone taps the face
@@ -18,11 +19,11 @@ export const TEAMS = {
 
 // Mixed on purpose: the order sets where each face sits, so teams end up spread around the section.
 export const MEMBERS = [
-  { name: 'Aarav Agarwal', role: 'Head of department', team: 'heads', photo: '', bio: 'Hey, I’m Aarav! I’m in Class 11, studying commerce, and I’m into economics, geopolitics, and just exploring new stuff. Pretty chill otherwise :)', instagram: 'aaravagarwal2010' },
-  { name: 'Sara Abedin', role: 'Writing team', team: 'writing', photo: '', bio: 'I love turning little thoughts and feelings into poetry especially when it turns into something other people can enjoy!', instagram: 'saraabe1in' },
+  { name: 'Aarav Agarwal', role: 'Head of department', team: 'heads', photo: '/team/aarav.webp', bio: 'Hey, I’m Aarav! I’m in Class 11, studying commerce, and I’m into economics, geopolitics, and just exploring new stuff. Pretty chill otherwise :)', instagram: 'aaravagarwal2010' },
+  { name: 'Sara Abedin', role: 'Writing team', team: 'writing', photo: '/team/sara.webp', bio: 'I love turning little thoughts and feelings into poetry especially when it turns into something other people can enjoy!', instagram: 'saraabe1in' },
   { name: 'Anushka Paul', role: 'Design team', team: 'design', photo: '', bio: '', instagram: '' },
   { name: 'Dhairya Khetan', role: 'Tech team', team: 'tech', photo: '', bio: 'One man army', instagram: 'dhairyakhetan', credit: 'Made this entire website alone', crown: true },
-  { name: 'Pahal Sethi', role: 'Writing team', team: 'writing', photo: '', bio: 'Writing, Creating, and Romanticising the little things. Mentally somewhere in New York.', instagram: 'pahalsethi' },
+  { name: 'Pahal Sethi', role: 'Writing team', team: 'writing', photo: '/team/pahal.webp', bio: 'Writing, Creating, and Romanticising the little things. Mentally somewhere in New York.', instagram: 'pahalsethi' },
   { name: 'Anoushka Chandak', role: 'Design & writing team', team: ['design', 'writing'], photo: '', bio: 'i love yapping 😌', instagram: 'anoushka.aaaaa' },
   { name: 'Hiya Khara', role: 'Head of department', team: 'heads', photo: '', bio: 'I live on Starbucks ;)', instagram: 'hiyakhara' },
   { name: 'Ahel Sarkar', role: 'Writing team', team: 'writing', photo: '', bio: 'Find me a new fandom to get into, and I will bring to you a thesis on it. Also some poems and stuff.', instagram: 'ahelsarkar' },
@@ -30,10 +31,10 @@ export const MEMBERS = [
   { name: 'Priyam Agarwal', role: 'Tech team', team: 'tech', photo: '', bio: 'Hey, I’m Priyam! I’m into tech, maths, and quant finance, and I like messing around with new ideas and building random stuff. Mostly just curious and figuring things out as I go :)', instagram: 'priyamagarwal3' },
   { name: 'Dhriti Agarwal', role: 'Writing team', team: 'writing', photo: '', bio: '', instagram: '' },
   { name: 'Divya Rathi', role: 'Design & writing team', team: ['design', 'writing'], photo: '', bio: 'probably drinking coffee or already five cups in.', instagram: '' },
-  { name: 'Ashwika Tripathi', role: 'Head of department', team: ['heads', 'writing'], steady: true, photo: '', bio: 'Just here to make things happen.', instagram: 'theashwika' },
+  { name: 'Ashwika Tripathi', role: 'Head of department', team: ['heads', 'writing'], steady: true, photo: '/team/ashwika.webp', bio: 'Just here to make things happen.', instagram: 'theashwika' },
   { name: 'Diti Shah', role: 'Writing team', team: 'writing', photo: '', bio: 'Hii…this is Diti Shah', instagram: '_ditishah' },
   { name: 'Ayushi Khemka', role: 'Design team', team: 'design', photo: '', bio: 'Designing my life one questionable decision at a time.', instagram: '' },
-  { name: 'Bhavishya Agarwal', role: 'Tech team', team: 'tech', photo: '', bio: 'I like Claude', instagram: 'bhavishya.idk' },
+  { name: 'Bhavishya Agarwal', role: 'Tech team', team: 'tech', photo: '/team/bhavishya.webp', bio: 'I like Claude', instagram: 'bhavishya.idk' },
   { name: 'Priyadarshini Hazra', role: 'Writing team', team: 'writing', photo: '', bio: 'Writing things I’d want to read myself.', instagram: 'pr1yadxrshini_' },
   { name: 'Rishavi Banerjee', role: 'Writing team', team: 'writing', photo: '', bio: 'Writer at heart, storyteller by nature, finding meaning in every word', instagram: 'the_awful_moon' },
 ];
