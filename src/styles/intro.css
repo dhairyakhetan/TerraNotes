@@ -1,4 +1,4 @@
-/* The opening notebook (components/Intro.jsx). Every piece's own style is how it ends up (open, logo in, stamped);
+/* The opening notebook (shared/IntroNotebook.jsx). Every piece's own style is how it ends up (open, logo in, stamped);
    the animations play into that, so with reduced motion it simply shows the open notebook.
    --pw / --ph: one page of the notebook. Timeline (ms): 0 slides in spinning · 1300 opens · 2150 logo · 2500
    "TerraNotes" is written · 3250 stamp · 4300 lifts away (Intro.jsx). */
@@ -52,10 +52,10 @@
   clip-path:inset(0 0 0 0);animation:nbWrite 750ms cubic-bezier(.45,.05,.55,.95) 2500ms both}
 @keyframes nbWrite{from{clip-path:inset(0 100% 0 0)}}
 .nb-line{margin-top:calc(var(--pw) * .05);font:400 calc(var(--pw) * .074)/1.15 'Caveat',cursive;color:#5B3A1E;animation:nbRise 420ms ease-out 3000ms both}
-.nb-stamp{position:absolute;left:calc(var(--pw) * .09);right:calc(var(--pw) * .07);top:62%;rotate:-9deg;color:#F0442B;mix-blend-mode:multiply;opacity:.92;filter:url(#aq-ink);
+.nb-stamp{position:absolute;left:calc(var(--pw) * .09);right:calc(var(--pw) * .07);top:62%;rotate:-9deg;color:#F0442B;mix-blend-mode:multiply;opacity:.92;will-change:scale,opacity;
   animation:nbStamp 300ms cubic-bezier(.3,0,.4,1) 3250ms both}
 @keyframes nbStamp{0%{opacity:0;scale:2.3}70%{opacity:.92;scale:.93}100%{opacity:.92;scale:1}}
-.nb-stamp-in{text-align:center;transform:scaleX(.88)}
+.nb-stamp-in{text-align:center;transform:scaleX(.88);filter:url(#aq-ink)} /* the ink filter sits here, on a still element, so the stamp's scale-in doesn't re-run it every frame */
 .nb-stamp-small{font:700 calc(var(--pw) * .034)/1 'Space Mono',monospace;letter-spacing:.25em;text-transform:uppercase}
 .nb-stamp-big{margin:calc(var(--pw) * .012) 0;font:400 calc(var(--pw) * .15)/.95 'Archivo Black',Impact,sans-serif;text-transform:uppercase;letter-spacing:-.01em}
 
