@@ -1,7 +1,7 @@
 import { Link } from 'react-router';
 import ArticleCard from '../ArticleCard.jsx';
 import Img from '../Img.jsx';
-import { ARTICLES, COMING_SOON, TAGS } from '../../data/articles.js';
+import { ARTICLES, COMING_SOON, TAGS, PILL_FIT } from '../../data/articles.js';
 import { SoonCard } from '../../web/ArticleLine.jsx';
 import { pad2 } from '../../lib/format.js';
 import { useFitTitle } from '../../lib/fit.js';
@@ -52,9 +52,9 @@ export default function HangingArticles() {
             <article style={{ width: "100%", height: "100%", boxSizing: "border-box", background: "#FFFFFF", border: "2px solid #111111", boxShadow: "7px 7px 0 #111111", padding: "8px", display: "flex", gap: "12px" }}>
               <Img src={a5w.cover} alt={a5w.alt} box={{ width: "122px", flexShrink: "0", height: "176px" }} />
               <div style={{ display: "flex", flexDirection: "column", gap: "8px", paddingTop: "4px", flexGrow: "1" }}>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexShrink: "0" }}>
-                  <span style={{ background: tag5.color, color: tag5.ink, fontFamily: "'Space Mono', monospace", fontWeight: "700", fontSize: "8.5px", letterSpacing: "1px", textTransform: "uppercase", padding: "3px 8px", borderRadius: "999px", lineHeight: "1.2" }}>{a5w.tag}</span>
-                  <span style={{ fontFamily: "'Space Mono', monospace", fontSize: "9px", letterSpacing: "1px", color: "#111111" }}>{`${pad2(ARTICLES.indexOf(a5w) + 1)} / ${pad2(ARTICLES.length)}`}</span>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "6px", flexShrink: "0" }}>
+                  <span style={{ background: tag5.color, color: tag5.ink, fontFamily: "'Space Mono', monospace", fontWeight: "700", fontSize: "8.5px", letterSpacing: a5w.tag.length > 11 ? "0.2px" : "1px", textTransform: "uppercase", padding: "3px 8px", borderRadius: "999px", lineHeight: "1.2", ...PILL_FIT }}>{a5w.tag}</span>
+                  <span style={{ fontFamily: "'Space Mono', monospace", fontSize: "9px", letterSpacing: "1px", color: "#111111", whiteSpace: "nowrap", flexShrink: "0" }}>{`${pad2(ARTICLES.indexOf(a5w) + 1)} / ${pad2(ARTICLES.length)}`}</span>
                 </div>
                 <h3 ref={fit5} style={{ flexShrink: "0", margin: "0", fontFamily: "'Archivo Black', Impact, sans-serif", fontWeight: "400", fontSize: "22px", lineHeight: "0.95", letterSpacing: "-0.3px", textTransform: "uppercase", color: "#111111" }}>{a5w.title}</h3>
                 <p style={{ flexShrink: "0", margin: "0", fontFamily: "'Caveat', cursive", fontSize: "16px", lineHeight: "1.1", color: "#5B4630" }}>{a5w.dek}</p>

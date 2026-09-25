@@ -22,6 +22,7 @@ export function articleHtml(a) {
   const body = a.body.map((b) => {
     if (typeof b === 'string') return `<p>${esc(b)}</p>`;
     if (b.h2) return `<h2>${esc(b.h2)}</h2>`;
+    if (b.projects) return `<ol>${b.projects.map((x) => `<li><strong>${esc(x.name)}</strong>, ${esc(x.what)} (${esc(x.meta)})</li>`).join('')}</ol>`;
     return '';
   }).join('\n');
   const { i, n, list } = placeOf(a), next = list[(i + 1) % n];

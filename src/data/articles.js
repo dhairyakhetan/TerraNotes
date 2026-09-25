@@ -31,6 +31,9 @@ export const TAGS = {
   'Under Aquaterra': { color: '#F7C21A', ink: '#111111' },
 };
 
+// A card's tag pill gives way before it runs into the card number: long tags set tighter, then ellipsis as a last resort.
+export const PILL_FIT = { minWidth: '0', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' };
+
 // Placeholder body from the design, until an article is written.
 const DRAFT = [
   '[Opening paragraph. Set the scene: where you were, what time it was, what it felt like. Two or three sentences that pull the reader straight in before any explanation.]',
@@ -65,14 +68,16 @@ export const ALL_ARTICLES = [
       "AQ Labs is AquaTerra's student build program, a space where teenagers pick a problem they actually care about and ship something real in a matter of weeks, not just a slide deck. It runs like a small, self-directed studio: teams choose their own idea, build it end to end, and put it in front of real users.",
       { h2: 'Eight teams, eight projects' },
       'Under this program, eight teams have shipped eight very different projects:',
-      'Karyaarth, a documentary series on the local vendors and workers most people walk past every day;',
-      "CareerCompass, a data-driven tool that maps India's skill gaps against student choices;",
-      'QUIRK, a hand-soldered pressure-sensing desktop game console;',
-      'wisdom woods, a gamified learning app for classes 3 to 7;',
-      'Cirqle Rentals, a WhatsApp-based community rental network;',
-      'hunar, a placement-first take on vocational trust and verification;',
-      'Photon, a screen-free light-sensing wearable;',
-      'and The Human Manual, a card-deck style app of teen psychology prompts.',
+      { projects: [
+        { name: 'Karyaarth', what: 'a documentary series on the local vendors and workers most people walk past every day', meta: 'documentary · youtube · team KARYAARTH', color: '#C4185C', ink: '#F4EFE1' },
+        { name: 'CareerCompass', what: "a data-driven tool that maps India's skill gaps against student choices", meta: 'data platform · live · team Merge Conflicts', color: '#3DA9FC', ink: '#0A0A0A' },
+        { name: 'QUIRK', what: 'a hand-soldered pressure-sensing desktop game console', meta: 'hardware · live · team Execution Pending', color: '#FFC700', ink: '#0A0A0A' },
+        { name: 'wisdom woods', what: 'a gamified learning app for classes 3 to 7', meta: 'education app · live · team alter ego', color: '#7E5BFF', ink: '#0A0A0A' },
+        { name: 'Cirqle Rentals', what: 'a WhatsApp-based community rental network', meta: 'rentals · instagram · team Idea Architects', color: '#12909C', ink: '#0A0A0A' },
+        { name: 'hunar', what: 'a placement-first take on vocational trust and verification', meta: 'placement · live · team Zero to deploy', color: '#1B8A5A', ink: '#0A0A0A' },
+        { name: 'Photon', what: 'a screen-free light-sensing wearable', meta: 'hardware · in build · team 404-Idea Not Found', color: '#FF4D2E', ink: '#0A0A0A' },
+        { name: 'The Human Manual', what: 'a card-deck style app of teen psychology prompts', meta: 'app', color: '#0A0A0A', ink: '#F4EFE1' },
+      ] },
       { quote: "Students don't need permission to build things that matter, they just need a room and six weeks.", by: 'AQ Labs' },
       "Each project is a live, working build, and AQ Labs exists to prove that students don't need permission to build things that matter, they just need a room and six weeks.",
     ],
