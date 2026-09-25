@@ -1,6 +1,7 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { Link } from 'react-router';
 import { BackHome } from '../lib/backHome.jsx';
+import { FeaturedTape } from '../lib/byWriter.jsx';
 import PageHeader from '../components/PageHeader.jsx';
 import MenuSheet from '../components/MenuSheet.jsx';
 import ArticleCard from '../components/ArticleCard.jsx';
@@ -100,7 +101,8 @@ export default function Article({ article: a, next }) {
           <div className="hero-sway" style={{ transformOrigin: "50% -32px", transform: "rotate(-0.8deg)" }}>
             <div style={{ position: "absolute", left: "178.3px", top: "-32px", width: "1.4px", height: "34px", background: "#5B3A1E" }} />
             <div style={{ position: "absolute", left: "50%", top: "-7px", marginLeft: "-17px", width: "34px", height: "9px", background: tag.color, border: "1.5px solid #111111", boxSizing: "border-box", zIndex: "2" }} />
-            <article style={{ boxSizing: "border-box", background: "#FFFFFF", border: "2px solid #111111", boxShadow: "8px 8px 0 #111111", padding: "10px", display: "flex", flexDirection: "column", gap: "12px" }}>
+            {a.featured && <FeaturedTape style={{ left: "-6px", top: "-10px" }} />}
+            <article style={{ boxSizing: "border-box", background: "#FFFFFF", border: "2px solid #111111", boxShadow: `8px 8px 0 ${a.featured ? "#F7C21A" : "#111111"}`, padding: "10px", display: "flex", flexDirection: "column", gap: "12px" }}>
               <Img src={a.cover} alt={a.alt} label={`${a.alt} — lead photo`} box={a.cover ? { height: "auto" } : { height: "240px" }} /> {/* a cover shows whole, at its own shape */}
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                 <span style={{ background: tag.color, color: tag.ink, fontFamily: "'Space Mono', monospace", fontWeight: "700", fontSize: "10px", letterSpacing: "1px", textTransform: "uppercase", padding: "3px 8px", borderRadius: "999px", lineHeight: "1.2" }}>{a.tag}</span>
@@ -112,15 +114,16 @@ export default function Article({ article: a, next }) {
           </div>
         </div>
         <div className="rise-in" style={{ position: "relative", margin: "28px 0 0 20px", width: "350px", display: "flex", border: "2px solid #111111", background: "#FFFFFF", fontFamily: "'Space Mono', monospace", fontSize: "10px", letterSpacing: "1px", textTransform: "uppercase" }}>
-          <div style={{ flexGrow: "1", padding: "10px", borderRight: "2px solid #111111" }}>{`By ${a.author || '[Author]'}`}</div>
-          <div style={{ padding: "10px", borderRight: "2px solid #111111" }}>{a.date || '[Date]'}</div>
+          {a.author !== null && <div style={{ flexGrow: "1", padding: "10px", borderRight: "2px solid #111111" }}>{`By ${a.author || '[Author]'}`}</div>}
+          <div style={{ flexGrow: a.author === null ? "1" : undefined, padding: "10px", borderRight: "2px solid #111111" }}>{a.date || '[Date]'}</div>
           <div style={{ padding: "10px", background: tag.color, color: tag.ink }}>{`${a.readTime || '[x]'} min`}</div>
         </div>
         {/* body: the blocks stack with 22px gaps; the page grows with them */}
         <div className="rise-in" style={{ position: "relative", margin: "39px 0 0 24px", width: "342px", minHeight: "2606px", display: "flex", flexDirection: "column", gap: "22px" }}>
           {a.body.map((b, i) => <Block key={i} b={b} first={i === firstText} a={a} tag={tag} />)}
           <div style={{ width: "16px", height: "16px", background: "#111111" }} />
-          {/* author */}
+          {/* author (none for pieces from Aquaterra itself) */}
+          {a.author !== null && (
           <div style={{ margin: "18px 0 0 -4px", width: "350px", boxSizing: "border-box", background: "#FFFFFF", border: "2px solid #111111", boxShadow: "6px 6px 0 #111111", padding: "14px", display: "flex", gap: "14px", alignItems: "center" }}>
             <div style={{ width: "72px", height: "72px", flexShrink: "0", borderRadius: "50%", border: "2px solid #111111", background: "#E3E8D8", overflow: "hidden" }}>
               {author && author.photo
@@ -135,6 +138,7 @@ export default function Article({ article: a, next }) {
               <div style={{ fontFamily: "'Archivo Black', Impact, sans-serif", fontSize: "20px", textTransform: "uppercase", lineHeight: "1" }}>{a.author || '[Name]'}</div>
             </div>
           </div>
+          )}
           {/* next on the line */}
           <div style={{ position: "relative", margin: "10px -24px 0", width: "390px", height: "470px" }}>
             <div style={{ position: "absolute", left: "20px", top: "0", fontFamily: "'Space Mono', monospace", fontSize: "11px", letterSpacing: "1.6px" }}>NEXT ON THE LINE</div>

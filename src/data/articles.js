@@ -5,7 +5,9 @@ import { LATEST } from './editions.js';
 //   tag:      one of the keys in TAGS (sets the colours)
 //   cover:    put the picture in public/articles/ and write its path, e.g. '/articles/wetlands.jpg'
 //   alt:      a few words describing the cover (also the placeholder label until there is one)
-//   author:   the writer's name (someone in src/data/team.js also gets their role under it)
+//   author:   the writer's name (someone in src/data/team.js also gets their role under it); null = no writer
+//             (no byline, no "words by" box), for pieces from Aquaterra itself
+//   featured: true = highlighted: a yellow star tape on its cards and a yellow shadow
 //   edition:  which edition it's in (src/data/editions.js); the home page shows the latest edition's
 //   date:     the edition's month, e.g. 'Sep 2026'
 //   readTime: minutes, e.g. '6'
@@ -26,6 +28,7 @@ export const TAGS = {
   Dispatch: { color: '#F7C21A', ink: '#111111' },
   Essay: { color: '#EE4E8A', ink: '#111111' },
   Prose: { color: '#1E7A4C', ink: '#FFFFFF' },
+  'Under Aquaterra': { color: '#F7C21A', ink: '#111111' },
 };
 
 // Placeholder body from the design, until an article is written.
@@ -46,6 +49,34 @@ const DRAFT = [
 
 // Every article, in every edition.
 export const ALL_ARTICLES = [
+  {
+    slug: 'under-aquaterra-aq-labs',
+    title: 'Under Aquaterra: AQ Labs',
+    dek: "AquaTerra's student build program",
+    tag: 'Under Aquaterra',
+    featured: true,
+    cover: '',
+    alt: 'AQ Labs',
+    author: null, // from Aquaterra itself: no byline
+    edition: 1,
+    date: 'Sep 2026',
+    readTime: '2',
+    body: [
+      "AQ Labs is AquaTerra's student build program, a space where teenagers pick a problem they actually care about and ship something real in a matter of weeks, not just a slide deck. It runs like a small, self-directed studio: teams choose their own idea, build it end to end, and put it in front of real users.",
+      { h2: 'Eight teams, eight projects' },
+      'Under this program, eight teams have shipped eight very different projects:',
+      'Karyaarth, a documentary series on the local vendors and workers most people walk past every day;',
+      "CareerCompass, a data-driven tool that maps India's skill gaps against student choices;",
+      'QUIRK, a hand-soldered pressure-sensing desktop game console;',
+      'wisdom woods, a gamified learning app for classes 3 to 7;',
+      'Cirqle Rentals, a WhatsApp-based community rental network;',
+      'hunar, a placement-first take on vocational trust and verification;',
+      'Photon, a screen-free light-sensing wearable;',
+      'and The Human Manual, a card-deck style app of teen psychology prompts.',
+      { quote: "Students don't need permission to build things that matter, they just need a room and six weeks.", by: 'AQ Labs' },
+      "Each project is a live, working build, and AQ Labs exists to prove that students don't need permission to build things that matter, they just need a room and six weeks.",
+    ],
+  },
   {
     slug: 'exam-stress',
     title: 'Exam stress: the academic plot twist nobody asked for',
