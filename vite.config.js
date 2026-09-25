@@ -33,11 +33,18 @@ const pages = () => ({
       html = setMeta(html, 'property', 'og:description', desc);
       html = setMeta(html, 'property', 'og:url', url);
       // link preview: its wide card from tools/make-og.mjs (public/og/<slug>.jpg, 1200x630); else the cover itself
-      // (?v=<content hash>: a changed picture gets a new address, so WhatsApp & co. don't keep showing the old one)
+      // (a changed picture gets a new file name, so WhatsApp & co. don't keep showing the old one)
       const ogFile = `public/og/${a.slug}.jpg`;
-      const og = fs.existsSync(ogFile) ? `/og/${a.slug}.jpg?v=${crypto.createHash('md5').update(fs.readFileSync(ogFile)).digest('hex').slice(0, 8)}` : a.cover;
+      let og = a.cover;
+      if (fs.existsSync(ogFile)) { // copied to a name with its content hash (no query string: some apps drop those)
+        const buf = fs.readFileSync(ogFile), name = `og/${a.slug}-${crypto.createHash('md5').update(buf).digest('hex').slice(0, 8)}.jpg`;
+        fs.mkdirSync(path.join(dir, 'og'), { recursive: true });
+        fs.writeFileSync(path.join(dir, name), buf);
+        og = `/${name}`;
+      }
       if (og) {
         html = setMeta(html, 'property', 'og:image', host + og);
+        html = setMeta(html, 'property', 'og:image:secure_url', host + og);
         html = setMeta(html, 'name', 'twitter:image', host + og);
         if (og === a.cover) { html = html.replace(/\s*<meta property="og:image:width"[^>]*>/, '').replace(/\s*<meta property="og:image:height"[^>]*>/, ''); } // its real size isn't 1200x630
         html = html.replace('<meta property="og:image:height"', `<meta property="og:image:alt" content="${esc(a.alt || a.title)}" />\n    <meta property="og:image:height"`);
