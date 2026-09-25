@@ -3,6 +3,7 @@ export const SITE = {
   // 2–3 lines under "Notes from where the land meets the water." on the home page (the phone card fits 3, no more)
   intro: 'TerraNotes is Aquaterra’s monthly magazine: stories, research, fashion, photos and art.',
   instagram: 'ngo.aquaterra', // handle without the @ (menu only; the footer links nowhere)
+  url: 'https://terranotes-aq.vercel.app', // this site's own address (link previews, sitemap); change it if the address changes
   website: 'https://ngoaquaterra.com', // Aquaterra's main site (web header and the phone menu)
   footerNote: 'Kolkata · est. 2021 · 1,300+ members', // second footer line
 };

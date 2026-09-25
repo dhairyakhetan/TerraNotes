@@ -6,8 +6,9 @@ import { ALL_ARTICLES as ARTICLES } from './src/data/articles.js'; // every edit
 import { SITE } from './src/data/site.js';
 import { articleHtml, pageHtml, withContent } from './build/static-html.js';
 
-// Link previews need absolute URLs. On Vercel this is the production domain; locally it stays relative.
-const host = process.env.SITE_URL || (process.env.VERCEL_PROJECT_PRODUCTION_URL && `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`) || '';
+// Link previews (WhatsApp, Instagram, iMessage…) need absolute URLs: the site's address from data/site.js
+// (SITE_URL in the environment overrides it).
+const host = (process.env.SITE_URL || SITE.url).replace(/\/$/, '');
 
 const esc = (t) => String(t).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 const setMeta = (html, attr, name, value) => html.replace(new RegExp(`(<meta ${attr}="${name}" content=")[^"]*(")`), `$1${esc(value)}$2`);
