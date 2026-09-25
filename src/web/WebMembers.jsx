@@ -144,7 +144,7 @@ export default function WebMembers() {
             ))}
             <div style={{ display: "flex", gap: "10px" }}>
               {teamsOf(sel).includes('writing') && <Link className="btn" to={byLink(sel.name)} onClick={(e) => { if (!articlesBy(sel.name).length) { e.preventDefault(); setEmpty(true); } else close(); }} style={{ minHeight: "44px", flexGrow: "1", display: "flex", alignItems: "center", justifyContent: "center", background: "#111111", color: "#FFFFFF", border: "2px solid #111111", fontFamily: "'Space Mono', monospace", fontWeight: "700", fontSize: "11px", letterSpacing: "1px", textDecoration: "none" }}>THEIR ARTICLES</Link>}
-              {sel.instagram && <a className="btn" href={instagramUrl(sel.instagram)} target="_blank" rel="noreferrer" style={{ minHeight: "44px", padding: "0 14px", display: "flex", alignItems: "center", background: "#FFFFFF", color: "#111111", border: "2px solid #111111", boxShadow: "3px 3px 0 #111111", fontFamily: "'Space Mono', monospace", fontWeight: "700", fontSize: "11px", letterSpacing: "1px", textDecoration: "none" }}>{`@${sel.instagram} ↗`}</a>}
+              {sel.instagram && <a className="btn" href={instagramUrl(sel.instagram)} target="_blank" rel="noreferrer" style={{ minHeight: "44px", padding: "0 14px", display: "flex", alignItems: "center", background: "#FFFFFF", color: "#111111", border: "2px solid #111111", boxShadow: "3px 3px 0 #111111", fontFamily: "'Space Mono', monospace", fontWeight: "700", fontSize: "11px", letterSpacing: "1px", textDecoration: "none" }}><span style={{ fontFamily: "'Figtree', system-ui, sans-serif", fontWeight: "700", fontSize: "13px", letterSpacing: "0", marginRight: "1px" }}>@</span>{`${sel.instagram} ↗`}</a>}
             </div>
           </div>
         </>
