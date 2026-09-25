@@ -6,6 +6,7 @@ import ArticleLine from './ArticleLine.jsx';
 import WebPhotoWall from './WebPhotoWall.jsx';
 import WebWords from './WebWords.jsx';
 import WebMembers, { WEB_MEMBERS_HEIGHT } from './WebMembers.jsx';
+import WebLabs, { WEB_LABS_HEIGHT } from './WebLabs.jsx';
 import WebPhotoViewer from './WebPhotoViewer.jsx';
 import { SITE } from '../data/site.js';
 
@@ -20,7 +21,7 @@ export default function WebHome() {
   return (
     <div className="web">
       {/* the root must stay overflow: clip (not hidden) for the sticky header to work */}
-      <div id="top" style={{ position: "relative", width: "1440px", height: `${2610 + WEB_MEMBERS_HEIGHT}px`, margin: "0 auto", overflow: "clip", background: "#F3EEE4", fontFamily: "'Figtree', system-ui, sans-serif", color: "#111111" }}>
+      <div id="top" style={{ position: "relative", width: "1440px", height: `${2610 + WEB_MEMBERS_HEIGHT + WEB_LABS_HEIGHT}px`, margin: "0 auto", overflow: "clip", background: "#F3EEE4", fontFamily: "'Figtree', system-ui, sans-serif", color: "#111111" }}>
         <WebHeader />
         {/* intro card; the red knot is where the "Articles" string is tied */}
         <section style={{ position: "absolute", left: "80px", top: "124px", width: "520px", transform: "rotate(-1deg)", zIndex: "3" }}>
@@ -45,6 +46,7 @@ export default function WebHome() {
         <WebPhotoWall onOpen={setPhoto} />
         <WebWords />
         <WebMembers />
+        <WebLabs top={2610 + WEB_MEMBERS_HEIGHT} />
       </div>
       {shownPhoto != null && <WebPhotoViewer start={shownPhoto} closing={photoLeaving} onClose={() => setPhoto(null)} />}
     </div>

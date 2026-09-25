@@ -7,6 +7,8 @@
 //   3. TilesView       : the phone home's "Tiles" view: big rounded tiles in a sideways row, double-tap to like
 //                        (the heart pops up where you tapped and drops into the like button; likes kept on the device).
 //   4. ViewSwitch      : the Hang / Line / Tiles switch that sat in the phone header to flip between the three views.
+//   5. NoArticlesYet   : the note that popped over a member's card when "their articles" was tapped but they had
+//                        nothing published. Now the button only shows for people who have articles.
 //
 // Their styles (the ones nothing else uses) are in ./archive.css, with notes.
 // ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────
@@ -352,5 +354,26 @@ export function ViewSwitch({ view, pick }) {
               <button key={v} onClick={() => pick(v)} aria-pressed={view === v ? 'true' : 'false'} style={{ minHeight: "30px", padding: "0 6px", border: "0", borderRadius: "999px", background: view === v ? '#111111' : 'transparent', color: view === v ? '#F3EEE4' : '#111111', fontFamily: "'Space Mono', monospace", fontWeight: "700", fontSize: "8px", letterSpacing: "0.5px", textTransform: "uppercase" }}>{label}</button>
             ))}
           </div>
+  );
+}
+
+
+// ═════ 5 ═════════════════════════════════════════════════════════════════════════════════════════════
+// 5. NoArticlesYet: was in src/lib/byWriter.jsx, shown by src/components/home/Members.jsx and src/web/WebMembers.jsx.
+// Shown over a writer's profile card when "Their articles" is tapped but nothing of theirs is up yet.
+export function NoArticlesYet({ name, leaving, onOk, onAll }) {
+  const first = name.split(' ')[0];
+  const btn = { minHeight: "44px", padding: "0 16px", display: "flex", alignItems: "center", justifyContent: "center", border: "2px solid #111111", fontFamily: "'Space Mono', monospace", fontWeight: "700", fontSize: "11px", letterSpacing: "1px", textTransform: "uppercase", textDecoration: "none", cursor: "pointer" };
+  return (
+    <div className={`no-cascade ${leaving ? 'fade-out' : 'fade-in'}`} style={{ position: "absolute", inset: "0", zIndex: "5", display: "flex", alignItems: "center", justifyContent: "center", padding: "18px", background: "rgba(243,238,228,.9)" }}>
+      <div className={leaving ? undefined : 'note-swing'} role="alertdialog" aria-label={`${first} has no articles yet`} style={{ width: "100%", boxSizing: "border-box", background: "#FFFFFF", border: "2px solid #111111", boxShadow: "6px 6px 0 #F7C21A", padding: "18px", transform: "rotate(-1.5deg)" }}>
+        <div style={{ fontFamily: "'Space Mono', monospace", fontSize: "10px", letterSpacing: "1.4px" }}>NOTHING ON THE LINE YET</div>
+        <div style={{ margin: "8px 0 14px", fontFamily: "'Caveat', cursive", fontSize: "24px", lineHeight: "1.1", color: "#5B3A1E" }}>{`${first} hasn't hung up any articles yet. check back soon!`}</div>
+        <div style={{ display: "flex", gap: "10px" }}>
+          <button className="press btn" onClick={onOk} autoFocus style={{ ...btn, background: "#111111", color: "#FFFFFF" }}>OK</button>
+          <Link className="press btn" to="/articles" onClick={onAll} style={{ ...btn, flexGrow: "1", background: "#FFFFFF", color: "#111111" }}>View all articles</Link>
+        </div>
+      </div>
+    </div>
   );
 }

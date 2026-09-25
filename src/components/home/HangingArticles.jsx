@@ -7,24 +7,39 @@ import { pad2 } from '../../lib/format.js';
 import { useFitTitle } from '../../lib/fit.js';
 import { ByTape, useByWriter } from '../../lib/byWriter.jsx';
 
-// How much taller this view is than the others (Home moves the sections below down by this much).
-export const HANG_EXTRA = 270;
+// Articles past the sixth hang in pairs below the wide card, a row each.
+const MORE_ROWS = Math.ceil(Math.max(0, ARTICLES.length - 6) / 2), ROW = 300;
+// How much taller than the page was drawn for (Home moves the sections below down by this much).
+export const HANG_EXTRA = 270 + MORE_ROWS * ROW;
 
 // All six articles hanging on strings from the intro card, in two columns with a wide card at the bottom:
 //   left:  "Articles" label → 02 → 04        right: 01 (string from above the screen) → 03 → 05
-//   06: the wide card, hanging from both 04 and 05.
+//   06: the wide card, hanging from both 04 and 05. 07 onwards: in pairs below it.
 // A card nested inside another card's box hangs from it and moves with it.
 // .sway = swing on the string (--a angle, --d duration); .flutter = wobble around the clip (--r = resting tilt).
 // With ?by=<writer> (their "Their articles" button) that writer's pieces come first, taped.
 export default function HangingArticles() {
   const { by, isMine, list } = useByWriter();
-  const [a1, a2, a3, a4, a5, a6] = list;
+  const [a1, a2, a3, a4, a5, a6, ...more] = list;
   const mark = (a) => (a && isMine(a) ? by : undefined);
   const a5w = a6; // the wide card
   const tag5 = a5w && TAGS[a5w.tag];
   const fit5 = useFitTitle(a5w?.title, 22, 15); // a long title shrinks to fit the wide card
   return (
     <>
+      {/* 07 onwards: pairs below the wide card, each on its own string tucked behind the card above */}
+      {more.map((a, i) => {
+        const row = Math.floor(i / 2), alone = i % 2 === 0 && i === more.length - 1;
+        const left = alone ? 112 : i % 2 ? 208 : 30, r = ['-1.2deg', '1.4deg'][i % 2];
+        return (
+          <div key={a.slug} className="hang sway" style={{ position: "absolute", left: `${left}px`, top: `${1376 + row * ROW}px`, width: "166px", height: "334px", "--a": "0.9deg", "--d": i % 2 ? "6.1s" : "5.5s", animationDelay: `${-0.8 - i}s` }}>
+            <div className="string" style={{ position: "absolute", left: "82.3px", top: "0", width: "1.4px", height: "96px", background: "#5B3A1E" }} />
+            <div className="flutter" style={{ position: "absolute", left: "0", top: "94px", width: "166px", height: "240px", "--r": r, transform: `rotate(${r})`, animationDelay: `${-1.5 - i}s` }}>
+              <ArticleCard article={a} mark={mark(a)} className="card" style={{ position: "absolute", left: "0", top: "0", width: "166px", height: "240px" }} imgH="92px" titleSize="15px" dekSize="15px" />
+            </div>
+          </div>
+        );
+      })}
       {/* wide card (06): hangs from both card 04 and card 05; painted first so its strings tuck behind them */}
       <div className="hang sway" style={{ position: "absolute", left: "28px", top: "1052px", width: "334px", height: "344px", "--a": "0.35deg", "--d": "6.4s", animationDelay: "-2.6s" }}>
         <div className="string" style={{ position: "absolute", left: "121.3px", top: "0", width: "1.4px", height: "150px", background: "#5B3A1E" }} />

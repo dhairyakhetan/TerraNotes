@@ -2,7 +2,7 @@ import { useState, useRef, useEffect, useLayoutEffect } from 'react';
 import { usePauseOffscreen } from '../../lib/offscreen.js';
 import { Link } from 'react-router';
 import { MEMBERS, TEAMS, teamsOf } from '../../data/team.js';
-import { NoArticlesYet, articlesBy, byLink } from '../../lib/byWriter.jsx';
+import { articlesBy, byLink } from '../../lib/byWriter.jsx';
 import { usePresence } from '../../lib/presence.js';
 import { profileTop, teamLinks, useFaceColors } from '../../lib/team.js';
 import { instagramUrl } from '../../lib/format.js';
@@ -80,8 +80,6 @@ export default function Members() {
   const [team, setTeam] = useState(null);
   const { colorFor, fade } = useFaceColors(team); // people in two teams switch colours     // legend filter, null = everyone
   const [open, setOpen] = useState(null);     // index of the member whose profile is open
-  const [empty, setEmpty] = useState(false); // "their articles" tapped for a writer with none yet
-  useEffect(() => setEmpty(false), [open]);
   const card = useRef(null);
   // a profile card opening off-screen scrolls itself into view
   // the card opens on screen, as central as it can be while level with the face (measured before it's painted)
@@ -92,7 +90,6 @@ export default function Members() {
   }, [open]);
   const count = NUMBER_WORDS[MEMBERS.length] || String(MEMBERS.length);
   const [shown, leaving] = usePresence(open, 170);     // stays on screen while it animates closed
-  const [emptyShown, emptyLeaving] = usePresence(empty ? true : null, 140);
   const sel = shown != null ? MEMBERS[shown] : null;
   const selColor = sel ? colorFor(sel) : "#111111";
   const close = () => setOpen(null);
@@ -156,7 +153,6 @@ export default function Members() {
           <button className={leaving ? 'fade-out' : 'fade-in'} onClick={close} aria-label="Close profile" style={{ position: "absolute", left: "0", top: "0", width: "390px", height: `${MEMBERS_HEIGHT}px`, border: "0", padding: "0", background: "rgba(17,17,17,.55)" }} />
           <div ref={card} className={leaving ? 'card-lift' : 'card-drop'} role="dialog" aria-label="Member profile" style={{ position: "absolute", left: "28px", top: `${cardAt ?? Math.max(120, Math.min(SPOTS[shown].top - 60, MEMBERS_HEIGHT - 540))}px`, width: "334px", boxSizing: "border-box", background: "#FFFFFF", border: "2px solid #111111", boxShadow: `8px 8px 0 ${selColor}`, padding: "18px", display: "flex", flexDirection: "column", gap: "12px", transform: "rotate(-1deg)" }}>
             {sel.badge && <Badge b={sel.badge} />}
-            {emptyShown && <NoArticlesYet name={sel.name} leaving={emptyLeaving} onOk={() => setEmpty(false)} onAll={close} />}
             <div style={{ position: "absolute", left: "50%", top: "-7px", marginLeft: "-17px", width: "34px", height: "10px", background: selColor, border: "1.5px solid #111111", boxSizing: "border-box" }} />
             <button className="press" onClick={close} aria-label="Close profile" style={{ "--c": "#111111", position: "absolute", right: "10px", top: "10px", width: "44px", height: "44px", background: "#FFFFFF", border: "2px solid #111111", boxShadow: "3px 3px 0 #111111", padding: "0", display: "flex", alignItems: "center", justifyContent: "center" }}>
               <svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="#111111" strokeWidth="2.6" strokeLinecap="square">
@@ -173,12 +169,12 @@ export default function Members() {
             <div style={{ fontFamily: "'Archivo Black', Impact, sans-serif", fontSize: "30px", lineHeight: "0.95", textTransform: "uppercase", color: "#111111" }}>{sel.name}</div>
             <div style={{ fontFamily: "'Caveat', cursive", fontSize: "20px", lineHeight: "1.1", color: "#5B3A1E" }}>{sel.role}</div>
             <p style={{ margin: "0", fontSize: "14px", lineHeight: "1.5", color: "#333333" }}>{sel.bio || '[Two lines about them: where they work from, what they write or shoot, what they care about.]'}</p>
-            {/* what their team made; only writers have articles */}
+            {/* what their team made; "their articles" only for people with something published */}
             {teamsOf(sel).map((t) => (
               <p key={t} style={{ margin: "0", paddingLeft: "10px", borderLeft: `3px solid ${TEAMS[t].color}`, fontSize: "13px", lineHeight: "1.45", color: "#1E2723" }}><strong style={{ fontWeight: "600" }}>{TEAMS[t].label}</strong>{` — ${(sel.credit || TEAMS[t].credit)[0].toLowerCase()}${(sel.credit || TEAMS[t].credit).slice(1)}.`}</p>
             ))}
             <div style={{ display: "flex", gap: "10px" }}>
-              {teamsOf(sel).includes('writing') && <Link to={byLink(sel.name)} onClick={(e) => { if (!articlesBy(sel.name).length) { e.preventDefault(); setEmpty(true); } }} style={{ minHeight: "44px", flexGrow: "1", display: "flex", alignItems: "center", justifyContent: "center", background: "#111111", color: "#FFFFFF", border: "2px solid #111111", fontFamily: "'Space Mono', monospace", fontWeight: "700", fontSize: "11px", letterSpacing: "1px", textDecoration: "none" }}>THEIR ARTICLES</Link>}
+              {articlesBy(sel.name).length > 0 && <Link to={byLink(sel.name)} style={{ minHeight: "44px", flexGrow: "1", display: "flex", alignItems: "center", justifyContent: "center", background: "#111111", color: "#FFFFFF", border: "2px solid #111111", fontFamily: "'Space Mono', monospace", fontWeight: "700", fontSize: "11px", letterSpacing: "1px", textDecoration: "none" }}>THEIR ARTICLES</Link>}
               {sel.instagram && <a href={instagramUrl(sel.instagram)} target="_blank" rel="noreferrer" style={{ minHeight: "44px", padding: "0 14px", display: "flex", alignItems: "center", background: "#FFFFFF", color: "#111111", border: "2px solid #111111", boxShadow: "3px 3px 0 #111111", fontFamily: "'Space Mono', monospace", fontWeight: "700", fontSize: "11px", letterSpacing: "1px", textDecoration: "none" }}><span style={{ fontFamily: "'Figtree', system-ui, sans-serif", fontWeight: "700", fontSize: "13px", letterSpacing: "0", marginRight: "1px" }}>@</span>{`${sel.instagram} ↗`}</a>}
             </div>
           </div>

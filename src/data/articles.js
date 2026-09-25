@@ -203,6 +203,22 @@ export const ALL_ARTICLES = [
       "But somewhere between then and now, she learned that being understood is different from being known, that peace is different from silence, and that growing up isn't becoming someone new.",
     ],
   },
+  {
+    slug: 'septembers-ai-revolution',
+    title: 'September’s AI Revolution',
+    dek: '',
+    tag: 'Reportage',
+    cover: '', // cover coming soon
+    alt: 'September’s AI news',
+    author: 'Bhavishya Agarwal',
+    edition: 1,
+    date: 'Sep 2026',
+    readTime: '2',
+    body: [
+      'The month of September has witnessed significant advancements in the field of Artificial Intelligence The month started off with Anthropic releasing Claude Fable 5.1 based on the Mythos AI architecture, immediately followed by Open AI’s Chat GPT-6 “Astra” and Sam Altman marking the new era of AI called the “AGI” era, both these models are the most revolutionary models known to mankind. The benchmarks show that GPT-Astra has proven to be the best model commercially available in the market, but has also attracted a lot of backlash from its users as they report that the Agent is prone to going rogue and hiding its actions.',
+      'In recent times,. Local AI has been a growing trend, people and enterprises have adopted local AI to cut down on costs and avoid safety of their crucial information. Deepseek has rolled out its v4.1-Flash a model with more than 550 Billion parameters that reduces agent memory overhead fourfold. Chinese lab Z.ai released GLM 5.3-Flash, a 320-billion-parameter multimodal model. The weights were made available for local research, optimized to run efficiently on local hardware clusters and home-grown silicon. Lastly semiconductor giant Nvidia acquired a platform called “Huggingface” for approximately $12.93Billion, Operating the world\'s primary repository for open-source AI models and datasets required immense compute infrastructure and financial backing, acquiring Huggingface is a massive business advantage for Nvidia as they excel in producing server grade Graphics Processing Units which allows them to have a direct control over the developer’s entry to the open source AI market, allowing Nvidia to integrate its runtime software and GPU optimisations and potential cloud services directly to the largest AI distribution platform',
+    ],
+  },
 ];
 
 // The latest edition's articles: what the home page, All articles and the line show.

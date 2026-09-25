@@ -3,7 +3,7 @@ import { usePauseOffscreen } from '../lib/offscreen.js';
 import { Link } from 'react-router';
 import { Chair, NUMBER_WORDS, PhotoIcon } from '../components/home/Members.jsx';
 import { MEMBERS, TEAMS, teamsOf } from '../data/team.js';
-import { NoArticlesYet, articlesBy, byLink } from '../lib/byWriter.jsx';
+import { articlesBy, byLink } from '../lib/byWriter.jsx';
 import { usePresence } from '../lib/presence.js';
 import { profileTop, teamLinks, useFaceColors } from '../lib/team.js';
 import { instagramUrl } from '../lib/format.js';
@@ -57,8 +57,6 @@ export default function WebMembers() {
   const [team, setTeam] = useState(null);
   const { colorFor, fade } = useFaceColors(team); // people in two teams switch colours
   const [open, setOpen] = useState(null);
-  const [empty, setEmpty] = useState(false); // "their articles" tapped for a writer with none yet
-  useEffect(() => setEmpty(false), [open]);
   const card = useRef(null);
   // the card opens on screen beside the face: on the side nearer the middle (if it fits), and as central up and down
   // as it can be while level with the face (measured before it's painted)
@@ -73,7 +71,6 @@ export default function WebMembers() {
   }, [open]);
   const count = NUMBER_WORDS[MEMBERS.length] || String(MEMBERS.length);
   const [shown, leaving] = usePresence(open, 170);     // stays on screen while it animates closed
-  const [emptyShown, emptyLeaving] = usePresence(empty ? true : null, 140);
   const sel = shown != null ? MEMBERS[shown] : null;
   const color = sel ? colorFor(sel) : '#111111';
   const spot = sel ? SPOTS[shown] : null;
@@ -137,7 +134,6 @@ export default function WebMembers() {
           <button className={leaving ? 'fade-out' : 'fade-in'} onClick={close} aria-label="Close profile" style={{ position: "absolute", left: "0", top: "0", width: "1440px", height: `${WEB_MEMBERS_HEIGHT}px`, border: "0", padding: "0", background: "rgba(17,17,17,.35)", cursor: "default" }} />
           <div className={leaving ? 'card-lift' : 'card-drop'} ref={card} role="dialog" aria-label={`${sel.name} — profile`} style={{ position: "absolute", left: `${cardAt ? cardAt.left : spot.cx < 1000 ? Math.round(spot.cx + r + 28) : Math.round(spot.cx - r - 28 - 360)}px`, top: `${cardAt ? cardAt.top : Math.max(20, Math.min(Math.round(spot.cy - 150), WEB_MEMBERS_HEIGHT - 530))}px`, width: "360px", boxSizing: "border-box", background: "#FFFFFF", border: "2px solid #111111", boxShadow: `9px 9px 0 ${color}`, padding: "22px", display: "flex", flexDirection: "column", gap: "12px", transform: "rotate(-1deg)" }}>
             {sel.badge && <Badge b={sel.badge} />}
-            {emptyShown && <NoArticlesYet name={sel.name} leaving={emptyLeaving} onOk={() => setEmpty(false)} onAll={close} />}
             <div style={{ position: "absolute", left: "50%", top: "-8px", marginLeft: "-18px", width: "36px", height: "11px", background: color, border: "1.5px solid #111111", boxSizing: "border-box" }} />
             <button className="btn" onClick={close} aria-label="Close profile" style={{ position: "absolute", right: "12px", top: "12px", width: "44px", height: "44px", background: "#FFFFFF", border: "2px solid #111111", boxShadow: "3px 3px 0 #111111", padding: "0", display: "flex", alignItems: "center", justifyContent: "center" }}>
               <svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="#111111" strokeWidth="2.6" strokeLinecap="square"><path d="M3 3 L17 17" /><path d="M17 3 L3 17" /></svg>
@@ -151,12 +147,12 @@ export default function WebMembers() {
             <div style={{ fontFamily: "'Archivo Black', Impact, sans-serif", fontSize: "34px", lineHeight: "0.95", textTransform: "uppercase", color: "#111111" }}>{sel.name}</div>
             <div style={{ fontFamily: "'Caveat', cursive", fontSize: "23px", lineHeight: "1.1", color: "#5B3A1E" }}>{sel.role}</div>
             <p style={{ margin: "0", fontSize: "15px", lineHeight: "1.5", color: "#333333" }}>{sel.bio || '[Two lines about them: where they work from, what they write or shoot, what they care about.]'}</p>
-            {/* what their team made; only writers have articles */}
+            {/* what their team made; "their articles" only for people with something published */}
             {teamsOf(sel).map((t) => (
               <p key={t} style={{ margin: "0", paddingLeft: "10px", borderLeft: `3px solid ${TEAMS[t].color}`, fontSize: "14px", lineHeight: "1.45", color: "#1E2723" }}><strong style={{ fontWeight: "600" }}>{TEAMS[t].label}</strong>{` — ${(sel.credit || TEAMS[t].credit)[0].toLowerCase()}${(sel.credit || TEAMS[t].credit).slice(1)}.`}</p>
             ))}
             <div style={{ display: "flex", gap: "10px" }}>
-              {teamsOf(sel).includes('writing') && <Link className="btn" to={byLink(sel.name)} onClick={(e) => { if (!articlesBy(sel.name).length) { e.preventDefault(); setEmpty(true); } else close(); }} style={{ minHeight: "44px", flexGrow: "1", display: "flex", alignItems: "center", justifyContent: "center", background: "#111111", color: "#FFFFFF", border: "2px solid #111111", fontFamily: "'Space Mono', monospace", fontWeight: "700", fontSize: "11px", letterSpacing: "1px", textDecoration: "none" }}>THEIR ARTICLES</Link>}
+              {articlesBy(sel.name).length > 0 && <Link className="btn" to={byLink(sel.name)} onClick={close} style={{ minHeight: "44px", flexGrow: "1", display: "flex", alignItems: "center", justifyContent: "center", background: "#111111", color: "#FFFFFF", border: "2px solid #111111", fontFamily: "'Space Mono', monospace", fontWeight: "700", fontSize: "11px", letterSpacing: "1px", textDecoration: "none" }}>THEIR ARTICLES</Link>}
               {sel.instagram && <a className="btn" href={instagramUrl(sel.instagram)} target="_blank" rel="noreferrer" style={{ minHeight: "44px", padding: "0 14px", display: "flex", alignItems: "center", background: "#FFFFFF", color: "#111111", border: "2px solid #111111", boxShadow: "3px 3px 0 #111111", fontFamily: "'Space Mono', monospace", fontWeight: "700", fontSize: "11px", letterSpacing: "1px", textDecoration: "none" }}><span style={{ fontFamily: "'Figtree', system-ui, sans-serif", fontWeight: "700", fontSize: "13px", letterSpacing: "0", marginRight: "1px" }}>@</span>{`${sel.instagram} ↗`}</a>}
             </div>
           </div>
