@@ -23,7 +23,7 @@ export const MEMBERS = [
   { name: 'Aarav Agarwal', role: 'Head of department', team: 'heads', photo: '/team/aarav.webp', bio: 'Hey, I’m Aarav! I’m in Class 11, studying commerce, and I’m into economics, geopolitics, and just exploring new stuff. Pretty chill otherwise :)', instagram: 'aaravagarwal2010' },
   { name: 'Sara Abedin', role: 'Writing team', team: 'writing', photo: '/team/sara.webp', bio: 'I love turning little thoughts and feelings into poetry especially when it turns into something other people can enjoy!', instagram: 'saraabe1in' },
   { name: 'Anushka Paul', role: 'Design team', team: 'design', photo: '', bio: '', instagram: '' },
-  { name: 'Dhairya Khetan', role: 'Tech team', team: 'tech', photo: '/team/dhairya.webp', bio: 'One man army', instagram: 'dhairyakhetan', credit: 'Made this entire website alone', crown: true },
+  { name: 'Dhairya Khetan', role: 'Tech team', team: 'tech', photo: '/team/dhairya.webp', bio: 'One man army', instagram: 'dhairyakhetan', credit: 'Made this entire website alone', crown: true, badge: { img: '/team/barca.webp', text: 'born culer' } },
   { name: 'Pahal Sethi', role: 'Writing team', team: 'writing', photo: '/team/pahal.webp', bio: 'Writing, Creating, and Romanticising the little things. Mentally somewhere in New York.', instagram: 'pahalsethi' },
   { name: 'Anoushka Chandak', role: 'Design & writing team', team: ['design', 'writing'], photo: '/team/anoushka.webp', bio: 'i love yapping 😌', instagram: 'anoushka.aaaaa' },
   { name: 'Hiya Khara', role: 'Head of department', team: 'heads', photo: '/team/hiya.webp', bio: 'I live on Starbucks ;)', instagram: 'hiyakhara' },
