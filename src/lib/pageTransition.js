@@ -4,10 +4,9 @@ import { webZoom } from './layout.js';
 import { rememberBox } from './fly.js';
 
 // Page-to-page motion. Every navigation (links, navigate(), the browser's Back/Forward) goes through this history,
-// which wraps the page swap in a view transition: the old page is snapshotted, the new one rendered, and the CSS in
-// styles/motion.css (::view-transition-*) animates between them. The header stays put (it's its own layer), and on
-// the way back to the home page the article's card flies from where the cover was back into its slot: the same
-// transform-only move as the way in (lib/fly.js), so it stays smooth on phones.
+// which animates the page swap: when a card is involved, the card itself flies (into an article the cover flies out of
+// the tapped card, lib/fly.js; back home the card flies from where the cover was into its slot) and the pages swap at
+// once; otherwise a short view-transition crossfade (styles/motion.css, ::view-transition-*), header held still.
 // Browsers without view transitions (or with reduced motion) just swap pages as before.
 
 const HOME = /^\/(articles|photos|words|members)?\/?$/; // the home page, under any of its section addresses
@@ -38,7 +37,6 @@ const flyBack = (card, from) => {
   ], { duration: 620 });
   an.onfinish = an.oncancel = () => { card.style.transformOrigin = was.origin; card.style.zIndex = was.z; };
 };
-const settle = (ms) => new Promise((ok) => setTimeout(ok, ms));
 
 let seq = 0;
 function swap(from, to, update, backwards = false) {
@@ -54,17 +52,21 @@ function swap(from, to, update, backwards = false) {
   const slug = kind === 'back' && slugOf(from);
   const cover = slug && document.querySelector('.hero-drop img')?.getBoundingClientRect();
   // opening an article from its card: note the card's box so the article's cover can fly out of it
-  const into = (kind === 'into' || kind === 'next') && document.querySelector(`a[href="/articles/${slugOf(to)}"]`);
-  if (into) { const r = into.getBoundingClientRect(); if (r.width && r.bottom > 0 && r.top < innerHeight) rememberBox(r); }
-  root.dataset.nav = kind;
-  const t = document.startViewTransition(async () => {
-    flushSync(update);
+  const link = (kind === 'into' || kind === 'next') && document.querySelector(`a[href="/articles/${slugOf(to)}"]`);
+  const box = link && link.getBoundingClientRect();
+  const flies = !!(box && box.width && box.bottom > 0 && box.top < innerHeight);
+  if (flies) rememberBox(box);
+  // When a card flies (into an article, or back onto home), that flight IS the transition: swap the pages at once
+  // and let it play. Crossfading as well played it twice (Safari snapshots the new page before the flight starts,
+  // so the finished page faded in and then the cover jumped back to the card and flew again).
+  if (flies || cover) {
+    flushSync(update); // rendered right now, so the card can be found and measured
     const card = cover && document.querySelector(`a[href="/articles/${slug}"]`);
-    if (!card) return;
-    const img = card.querySelector('img');
-    if (img && !img.complete) await Promise.race([img.decode().catch(() => {}), settle(250)]); // no blank card mid-flight
-    flyBack(card, cover);
-  });
+    if (card) flyBack(card, cover);
+    return;
+  }
+  root.dataset.nav = kind;
+  const t = document.startViewTransition(() => { flushSync(update); });
   t.finished.finally(() => { if (id === seq) delete root.dataset.nav; });
 }
 
