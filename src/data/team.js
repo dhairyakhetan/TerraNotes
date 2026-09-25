@@ -7,6 +7,7 @@
 //   instagram: handle without the @
 //   credit:    (optional) their own line in place of the team's "what we made" line on their profile
 //   crown:     (optional) true = a little crown on their photo in the profile pop-up
+//   badge:     (optional) { img, text }: a small picture and a line beside their photo in the pop-up
 // Leave a field '' and the design's placeholder shows instead.
 
 // label: the legend and profile tag. made: what the team made; credit: the same as a sentence, shown on its members' profiles (writers also get "their articles").
@@ -28,7 +29,7 @@ export const MEMBERS = [
   { name: 'Hiya Khara', role: 'Head of department', team: 'heads', photo: '/team/hiya.webp', bio: 'I live on Starbucks ;)', instagram: 'hiyakhara' },
   { name: 'Ahel Sarkar', role: 'Writing team', team: 'writing', photo: '/team/ahel.webp', bio: 'Find me a new fandom to get into, and I will bring to you a thesis on it. Also some poems and stuff.', instagram: 'ahelsarkar' },
   { name: 'Syeda Tashirun Nabi', role: 'Design team', team: 'design', photo: '/team/syeda.webp', bio: 'Fueled by Diet Coke and questionable layout choices', instagram: 'tashirun.hq' },
-  { name: 'Priyam Agarwal', role: 'Tech team', team: 'tech', photo: '/team/priyam.webp', bio: 'Hey, I’m Priyam! I’m into tech, maths, and quant finance, and I like messing around with new ideas and building random stuff. Mostly just curious and figuring things out as I go :)', instagram: 'priyamagarwal3' },
+  { name: 'Priyam Agarwal', role: 'Tech team', team: 'tech', photo: '/team/priyam.webp', bio: 'Hey, I’m Priyam! I’m into tech, maths, and quant finance, and I like messing around with new ideas and building random stuff. Mostly just curious and figuring things out as I go :)', instagram: 'priyamagarwal3', badge: { img: '/team/barca.webp', text: 'born culer' } },
   { name: 'Dhriti Agarwal', role: 'Writing team', team: 'writing', photo: '/team/dhriti.webp', bio: "I'm a student of class 11 flowing through life and accounts!!", instagram: 'wtf__dhriti' },
   { name: 'Divya Rathi', role: 'Design & writing team', team: ['design', 'writing'], photo: '/team/divya.webp', bio: 'probably drinking coffee or already five cups in.', instagram: '' },
   { name: 'Ashwika Tripathi', role: 'Head of department', team: ['heads', 'writing'], steady: true, photo: '/team/ashwika.webp', bio: 'Just here to make things happen.', instagram: 'theashwika' },
