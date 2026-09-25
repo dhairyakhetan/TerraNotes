@@ -14,11 +14,11 @@ export default function Extra({ b, tag, web }) {
   const z = web ? 1.25 : 1, px = (n) => `${Math.round(n * z)}px`;
   if (b.projects) {
     return (
-      <ol style={{ listStyle: "none", margin: web ? "4px 0" : "2px 0", padding: "0", display: "flex", flexDirection: "column", gap: px(10) }}>
+      <ol style={{ listStyle: "none", margin: web ? "4px 0" : "2px 0", padding: "0", display: web ? "grid" : "flex", gridTemplateColumns: "minmax(0, 1fr) minmax(0, 1fr)", flexDirection: "column", gap: px(10) }}>
         {b.projects.map((p, i) => (
           <li key={p.name} style={{ boxSizing: "border-box", background: p.color, color: p.ink, borderRadius: px(18), padding: `${px(14)} ${px(18)} ${px(15)}`, display: "flex", alignItems: "flex-start", gap: px(12) }}>
             <div style={{ flexGrow: "1", minWidth: "0" }}>
-              <div style={{ ...HEAD, fontSize: px(22), letterSpacing: "-0.6px" }}>{p.name}</div>
+              <div style={{ ...HEAD, fontSize: web ? "24px" : px(22), letterSpacing: "-0.6px" }}>{p.name}</div>
               <div style={{ fontFamily: "'Space Mono', monospace", fontWeight: "700", fontSize: px(10.5), lineHeight: "1.4", marginTop: px(5) }}>{p.meta}</div>
               <div style={{ fontSize: px(13.5), lineHeight: "1.4", marginTop: px(7), opacity: ".9" }}>{p.what}</div>
             </div>
@@ -78,7 +78,7 @@ export default function Extra({ b, tag, web }) {
     return (
       <aside style={{ boxSizing: "border-box", margin: web ? "8px -40px" : "4px 0", transform: "rotate(0.8deg)", background: "#FFFFFF", border: "2px solid #111111", boxShadow: "7px 7px 0 #111111" }}>
         <div style={{ ...HEAD, fontSize: px(18), padding: `${px(14)} ${px(12)} ${px(10)}` }}>{b.title}</div>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "minmax(0, 1fr) minmax(0, 1fr)" }}>
           <div style={{ ...cell, ...MONO, fontSize: px(10), background: tag.color, color: tag.ink, borderRight: "1.5px solid #111111" }}>{left}</div>
           <div style={{ ...cell, ...MONO, fontSize: px(10), background: "#111111", color: "#F3EEE4" }}>{right}</div>
           {b.then.map(([a, c], i) => [
