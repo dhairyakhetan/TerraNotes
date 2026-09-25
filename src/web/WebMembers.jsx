@@ -30,11 +30,14 @@ const LINKS = teamLinks(SPOTS, 24);
 const photoFill = { width: "100%", height: "100%", objectFit: "cover", display: "block" };
 
 // "Meet the team", web layout: click a team to fade the others, click a face for a profile card beside it.
+// the badge pictures, fetched and decoded ahead of time so they're there the moment a card opens
+const kept = []; // held on to, so the browser keeps them ready
+const preloadBadges = () => { if (kept.length) return; MEMBERS.filter((m) => m.badge).forEach((m) => { const i = new Image(); i.src = m.badge.img; i.decode?.().catch(() => {}); kept.push(i); }); };
 // a little extra on one card (badge in data/team.js): a small picture in the card's corner; its line shows on hover (or tap)
 const Badge = ({ b }) => (
   <button type="button" className="card-badge" aria-label={b.text}>
     <span>{b.text}</span>
-    <img src={b.img} alt="" width="24" height="24" />
+    <img src={b.img} alt="" width="24" height="24" decoding="sync" />
   </button>
 );
 
@@ -48,6 +51,7 @@ const Crown = () => (
 );
 
 export default function WebMembers() {
+  useEffect(() => { preloadBadges(); }, []);
   const self = useRef(null);
   usePauseOffscreen(self);
   const [team, setTeam] = useState(null);
