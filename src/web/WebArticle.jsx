@@ -28,9 +28,9 @@ export default function WebArticle({ article: a, next }) {
   return (
     <div className="web">
       <div style={{ position: "relative", width: "1440px", margin: "0 auto", overflow: "clip", background: "#F3EEE4", fontFamily: FONT.body, color: "#111111" }}>
-        <WebHeader />
-        <div style={{ position: "absolute", left: "0", top: "114px", width: "1440px", height: "2px", background: "#5B3A1E" }} />
-        <div ref={hero} className="hero-drop" style={{ position: "absolute", left: "80px", top: "154px", width: a.cover ? "fit-content" : "620px", transformOrigin: "50% -38px" }}>
+        <WebHeader wire />
+        <div style={{ position: "absolute", left: "0", top: "78px", width: "1440px", height: "2px", background: "#5B3A1E" }} />
+        <div ref={hero} className="hero-drop" style={{ position: "absolute", left: "80px", top: "118px", width: a.cover ? "fit-content" : "620px", transformOrigin: "50% -38px" }}>
           <div className="hero-sway" style={{ transformOrigin: "50% -38px", transform: "rotate(-1deg)" }}>
             <div style={{ position: "absolute", left: "50%", marginLeft: "-0.7px", top: "-38px", width: "1.4px", height: "40px", background: "#5B3A1E" }} />
             <Clip color={tag.color} w={40} h={10} top="-8px" />
@@ -40,7 +40,7 @@ export default function WebArticle({ article: a, next }) {
             </div>
           </div>
         </div>
-        <div className="rise-in" style={{ position: "relative", margin: "84px 0 0 780px", width: "580px", minHeight: "560px", display: "flex", flexDirection: "column", gap: "22px" }}>
+        <div className="rise-in" style={{ position: "relative", margin: "48px 0 0 780px", width: "580px", minHeight: "560px", display: "flex", flexDirection: "column", gap: "22px" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
             <TagPill a={a} size="12px" pad="3px 9px" lh="1.3" />
             <span style={{ fontFamily: FONT.mono, fontSize: "13px", letterSpacing: "1px" }}>{`${pad2(i + 1)} / ${pad2(n)}`}</span>
