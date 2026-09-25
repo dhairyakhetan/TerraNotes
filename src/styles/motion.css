@@ -64,14 +64,7 @@
 @keyframes wrongShake{20%{translate:-6px 0}40%{translate:5px 0}60%{translate:-3px 0}80%{translate:2px 0}}
 
 /* buttons that switch state fade between their colours */
-.legend-chip,.view-switch button{transition:background-color .18s ease,color .18s ease,border-color .18s ease}
-
-/* the phone's articles view switch: the new view fades up */
-.view-in{animation:cascade 320ms var(--settle) backwards}
-
-/* tiles: like / bookmark icons pop */
-.icon-pop{animation:iconPop 380ms var(--spring)}
-@keyframes iconPop{0%{scale:.6}50%{scale:1.25}100%{scale:1}}
+.legend-chip{transition:background-color .18s ease,color .18s ease,border-color .18s ease}
 
 /* a writer's articles (/articles?by=…): the filter bar slides in, the "by …" tapes slap on */
 .slide-in{animation:slideIn 360ms var(--settle) backwards}
@@ -86,8 +79,8 @@
 
 @media (prefers-reduced-motion: reduce){
 .fade-in,.fade-out,.card-drop,.card-drop > *,.card-lift,.note-swing,.viewer-in,.viewer-in .viewer-stage,.viewer-in .viewer-bits,.viewer-out,.viewer-out .viewer-stage,
-.menu-sheet.is-open .menu-card,.menu-sheet.is-open .here-note,.word-pop,.w-in > *,.w-right,.w-wrong,.w-reveal,.view-in,.icon-pop,.slide-in,.tape-slap,.cascade-in > *{animation:none !important}
-.legend-chip,.view-switch button{transition:none}
+.menu-sheet.is-open .menu-card,.menu-sheet.is-open .here-note,.word-pop,.w-in > *,.w-right,.w-wrong,.w-reveal,.slide-in,.tape-slap,.cascade-in > *{animation:none !important}
+.legend-chip{transition:none}
 }
 
 /* Page to page (lib/pageTransition.js sets html[data-nav] to into / next / back / page for the swap).

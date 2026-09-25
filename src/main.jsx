@@ -8,7 +8,6 @@ import { introWanted } from './lib/intro.js';
 import { sayHello } from './lib/hello.js';
 import './styles/global.css';
 import './styles/home.css';
-import './styles/articles.css';
 import './styles/article.css';
 import './styles/footer.css';
 import './web/web.css';

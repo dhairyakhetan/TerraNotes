@@ -16,7 +16,7 @@ import Games from './components/buddy/Games.jsx';
 import './styles/buddy.css';
 
 // Home page sections, each with its own clean address: /photos opens the home page at the photo wall.
-// (/articles is the articles on the home page. The phone's old All articles page, pages/Articles.jsx, is kept but unused.)
+// (/articles is the articles on the home page. The phone's old All articles page is in src/unused/archive.jsx, unused.)
 const SECTIONS = ['articles', 'photos', 'words', 'members'];
 
 // Where each visited page was scrolled to, so Back/Forward return you there (kept for the tab's session).

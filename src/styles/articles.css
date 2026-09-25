@@ -1,6 +1,0 @@
-/* All articles page */
-.page-articles a{color:#111111}
-
-/* cards drop into their hard shadow while pressed */
-.page-articles a:active > article{transform:translate(4px,4px);box-shadow:2px 2px 0 #111111 !important}
-.page-articles button:active{transform:translate(1px,1px)}

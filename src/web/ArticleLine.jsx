@@ -18,14 +18,6 @@ const peg = (i) => {
   return { x, y, drop, tilt: TILT[i % 12], swing: SWING[i % 12], dur: DURATION[i % 3] };
 };
 
-// The wire: sags between pegs, runs off both ends of the track. dy moves it up or down. (Phone line view.)
-export const wirePath = (pegs, width, dy = 0) => {
-  let d = `M0 ${78 + dy} Q82 ${100 + dy} ${pegs[0].x} ${pegs[0].y}`;
-  for (let i = 1; i < pegs.length; i++) d += ` Q${(pegs[i - 1].x + pegs[i].x) / 2} ${110 + dy} ${pegs[i].x} ${pegs[i].y}`;
-  const last = pegs[pegs.length - 1];
-  return `${d} Q${(last.x + width) / 2} ${110 + dy} ${width} ${78 + dy}`;
-};
-
 // Web wire: starts at peg `from` (the lead string from the label card ties on there) and runs off the far end.
 const wireFrom = (pegs, width, from) => {
   let d = `M${pegs[from].x} ${pegs[from].y}`;

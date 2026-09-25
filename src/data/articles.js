@@ -210,7 +210,7 @@ export const ARTICLES = ALL_ARTICLES.filter((a) => a.edition === LATEST);
 // An article's place in its own edition: { i: 0-based position, n: how many }.
 export const placeOf = (a) => { const list = ALL_ARTICLES.filter((x) => x.edition === a.edition); return { i: list.indexOf(a), n: list.length, list }; };
 
-// Shown in the All articles page's spots 04–05 only while an edition has fewer articles than spots.
+// Shown on an empty peg (the phone's hanging view, the web line) while an edition has fewer articles than spots.
 export const COMING_SOON = [
   "this peg's saving a spot for the next one",
 ];
