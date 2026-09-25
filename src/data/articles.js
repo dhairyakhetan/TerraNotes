@@ -244,7 +244,7 @@ export const ALL_ARTICLES = [
     title: 'September’s AI Revolution',
     dek: '',
     tag: 'Reportage',
-    cover: '', // cover coming soon
+    cover: '/articles/septembers-ai-revolution.jpg',
     alt: 'September’s AI news',
     author: 'Bhavishya Agarwal',
     edition: 1,
