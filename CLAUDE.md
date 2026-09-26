@@ -45,10 +45,15 @@ Two separate layouts, chosen by window width (`lib/layoutMode.js`, `useIsWeb()`)
 - **An article can have its own page** instead of the usual layout: `page: 'labs'` in its data and an entry in `PAGES` (`App.jsx`). It lives in `src/articles/<name>/`.
   - Its `body` is still what crawlers and AIs read.
   - It gets no card flight (no cover to land on; `flight()` in `lib/cardFlight.js`), just the crossfade.
-  - **AQ Labs** (`src/articles/labs/`, the "labs" article) is the AQ Labs team's own gallery site, ported. It keeps their look on purpose: their fonts (`public/fonts/`, JetBrains Mono from Google Fonts), their palette and rounded pills. Don't restyle it into the magazine's design.
+  - `chapters`: its sections get addresses, `<article>/<id>` (element ids).
+  - `demos`: `{ chapter: folder }`, a web app kept in its folder, opened in a new tab at `<article>/<chapter>/demo`. `pages/DemoPage.jsx` shows it full-window in a same-origin frame, with no footer, Buddy or opening animation. Its files stay as the team made them.
+  - **AQ Labs** (`src/articles/labs/`, the "labs" article; teams and chapter ids in `data/labs.js`) is the AQ Labs team's own gallery site, ported. Its Wisdom Woods chapter opens the team's demo at `/articles/labs/wisdom-woods/demo` (files: `public/editions/sep26/articles/labs/wisdom-woods/demo/`). It keeps their look on purpose: their fonts (`public/fonts/`, JetBrains Mono from Google Fonts), their palette and rounded pills. Don't restyle it into the magazine's design.
   - Its CSS (`labs.css`) is scoped to `.labs`. Its class names must not match any in `src/styles/` (it had to rename `.intro` and `.orbit`). Its loops keep the motion rules below, inside `labs.css`: transform / opacity only, stopped by reduced motion, `.lite`, `.off-screen` and `html[data-nav]`.
 - **Shared components** (`src/shared/`) take a `web` prop (or `look`) and keep a `PHONE` / `WEB` table of positions and sizes. Change a value in the right table; don't fork the component.
 - **The home page also answers at `/articles`, `/photos`, `/words` and `/members`** and scrolls to that section: element ids `articles`, `photos`, `words`, `members`. See `lib/routes.js` and `lib/scrollMemory.js`.
+- **Section addresses drop off by themselves.** Once you scroll a screen away from the section an address names (`/photos`, `/articles/labs/photon`), `lib/scrollMemory.js` replaces it with the plain page (`/`, `/articles/labs`) in place, with state `{ quiet: true }`, so nothing scrolls or remounts. `?by=` addresses stay.
+  - To change the address from a page without scrolling, use `navigate(path, { replace: true, state: { quiet: true } })`.
+  - The home page (`/:section?`) and an article with its chapters (`/articles/:slug/*`) are one route each, so the page survives the change.
 - **Styling is inline** (`style={{ … }}` with string values like `"12px"`), matching the existing code.
   - CSS files only hold what inline styles can't: `:active` / `:hover`, keyframes, and shared classes.
   - Fonts come from `FONT` in `src/styles/fonts.js`. Never retype a font stack.
@@ -143,9 +148,11 @@ src/data/               ALL content (each file documents its fields at the top)
   editions.js           EDITIONS (newest last), LATEST, editionId, articleLink, editionLink, articleFolder
   team.js               TEAMS, MEMBERS (photo, bio, instagram, credit, crown, badge)
   photos.js  words.js   photo wall; words game
+  labs.js               the AQ Labs gallery's teams (chapter ids, labels, colours)
 src/phone/              PhoneHome, PhoneHangingArticles (the strung-up cards), PhoneArticle, PhoneHeader, PhoneMenu
 src/web/                WebHome, WebArticleLine (sideways wire), WebArticle, WebHeader, WebEditionPicker
-src/pages/              EditionsPage (/editions, /<id> e.g. /sep26), NotFoundPage (404): both layouts in one file
+src/pages/              EditionsPage (/editions, /<id> e.g. /sep26), NotFoundPage (404): both layouts in one file;
+                        DemoPage (an article's demo app, full-window)
 src/articles/labs/      LabsPage.jsx + labs.css: the AQ Labs gallery (the "labs" article's own page, both layouts)
 src/shared/             used by both layouts:
   ArticleCard           the card (+ TagPill, TagRow)          ArticleBody   body blocks, FieldLog, AuthorBox

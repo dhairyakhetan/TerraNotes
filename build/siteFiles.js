@@ -1,5 +1,6 @@
 // Vite plugin (build only): after the app is bundled, writes the extra files a static host needs, all from src/data:
-// - an .html per article at its address (articles/<slug>.html, older editions <id>/articles/<slug>.html; served
+// - an .html per article at its address (articles/<slug>.html, older editions <id>/articles/<slug>.html; also one per
+//   chapter and demo of an own-page article, <article>/<chapter>.html and <article>/<chapter>/demo.html; served
 //   without .html via cleanUrls in vercel.json): its own title, description, link-preview tags (image: preview.jpg in
 //   the article's folder, public/editions/<id>/articles/<slug>/, copied to a content-hashed name so chat apps don't
 //   keep showing an old picture) and its text (build/staticCopy.js) for crawlers that don't run JavaScript;
@@ -48,6 +49,12 @@ export default function siteFiles(host) {
         }
         html = html.replace('</title>', `</title>\n    <link rel="canonical" href="${esc(url(articleLink(a)))}" />`);
         out(`${articleLink(a).slice(1)}.html`, withContent(html, articleHtml(a)));
+        // its chapters (<article>/<id>) share its page; a demo (<article>/<chapter>/demo) gets its own title
+        for (const c of a.chapters || []) out(`${articleLink(a).slice(1)}/${c}.html`, withContent(setMeta(html, 'property', 'og:url', url(`${articleLink(a)}/${c}`)), articleHtml(a)));
+        for (const c of Object.keys(a.demos || {})) {
+          const name = `${c.replace(/-/g, ' ').replace(/\b\w/g, (x) => x.toUpperCase())} · demo`;
+          out(`${articleLink(a).slice(1)}/${c}/demo.html`, setMeta(setMeta(setTitle(html, name), 'property', 'og:title', name), 'property', 'og:url', url(`${articleLink(a)}/${c}/demo`)));
+        }
       }
 
       const TITLES = { '/': '', '/articles': 'All articles', '/photos': 'Photo wall', '/words': 'Words we should bring back', '/members': 'Meet the team', '/editions': 'Editions' };

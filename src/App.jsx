@@ -4,15 +4,16 @@ import PhoneArticle from './phone/PhoneArticle.jsx';
 import WebHome from './web/WebHome.jsx';
 import WebArticle from './web/WebArticle.jsx';
 import { EditionPage, EditionsPage } from './pages/EditionsPage.jsx';
+import DemoPage from './pages/DemoPage.jsx';
 import LabsPage from './articles/labs/LabsPage.jsx';
 import NotFoundPage from './pages/NotFoundPage.jsx';
 import ErrorBoundary from './shared/ErrorBoundary.jsx';
 import SiteFooter from './shared/SiteFooter.jsx';
 import BuddyGames from './shared/buddy/BuddyGames.jsx';
 import { ALL_ARTICLES } from './data/articles.js';
-import { LATEST, articleLink, editionById, editionLink, editionOf } from './data/editions.js';
+import { LATEST, articleFolder, articleLink, editionById, editionLink, editionOf } from './data/editions.js';
 import { useIsWeb } from './lib/layoutMode.js';
-import { SECTIONS } from './lib/routes.js';
+import { SECTIONS, isDemoPath } from './lib/routes.js';
 import { ScrollMemory } from './lib/scrollMemory.js';
 
 // The routes, per layout (lib/layoutMode.js: 900px+ wide = web, else phone):
@@ -22,6 +23,9 @@ import { ScrollMemory } from './lib/scrollMemory.js';
 //                             `next` = the following one in its edition
 //   /<id>/articles/<slug>     an article in an older edition, e.g. /sep26/articles/labs (data/editions.js). Either
 //                             address of an article redirects to its current one, so links survive a new edition.
+//   <article>/<chapter>       an own-page article opened at a chapter (its `chapters`), e.g. /articles/labs/photon
+//   <article>/<chapter>/demo  a demo web app kept in the article's folder (its `demos`), full-window with nothing
+//                             else of the site around it (pages/DemoPage.jsx), e.g. /articles/labs/wisdom-woods/demo
 //   /editions, /<id>          every edition / a previous one (pages/EditionsPage.jsx); old /editions/<n> redirects
 //   anything else             404 (pages/NotFoundPage.jsx)
 // Any address with ?by=<writer> goes to /articles?by=<writer> (that writer's articles first, lib/byWriter.js).
@@ -30,10 +34,11 @@ import { ScrollMemory } from './lib/scrollMemory.js';
 // Articles with their own page instead of the usual layout (an article's `page` in data/articles.js)
 const PAGES = { labs: LabsPage };
 
-// /articles, /photos… (the home page) or an edition's id (/sep26: that edition, or home if it's the latest)
+// / and /articles, /photos… (the home page: one route, so the address can change in place without a remount) or an
+// edition's id (/sep26: that edition, or home if it's the latest)
 function SectionRoute({ web }) {
   const { section } = useParams();
-  if (SECTIONS.includes(section)) return web ? <WebHome /> : <PhoneHome />;
+  if (!section || SECTIONS.includes(section)) return web ? <WebHome /> : <PhoneHome />;
   const e = editionById(section);
   if (!e) return <NotFoundPage web={web} />;
   return e.number === LATEST ? <Navigate to="/" replace /> : <EditionPage web={web} n={e.number} />;
@@ -44,14 +49,19 @@ function OldEditionRoute({ web }) {
   return e ? <Navigate to={editionLink(e.number)} replace /> : <NotFoundPage web={web} />;
 }
 
+// <article>, <article>/<chapter> (one route, so the address can change in place) and <article>/<chapter>/demo
 function ArticleRoute({ web }) {
-  const { edition, slug } = useParams();
+  const { edition, slug, '*': rest } = useParams();
   const { pathname, search, hash } = useLocation();
   const n = edition ? editionById(edition)?.number : LATEST;
   // an older edition's article at the clean address it had while it was the latest is still found (then redirected)
   const a = ALL_ARTICLES.find((x) => x.slug === slug && x.edition === n) || (!edition && ALL_ARTICLES.findLast((x) => x.slug === slug));
-  if (!a) return <NotFoundPage web={web} />;
-  if (pathname !== articleLink(a)) return <Navigate to={articleLink(a) + search + hash} replace />;
+  const [chapter, demo, more] = (rest || '').split('/').filter(Boolean);
+  const ok = a && !more && (!chapter || (a.chapters?.includes(chapter) && (!demo || (demo === 'demo' && a.demos?.[chapter]))));
+  if (!ok) return <NotFoundPage web={web} />;
+  const here = [articleLink(a), chapter, demo].filter(Boolean).join('/');
+  if (pathname !== here) return <Navigate to={here + search + hash} replace />;
+  if (demo) return <DemoPage src={`${articleFolder(a)}/${a.demos[chapter]}/`} name={chapter.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())} />;
   const key = articleLink(a); // remount per article so its entrance replays
   if (a.page) { const Own = PAGES[a.page]; return <Own key={key} article={a} web={web} />; }
   const Page = web ? WebArticle : PhoneArticle;
@@ -76,25 +86,25 @@ export default function App() {
   const { pathname, search } = useLocation();
   const web = useIsWeb();
   const toWriter = pathname !== '/articles' && new URLSearchParams(search).get('by');
+  const bare = isDemoPath(pathname); // a demo tab: the demo alone
   return (
     <>
-      <SkipLink />
+      {!bare && <SkipLink />}
       <ScrollMemory />
       <ErrorBoundary resetKey={pathname}>
         {toWriter ? <Navigate to={{ pathname: '/articles', search }} replace /> : (
           <Routes>
-            <Route path="/" element={web ? <WebHome /> : <PhoneHome />} />
             <Route path="/editions" element={<EditionsPage web={web} />} />
             <Route path="/editions/:n" element={<OldEditionRoute web={web} />} />
-            <Route path="/:section" element={<SectionRoute web={web} />} />
-            <Route path="/articles/:slug" element={<ArticleRoute web={web} />} />
-            <Route path="/:edition/articles/:slug" element={<ArticleRoute web={web} />} />
+            <Route path="/:section?" element={<SectionRoute web={web} />} />
+            <Route path="/articles/:slug/*" element={<ArticleRoute web={web} />} />
+            <Route path="/:edition/articles/:slug/*" element={<ArticleRoute web={web} />} />
             <Route path="*" element={<NotFoundPage web={web} />} />
           </Routes>
         )}
       </ErrorBoundary>
-      <SiteFooter />
-      <BuddyGames />
+      {!bare && <SiteFooter />}
+      {!bare && <BuddyGames />}
     </>
   );
 }

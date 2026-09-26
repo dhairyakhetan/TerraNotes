@@ -222,7 +222,7 @@ html.labs-snap:not(.labs-finding) .labs section.chapter[data-team]{scroll-snap-a
 .labs .media-note{text-align:center;font-size:10px;letter-spacing:.14em;color:#8C877C;margin-top:12px}
 
 /* ===== 04 wisdom woods: game HUD ===== */
-.labs #wisdomwoods{background:var(--cream2)}
+.labs #wisdom-woods{background:var(--cream2)}
 .labs .ww-frame{width:calc(min(var(--vh) * .6, 620px) * 9 / 16);aspect-ratio:9/16;margin:0 auto}
 .labs .ww-frame img{width:100%;height:100%;object-fit:cover}
 .labs .ww-xp{flex:1;height:20px;border:2px solid var(--ink);border-radius:999px;background:var(--card);overflow:clip;position:relative}

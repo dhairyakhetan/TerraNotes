@@ -1,4 +1,5 @@
 import { LATEST } from './editions.js';
+import { LABS_TEAMS } from './labs.js';
 
 // Articles, in order: this order sets the numbers (01, 02…) and the "next on the line" chain.
 //   slug:     the address: /articles/<slug> while its edition is the latest, then /<edition id>/articles/<slug>
@@ -27,6 +28,10 @@ import { LATEST } from './editions.js';
 //     { projects: [{ name, what, meta, color, ink }, …] }  numbered coloured project bars (AQ Labs)
 //   page:     optional: the article has its own page instead of the usual layout (App.jsx PAGES), e.g. 'labs' →
 //             src/articles/labs/. Its body is still what crawlers and AIs read (build/).
+//   chapters: optional (own-page articles): section ids that get their own address, <article>/<id> (opens the page
+//             scrolled to the element with that id; the address drops the <id> once you scroll away, lib/scrollMemory.js)
+//   demos:    optional: { <chapter>: '<folder>' }: a web app kept in the article's folder, opened full-window at
+//             <article>/<chapter>/demo (pages/DemoPage.jsx), e.g. { 'wisdom-woods': 'wisdom-woods/demo' }
 // Blocks render in shared/ArticleBody.jsx. Leave a field '' and the design's placeholder shows instead.
 // After adding or changing an article's cover, run tools/make-link-previews.mjs for its link-preview image.
 
@@ -46,6 +51,8 @@ export const ALL_ARTICLES = [
   {
     slug: 'labs',
     page: 'labs', // its own page: the AQ Labs gallery (src/articles/labs/)
+    chapters: LABS_TEAMS.map((t) => t.id), // /articles/labs/photon…
+    demos: { 'wisdom-woods': 'wisdom-woods/demo' }, // the Wisdom Woods demo: /articles/labs/wisdom-woods/demo
     title: 'Under Aquaterra: AQ Labs',
     dek: "AquaTerra's student build program",
     tag: 'Under Aquaterra',

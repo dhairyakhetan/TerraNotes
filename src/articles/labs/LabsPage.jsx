@@ -1,8 +1,10 @@
-import { Fragment, memo, useEffect, useRef, useState } from 'react';
+import { Fragment, memo, useCallback, useEffect, useRef, useState } from 'react';
+import { useNavigate } from 'react-router';
 import PhoneHeader from '../../phone/PhoneHeader.jsx';
 import WebHeader from '../../web/WebHeader.jsx';
 import { TAGS } from '../../data/articles.js';
-import { articleFolder } from '../../data/editions.js';
+import { articleFolder, articleLink } from '../../data/editions.js';
+import { LABS_TEAMS as TEAMS } from '../../data/labs.js';
 import { calm, LITE } from '../../lib/motion.js';
 
 // The "labs" article's own page (data/articles.js: page: 'labs'): the AQ Labs gallery, ported from the AQ Labs team's
@@ -14,21 +16,13 @@ import { calm, LITE } from '../../lib/motion.js';
 // Photos: public/editions/<id>/articles/labs/<team>/ (this article's folder). Text is the team's, word for word.
 // Behaviour (all skipped or stilled with reduced motion; LITE stops the loops, lib/motion.js):
 // - chapters fade/slide in each time they come into view (.in); loops pause when their section is off screen;
-// - web: the page snaps to chapters (html.labs-snap); the tab bar, the rack and "walk the gallery" jump to them;
+// - web: the page snaps to chapters (html.labs-snap); the tab bar, the rack and "walk the gallery" glide to them;
+// - each chapter has its own address, /articles/labs/<id> (ids: data/labs.js), shown when you jump there and dropped
+//   again once you scroll a screen away (lib/scrollMemory.js); Wisdom Woods' demo opens in a new tab at
+//   /articles/labs/wisdom-woods/demo (pages/DemoPage.jsx; its files: this article's folder, wisdom-woods/demo/);
 // - each chapter title brightens as it nears the middle of the window (on scroll, not every frame);
 // - search: type to highlight every match on the page, Enter / ↓ for the next; tabs with matches get a red dot.
 
-// label: on its tab and folder (a long one folds onto two lines on the folder, at the |)
-const TEAMS = [
-  { id: 'karyaarth', label: 'karyaarth', c: 'tomato', glyph: '★', cat: 'documentary' },
-  { id: 'careercompass', label: 'career|compass', c: 'sky', glyph: '◆', cat: 'career data' },
-  { id: 'quirk', label: 'quirk', c: 'pink', glyph: '✦', cat: 'hardware' },
-  { id: 'wisdomwoods', label: 'wisdom| woods', c: 'mint', glyph: '♥', cat: 'ed-game' },
-  { id: 'cirqle', label: 'cirqle| rentals', c: 'lemon', glyph: '◆', cat: 'rentals' },
-  { id: 'hunar', label: 'hunar', c: 'grape', glyph: '★', cat: 'placement' },
-  { id: 'photon', label: 'photon', c: 'sky', glyph: '✦', cat: 'wearable' },
-  { id: 'humanmanual', label: 'human| manual', c: 'pink', glyph: '♠', cat: 'card game' },
-];
 const oneLine = (label) => label.replace('|', '');
 const folded = (label) => label.split('|').map((part, i) => <Fragment key={i}>{i > 0 && <br />}{part}</Fragment>);
 const ON = { tomato: 'var(--cream)', sky: 'var(--ink)', pink: 'var(--ink)', mint: 'var(--cream)', lemon: 'var(--ink)', grape: 'var(--cream)' }; // text on each accent
@@ -38,12 +32,12 @@ const SIZE = {
   'karyaarth/still-01.webp': [1100, 606], 'karyaarth/still-02.webp': [1100, 585], 'karyaarth/still-03.webp': [1100, 594],
   'karyaarth/still-04.webp': [1100, 586], 'karyaarth/still-05.webp': [1100, 657], 'karyaarth/still-06.webp': [900, 1686],
   'karyaarth/still-07.webp': [880, 496], 'karyaarth/still-08.webp': [880, 458], 'karyaarth/still-09.webp': [1100, 637],
-  'karyaarth/still-10.webp': [900, 1637], 'careercompass/site-home.webp': [1400, 464], 'careercompass/site-find-your-path.webp': [1017, 868],
+  'karyaarth/still-10.webp': [900, 1637], 'career-compass/site-home.webp': [1400, 464], 'career-compass/site-find-your-path.webp': [1017, 868],
   'cirqle/poster.webp': [880, 1956], 'hunar/site.webp': [1400, 636], 'photon/band.webp': [784, 1168],
   'photon/sheet-parts.webp': [1280, 853], 'photon/sheet-design.webp': [1280, 700], 'photon/sheet-lock.webp': [1280, 853],
   'quirk/breadboard.webp': [1280, 960], 'quirk/site-meet-quirk.webp': [1400, 631], 'quirk/site-play-now.webp': [1400, 640],
-  'quirk/oled-test.webp': [1000, 563], 'quirk/player-one.webp': [1000, 563], 'wisdomwoods/poster.webp': [1000, 563],
-  'wisdomwoods/app-enter.webp': [880, 427], 'wisdomwoods/app-question.webp': [880, 403],
+  'quirk/oled-test.webp': [1000, 563], 'quirk/player-one.webp': [1000, 563], 'wisdom-woods/poster.webp': [1000, 563],
+  'wisdom-woods/app-enter.webp': [880, 427], 'wisdom-woods/app-question.webp': [880, 403],
 };
 const KARYAARTH = ['karyaarth street vendor documentary', 'a tea stall owner mid-pour at his roadside counter', 'an ice cream cart vendor waiting for customers',
   'a street craftsman at work with his tools', 'a vendor arranging goods at his stall', 'a shopkeeper behind his counter at dusk',
@@ -51,9 +45,9 @@ const KARYAARTH = ['karyaarth street vendor documentary', 'a tea stall owner mid
 // the intro's scattered screenshots: [photo, tilt, bob delay, web box]; on phone three hang off each side, faded
 const FLOATS = [
   ['karyaarth/still-01.webp', '-8deg', '0s', { top: '9%', left: '2%', width: '180px', height: '150px' }],
-  ['careercompass/site-home.webp', '-10deg', '.7s', { top: '40%', left: '5%', width: '172px', height: '150px' }],
+  ['career-compass/site-home.webp', '-10deg', '.7s', { top: '40%', left: '5%', width: '172px', height: '150px' }],
   ['quirk/site-meet-quirk.webp', '5deg', '1.3s', { bottom: '2%', left: '3%', width: '205px', height: '150px' }],
-  ['wisdomwoods/poster.webp', '7deg', '.4s', { top: '11%', right: '3%', width: '200px', height: '150px' }],
+  ['wisdom-woods/poster.webp', '7deg', '.4s', { top: '11%', right: '3%', width: '200px', height: '150px' }],
   ['cirqle/poster.webp', '8deg', '1s', { top: '42%', right: '5%', width: '170px', height: '150px' }],
   ['hunar/site.webp', '-6deg', '1.6s', { bottom: '2%', right: '2%', width: '150px', height: '172px' }],
 ];
@@ -72,15 +66,9 @@ const SUITS = [
 const OUT = { target: '_blank', rel: 'noreferrer' };
 
 const behavior = () => (calm() ? 'auto' : 'smooth');
-// scroll a chapter to the top of the window (its scroll-margin allows for the sticky bars) and put it in the address
-function jump(e, id) {
-  e?.preventDefault();
-  document.getElementById(id)?.scrollIntoView({ behavior: behavior() });
-  history.replaceState(history.state, '', `#${id}`);
-}
-// "copy chapter link": the address of this page at that chapter
-async function copyLink(e, id) {
-  const btn = e.currentTarget, url = `${location.origin}${location.pathname}#${id}`;
+// "copy chapter link": the chapter's own address
+async function copyLink(e, url) {
+  const btn = e.currentTarget;
   try { await navigator.clipboard.writeText(url); } catch { return; }
   const was = btn.textContent;
   btn.textContent = '✓ copied';
@@ -118,7 +106,7 @@ const HL = typeof CSS !== 'undefined' && !!CSS.highlights && typeof Highlight ==
 const unmark = () => { if (HL) { CSS.highlights.delete('labs-find'); CSS.highlights.delete('labs-find-now'); } };
 
 // The sticky bar: team tabs (the one on screen lit, scrolled into view on phone), search, apply; the find row under it.
-function LabsBar({ main }) {
+function LabsBar({ main, base, go }) {
   const [active, setActive] = useState(null);
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState('');
@@ -165,7 +153,7 @@ function LabsBar({ main }) {
     <div className="labs-bar">
       <nav className="labs-tabs" ref={tabs} aria-label="Teams">
         {TEAMS.map((t, i) => (
-          <a key={t.id} className={`tab${active === t.id ? ' on' : ''}${hits.teams.has(t.id) ? ' hit' : ''}`} data-spy={t.id} href={`#${t.id}`} onClick={(e) => jump(e, t.id)} style={tint(t.c)} aria-current={active === t.id ? 'true' : undefined}>
+          <a key={t.id} className={`tab${active === t.id ? ' on' : ''}${hits.teams.has(t.id) ? ' hit' : ''}`} data-spy={t.id} href={`${base}/${t.id}`} onClick={(e) => go(e, t.id)} style={tint(t.c)} aria-current={active === t.id ? 'true' : undefined}>
             <span className="tnum">{String(i + 1).padStart(2, '0')}</span><span className="tname">{oneLine(t.label)}</span>
           </a>
         ))}
@@ -210,7 +198,7 @@ const Ticker = ({ light }) => (
 );
 
 // Everything under the bar. Never re-renders (no changing props), so the bar's state changes don't touch it.
-const Gallery = memo(function Gallery({ web, dir }) {
+const Gallery = memo(function Gallery({ web, dir, base, go }) {
   const pic = (f, alt = '', cls) => <img src={`${dir}/${f}`} width={SIZE[f][0]} height={SIZE[f][1]} alt={alt} className={cls} loading="lazy" decoding="async" />;
   const cols = (c) => (web ? { gridTemplateColumns: c } : undefined);
   const claim = CLAIM.map((part) => part.split(' '));
@@ -225,12 +213,12 @@ const Gallery = memo(function Gallery({ web, dir }) {
           <div className="showpill reveal" style={{ '--i': 0 }}>★ AQ LABS '26 · AN AQUATERRA SHOWCASE</div>
           <h1 className="bigtitle reveal" style={{ '--i': 1 }}>AQ <span className="lab">Labs</span></h1>
           <p className="lead intro-lead reveal" style={{ '--i': 2 }}>eight teams. eight things that didn't exist six weeks ago, and now do.</p>
-          <a className="walkbtn reveal" style={{ '--i': 3 }} href="#karyaarth" onClick={(e) => jump(e, 'karyaarth')}>walk the gallery <span className="arr">↓</span></a>
+          <a className="walkbtn reveal" style={{ '--i': 3 }} href={`${base}/karyaarth`} onClick={(e) => go(e, 'karyaarth')}>walk the gallery <span className="arr">↓</span></a>
           <div className="sectlabel reveal" style={{ '--i': 4 }}>// or pull a folder</div>
           <div className="rack reveal" style={{ '--i': 4 }}>
             <div className="spine cover"><span className="cbar">▚</span><span className="ctitle">AQ LABS</span><span className="cmeta">08 works · 01 room</span></div>
             {TEAMS.map((t, i) => (
-              <a key={t.id} className="spine" href={`#${t.id}`} onClick={(e) => jump(e, t.id)} style={{ ...tint(t.c), '--sd': `${(i * 0.22).toFixed(2)}s` }}>
+              <a key={t.id} className="spine" href={`${base}/${t.id}`} onClick={(e) => go(e, t.id)} style={{ ...tint(t.c), '--sd': `${(i * 0.22).toFixed(2)}s` }}>
                 <span className="snum2">{String(i + 1).padStart(2, '0')}</span><span className="sname2">{folded(t.label)}</span><span className="scat2">{t.cat}</span><span className="sglyph2" aria-hidden="true">{t.glyph}</span>
               </a>
             ))}
@@ -264,7 +252,7 @@ const Gallery = memo(function Gallery({ web, dir }) {
       </section>
 
       {/* 02 CAREERCOMPASS · dashboard */}
-      <section id="careercompass" className="chapter" data-team="" style={{ '--c': 'var(--sky)' }}>
+      <section id="career-compass" className="chapter" data-team="" style={{ '--c': 'var(--sky)' }}>
         <div className="wrap cols" style={cols('1fr 1.05fr')}>
           <div style={{ minWidth: "0" }}>
             <Meta k="02 · career data" t="team merge conflicts" />
@@ -273,7 +261,7 @@ const Gallery = memo(function Gallery({ web, dir }) {
             <p className="lead reveal" style={{ '--i': 3, marginTop: "14px" }}>india trains millions and still can't fill the jobs that matter. careercompass reads what industries actually need against what students actually study, and hands you a direction instead of a shrug.</p>
             <div className="pills reveal" style={{ '--i': 4 }}>
               <a className="pill solid" href="https://careerrcompassindia.netlify.app" {...OUT}>↗ visit site</a>
-              <button className="pill" type="button" onClick={(e) => copyLink(e, 'careercompass')}>⧉ copy chapter link</button>
+              <button className="pill" type="button" onClick={(e) => copyLink(e, `${location.origin}${base}/career-compass`)}>⧉ copy chapter link</button>
             </div>
           </div>
           <div className="cc-dash media reveal" style={{ '--i': 3 }}>
@@ -285,8 +273,8 @@ const Gallery = memo(function Gallery({ web, dir }) {
               <div className="stat fill ondark" style={{ '--c': 'var(--grape)' }}><div className="n">25 L</div><div className="l">emigrate / year</div></div>
             </div>
             <div className="cc-shots">
-              <a className="browser" href="https://careerrcompassindia.netlify.app" {...OUT}><div className="bb"><i /><i /><i /></div>{pic('careercompass/site-home.webp', 'careercompass overview')}</a>
-              <a className="browser" href="https://careerrcompassindia.netlify.app" {...OUT}><div className="bb"><i /><i /><i /></div>{pic('careercompass/site-find-your-path.webp', 'careercompass find your path')}</a>
+              <a className="browser" href="https://careerrcompassindia.netlify.app" {...OUT}><div className="bb"><i /><i /><i /></div>{pic('career-compass/site-home.webp', 'careercompass overview')}</a>
+              <a className="browser" href="https://careerrcompassindia.netlify.app" {...OUT}><div className="bb"><i /><i /><i /></div>{pic('career-compass/site-find-your-path.webp', 'careercompass find your path')}</a>
             </div>
           </div>
         </div>
@@ -326,10 +314,10 @@ const Gallery = memo(function Gallery({ web, dir }) {
       </section>
 
       {/* 04 WISDOM WOODS · game HUD */}
-      <section id="wisdomwoods" className="chapter" data-team="" style={{ '--c': 'var(--mint)' }}>
+      <section id="wisdom-woods" className="chapter" data-team="" style={{ '--c': 'var(--mint)' }}>
         <div className="wrap cols" style={cols('.85fr 1.15fr')}>
           <div className="media reveal" style={{ '--i': 2 }}>
-            <div className="frame shadow-c ww-frame">{pic('wisdomwoods/poster.webp', 'wisdom woods app')}</div>
+            <div className="frame shadow-c ww-frame">{pic('wisdom-woods/poster.webp', 'wisdom woods app')}</div>
           </div>
           <div style={{ minWidth: "0" }}>
             <Meta k="04 · ed-game · classes 3–7" t="team alter ego" />
@@ -344,7 +332,7 @@ const Gallery = memo(function Gallery({ web, dir }) {
               {[['LVL 1', 'Vocab'], ['LVL 2', 'Logic'], ['LVL 3', 'World']].map(([l, w]) => <div key={l} className="ww-card"><div className="mono lvl">{l}</div><div className="what">{w}</div></div>)}
             </div>
             <div className="pills reveal" style={{ '--i': 4, marginTop: "20px" }}>
-              <a className="pill solid" href="https://dipdagod.github.io/Wisdom-Woods/main.html" {...OUT}>↗ play the demo</a>
+              <a className="pill solid" href={`${base}/wisdom-woods/demo`} {...OUT}>↗ play the demo</a>
               <a className="pill" href="https://www.instagram.com/wisdomwoods26" {...OUT}>◎ @wisdomwoods26</a>
             </div>
           </div>
@@ -352,8 +340,8 @@ const Gallery = memo(function Gallery({ web, dir }) {
         <div className="exhibit reveal" style={{ '--i': 1 }}>
           <div className="exhibit-h"><span className="eh-k">inside the app</span><span className="eh-t">from the demo</span></div>
           <div className="plates" style={{ gridTemplateColumns: "1fr 1fr" }}>
-            <figure className="plate">{pic('wisdomwoods/app-enter.webp', 'wisdom woods: enter the woods', 'natural')}<figcaption><span className="pc-k">enter the woods</span>make an explorer, pick a guide.</figcaption></figure>
-            <figure className="plate">{pic('wisdomwoods/app-question.webp', 'wisdom woods: a world explorer question', 'natural')}<figcaption><span className="pc-k">world explorer</span>one question, four answers, a score.</figcaption></figure>
+            <figure className="plate">{pic('wisdom-woods/app-enter.webp', 'wisdom woods: enter the woods', 'natural')}<figcaption><span className="pc-k">enter the woods</span>make an explorer, pick a guide.</figcaption></figure>
+            <figure className="plate">{pic('wisdom-woods/app-question.webp', 'wisdom woods: a world explorer question', 'natural')}<figcaption><span className="pc-k">world explorer</span>one question, four answers, a score.</figcaption></figure>
           </div>
           <Credits team="team alter ego · @wisdomwoods26" tags={['ed-game', 'classes 3–7', 'gamified']} />
         </div>
@@ -454,7 +442,7 @@ const Gallery = memo(function Gallery({ web, dir }) {
       </section>
 
       {/* 08 THE HUMAN MANUAL · card deck */}
-      <section id="humanmanual" className="chapter dark" data-team="" style={{ '--c': 'var(--pink)' }}>
+      <section id="human-manual" className="chapter dark" data-team="" style={{ '--c': 'var(--pink)' }}>
         <div className="wrap cols" style={cols('1fr 1fr')}>
           <div style={{ minWidth: "0" }}>
             <Meta k="08 · teen psychology" t="team unfiltered minds" />
@@ -463,7 +451,7 @@ const Gallery = memo(function Gallery({ web, dir }) {
             <p className="lead reveal" style={{ '--i': 3, marginTop: "14px" }}>unfiltered minds wrote it as a deck instead of a lecture: the questions you already ask yourself at 2am, sorted into suits you can actually name. pick your poison, draw a prompt, fill the blank honestly.</p>
             <div className="pills reveal" style={{ '--i': 4, marginTop: "20px" }}>
               <a className="pill solid" href="https://human-manual.vercel.app/" {...OUT}>↗ play it</a>
-              <button className="pill" type="button" onClick={(e) => copyLink(e, 'humanmanual')}>⧉ copy chapter link</button>
+              <button className="pill" type="button" onClick={(e) => copyLink(e, `${location.origin}${base}/human-manual`)}>⧉ copy chapter link</button>
             </div>
           </div>
           <div className="media reveal" style={{ '--i': 2 }}>
@@ -494,7 +482,16 @@ const Gallery = memo(function Gallery({ web, dir }) {
 });
 
 export default function LabsPage({ article: a, web }) {
-  const main = useRef(null);
+  const main = useRef(null), base = articleLink(a);
+  const navigate = useNavigate(), nav = useRef(navigate);
+  nav.current = navigate;
+  // a tab, a folder or "walk the gallery": glide the chapter to the top of the window (its scroll-margin allows for the
+  // sticky bars) and show its address, <article>/<id>, replaced in place (quiet: lib/scrollMemory.js doesn't scroll)
+  const go = useCallback((e, id) => {
+    e?.preventDefault();
+    document.getElementById(id)?.scrollIntoView({ behavior: behavior() });
+    nav.current(`${base}/${id}`, { replace: true, state: { quiet: true } });
+  }, [base]);
   useEffect(() => { document.title = `Aquaterra — ${a.title}`; }, [a.title]);
 
   useEffect(() => { // web: snap to chapters
@@ -571,8 +568,8 @@ export default function LabsPage({ article: a, web }) {
   const page = (
     <div className={`labs ${web ? 'labs-web' : 'labs-phone'}`} style={{ width: web ? "1440px" : "390px" }}>
       {web ? <WebHeader /> : <PhoneHeader current="article" edge={TAGS[a.tag].color} />}
-      <LabsBar main={main} />
-      <main ref={main}><Gallery web={web} dir={articleFolder(a)} /></main>
+      <LabsBar main={main} base={base} go={go} />
+      <main ref={main}><Gallery web={web} dir={articleFolder(a)} base={base} go={go} /></main>
       <BackToTop />
     </div>
   );
