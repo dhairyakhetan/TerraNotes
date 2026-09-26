@@ -151,30 +151,42 @@ html.labs-snap:not(.labs-finding) .labs section.chapter[data-team]{scroll-snap-a
 .labs .walkbtn{display:inline-flex;align-items:center;gap:10px;margin-top:40px;font-family:var(--mono);font-weight:700;font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink);background:var(--mint);border:2px solid var(--mint);border-radius:999px;padding:15px 26px;transition:transform .16s,box-shadow .16s}
 .labs .walkbtn:hover{transform:translateY(-3px);box-shadow:0 9px 0 -2px rgba(0,0,0,.45)}
 .labs .labs-intro .sectlabel{margin:52px 0 4px}
-/* the shelf of books, one per team: real 3D. Each book is its coloured spine (the link) plus two faces folded back
-   into the page: its top (the pages) and its right side (the cover, darker). The shelf is seen from a little above
-   and to the right (perspective-origin), so every book shows its top and right side, and each side tucks behind the
-   next book (painted after it); on phone, scrolling the shelf sideways turns them. Hover / focus pulls a book up and
-   out toward you. On the spine: number, title + category side by side, glyph. --d = how deep the books are */
-.labs .rack{--d:38px;position:relative;display:flex;align-items:flex-end;margin:40px auto 0;width:100%;max-width:1000px;height:clamp(330px,calc(var(--vh) * .44 + 30px),460px);padding:52px 16px 14px;overflow-x:auto;overflow-y:hidden;scrollbar-width:none;perspective:1100px;perspective-origin:125% -60%;background:linear-gradient(to top,#2A2A28 0 12px,#5A5A55 12px 14px,transparent 14px)}
+/* the shelf of books, one per team, in real 3D (transforms only). Each team is a slot (the link): its whole column on
+   the shelf, which never moves, so hovering anywhere in it holds the book out steadily. Inside, the book: its spine
+   (rounded: lit down the middle, shaded at the edges; bands at the head and foot) plus two faces folded back into the
+   page: the top (the page block between the two cover boards) and the right side (the back cover, darker, with the
+   hinge groove by the spine). Seen from a little above and to the right (perspective-origin), so each side tucks
+   behind the next book. Hover / focus: the book slides up and out toward you, turning a little. Each book has its own
+   thickness (--bw) and height (--bh); --d = how deep the books are. */
+.labs .rack{--d:40px;position:relative;display:flex;align-items:flex-end;margin:40px auto 0;width:100%;max-width:1000px;height:clamp(330px,calc(var(--vh) * .44 + 30px),460px);padding:52px 16px 14px;overflow-x:auto;overflow-y:hidden;scrollbar-width:none;perspective:1100px;perspective-origin:125% -60%;background:linear-gradient(to top,#2A2A28 0 12px,#5A5A55 12px 14px,transparent 14px)}
 .labs .rack::-webkit-scrollbar{display:none}
-.labs .spine{position:relative;flex:0 0 auto;width:96px;margin:0 6px;border:2px solid var(--ink);border-radius:3px;background:var(--c);color:var(--tc,var(--ink));transform-style:preserve-3d;display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:15px 8px 18px;cursor:pointer;transition:translate .3s cubic-bezier(.2,.85,.25,1);animation:labsSway 2.4s ease-in-out infinite;animation-delay:var(--sd,0s)}
+.labs .book-slot{position:relative;flex:0 0 auto;height:100%;display:flex;align-items:flex-end;padding:0 5px;transform-style:preserve-3d;cursor:pointer;outline:none}
+.labs .book-slot:first-child{margin-left:auto}
+.labs .book-slot:last-child{margin-right:auto}
+.labs .book-slot:hover,.labs .book-slot:focus-visible{z-index:20}
+.labs .book{position:relative;width:var(--bw);height:var(--bh);border:2px solid var(--ink);border-radius:6px 6px 3px 3px;color:var(--tc,var(--ink));transform-style:preserve-3d;display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:17px 8px 20px;
+  background:
+    linear-gradient(to bottom,transparent 5px,rgba(0,0,0,.3) 5px 7px,transparent 7px 10px,rgba(0,0,0,.3) 10px 12px,transparent 12px),
+    linear-gradient(to top,transparent 5px,rgba(0,0,0,.3) 5px 7px,transparent 7px 10px,rgba(0,0,0,.3) 10px 12px,transparent 12px),
+    linear-gradient(90deg,rgba(0,0,0,.24),rgba(255,255,255,.2) 30%,rgba(255,255,255,0) 58%,rgba(0,0,0,.28)),
+    var(--c);
+  transition:translate .32s cubic-bezier(.2,.85,.25,1),rotate .32s cubic-bezier(.2,.85,.25,1);animation:labsSway 2.4s ease-in-out infinite;animation-delay:var(--sd,0s)}
 @keyframes labsSway{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
-.labs .spine:first-child{margin-left:auto}
-.labs .spine:last-child{margin-right:auto}
-.labs .spine:nth-child(odd){height:86%}
-.labs .spine:nth-child(even){height:95%}
-.labs .spine::before,.labs .spine::after{content:"";position:absolute;border:2px solid var(--ink);pointer-events:none}
-.labs .spine::before{left:-2px;right:-2px;top:-2px;height:var(--d);transform-origin:top;transform:rotateX(-90deg);background:repeating-linear-gradient(90deg,#F3EEE4 0 3px,#D6CCB6 3px 4px)}
-.labs .spine::after{left:100%;top:-2px;bottom:-2px;width:var(--d);transform-origin:left;transform:rotateY(90deg);background:linear-gradient(rgba(0,0,0,.32),rgba(0,0,0,.32)) var(--c)}
-.labs .spine:hover,.labs .spine:focus-visible{translate:0 -26px 46px;z-index:20;outline:none;animation:none}
-.labs .spine:focus-visible{box-shadow:0 0 0 3px var(--sky)}
-.labs .spine .snum2{font-family:var(--mono);font-weight:700;font-size:11px;letter-spacing:.08em;border:1.5px solid currentColor;border-radius:5px;padding:3px 6px}
-.labs .spine .stitle{display:flex;align-items:flex-end;gap:5px;margin:10px 0}
-.labs .spine :is(.sname2,.scat2){writing-mode:vertical-rl;transform:rotate(180deg);white-space:nowrap}
-.labs .spine .sname2{font-family:var(--display);font-weight:900;text-transform:uppercase;letter-spacing:-.02em;font-size:30px;line-height:.95}
-.labs .spine .scat2{font-family:var(--mono);font-weight:700;font-size:9px;letter-spacing:.16em;text-transform:uppercase;opacity:.72}
-.labs .spine .sglyph2{font-size:15px;line-height:1;opacity:.9}
+.labs .book::before,.labs .book::after{content:"";position:absolute;border:2px solid var(--ink);pointer-events:none}
+/* top: the spine's head at the front, the two cover boards down the sides, the page block between them */
+.labs .book::before{left:-2px;right:-2px;top:-2px;height:var(--d);transform-origin:top;transform:rotateX(-90deg);border-radius:4px 4px 0 0;
+  background:linear-gradient(to bottom,var(--c) 0 5px,transparent 5px),linear-gradient(90deg,var(--c) 0 4px,transparent 4px calc(100% - 4px),var(--c) calc(100% - 4px)),repeating-linear-gradient(90deg,#F3EEE4 0 2px,#D6CCB6 2px 3px)}
+/* right side: the back cover, with the hinge groove where it bends round to the spine */
+.labs .book::after{left:100%;top:-2px;bottom:-2px;width:var(--d);transform-origin:left;transform:rotateY(90deg);
+  background:linear-gradient(90deg,transparent 6px,rgba(0,0,0,.34) 6px 9px,transparent 9px),linear-gradient(rgba(0,0,0,.3),rgba(0,0,0,.3)),var(--c)}
+.labs .book-slot:hover .book,.labs .book-slot:focus-visible .book{translate:0 -28px 50px;rotate:y -10deg;animation:none}
+.labs .book-slot:focus-visible .book{box-shadow:0 0 0 3px var(--sky)}
+.labs .book .snum2{font-family:var(--mono);font-weight:700;font-size:11px;letter-spacing:.08em;border:1.5px solid currentColor;border-radius:5px;padding:3px 6px}
+.labs .book .stitle{display:flex;align-items:flex-end;gap:5px;margin:10px 0}
+.labs .book :is(.sname2,.scat2){writing-mode:vertical-rl;transform:rotate(180deg);white-space:nowrap}
+.labs .book .sname2{font-family:var(--display);font-weight:900;text-transform:uppercase;letter-spacing:-.02em;font-size:30px;line-height:.95}
+.labs .book .scat2{font-family:var(--mono);font-weight:700;font-size:9px;letter-spacing:.16em;text-transform:uppercase;opacity:.72}
+.labs .book .sglyph2{font-size:15px;line-height:1;opacity:.9}
 
 /* ===== the ticker band ===== */
 .labs .marquee{position:relative;overflow:clip;background:var(--ink);color:var(--cream);border-top:2px solid var(--ink);border-bottom:2px solid var(--ink);padding:14px 0}
@@ -325,10 +337,11 @@ html.labs-snap:not(.labs-finding) .labs section.chapter[data-team]{scroll-snap-a
 .labs-phone .intro-lead{font-size:16px;margin-top:20px}
 .labs-phone .walkbtn{margin-top:30px}
 .labs-phone .labs-intro .sectlabel{margin-top:40px}
-.labs-phone .rack{--d:26px;height:350px;margin-top:20px;padding:40px 10px 14px;perspective:800px}
-.labs-phone .spine{width:74px;margin:0 5px;padding:12px 6px 14px}
-.labs-phone .spine .stitle{gap:3px}
-.labs-phone .spine .sname2{font-size:19px}
+.labs-phone .rack{--d:28px;height:350px;margin-top:20px;padding:40px 10px 14px;perspective:800px}
+.labs-phone .book-slot{padding:0 4px}
+.labs-phone .book{width:calc(var(--bw) * .77);padding:15px 6px 17px}
+.labs-phone .book .stitle{gap:3px}
+.labs-phone .book .sname2{font-size:19px}
 .labs-phone .mtrack > span{font-size:20px;padding:0 14px;gap:14px}
 /* chapters */
 .labs-phone .k-cols{height:auto}
@@ -352,14 +365,14 @@ html.labs-snap:not(.labs-finding) .labs section.chapter[data-team]{scroll-snap-a
 
 /* ===== stopping the motion ===== */
 /* page swaps (lib/animatedHistory.js) */
-html[data-nav] .labs :is(.floatcard,.spine,.mtrack,.spin,.onode span,.q-scan,.ph-halo,.chaphint .a,.walkbtn .arr){animation-play-state:paused}
+html[data-nav] .labs :is(.floatcard,.book,.mtrack,.spin,.onode span,.q-scan,.ph-halo,.chaphint .a,.walkbtn .arr){animation-play-state:paused}
 /* low-end devices (lib/motion.js): no loops, the stills are simply in colour */
-.lite .labs :is(.floatcard,.spine,.mtrack,.spin,.onode span,.q-scan,.ph-halo,.chaphint .a,.walkbtn .arr,.glitch){animation:none !important}
+.lite .labs :is(.floatcard,.book,.mtrack,.spin,.onode span,.q-scan,.ph-halo,.chaphint .a,.walkbtn .arr,.glitch){animation:none !important}
 .lite .labs .k-cell img{filter:none;transform:none;transition:none}
 @media (prefers-reduced-motion: reduce){
-  .labs :is(.floatcard,.spine,.mtrack,.spin,.onode span,.q-scan,.ph-halo,.chaphint .a,.walkbtn .arr,.glitch,.ww-badge,.ww-card){animation:none !important}
+  .labs :is(.floatcard,.book,.mtrack,.spin,.onode span,.q-scan,.ph-halo,.chaphint .a,.walkbtn .arr,.glitch,.ww-badge,.ww-card){animation:none !important}
   .labs :is(.reveal,.hn-word,.ww-card,.ww-badge){opacity:1 !important;transform:none !important;transition:none !important}
-  .labs :is(.k-cell img,.bar .bfill,.ww-xp b,.cc-needle::after,.tab,.pill,.walkbtn,.spine,.fab,.ph-prod img,.plate img,.frame,.browser){transition:none !important}
+  .labs :is(.k-cell img,.bar .bfill,.ww-xp b,.cc-needle::after,.tab,.pill,.walkbtn,.book,.fab,.ph-prod img,.plate img,.frame,.browser){transition:none !important}
   .labs .k-cell img{filter:none;transform:none}
   .labs :is(.bar .bfill,.ww-xp b){transform:none}
   .labs .cc-needle::after{transform:translate(-50%,-100%) rotate(38deg)}

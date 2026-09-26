@@ -52,6 +52,9 @@ const FLOATS = [
   ['hunar/site.webp', '-6deg', '1.6s', { bottom: '2%', right: '2%', width: '150px', height: '172px' }],
 ];
 const PHONE_FLOAT = (i) => ({ top: ['8%', '40%', '72%'][i % 3], [i < 3 ? 'left' : 'right']: i % 3 === 1 ? '-26px' : '-14px', width: '120px', height: '104px' });
+// each team's book on the intro shelf: [thickness in px (phone: ×0.77), height in % of the shelf]; the two-line titles
+// need the thicker ones
+const BOOKS = [[84, 90], [104, 96], [80, 84], [100, 98], [98, 88], [82, 86], [88, 93], [106, 95]];
 const TICKER = ['AQ LABS', '2026', 'KOLKATA', '08 WORKS', 'ONE ROOM', 'STUDENT BUILT', 'GOT OUT OF HAND'];
 const DOTS = ['tomato', 'sky', 'pink', 'mint', 'lemon', 'grape', 'tomato'];
 const CLAIM = ['not a training problem.', 'a placement problem.'];
@@ -217,8 +220,8 @@ const Gallery = memo(function Gallery({ web, dir, base, go }) {
           <div className="sectlabel reveal" style={{ '--i': 4 }}>// or pull a book</div>
           <div className="rack reveal" style={{ '--i': 4 }}>
             {TEAMS.map((t, i) => (
-              <a key={t.id} className="spine" href={`${base}/${t.id}`} onClick={(e) => go(e, t.id)} style={{ ...tint(t.c), '--sd': `${(i * 0.22).toFixed(2)}s` }}>
-                <span className="snum2">{String(i + 1).padStart(2, '0')}</span><span className="stitle"><span className="sname2">{folded(t.label)}</span><span className="scat2">{t.cat}</span></span><span className="sglyph2" aria-hidden="true">{t.glyph}</span>
+              <a key={t.id} className="book-slot" href={`${base}/${t.id}`} onClick={(e) => go(e, t.id)} style={{ ...tint(t.c), '--sd': `${(i * 0.22).toFixed(2)}s`, '--bw': `${BOOKS[i][0]}px`, '--bh': `${BOOKS[i][1]}%` }}>
+                <span className="book"><span className="snum2">{String(i + 1).padStart(2, '0')}</span><span className="stitle"><span className="sname2">{folded(t.label)}</span><span className="scat2">{t.cat}</span></span><span className="sglyph2" aria-hidden="true">{t.glyph}</span></span>
               </a>
             ))}
           </div>
