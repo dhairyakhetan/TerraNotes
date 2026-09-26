@@ -1,16 +1,16 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link, useLocation } from 'react-router';
 import { LatestTag } from '../shared/Tapes.jsx';
-import { EDITIONS, LATEST, editionLink, editionName } from '../data/editions.js';
+import { EDITIONS, LATEST, editionById, editionLink, editionName } from '../data/editions.js';
 import { FONT } from '../styles/fonts.js';
 
 // The web header's "Edition 01 · Sep 2026 [LATEST] ▾" button: opens a list of every edition (newest first) and a
-// link to /editions. Shows the edition of the page you're on (/editions/<n>, else the latest). Esc / outside click closes.
+// link to /editions. Shows the edition of the page you're on (/sep26…, else the latest). Esc / outside click closes.
 const MONO = { fontFamily: FONT.mono, fontWeight: "700", letterSpacing: "1.2px", textTransform: "uppercase" };
 
 export default function WebEditionPicker() {
   const [open, setOpen] = useState(false);
-  const m = useLocation().pathname.match(/^\/editions\/(\d+)$/), here = m ? Number(m[1]) : LATEST;
+  const here = editionById(useLocation().pathname.split('/')[1])?.number ?? LATEST;
   const box = useRef(null);
   useEffect(() => {
     if (!open) return undefined;

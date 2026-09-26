@@ -2,7 +2,7 @@
 // replaces it the moment it starts (index.html hides .static-copy once JavaScript runs), so people see the real page;
 // chatbots, search engines and link readers that don't run JavaScript read this instead.
 import { ALL_ARTICLES, ARTICLES, placeOf } from '../src/data/articles.js';
-import { EDITIONS, LATEST, editionName } from '../src/data/editions.js';
+import { EDITIONS, LATEST, articleLink, editionName } from '../src/data/editions.js';
 import { PHOTOS } from '../src/data/photos.js';
 import { SITE } from '../src/data/site.js';
 import { MEMBERS, TEAMS, teamsOf } from '../src/data/team.js';
@@ -17,7 +17,7 @@ const shell = (inner) => `<div class="static-copy" style="max-width:680px;margin
 <main>${inner}</main>
 </div>`;
 
-const articleList = () => `<ul>${ARTICLES.map((a) => `<li><a href="/articles/${a.slug}"><strong>${esc(a.title)}</strong></a> (${esc(a.tag)}): ${esc(a.dek)}. ${byline(a)}</li>`).join('')}</ul>`;
+const articleList = () => `<ul>${ARTICLES.map((a) => `<li><a href="${articleLink(a)}"><strong>${esc(a.title)}</strong></a> (${esc(a.tag)}): ${esc(a.dek)}. ${byline(a)}</li>`).join('')}</ul>`;
 
 export function articleHtml(a) {
   const body = a.body.map((b) => {
@@ -34,7 +34,7 @@ export function articleHtml(a) {
 <p>${byline(a)}</p>
 ${body}
 </article>
-<p>Next: <a href="/articles/${next.slug}">${esc(next.title)}</a> · <a href="/articles">All articles</a></p>`);
+<p>Next: <a href="${articleLink(next)}">${esc(next.title)}</a> · <a href="/articles">All articles</a></p>`);
 }
 
 export const pageHtml = {
@@ -45,7 +45,7 @@ export const pageHtml = {
 <h2><a href="/words">Words we should bring back</a></h2><p>A mini game: guess what an old, forgotten word means.</p>
 <h2><a href="/members">Meet the team</a></h2><p>${MEMBERS.length} people across the heads, design, writing and tech teams.</p>
 <p>${esc(SITE.footerNote)}</p>`),
-  '/editions': () => shell(`<h1>Editions</h1><p>TerraNotes comes out once a month.</p><ul>${[...EDITIONS].reverse().map((e) => `<li><strong>${editionName(e.number)}</strong>, ${esc(e.month)}${e.number === LATEST ? ' (latest)' : ''}: ${ALL_ARTICLES.filter((a) => a.edition === e.number).map((a) => `<a href="/articles/${a.slug}">${esc(a.title)}</a>`).join(', ')}</li>`).join('')}</ul>`),
+  '/editions': () => shell(`<h1>Editions</h1><p>TerraNotes comes out once a month.</p><ul>${[...EDITIONS].reverse().map((e) => `<li><strong>${editionName(e.number)}</strong>, ${esc(e.month)}${e.number === LATEST ? ' (latest)' : ''}: ${ALL_ARTICLES.filter((a) => a.edition === e.number).map((a) => `<a href="${articleLink(a)}">${esc(a.title)}</a>`).join(', ')}</li>`).join('')}</ul>`),
   '/articles': () => shell(`<h1>All articles</h1><p>${ARTICLES.length} pieces, hung up to dry, one by one.</p>${articleList()}`),
   '/photos': () => shell(`<h1>Photo wall</h1><p>Moments, strung up.</p><ul>${PHOTOS.filter((p) => p.photo).map((p, i) => `<li><img src="${esc(p.photo)}" alt="${esc(p.caption)}" width="240" style="max-width:100%;height:auto"><br>Highlight ${pad2(i + 1)}: ${esc(p.caption)}${p.place ? `, ${esc(p.place)}` : ''}</li>`).join('')}</ul>`),
   '/words': () => shell(`<h1>Words we should bring back</h1><p>A mini game: each round shows an old word and three meanings; pick the right one. Some of the words:</p><ul>${WORDS.map((w) => `<li>${esc(w.meaning)}</li>`).join('')}</ul>`),

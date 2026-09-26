@@ -15,20 +15,21 @@ const pathOf = (to) => (typeof to === 'string' ? new URL(to, location.href).path
 
 let seq = 0;
 function swap(from, to, update, backwards = false) {
-  if (!document.startViewTransition || calm() || from === to || (isHomePath(from) && isHomePath(to)) || document.visibilityState !== 'visible') {
+  // (also none when an article's other address redirects to it, e.g. /sep26/articles/labs → /articles/labs)
+  if (!document.startViewTransition || calm() || from === to || (isHomePath(from) && isHomePath(to)) || (slugOf(from) && slugOf(from) === slugOf(to)) || document.visibilityState !== 'visible') {
     update();
     return;
   }
   const kind = isHomePath(to) ? 'back' : slugOf(to) ? (slugOf(from) ? (backwards ? 'prev' : 'next') : 'into') : 'page';
-  const slug = kind === 'back' && slugOf(from);
-  const cover = slug && document.querySelector('.hero-drop img')?.getBoundingClientRect();
-  const link = (kind === 'into' || kind === 'next') && document.querySelector(`a[href="/articles/${slugOf(to)}"]`);
+  const cover = kind === 'back' && slugOf(from) && document.querySelector('.hero-drop img')?.getBoundingClientRect();
+  // a card whose article has its own page (data-flight="off", e.g. AQ Labs: no cover to land) crossfades instead
+  const link = (kind === 'into' || kind === 'next') && document.querySelector(`a[href="${to}"]:not([data-flight="off"])`);
   const box = link && link.getBoundingClientRect();
   const flies = !!(box && box.width && box.bottom > 0 && box.top < innerHeight);
   if (flies) rememberBox(box);
   if (flies || cover) {
     flushSync(update); // rendered now, so the card on the new page can be found and measured
-    const card = cover && document.querySelector(`a[href="/articles/${slug}"]`);
+    const card = cover && document.querySelector(`a[href="${from}"]`);
     if (card) flyBack(card, cover);
     return;
   }

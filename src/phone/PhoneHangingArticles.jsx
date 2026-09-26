@@ -3,10 +3,11 @@ import ArticleCard, { TagRow } from '../shared/ArticleCard.jsx';
 import ImageSlot from '../shared/ImageSlot.jsx';
 import { ByTape, Clip, FeaturedTape } from '../shared/Tapes.jsx';
 import { ARTICLES, TAGS } from '../data/articles.js';
+import { articleLink } from '../data/editions.js';
 import { pad2 } from '../lib/format.js';
 import { useFitTitle } from '../lib/fitTitle.js';
 import { useByWriter } from '../lib/byWriter.js';
-import { rememberCard } from '../lib/cardFlight.js';
+import { flight } from '../lib/cardFlight.js';
 import { FONT } from '../styles/fonts.js';
 
 // The phone home page's articles: every card of the latest edition hangs on a string, in page coordinates (the
@@ -52,7 +53,7 @@ export default function PhoneHangingArticles() {
         <div className="hang sway" style={{ position: "absolute", left: "28px", top: "1052px", width: "334px", height: "344px", "--a": "0.35deg", "--d": "6.4s", animationDelay: "-2.6s" }}>
           <Thread left={121.3} h={150} />
           <Thread left={261.3} top={100} h={50} />
-          <Link className="card" onClick={rememberCard} style={{ position: "absolute", left: "0", top: "148px", width: "334px", height: "196px", display: "block", textDecoration: "none", color: "#111111" }} to={`/articles/${a6.slug}`}>
+          <Link className="card" {...flight(a6)} style={{ position: "absolute", left: "0", top: "148px", width: "334px", height: "196px", display: "block", textDecoration: "none", color: "#111111" }} to={articleLink(a6)}>
             {mark(a6) && <ByTape name={by} />}
             {a6.featured && <FeaturedTape />}
             <Clip color={TAGS[a6.tag].color} w={24} h={9} top="-6px" left={110} />

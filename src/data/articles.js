@@ -1,9 +1,11 @@
 import { LATEST } from './editions.js';
 
 // Articles, in order: this order sets the numbers (01, 02…) and the "next on the line" chain.
-//   slug:     the address, /articles/<slug>
+//   slug:     the address: /articles/<slug> while its edition is the latest, then /<edition id>/articles/<slug>
+//             (e.g. /sep26/articles/labs; articleLink in data/editions.js). Unique within its edition.
 //   tag:      one of the keys in TAGS (sets the colours)
-//   cover:    put the picture in public/articles/ and write its path, e.g. '/articles/wetlands.jpg'
+//   cover:    put the picture in public/editions/<edition id>/articles/<slug>/cover.jpg and write that path, e.g.
+//             '/editions/sep26/articles/wetlands/cover.jpg' (the article's own folder: its photos go there too)
 //   alt:      a few words describing the cover (also the placeholder label until there is one)
 //   author:   the writer's name (a member in data/team.js also gets their photo in the "words by" box); null = no writer
 //             (no byline, no "words by" box), for pieces from Aquaterra itself
@@ -15,7 +17,7 @@ import { LATEST } from './editions.js';
 //     'Some text.'                                         paragraph (the first one gets the drop cap)
 //     { h2: 'Heading' }                                    section heading
 //     { quote: 'The line.', by: 'who said it' }            pull quote
-//     { photo: '/articles/x.jpg', caption: '' }            pinned photo
+//     { photo: '/editions/…/x.jpg', caption: '' }          pinned photo
 //     { photos: [{ photo, caption }, { photo, caption }] } two small photos
 //     { log: [['PLACE', 'Kolkata'], ['VISITS', '3']] }     yellow field log box (web: in the margin)
 //     { numbers: [['label', 'value'], …], title }         yellow tally card
@@ -23,6 +25,8 @@ import { LATEST } from './editions.js';
 //     { loop: ['step', …], title }                         steps that go round and round
 //     { then: [['then', 'now'], …], title, labels }        two-column then / now card
 //     { projects: [{ name, what, meta, color, ink }, …] }  numbered coloured project bars (AQ Labs)
+//   page:     optional: the article has its own page instead of the usual layout (App.jsx PAGES), e.g. 'labs' →
+//             src/articles/labs/. Its body is still what crawlers and AIs read (build/).
 // Blocks render in shared/ArticleBody.jsx. Leave a field '' and the design's placeholder shows instead.
 // After adding or changing an article's cover, run tools/make-link-previews.mjs for its link-preview image.
 
@@ -40,7 +44,8 @@ export const TAGS = {
 // Every article, in every edition.
 export const ALL_ARTICLES = [
   {
-    slug: 'under-aquaterra-aq-labs',
+    slug: 'labs',
+    page: 'labs', // its own page: the AQ Labs gallery (src/articles/labs/)
     title: 'Under Aquaterra: AQ Labs',
     dek: "AquaTerra's student build program",
     tag: 'Under Aquaterra',
@@ -74,7 +79,7 @@ export const ALL_ARTICLES = [
     title: 'Exam stress: the academic plot twist nobody asked for',
     dek: 'when a little pressure helps, and when it takes over',
     tag: 'Essay',
-    cover: '/articles/exam-stress.jpg',
+    cover: '/editions/sep26/articles/exam-stress/cover.jpg',
     alt: 'exam season',
     author: 'Diti Shah',
     edition: 1,
@@ -108,7 +113,7 @@ export const ALL_ARTICLES = [
     title: 'Locked in or logged on?',
     dek: 'on announcing a fresh start instead of making one',
     tag: 'Dispatch',
-    cover: '/articles/locked-in-or-logged-on.jpg',
+    cover: '/editions/sep26/articles/locked-in-or-logged-on/cover.jpg',
     alt: 'lock-in',
     author: 'Pahal Sethi',
     edition: 1,
@@ -132,7 +137,7 @@ export const ALL_ARTICLES = [
     title: 'The rise of “fast fashion” and anxiety',
     dek: 'why shopping for clothes started to feel exhausting',
     tag: 'Object study',
-    cover: '/articles/fast-fashion-and-anxiety.jpg',
+    cover: '/editions/sep26/articles/fast-fashion-and-anxiety/cover.jpg',
     alt: 'fast fashion',
     author: 'Dhriti Agarwal',
     edition: 1,
@@ -152,7 +157,7 @@ export const ALL_ARTICLES = [
     title: 'This side of the river',
     dek: 'on the side that blooms without being looked after',
     tag: 'Prose',
-    cover: '/articles/this-side-of-the-river.jpg',
+    cover: '/editions/sep26/articles/this-side-of-the-river/cover.jpg',
     alt: 'the river',
     author: 'Ashwika Tripathi',
     edition: 1,
@@ -177,7 +182,7 @@ export const ALL_ARTICLES = [
     title: 'My grandma’s daughter',
     dek: 'a portrait of mom, by someone slowly turning into her',
     tag: 'Prose',
-    cover: '/articles/my-grandmas-daughter.jpg',
+    cover: '/editions/sep26/articles/my-grandmas-daughter/cover.jpg',
     alt: 'grandma',
     author: 'Ashwika Tripathi',
     edition: 1,
@@ -204,7 +209,7 @@ export const ALL_ARTICLES = [
     title: 'Which is weird',
     dek: 'ten years, one girl, and everything that quietly changed',
     tag: 'Essay',
-    cover: '/articles/which-is-weird.jpg',
+    cover: '/editions/sep26/articles/which-is-weird/cover.jpg',
     alt: 'ten years ago',
     author: 'Ashwika Tripathi',
     edition: 1,
@@ -231,7 +236,7 @@ export const ALL_ARTICLES = [
     title: 'September’s AI Revolution',
     dek: '',
     tag: 'Reportage',
-    cover: '/articles/septembers-ai-revolution.jpg',
+    cover: '/editions/sep26/articles/septembers-ai-revolution/cover.jpg',
     alt: 'September’s AI news',
     author: 'Bhavishya Agarwal',
     edition: 1,

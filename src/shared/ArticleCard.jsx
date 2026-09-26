@@ -2,8 +2,9 @@ import { Link } from 'react-router';
 import ImageSlot from './ImageSlot.jsx';
 import { ByTape, Clip, FeaturedTape } from './Tapes.jsx';
 import { placeOf, TAGS } from '../data/articles.js';
+import { articleLink } from '../data/editions.js';
 import { pad2 } from '../lib/format.js';
-import { rememberCard } from '../lib/cardFlight.js';
+import { flight } from '../lib/cardFlight.js';
 import { coverFloor, useFitTitle } from '../lib/fitTitle.js';
 import { FONT } from '../styles/fonts.js';
 
@@ -43,7 +44,7 @@ export default function ArticleCard({ article: a, look = 'phone', mark, classNam
   const title = useFitTitle(a.title, titlePx, titlePx * 0.7);
   const [cw, ch, ctop] = L.clip;
   return (
-    <Link to={`/articles/${a.slug}`} className={className ?? (L.w ? 'card-link' : undefined)} onClick={rememberCard}
+    <Link to={articleLink(a)} className={className ?? (L.w ? 'card-link' : undefined)} {...flight(a)}
       style={{ ...(L.w && { position: "absolute", left: "0", top: "0", width: `${L.w}px`, height: `${L.h}px` }), ...style, display: "block", textDecoration: "none", color: "#111111" }}>
       {mark && <ByTape name={mark} />}
       {a.featured && <FeaturedTape />}

@@ -16,6 +16,7 @@ npm run preview  # serve the build
 ## Deploy
 
 Import the repo in Vercel; it detects Vite. `vercel.json` adds the single-page-app rewrite, clean URLs (so
-`/articles/<slug>` serves that article's own HTML with its link preview) and security and cache headers.
+`/articles/<slug>`, or `/<edition>/articles/<slug>` for an older edition, serves that article's own HTML with its link
+preview) and security and cache headers.
 The site's address for link previews is `SITE.url` in `src/data/site.js`. To override it, set `SITE_URL` in the
 Vercel project.

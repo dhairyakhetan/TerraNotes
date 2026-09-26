@@ -8,6 +8,9 @@ import { calm } from './motion.js';
 let last = null;
 export const rememberBox = (r) => { last = { x: r.left, y: r.top, w: r.width, t: Date.now() }; };
 export const rememberCard = (e) => rememberBox(e.currentTarget.getBoundingClientRect());
+// Props for a card's link: remember the tap, or, for an article with its own page (no cover to land on, e.g. AQ Labs),
+// data-flight="off" so animatedHistory.js crossfades instead.
+export const flight = (a) => (a.page ? { 'data-flight': 'off' } : { onClick: rememberCard });
 
 // direct (phone): straight into place with one small settle. Otherwise (web): lifts, then drops onto its wire.
 function flyFrom(el, f, direct) {

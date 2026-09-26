@@ -15,6 +15,7 @@ import './styles/web.css';
 import './styles/footer.css';
 import './styles/intro.css';
 import './styles/buddy.css';
+import './articles/labs/labs.css'; // last: its scoped rules must win over web.css's generic ones
 
 // Entry point (index.html loads it). Starts the React app inside a router whose history animates page changes
 // (lib/animatedHistory.js; useTransitions off: the page swap must render at once, inside the transition), plays the

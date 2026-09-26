@@ -1,4 +1,5 @@
-// Link-preview pictures for the articles: public/og/<slug>.jpg, 1200×630 (the shape WhatsApp, Instagram, iMessage…
+// Link-preview pictures for the articles: preview.jpg in each article's folder (public/editions/<id>/articles/<slug>/),
+// 1200×630 (the shape WhatsApp, Instagram, iMessage…
 // show big). Drawn like the site: the whole cover, uncropped, on the left (white mount, hard shadow); on the right the
 // logo, the tag, the title big enough to read in a chat bubble, the dek and the byline. The build (build/siteFiles.js)
 // copies each to a content-hashed name and points that article's page at it. public/og/home.jpg (the home page's
@@ -9,7 +10,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { chromium } from 'playwright';
 import { ALL_ARTICLES, TAGS } from '../src/data/articles.js';
-import { editionName } from '../src/data/editions.js';
+import { articleFolder, editionName } from '../src/data/editions.js';
 
 const root = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..');
 const pub = (f) => path.join(root, 'public', f);
@@ -53,14 +54,15 @@ if (process.env.FONTS_DIR) { // offline: serve Google Fonts from a local folder 
   await ctx.route(/fonts\.gstatic\.com/, (r) => r.fulfill({ path: path.join(process.env.FONTS_DIR, r.request().url().replace('https://fonts.gstatic.com/', '').replace(/\//g, '_')), contentType: 'font/woff2' }));
 }
 const p = await ctx.newPage();
-fs.mkdirSync(pub('og'), { recursive: true });
 for (const a of ALL_ARTICLES.filter((x) => x.cover)) {
   const size = await p.evaluate((src) => new Promise((ok) => { const i = new Image(); i.onload = () => ok([i.naturalWidth, i.naturalHeight]); i.src = src; }), data(a.cover.slice(1), 'image/jpeg'));
   await p.setContent(page(a, data(a.cover.slice(1), 'image/jpeg'), ...size), { waitUntil: 'load' });
   await p.evaluate(() => document.fonts.ready);
   // the title shrinks until it fits in four lines
   await p.evaluate(() => { const t = document.getElementById('t'); let s = 64; while (t.getBoundingClientRect().height > s * 0.98 * 4 + 4 && s > 34) { s -= 2; t.style.fontSize = `${s}px`; } });
-  await p.screenshot({ path: pub(`og/${a.slug}.jpg`), type: 'jpeg', quality: 90 });
-  console.log(a.slug, Math.round(fs.statSync(pub(`og/${a.slug}.jpg`)).size / 1024), 'KB');
+  const file = pub(`${articleFolder(a).slice(1)}/preview.jpg`);
+  fs.mkdirSync(path.dirname(file), { recursive: true });
+  await p.screenshot({ path: file, type: 'jpeg', quality: 90 });
+  console.log(articleFolder(a), Math.round(fs.statSync(file).size / 1024), 'KB');
 }
 await browser.close();

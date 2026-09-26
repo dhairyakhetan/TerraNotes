@@ -1,17 +1,16 @@
 import { useEffect } from 'react';
-import { Link, Navigate, useParams } from 'react-router';
+import { Link } from 'react-router';
 import PhoneHeader from '../phone/PhoneHeader.jsx';
 import WebHeader from '../web/WebHeader.jsx';
 import ArticleCard from '../shared/ArticleCard.jsx';
 import { LatestTag } from '../shared/Tapes.jsx';
-import NotFoundPage from './NotFoundPage.jsx';
 import { ALL_ARTICLES } from '../data/articles.js';
-import { EDITIONS, LATEST, editionLink, editionName, editionOf, nextMonth } from '../data/editions.js';
+import { EDITIONS, LATEST, articleLink, editionLink, editionName, editionOf, nextMonth } from '../data/editions.js';
 import { pad2 } from '../lib/format.js';
 import { FONT } from '../styles/fonts.js';
 
-// /editions (every monthly edition, the latest on top) and /editions/<n> (a previous edition's articles; the latest
-// one lives on the home page, so it redirects there). Both layouts, in normal document flow (not absolutely placed).
+// /editions (every monthly edition, the latest on top) and /<edition id>, e.g. /sep26 (a previous edition's articles;
+// App.jsx sends the latest one's id to the home page). Both layouts, in normal document flow (not absolutely placed).
 const HEAD = { fontFamily: FONT.head, fontWeight: "400", textTransform: "uppercase", color: "#111111" };
 const MONO = { fontFamily: FONT.mono, letterSpacing: "1.4px", textTransform: "uppercase" };
 const inEdition = (n) => ALL_ARTICLES.filter((a) => a.edition === n);
@@ -50,11 +49,11 @@ function EditionCard({ e, web }) {
       <div style={{ ...MONO, marginTop: "4px", fontSize: web ? "12px" : "10px" }}>{`${pad2(list.length)} pieces`}</div>
       <div style={{ display: "flex", gap: web ? "12px" : "6px", marginTop: web ? "18px" : "14px" }}>
         {list.filter((a) => a.cover).slice(0, 6).map((a) => (
-          <Link key={a.slug} to={`/articles/${a.slug}`} aria-label={a.title} style={{ flex: "1", minWidth: "0", aspectRatio: "3 / 4", border: "1.5px solid #111111", background: `#E6E0D3 url(${a.cover}) 50% 12% / cover no-repeat` }} />
+          <Link key={a.slug} to={articleLink(a)} aria-label={a.title} style={{ flex: "1", minWidth: "0", aspectRatio: "3 / 4", border: "1.5px solid #111111", background: `#E6E0D3 url(${a.cover}) 50% 12% / cover no-repeat` }} />
         ))}
       </div>
       <ol style={{ margin: web ? "18px 0 0" : "14px 0 0", padding: "0 0 0 22px", fontSize: web ? "16px" : "14px", lineHeight: "1.5" }}>
-        {list.map((a) => <li key={a.slug}><Link to={`/articles/${a.slug}`} style={{ color: "#111111" }}>{a.title}</Link>{a.author ? <span style={{ color: "#6B665C" }}>{` · ${a.author}`}</span> : null}</li>)}
+        {list.map((a) => <li key={a.slug}><Link to={articleLink(a)} style={{ color: "#111111" }}>{a.title}</Link>{a.author ? <span style={{ color: "#6B665C" }}>{` · ${a.author}`}</span> : null}</li>)}
       </ol>
       <Link className="press btn" to={editionLink(e.number)} style={{ "--c": "#111111", ...MONO, fontWeight: "700", fontSize: "11px", marginTop: web ? "22px" : "16px", minHeight: "44px", padding: "0 18px", display: "inline-flex", alignItems: "center", background: "#111111", color: "#FFFFFF", border: "2px solid #111111", boxShadow: "4px 4px 0 #F7C21A", textDecoration: "none" }}>{latest ? 'Open the latest edition →' : 'Open this edition →'}</Link>
     </article>
@@ -84,11 +83,8 @@ export function EditionsPage({ web }) {
   );
 }
 
-export function EditionPage({ web }) {
-  const n = Number(useParams().n), e = editionOf(n);
-  if (!e) return <NotFoundPage web={web} />;
-  if (n === LATEST) return <Navigate to="/" replace />;
-  const list = inEdition(n);
+export function EditionPage({ web, n }) {
+  const e = editionOf(n), list = inEdition(n);
   return (
     <Frame web={web} title={`${editionName(n)} · ${e.month}`}>
       <Link to="/editions" style={{ fontFamily: FONT.hand, fontSize: "22px", color: "#111111" }}>← all editions</Link>

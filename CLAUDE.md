@@ -38,6 +38,15 @@ Two separate layouts, chosen by window width (`lib/layoutMode.js`, `useIsWeb()`)
   - Sections export their heights so the page grows with the data: `HANG_EXTRA` (PhoneHangingArticles) and `TEAM_HEIGHT` (TeamSection).
   - When a section grows, move what's below it; don't reflow.
 - **Article, editions and 404 pages** are in normal document flow.
+- **Addresses follow the editions** (`data/editions.js`; each edition's id comes from its month, `sep26`):
+  - latest edition: `/articles/<slug>`; older ones: `/<id>/articles/<slug>` and `/<id>` for the edition itself.
+  - Build links with `articleLink(a)` / `editionLink(n)`, never by hand. A new edition moves the old links by itself; either address of an article redirects to its current one (`App.jsx`).
+- **Files follow the editions too:** `public/editions/<id>/` holds that edition's files, latest or not. Each article has a folder, `public/editions/<id>/articles/<slug>/`: `cover.jpg`, `preview.jpg` (link preview, made by the tool) and any photos of its own (`articleFolder(a)`). The photo wall's pictures are in `public/editions/<id>/photos/`.
+- **An article can have its own page** instead of the usual layout: `page: 'labs'` in its data and an entry in `PAGES` (`App.jsx`). It lives in `src/articles/<name>/`.
+  - Its `body` is still what crawlers and AIs read.
+  - It gets no card flight (no cover to land on; `flight()` in `lib/cardFlight.js`), just the crossfade.
+  - **AQ Labs** (`src/articles/labs/`, the "labs" article) is the AQ Labs team's own gallery site, ported. It keeps their look on purpose: their fonts (`public/fonts/`, JetBrains Mono from Google Fonts), their palette and rounded pills. Don't restyle it into the magazine's design.
+  - Its CSS (`labs.css`) is scoped to `.labs`. Its class names must not match any in `src/styles/` (it had to rename `.intro` and `.orbit`). Its loops keep the motion rules below, inside `labs.css`: transform / opacity only, stopped by reduced motion, `.lite`, `.off-screen` and `html[data-nav]`.
 - **Shared components** (`src/shared/`) take a `web` prop (or `look`) and keep a `PHONE` / `WEB` table of positions and sizes. Change a value in the right table; don't fork the component.
 - **The home page also answers at `/articles`, `/photos`, `/words` and `/members`** and scrolls to that section: element ids `articles`, `photos`, `words`, `members`. See `lib/routes.js` and `lib/scrollMemory.js`.
 - **Styling is inline** (`style={{ … }}` with string values like `"12px"`), matching the existing code.
@@ -122,20 +131,22 @@ Popups are white cards with a hard shadow and a clip:
 ```
 index.html              meta / link-preview tags (%SITE_URL% filled at build), fonts, viewport switch, no-JS notice
 vite.config.js          plugins: React, %SITE_URL%, build/siteFiles.js
-build/siteFiles.js      at build: articles/<slug>.html (own title + preview image), section pages, 404, sitemap, robots, llms.txt
+build/siteFiles.js      at build: an .html per article at its address (own title + preview image), section pages, 404, sitemap, robots, llms.txt
 build/staticCopy.js     each page's text as plain HTML inside #root, for crawlers without JavaScript
-tools/make-link-previews.mjs   public/og/<slug>.jpg (1200×630 preview per article)
-src/main.jsx            entry: router with the animated history, intro, lite class, console hello, all CSS imports
-src/App.jsx             routes (phone vs web page per route), skip link, scroll memory, error card, footer, games popup
+tools/make-link-previews.mjs   preview.jpg in each article's folder (1200×630 link preview)
+src/main.jsx            entry: router with the animated history, intro, lite class, console hello, all CSS imports (labs.css last)
+src/App.jsx             routes (phone vs web page per route, articles with their own page: PAGES, address redirects), skip link,
+                        scroll memory, error card, footer, games popup
 src/data/               ALL content (each file documents its fields at the top)
   site.js               site URL, Aquaterra website + Instagram, intro line, footer note, footer video, bubble colours
   articles.js           TAGS, ALL_ARTICLES (body block formats at the top), ARTICLES (latest edition), placeOf()
-  editions.js           EDITIONS (newest last), LATEST, helpers
+  editions.js           EDITIONS (newest last), LATEST, editionId, articleLink, editionLink, articleFolder
   team.js               TEAMS, MEMBERS (photo, bio, instagram, credit, crown, badge)
   photos.js  words.js   photo wall; words game
 src/phone/              PhoneHome, PhoneHangingArticles (the strung-up cards), PhoneArticle, PhoneHeader, PhoneMenu
 src/web/                WebHome, WebArticleLine (sideways wire), WebArticle, WebHeader, WebEditionPicker
-src/pages/              EditionsPage (/editions, /editions/<n>), NotFoundPage (404): both layouts in one file
+src/pages/              EditionsPage (/editions, /<id> e.g. /sep26), NotFoundPage (404): both layouts in one file
+src/articles/labs/      LabsPage.jsx + labs.css: the AQ Labs gallery (the "labs" article's own page, both layouts)
 src/shared/             used by both layouts:
   ArticleCard           the card (+ TagPill, TagRow)          ArticleBody   body blocks, FieldLog, AuthorBox
   TeamSection           "Meet the team" + profile card        PhotoWallSection, PhotoViewer, WordsGameSection
@@ -149,17 +160,18 @@ src/lib/                logic only, no JSX:
   scrollLock   buddyState   introNotebook   consoleHello   format (pad2, firstName, instagramUrl)
 src/styles/             fonts.js (FONT) · base.css (resets, press / focus states) · loops.css (endless animations)
                         motion.css (one-shot) · phone.css · web.css · footer.css · intro.css · buddy.css
-public/                 brand/ (globe, wordmark) · articles/ (covers) · photos/ · team/ (faces, 400px WebP) · badges/
-                        video/footer-bubbles.mp4 · og/ (link previews; home.jpg made by hand) · icons + site.webmanifest
+public/                 editions/<id>/ (articles/<slug>/: cover, preview, own photos · photos/: the photo wall)
+                        brand/ (globe, wordmark) · team/ (faces, 400px WebP) · badges/ · fonts/ (AQ Labs' own fonts)
+                        video/footer-bubbles.mp4 · og/home.jpg (home link preview, made by hand) · icons + site.webmanifest
 ```
 
 ## Common jobs
 
 - **New article:**
-  1. Add an entry to `ALL_ARTICLES` (fields at the top of `data/articles.js`) and put the cover in `public/articles/`.
+  1. Add an entry to `ALL_ARTICLES` (fields at the top of `data/articles.js`) and put the cover in its folder: `public/editions/<id>/articles/<slug>/cover.jpg`.
   2. Run `node tools/make-link-previews.mjs`.
   - Both layouts pick it up. Phone cards past the sixth hang in pairs; the web line grows.
-- **New edition:** add it to `EDITIONS`, then set its articles' `edition`.
+- **New edition:** add it to `EDITIONS`, then set its articles' `edition` and put their files in `public/editions/<new id>/`. The previous edition's links move under its id by themselves; nothing else to change.
 - **New member:** add them to `MEMBERS` with a square ~400px WebP in `public/team/`. The faces lay themselves out.
 - **New block type in articles:**
   1. Render it in `shared/ArticleBody.jsx` (both sizes, `web` = ×1.25).
