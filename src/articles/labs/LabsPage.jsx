@@ -52,9 +52,9 @@ const FLOATS = [
   ['hunar/site.webp', '-6deg', '1.6s', { bottom: '2%', right: '2%', width: '150px', height: '172px' }],
 ];
 const PHONE_FLOAT = (i) => ({ top: ['8%', '40%', '72%'][i % 3], [i < 3 ? 'left' : 'right']: i % 3 === 1 ? '-26px' : '-14px', width: '120px', height: '104px' });
-// each team's book on the intro shelf: [thickness in px (phone: ×0.77), height in % of the shelf]; the two-line titles
-// need the thicker ones
-const BOOKS = [[84, 90], [104, 96], [80, 84], [100, 98], [98, 88], [82, 86], [88, 93], [106, 95]];
+// each team's book on the intro shelf (Book): [thickness in px (phone: ×0.77), height in % of the shelf]; the two-line
+// titles need the thicker ones
+const BOOKS = [[84, 90], [112, 96], [80, 84], [108, 98], [106, 88], [82, 86], [88, 93], [112, 95]];
 const TICKER = ['AQ LABS', '2026', 'KOLKATA', '08 WORKS', 'ONE ROOM', 'STUDENT BUILT', 'GOT OUT OF HAND'];
 const DOTS = ['tomato', 'sky', 'pink', 'mint', 'lemon', 'grape', 'tomato'];
 const CLAIM = ['not a training problem.', 'a placement problem.'];
@@ -191,6 +191,33 @@ function BackToTop() {
   return <button type="button" className={`fab${show ? ' show' : ''}`} aria-label="Back to top" tabIndex={show ? 0 : -1} onClick={() => scrollTo({ top: 0, behavior: behavior() })}>↑</button>;
 }
 
+// A book on the intro shelf (labs.css, "the shelf of books"): w = thickness in px, h = height in % of the shelf. Its
+// spine is a real curve: FACES narrow faces around a circular arc that bulges `sag` forward, each turned to face out
+// from the arc and shaded by which way it faces (blending into its neighbours, so it reads smooth); the top is cut to
+// the same arc (clip-path).
+const FACES = 9;
+const lightAt = (t) => Math.max(0, 0.24 * (1 - Math.abs(t + 0.35) * 1.7)); // t: -1 left edge … 1 right edge; lit left of centre
+const darkAt = (t) => 0.06 + 0.34 * Math.max(0, t) ** 1.3 + 0.12 * Math.max(0, -t - 0.6);
+function Book({ w, h, children }) {
+  const sag = Math.round(w * 0.14), r = (w * w / 4 + sag * sag) / (2 * sag), half = Math.asin(w / 2 / r), step = (2 * half) / FACES;
+  const px = (n) => `${n.toFixed(2)}px`;
+  const arc = Array.from({ length: 9 }, (_, k) => { const x = (w * k) / 8; return `${px(x)} ${px(r - Math.sqrt(r * r - (x - w / 2) ** 2))}`; });
+  return (
+    <span className="book" style={{ '--bw': `${w}px`, '--bh': `${h}%`, '--sag': `${sag}px` }}>
+      {Array.from({ length: FACES }, (_, i) => {
+        const a = -half + step * (i + 0.5), c = 2 * r * Math.sin(step / 2) + 1.2;
+        const x = w / 2 + r * Math.sin(a), z = r * Math.cos(a) - r;
+        const t0 = (a - step / 2) / half, t1 = (a + step / 2) / half, rgba = (v, n) => `rgba(${v},${v},${v},${n.toFixed(3)})`;
+        return <i key={i} className={`bk-face${i === 0 ? ' edge-l' : ''}${i === FACES - 1 ? ' edge-r' : ''}`} style={{ width: px(c), transform: `translate3d(${px(x - c / 2)}, 0, ${px(z)}) rotateY(${(a * 180) / Math.PI}deg)`, '--lt0': rgba(255, lightAt(t0)), '--lt1': rgba(255, lightAt(t1)), '--dk0': rgba(0, darkAt(t0)), '--dk1': rgba(0, darkAt(t1)) }} />;
+      })}
+      <i className="bk-head" style={{ clipPath: `polygon(${arc.join(', ')}, 100% 100%, 0 100%)` }} />
+      <i className="bk-pages" />
+      <i className="bk-side" />
+      <span className="bk-label">{children}</span>
+    </span>
+  );
+}
+
 const Credits = ({ team, tags }) => <div className="credits"><span className="cr-team">{team}</span><span className="cr-tags">{tags.map((t) => <span key={t} className="cr-tag">{t}</span>)}</span></div>;
 const Hint = ({ i, next, dark }) => <div className={`chaphint${dark ? ' dark' : ''}`} aria-hidden="true">{`${String(i).padStart(2, '0')} / 08 · ${next} `}<span className="a">↓</span></div>;
 const Meta = ({ k, t }) => <div className="cmeta-row"><span className="cm-k">{k}</span><span className="cm-t">{t}</span></div>;
@@ -220,8 +247,10 @@ const Gallery = memo(function Gallery({ web, dir, base, go }) {
           <div className="sectlabel reveal" style={{ '--i': 4 }}>// or pull a book</div>
           <div className="rack reveal" style={{ '--i': 4 }}>
             {TEAMS.map((t, i) => (
-              <a key={t.id} className="book-slot" href={`${base}/${t.id}`} onClick={(e) => go(e, t.id)} style={{ ...tint(t.c), '--sd': `${(i * 0.22).toFixed(2)}s`, '--bw': `${BOOKS[i][0]}px`, '--bh': `${BOOKS[i][1]}%` }}>
-                <span className="book"><span className="snum2">{String(i + 1).padStart(2, '0')}</span><span className="stitle"><span className="sname2">{folded(t.label)}</span><span className="scat2">{t.cat}</span></span><span className="sglyph2" aria-hidden="true">{t.glyph}</span></span>
+              <a key={t.id} className="book-slot" href={`${base}/${t.id}`} onClick={(e) => go(e, t.id)} style={{ ...tint(t.c), '--sd': `${(i * 0.22).toFixed(2)}s` }}>
+                <Book w={web ? BOOKS[i][0] : Math.round(BOOKS[i][0] * 0.77)} h={BOOKS[i][1]}>
+                  <span className="snum2">{String(i + 1).padStart(2, '0')}</span><span className="stitle"><span className="sname2">{folded(t.label)}</span><span className="scat2">{t.cat}</span></span><span className="sglyph2" aria-hidden="true">{t.glyph}</span>
+                </Book>
               </a>
             ))}
           </div>

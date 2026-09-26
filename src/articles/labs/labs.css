@@ -151,36 +151,40 @@ html.labs-snap:not(.labs-finding) .labs section.chapter[data-team]{scroll-snap-a
 .labs .walkbtn{display:inline-flex;align-items:center;gap:10px;margin-top:40px;font-family:var(--mono);font-weight:700;font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink);background:var(--mint);border:2px solid var(--mint);border-radius:999px;padding:15px 26px;transition:transform .16s,box-shadow .16s}
 .labs .walkbtn:hover{transform:translateY(-3px);box-shadow:0 9px 0 -2px rgba(0,0,0,.45)}
 .labs .labs-intro .sectlabel{margin:52px 0 4px}
-/* the shelf of books, one per team, in real 3D (transforms only). Each team is a slot (the link): its whole column on
-   the shelf, which never moves, so hovering anywhere in it holds the book out steadily. Inside, the book: its spine
-   (rounded: lit down the middle, shaded at the edges; bands at the head and foot) plus two faces folded back into the
-   page: the top (the page block between the two cover boards) and the right side (the back cover, darker, with the
-   hinge groove by the spine). Seen from a little above and to the right (perspective-origin), so each side tucks
-   behind the next book. Hover / focus: the book slides up and out toward you, turning a little. Each book has its own
-   thickness (--bw) and height (--bh); --d = how deep the books are. */
+/* the shelf of books, one per team, in real 3D (transforms only; LabsPage.jsx Book builds the pieces). Each team is a
+   slot (the link): its whole column on the shelf, which never moves, so hovering anywhere in it holds the book out
+   steadily. The book, seen from a little above and to the right (perspective-origin):
+   - .bk-face × 7: the spine, a curve of narrow faces bulging --sag forward, lit left of centre and shaded to the right,
+     head and foot bands across it, ink along its top, bottom and edges;
+   - .bk-head: the top of the spine (its rounded cap) and the two cover boards' edges, running back --d;
+   - .bk-pages: the page block between the boards, set 3px lower, so the covers stand proud of it;
+   - .bk-side: the back cover (darker, hinge groove by the spine), from where the curve ends;
+   - .bk-label: number, title + category, glyph, flat, on the curve's crest.
+   Each side tucks behind the next book (painted after it). Hover / focus: the book slides up and out, turning. */
 .labs .rack{--d:40px;position:relative;display:flex;align-items:flex-end;margin:40px auto 0;width:100%;max-width:1000px;height:clamp(330px,calc(var(--vh) * .44 + 30px),460px);padding:52px 16px 14px;overflow-x:auto;overflow-y:hidden;scrollbar-width:none;perspective:1100px;perspective-origin:125% -60%;background:linear-gradient(to top,#2A2A28 0 12px,#5A5A55 12px 14px,transparent 14px)}
 .labs .rack::-webkit-scrollbar{display:none}
 .labs .book-slot{position:relative;flex:0 0 auto;height:100%;display:flex;align-items:flex-end;padding:0 5px;transform-style:preserve-3d;cursor:pointer;outline:none}
 .labs .book-slot:first-child{margin-left:auto}
 .labs .book-slot:last-child{margin-right:auto}
 .labs .book-slot:hover,.labs .book-slot:focus-visible{z-index:20}
-.labs .book{position:relative;width:var(--bw);height:var(--bh);border:2px solid var(--ink);border-radius:6px 6px 3px 3px;color:var(--tc,var(--ink));transform-style:preserve-3d;display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:17px 8px 20px;
-  background:
-    linear-gradient(to bottom,transparent 5px,rgba(0,0,0,.3) 5px 7px,transparent 7px 10px,rgba(0,0,0,.3) 10px 12px,transparent 12px),
-    linear-gradient(to top,transparent 5px,rgba(0,0,0,.3) 5px 7px,transparent 7px 10px,rgba(0,0,0,.3) 10px 12px,transparent 12px),
-    linear-gradient(90deg,rgba(0,0,0,.24),rgba(255,255,255,.2) 30%,rgba(255,255,255,0) 58%,rgba(0,0,0,.28)),
-    var(--c);
-  transition:translate .32s cubic-bezier(.2,.85,.25,1),rotate .32s cubic-bezier(.2,.85,.25,1);animation:labsSway 2.4s ease-in-out infinite;animation-delay:var(--sd,0s)}
+.labs .book{position:relative;width:var(--bw);height:var(--bh);transform-style:preserve-3d;color:var(--tc,var(--ink));transition:translate .32s cubic-bezier(.2,.85,.25,1),rotate .32s cubic-bezier(.2,.85,.25,1);animation:labsSway 2.4s ease-in-out infinite;animation-delay:var(--sd,0s)}
 @keyframes labsSway{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
-.labs .book::before,.labs .book::after{content:"";position:absolute;border:2px solid var(--ink);pointer-events:none}
-/* top: the spine's head at the front, the two cover boards down the sides, the page block between them */
-.labs .book::before{left:-2px;right:-2px;top:-2px;height:var(--d);transform-origin:top;transform:rotateX(-90deg);border-radius:4px 4px 0 0;
-  background:linear-gradient(to bottom,var(--c) 0 5px,transparent 5px),linear-gradient(90deg,var(--c) 0 4px,transparent 4px calc(100% - 4px),var(--c) calc(100% - 4px)),repeating-linear-gradient(90deg,#F3EEE4 0 2px,#D6CCB6 2px 3px)}
-/* right side: the back cover, with the hinge groove where it bends round to the spine */
-.labs .book::after{left:100%;top:-2px;bottom:-2px;width:var(--d);transform-origin:left;transform:rotateY(90deg);
+.labs .book > i{position:absolute;display:block;box-sizing:border-box;pointer-events:none}
+.labs .bk-face{top:0;bottom:0;left:0;border-top:2px solid var(--ink);border-bottom:2px solid var(--ink);
+  background:
+    linear-gradient(to bottom,transparent 6px,rgba(0,0,0,.3) 6px 8px,transparent 8px 11px,rgba(0,0,0,.3) 11px 13px,transparent 13px),
+    linear-gradient(to top,transparent 6px,rgba(0,0,0,.3) 6px 8px,transparent 8px 11px,rgba(0,0,0,.3) 11px 13px,transparent 13px),
+    linear-gradient(90deg,var(--lt0),var(--lt1)),linear-gradient(90deg,var(--dk0),var(--dk1)),var(--c)}
+.labs .bk-face.edge-l{border-left:2px solid var(--ink)}
+.labs .bk-face.edge-r{border-right:2px solid var(--ink)}
+.labs .bk-head{left:0;top:0;width:100%;height:calc(var(--sag) + var(--d));transform-origin:top;transform:rotateX(-90deg);
+  background:linear-gradient(to bottom,rgba(255,255,255,.22) 0 calc(var(--sag) + 2px),transparent 0),linear-gradient(to bottom,var(--c) 0 calc(var(--sag) + 2px),transparent 0),linear-gradient(90deg,var(--ink) 0 2px,var(--c) 2px 5px,transparent 5px calc(100% - 5px),var(--c) calc(100% - 5px) calc(100% - 2px),var(--ink) calc(100% - 2px))}
+.labs .bk-pages{left:5px;right:5px;top:3px;height:var(--d);transform-origin:top;transform:translateZ(calc(var(--sag) * -1)) rotateX(-90deg);background:repeating-linear-gradient(90deg,#F3EEE4 0 2px,#D6CCB6 2px 3px);box-shadow:inset 0 0 0 1px rgba(0,0,0,.25)}
+.labs .bk-side{left:100%;top:0;bottom:0;width:var(--d);transform-origin:left;transform:translateZ(calc(var(--sag) * -1)) rotateY(90deg);border:2px solid var(--ink);
   background:linear-gradient(90deg,transparent 6px,rgba(0,0,0,.34) 6px 9px,transparent 9px),linear-gradient(rgba(0,0,0,.3),rgba(0,0,0,.3)),var(--c)}
+.labs .bk-label{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:17px 6px 20px;transform:translateZ(1px)}
 .labs .book-slot:hover .book,.labs .book-slot:focus-visible .book{translate:0 -28px 50px;rotate:y -10deg;animation:none}
-.labs .book-slot:focus-visible .book{box-shadow:0 0 0 3px var(--sky)}
+.labs .book-slot:focus-visible .bk-label{outline:3px solid var(--sky);outline-offset:3px}
 .labs .book .snum2{font-family:var(--mono);font-weight:700;font-size:11px;letter-spacing:.08em;border:1.5px solid currentColor;border-radius:5px;padding:3px 6px}
 .labs .book .stitle{display:flex;align-items:flex-end;gap:5px;margin:10px 0}
 .labs .book :is(.sname2,.scat2){writing-mode:vertical-rl;transform:rotate(180deg);white-space:nowrap}
@@ -339,7 +343,7 @@ html.labs-snap:not(.labs-finding) .labs section.chapter[data-team]{scroll-snap-a
 .labs-phone .labs-intro .sectlabel{margin-top:40px}
 .labs-phone .rack{--d:28px;height:350px;margin-top:20px;padding:40px 10px 14px;perspective:800px}
 .labs-phone .book-slot{padding:0 4px}
-.labs-phone .book{width:calc(var(--bw) * .77);padding:15px 6px 17px}
+.labs-phone .bk-label{padding:15px 4px 17px}
 .labs-phone .book .stitle{gap:3px}
 .labs-phone .book .sname2{font-size:19px}
 .labs-phone .mtrack > span{font-size:20px;padding:0 14px;gap:14px}
