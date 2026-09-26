@@ -1,9 +1,9 @@
 // The AQ Labs gallery's teams (the "labs" article's own page, src/articles/labs/), in chapter order.
 //   id:    the chapter's address, /articles/labs/<id> (its element id on the page; photos: public/editions/<edition>/
 //          articles/labs/<id>/). data/articles.js lists them as the article's chapters.
-//   label: on its tab and folder; a long one folds onto two lines on the folder, at the |
+//   label: on its tab and book; a long one folds onto two lines on the book's spine, at the |
 //   c:     its accent (a colour name from src/articles/labs/labs.css: tomato, sky, pink, mint, lemon, grape)
-//   glyph, cat: the folder's symbol and category
+//   glyph, cat: the book's symbol and category
 export const LABS_TEAMS = [
   { id: 'karyaarth', label: 'karyaarth', c: 'tomato', glyph: '★', cat: 'documentary' },
   { id: 'career-compass', label: 'career|compass', c: 'sky', glyph: '◆', cat: 'career data' },

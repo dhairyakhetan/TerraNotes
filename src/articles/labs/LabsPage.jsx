@@ -11,7 +11,7 @@ import { calm, LITE } from '../../lib/motion.js';
 // own site, so it keeps their design (styles: ./labs.css). Both layouts from one component (web: 1440px artboard with
 // the web header; phone: 390px with the phone header). Top to bottom: the site header; a sticky bar with a folder tab
 // per team (lights up for the chapter on screen), in-page search and "Apply"; the dark intro (floating screenshots,
-// "AQ Labs", a rack of folders); a ticker; one full-screen chapter per team, each with its own signature (contact
+// "AQ Labs", a shelf of 3D books, one per team); a ticker; one full-screen chapter per team, each with its own signature (contact
 // sheet, dashboard, arcade screen, game HUD, orbit, typed claim, crossfading object, dealt cards); the outro.
 // Photos: public/editions/<id>/articles/labs/<team>/ (this article's folder). Text is the team's, word for word.
 // Behaviour (all skipped or stilled with reduced motion; LITE stops the loops, lib/motion.js):
@@ -214,12 +214,11 @@ const Gallery = memo(function Gallery({ web, dir, base, go }) {
           <h1 className="bigtitle reveal" style={{ '--i': 1 }}>AQ <span className="lab">Labs</span></h1>
           <p className="lead intro-lead reveal" style={{ '--i': 2 }}>eight teams. eight things that didn't exist six weeks ago, and now do.</p>
           <a className="walkbtn reveal" style={{ '--i': 3 }} href={`${base}/karyaarth`} onClick={(e) => go(e, 'karyaarth')}>walk the gallery <span className="arr">↓</span></a>
-          <div className="sectlabel reveal" style={{ '--i': 4 }}>// or pull a folder</div>
+          <div className="sectlabel reveal" style={{ '--i': 4 }}>// or pull a book</div>
           <div className="rack reveal" style={{ '--i': 4 }}>
-            <div className="spine cover"><span className="cbar">▚</span><span className="ctitle">AQ LABS</span><span className="cmeta">08 works · 01 room</span></div>
             {TEAMS.map((t, i) => (
               <a key={t.id} className="spine" href={`${base}/${t.id}`} onClick={(e) => go(e, t.id)} style={{ ...tint(t.c), '--sd': `${(i * 0.22).toFixed(2)}s` }}>
-                <span className="snum2">{String(i + 1).padStart(2, '0')}</span><span className="sname2">{folded(t.label)}</span><span className="scat2">{t.cat}</span><span className="sglyph2" aria-hidden="true">{t.glyph}</span>
+                <span className="snum2">{String(i + 1).padStart(2, '0')}</span><span className="stitle"><span className="sname2">{folded(t.label)}</span><span className="scat2">{t.cat}</span></span><span className="sglyph2" aria-hidden="true">{t.glyph}</span>
               </a>
             ))}
           </div>
@@ -485,7 +484,7 @@ export default function LabsPage({ article: a, web }) {
   const main = useRef(null), base = articleLink(a);
   const navigate = useNavigate(), nav = useRef(navigate);
   nav.current = navigate;
-  // a tab, a folder or "walk the gallery": glide the chapter to the top of the window (its scroll-margin allows for the
+  // a tab, a book or "walk the gallery": glide the chapter to the top of the window (its scroll-margin allows for the
   // sticky bars) and show its address, <article>/<id>, replaced in place (quiet: lib/scrollMemory.js doesn't scroll)
   const go = useCallback((e, id) => {
     e?.preventDefault();
