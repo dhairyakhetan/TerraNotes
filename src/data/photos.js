@@ -8,5 +8,5 @@ export const PHOTOS = [
   { photo: '/editions/sep26/photos/mist.jpg', caption: 'clouds rolling down through the pines', place: '', tint: '#5E7F8C' },
   { photo: '/editions/sep26/photos/sea.jpg', caption: 'the sky going pink over the water', place: '', tint: '#A7765A' },
   { photo: '/editions/sep26/photos/sunset-steps.jpeg', caption: 'the sun dropping behind the steps', place: '', tint: '#8A8F6A' },
-  { photo: '/editions/sep26/photos/flyover-storm.jpeg', caption: 'a storm parked over the flyover', place: '', tint: '#4F6B78' },
+  { photo: '/editions/sep26/photos/flyover-storm.jpg', caption: 'a storm parked over the flyover', place: '', tint: '#4F6B78' },
 ];
