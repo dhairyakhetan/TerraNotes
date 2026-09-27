@@ -108,7 +108,7 @@
 .labs .bslot{position:relative;flex:none;height:100%;display:flex;align-items:flex-end;transform-style:preserve-3d;cursor:pointer;outline:none;-webkit-tap-highlight-color:transparent}
 .labs .book{position:relative;display:block;transform-style:preserve-3d;transition:transform .5s cubic-bezier(.2,.9,.25,1);color:var(--tc);pointer-events:none}
 .labs-web .bslot:hover,.labs-web .bslot:focus-visible{z-index:5}
-.labs-web .bslot:hover .book,.labs-web .bslot:focus-visible .book{transform:translateZ(var(--pop)) translateY(var(--lift)) rotateY(-22deg)}
+.labs-web .bslot:hover .book,.labs-web .bslot:focus-visible .book{transform:translateZ(var(--pop)) translateY(var(--lift))}
 .labs-web .bslot:hover .sp,.labs-web .bslot:focus-visible .sp{box-shadow:-18px 22px 34px rgba(0,0,0,.65)}
 /* only the slot takes the pointer (a pulled book overhangs its neighbours' slots). And while a book is out, the book to
    its left hides its right side: the pulled book covers it anyway, and Chrome would draw a strip of it through the
@@ -120,7 +120,7 @@
    opens; web: while the mouse button is down on a pulled-out book) */
 .labs .bslot:active .book,.labs .bslot.pressed .book{transition-duration:.09s}
 .labs-phone .bslot:active .book,.labs-phone .bslot.pressed .book{transform:translateZ(-12px) translateY(4px) scale(.96)}
-.labs-web .bslot:hover:active .book{transform:translateZ(calc(var(--pop) * .45)) translateY(calc(var(--lift) * .35)) rotateY(-16deg) scale(.97)}
+.labs-web .bslot:hover:active .book{transform:translateZ(calc(var(--pop) * .45)) translateY(calc(var(--lift) * .35)) scale(.97)}
 .labs .bslot:active .sp::after,.labs .bslot.pressed .sp::after{content:'';position:absolute;inset:0;background:rgba(0,0,0,.16);pointer-events:none}
 .labs .book :is(.ft,.fl,.fr,.fb){position:absolute;display:block}
 .labs .book .ft{left:0;top:0;width:100%;height:var(--d);transform-origin:50% 0;transform:translateZ(calc(var(--d) * -1)) rotateX(90deg)}

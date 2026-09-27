@@ -1,7 +1,8 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { ChevronIcon, CloseIcon } from './Icons.jsx';
 import { PHOTOS } from '../data/photos.js';
 import { pad2 } from '../lib/format.js';
+import { calm } from '../lib/motion.js';
 import { lockScroll, unlockScroll } from '../lib/scrollLock.js';
 import { useGallery } from '../lib/useGallery.js';
 import { usePhotoShapes } from '../lib/photoShapes.js';
@@ -38,6 +39,13 @@ export default function PhotoViewer({ web, photos = PHOTOS, title = 'Photo wall'
   const shapes = usePhotoShapes(0.2, 5, photos);
   const { cur, go, dx, dragging, prog, nb, handlers } = useGallery(n, start, { width: L.W, ...L.drag });
   useEffect(() => { lockScroll(); return unlockScroll; }, []);
+  const strip = useRef(null), first = useRef(true);
+  useEffect(() => { // the thumbnails follow along, keeping the current one in the middle (when they don't all fit)
+    const el = strip.current, t = el?.children[cur];
+    if (!t) return;
+    el.scrollTo({ left: t.offsetLeft + t.offsetWidth / 2 - el.clientWidth / 2, behavior: first.current || calm() ? 'auto' : 'smooth' });
+    first.current = false;
+  }, [cur]);
   useEffect(() => {
     const onKey = (e) => { if (e.key === 'Escape') onClose(); else if (e.key === 'ArrowLeft') go(cur - 1); else if (e.key === 'ArrowRight') go(cur + 1); };
     addEventListener('keydown', onKey);
@@ -109,8 +117,8 @@ export default function PhotoViewer({ web, photos = PHOTOS, title = 'Photo wall'
         </>
       )}
       {web && <div className="viewer-bits" style={{ position: "absolute", left: "0", top: L.dots.top, width: "1440px" }}>{dots}</div>}
-      {/* thumbnails: centred; more than fit scroll sideways */}
-      <div className="viewer-bits" style={{ position: "absolute", left: "0", top: L.thumb.top, width: `${L.W}px`, display: "flex", justifyContent: "safe center", gap: L.thumb.gap, overflowX: "auto", scrollbarWidth: "none", boxSizing: "border-box", padding: "8px 20px 6px", marginTop: "-8px" }}>
+      {/* thumbnails: centred; more than fit scroll sideways, keeping the current one in the middle */}
+      <div ref={strip} className="viewer-bits" style={{ position: "absolute", left: "0", top: L.thumb.top, width: `${L.W}px`, display: "flex", justifyContent: "safe center", gap: L.thumb.gap, overflowX: "auto", scrollbarWidth: "none", boxSizing: "border-box", padding: "8px 20px 6px", marginTop: "-8px" }}>
         {photos.map((p, i) => {
           const on = i === cur;
           return (

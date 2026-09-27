@@ -101,10 +101,10 @@ html[data-nav]::view-transition-old(root){animation:vtOut 220ms ease-out both}
 html[data-nav]::view-transition-new(root){animation:vtIn 260ms ease-out both}
 @keyframes vtOut{to{opacity:0}}
 @keyframes vtIn{from{opacity:0}}
-/* web: the header isn't crossfaded; the new one simply takes over (and glides its logo over when the back link comes or
-   goes, web/WebHeader.jsx), so the old logo never ghosts */
-html[data-layout="web"]::view-transition-old(site-header){animation:none;opacity:0}
-html[data-layout="web"]::view-transition-new(site-header){animation:none}
+/* the header isn't crossfaded; the new one simply takes over (and glides its logo over when the back link comes or
+   goes, web/WebHeader.jsx, phone/PhoneHeader.jsx), so the old logo never ghosts */
+::view-transition-old(site-header){animation:none;opacity:0}
+::view-transition-new(site-header){animation:none}
 @media (prefers-reduced-motion: reduce){::view-transition-group(*),::view-transition-old(*),::view-transition-new(*){animation:none !important}}
 
 /* "back to home": no underline; it lifts a little when hovered */
