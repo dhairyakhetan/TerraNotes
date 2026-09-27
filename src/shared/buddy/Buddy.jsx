@@ -52,17 +52,19 @@ function TapGhost({ size, bubbleStyle }) {
   );
 }
 
-// The hidden call button. Invisible unless the pointer is right on it, but while the pointer is around this
-// corner he peeks out (fades in and back out) every 6.5 seconds, so it can be found.
+// The hidden call button. Invisible until the pointer comes into the area around it (within 120px), where it fades
+// in; and while the pointer is anywhere near this corner (220px) he peeks out every 6.5 seconds, so it can be found.
 function CallButton() {
   const btn = useRef(null);
   const [peek, setPeek] = useState(false);
+  const [shown, setShown] = useState(false); // the pointer is in the area around it
   useEffect(() => {
     let near = false, first = 0, every = 0, off = 0;
     const show = () => { setPeek(true); clearTimeout(off); off = setTimeout(() => setPeek(false), 1800); };
     const move = (e) => {
       const b = btn.current?.getBoundingClientRect(); if (!b) return;
       const d = Math.hypot(e.clientX - (b.left + b.width / 2), e.clientY - (b.top + b.height / 2));
+      setShown(d < 120);
       const now = d < 220;
       if (now === near) return;
       near = now;
@@ -73,9 +75,9 @@ function CallButton() {
     return () => { removeEventListener('pointermove', move); clearTimeout(first); clearInterval(every); clearTimeout(off); };
   }, []);
   return (
-    <div style={{ position: "absolute", left: "1250px", top: "92px", width: "140px", height: "30px", zIndex: "6" }}>
-      <button ref={btn} className={peek ? 'buddy-call buddy-peek' : 'buddy-call'} onClick={callBuddy} aria-label="Call buddy?" style={{ position: "absolute", right: "0", top: "0" }}>
-        <Ghost size={16} />
+    <div style={{ position: "absolute", left: "1240px", top: "88px", width: "150px", height: "36px", zIndex: "6" }}>
+      <button ref={btn} className={`buddy-call${shown ? ' buddy-near' : peek ? ' buddy-peek' : ''}`} onClick={callBuddy} aria-label="Call buddy?" style={{ position: "absolute", right: "0", top: "0" }}>
+        <Ghost size={22} />
       </button>
       <span className="buddy-call-label" aria-hidden="true">Call buddy?</span>
     </div>

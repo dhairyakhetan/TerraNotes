@@ -8,6 +8,7 @@ import { articleFolder, articleLink } from '../../data/editions.js';
 import { LABS_TEAMS as TEAMS } from '../../data/labs.js';
 import { pad2 } from '../../lib/format.js';
 import { calm } from '../../lib/motion.js';
+import { FONT } from '../../styles/fonts.js';
 import { usePresence } from '../../lib/usePresence.js';
 
 // The "labs" article's own page (data/articles.js: page: 'labs'): the AQ Labs gallery, built from the AQ Labs design
@@ -118,11 +119,12 @@ const Browser = ({ href, url, img, pos, h, blank, style, bb }) => (
 );
 const Play = ({ size, fill }) => <svg width={size} height={size * 1.1} viewBox="0 0 22 24" aria-hidden="true"><path d="M3 2 L20 12 L3 22 Z" fill={fill} /></svg>;
 
-// A book on the shelf (labs.css "the bookshelf"): the slot is the link; the book inside it is what moves
-function Book({ t, i, size: [w, h, fs], web, href, onClick }) {
-  const rib = web ? [18, 56, 20, 76] : [14, 42, 16, 54];
+// A book on the shelf (labs.css "the bookshelf"): the slot is the link; the book inside it is what moves (pressed: it
+// sinks into the shelf for a moment before its chapter opens)
+function Book({ t, i, size: [w, h, fs], web, href, onClick, pressed }) {
+  const rib = web ? [18, 56, 20, 56] : [14, 42, 16, 42];
   return (
-    <a className="bslot" href={href} onClick={onClick} aria-label={`${pad2(i + 1)} ${t.name}`}>
+    <a className={pressed ? 'bslot pressed' : 'bslot'} href={href} onClick={onClick} aria-label={`${pad2(i + 1)} ${t.name}`}>
       <span className="book" style={{ '--c': t.c, '--tc': t.tc, width: `${w}px`, height: `${h}px` }}>
         <i className="ft" /><i className="fl" /><i className="fr" /><i className="fb" />
         <span className="sp">
@@ -130,7 +132,6 @@ function Book({ t, i, size: [w, h, fs], web, href, onClick }) {
           <i className="rib" style={{ bottom: `${rib[2]}px` }} /><i className="rule" style={{ bottom: `${rib[3]}px` }} />
           <span className="gl" aria-hidden="true">{t.glyph}</span>
           <span className="lab"><span className="ti" style={{ fontSize: `${fs}px` }}>{folded(t.label)}</span></span>
-          <span className="tag">AQ<br />{pad2(i + 1)}</span>
         </span>
       </span>
     </a>
@@ -203,7 +204,7 @@ const MoreButton = ({ onOpen }) => (
   </div>
 );
 
-// phone: the "all projects" sheet: search, the eight projects (the open one marked "you're here"), back to the shelf
+// phone: the "all projects" sheet: search, the eight projects (the open one marked "you're here", handwritten like the phone menu's), back to the shelf
 function ProjectSheet({ ch, leaving, main, onPick, onClose }) {
   const [query, setQuery] = useState('');
   const counts = useMemo(() => {
@@ -239,7 +240,9 @@ function ProjectSheet({ ch, leaving, main, onPick, onClose }) {
               <button key={t.id} type="button" className={`pick${here ? ' here' : ''}`} style={{ '--k': i }} disabled={counts ? !found : false} onClick={() => onPick(t.id, counts ? query : null)}>
                 <span className="sw" style={{ background: t.c, color: t.tc }}>{pad2(i + 1)}</span>
                 <span className="nm">{t.name}</span>
-                <span className={`ct${found ? ' found' : ''}`}>{counts ? (found ? `${found} found` : 'none') : here ? "you're here" : t.cat}</span>
+                {here && !counts
+                  ? <span className="here-note" style={{ fontFamily: FONT.hand, fontSize: "20px", lineHeight: "1", color: t.c, transform: "rotate(-6deg)", whiteSpace: "nowrap" }}>you're here</span>
+                  : <span className={`ct${found ? ' found' : ''}`}>{counts ? (found ? `${found} found` : 'none') : t.cat}</span>}
               </button>
             );
           })}
@@ -273,6 +276,7 @@ export default function LabsPage({ article: a, web, chapter }) {
   const [sheet, setSheet] = useState(false); // phone: "all projects" open
   const [shownSheet, sheetLeaving] = usePresence(sheet || null, 180);
   const [find, setFind] = useState(null); // phone: a search to mark in the chapter opened from the sheet
+  const [pressed, setPressed] = useState(null); // phone: the book just tapped, pushed in
   const [still, setStill] = useState(null); // Karyaarth's stills: the one open in the photo viewer
   const [shownStill, stillLeaving] = usePresence(still, 180);
   const ch = web ? null : chapter; // phone: the chapter open (null = the shelf)
@@ -293,7 +297,13 @@ export default function LabsPage({ article: a, web, chapter }) {
   }, [base]);
   const closeSheet = useCallback(() => setSheet(false), []);
   const onTab = web ? go : (e, id) => { e.preventDefault(); open(ch === id ? null : id); };
-  const onBook = (id) => (e) => (web ? go(e, id) : (e.preventDefault(), open(id)));
+  const onBook = (id) => (e) => {
+    if (web) return go(e, id);
+    e.preventDefault();
+    if (calm()) return open(id);
+    setPressed(id); // let the press show, then open
+    setTimeout(() => { setPressed(null); open(id); }, 170);
+  };
 
   useEffect(() => { // web: scroll spy (intro: none), chapters rise in once seen
     if (!web) return undefined;
@@ -322,7 +332,7 @@ export default function LabsPage({ article: a, web, chapter }) {
 
   // ---- the pieces, per layout
   const W = (phone, webV) => (web ? webV : phone);
-  const books = (from, to) => TEAMS.slice(from, to).map((t, k) => <Book key={t.id} t={t} i={from + k} size={BOOKS[web ? 'web' : 'phone'][from + k]} web={web} href={`${base}/${t.id}`} onClick={onBook(t.id)} />);
+  const books = (from, to) => TEAMS.slice(from, to).map((t, k) => <Book key={t.id} t={t} i={from + k} size={BOOKS[web ? 'web' : 'phone'][from + k]} web={web} href={`${base}/${t.id}`} onClick={onBook(t.id)} pressed={pressed === t.id} />);
   const prints = PRINTS[web ? 'web' : 'phone'].map(([f, label, { rotate, ...box }, h]) => (
     <figure key={f + label} className="print" style={{ ...box, transform: `rotate(${rotate})` }}><img src={`${dir}/${f}`} alt="" style={{ height: `${h}px` }} /><span>{label}</span></figure>
   ));
