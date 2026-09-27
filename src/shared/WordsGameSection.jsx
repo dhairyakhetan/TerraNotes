@@ -2,7 +2,7 @@ import { useRef } from 'react';
 import { fitWord, useWordsGame } from '../lib/useWordsGame.js';
 import { FONT } from '../styles/fonts.js';
 
-// "Words we should bring back." (id="words"), both layouts: an old word on a cloud, three meanings to pick from,
+// "Words we should bring back." (id="words"), both layouts: an old word on a cloud (with how to say it), three meanings to pick from,
 // the verdict + real definition, a "psst." hint after a while, and a score card after 5 words. Game state:
 // lib/useWordsGame.js; words: data/words.js. Phone: cloud on top, options under it; web: cloud left, options right.
 const CLOUD = 'M26 104 H176 A24 24 0 0 0 178 56 A36 36 0 0 0 110 30 A30 30 0 0 0 56 42 A30 30 0 0 0 26 104 Z';
@@ -10,7 +10,7 @@ const PHONE = {
   section: { top: "1830px", width: "390px", height: "650px" }, btn: 'press',
   title: { left: "20px", top: "18px", width: "260px", fontSize: "36px", lineHeight: "0.98" },
   score: { right: "20px", top: "26px", textAlign: "right", fontSize: "9px", letterSpacing: "1.6px", lineHeight: "1.6" },
-  cloud: { left: 10, top: 110, w: 370, h: 200, textTop: "78px", count: { fontSize: "9.5px", letterSpacing: "1.6px" }, word: [42, 300], gap: "4px", wordSpacing: "-0.5px", ask: "20px" },
+  cloud: { left: 10, top: 110, w: 370, h: 200, textTop: "78px", count: { fontSize: "9.5px", letterSpacing: "1.6px" }, word: [42, 300], gap: "4px", say: { fontSize: "11px", letterSpacing: "0.5px" }, sayGap: "2px", wordSpacing: "-0.5px", ask: "20px" },
   options: { left: "20px", top: "330px", width: "350px", gap: "12px" },
   option: { minHeight: "52px", padding: "10px 14px", gap: "12px", boxShadow: "4px 4px 0 #111111", fontSize: "15px", transition: "background-color 120ms ease, opacity 120ms ease" }, mark: ["26px", "12px"],
   hint: { left: "34px", top: "550px", width: "300px", boxShadow: "5px 5px 0 #F7C21A", padding: "12px 16px 10px 18px" }, psst: { left: "-12px", top: "-17px", fontSize: "20px", padding: "2px 12px" }, hintText: "21px",
@@ -23,7 +23,7 @@ const WEB = {
   section: { top: "1910px", width: "1440px", height: "600px" }, btn: 'btn',
   title: { left: "80px", top: "20px", width: "560px", fontSize: "68px", lineHeight: "0.95" },
   score: { left: "84px", top: "172px", fontSize: "12px", letterSpacing: "1.8px" },
-  cloud: { left: 50, top: 230, w: 620, h: 320, textTop: "128px", count: { fontSize: "11px", letterSpacing: "1.8px" }, word: [68, 500], gap: "6px", wordSpacing: "-1px", ask: "26px" },
+  cloud: { left: 50, top: 230, w: 620, h: 320, textTop: "128px", count: { fontSize: "11px", letterSpacing: "1.8px" }, word: [68, 500], gap: "6px", say: { fontSize: "14px", letterSpacing: "0.6px" }, sayGap: "4px", wordSpacing: "-1px", ask: "26px" },
   options: { left: "760px", top: "110px", width: "600px", gap: "18px" },
   option: { minHeight: "68px", padding: "12px 20px", gap: "16px", boxShadow: "5px 5px 0 #111111", fontSize: "19px", transition: "background-color 120ms ease, opacity 120ms ease, translate 160ms ease" }, mark: ["34px", "14px"],
   hint: { left: "790px", top: "414px", width: "440px", boxShadow: "6px 6px 0 #F7C21A", padding: "14px 20px 12px 22px" }, psst: { left: "-14px", top: "-19px", fontSize: "23px", padding: "2px 14px" }, hintText: "26px",
@@ -51,6 +51,7 @@ export default function WordsGameSection({ web }) {
         <div style={{ position: "absolute", left: "0", top: C.textTop, width: `${C.w}px`, textAlign: "center" }}>
           <div style={{ fontFamily: FONT.mono, color: "#4A4A45", ...C.count }}>{`WORD ${w.n} / ${w.total}`}</div>
           <div key={w.word} className="word-pop" style={{ marginTop: C.gap, fontFamily: FONT.head, fontSize: fitWord(w.word, ...C.word), lineHeight: "1", textTransform: "uppercase", letterSpacing: C.wordSpacing, color: "#111111" }}>{w.word}</div>
+          <div key={`${w.word}-say`} className="word-pop" style={{ marginTop: C.sayGap, fontFamily: FONT.mono, color: "#4A4A45", ...C.say }}>/ {w.say} /</div>
           <div style={{ marginTop: C.gap, fontFamily: FONT.hand, fontSize: C.ask, color: "#5B3A1E" }}>what do you think it means?</div>
         </div>
       </div>

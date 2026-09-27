@@ -36,6 +36,7 @@ export function useWordsGame(section) {
     n: pad2(s.q + 1),
     score: pad2(s.score),
     word: round.word,
+    say: round.say,
     playing: !s.done,
     done: s.done,
     locked: shown,

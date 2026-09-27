@@ -12,7 +12,7 @@ import { faceSpots, profileTop, teamLinks, useFaceColors } from '../lib/teamLayo
 import { FONT } from '../styles/fonts.js';
 
 // "Meet the team" (id="members"), both layouts: every member's face (data/team.js) floating in a honeycomb, dotted
-// lines joining each team, a legend that highlights one team, the "we meet every Friday" note, and a profile card
+// lines joining each team, a legend that highlights one team, and a profile card
 // that opens level with a tapped face (bio, what their team made, their articles, Instagram, optional badge / crown).
 // PHONE and WEB hold each layout's positions and sizes; the section's height grows with the number of members.
 const PHONE = {
@@ -25,7 +25,6 @@ const PHONE = {
   note: { left: "22px", top: "270px", width: "250px", fontSize: "21px" },
   legend: { left: "16px", top: "340px", width: "142px", gap: "4px" }, chip: { minHeight: "32px", padding: "0 10px 0 6px", gap: "8px", fontSize: "9.5px", letterSpacing: "1.2px" }, dot: "12px",
   face: { half: 58, gap: "8px", shadow: "6px 5px 0", icon: 20, font: "11px", name: "12px", role: "8.5px", roleSpacing: "1px", roleGap: "3px", pad: "2px 6px", bump: "transform .12s ease" },
-  friday: { box: { left: "22px", width: "330px", boxShadow: "8px 8px 0 #111111", padding: "18px 18px 16px" }, psst: { right: "-12px", top: "-16px", fontSize: "20px", padding: "2px 12px" }, head: "25px", line: "23px", chairs: "8px", chair: {}, emptyGap: "6px", yours: { fontSize: "19px", paddingBottom: "20px" } },
   dim: "rgba(17,17,17,.55)",
   card: { width: 334, shadow: "8px 8px 0", padding: "18px", clip: [34, 10, "-7px"], close: { right: "10px", top: "10px" }, photo: "96px", name: "30px", role: "20px", bio: "14px", credit: "13px" },
 };
@@ -39,29 +38,19 @@ const WEB = {
   note: { left: "82px", top: "360px", width: "400px", fontSize: "27px" },
   legend: { left: "78px", top: "440px", width: "220px", gap: "6px" }, chip: { minHeight: "40px", padding: "0 14px 0 8px", gap: "10px", fontSize: "11px", letterSpacing: "1.4px" }, dot: "14px",
   face: { half: 66, gap: "10px", shadow: "8px 6px 0", icon: 22, font: "13px", name: "15px", role: "10px", roleSpacing: "1.2px", roleGap: "4px", pad: "2px 8px", bump: "transform 180ms cubic-bezier(0.32, 0.72, 0, 1)" },
-  friday: { box: { left: "90px", top: "660px", width: "400px", boxShadow: "9px 9px 0 #111111", padding: "22px 24px 18px" }, psst: { right: "-14px", top: "-18px", fontSize: "22px", padding: "2px 14px" }, head: "30px", line: "26px", chairs: "10px", chair: { width: 40, height: 48 }, emptyGap: "8px", yours: { fontSize: "22px", paddingBottom: "22px" } },
   dim: "rgba(17,17,17,.35)",
   card: { width: 360, shadow: "9px 9px 0", padding: "22px", clip: [36, 11, "-8px"], close: { right: "12px", top: "12px" }, photo: "108px", name: "34px", role: "23px", bio: "15px", credit: "14px" },
 };
 const layoutOf = (L) => {
   const spots = faceSpots(L.faces), bottom = Math.max(...spots.map((s) => s.cy + s.size / 2));
-  const height = L === PHONE ? bottom + 56 + 260 : Math.max(900, bottom + 110);
-  return { ...L, spots, links: teamLinks(spots, L.bend), fridayTop: bottom + 56, height };
+  const height = L === PHONE ? bottom + 64 : Math.max(900, bottom + 110);
+  return { ...L, spots, links: teamLinks(spots, L.bend), height };
 };
 const LAYOUT = { phone: layoutOf(PHONE), web: layoutOf(WEB) };
 export const TEAM_HEIGHT = { phone: LAYOUT.phone.height, web: LAYOUT.web.height }; // the home pages grow with it
 
 const NUMBER_WORDS = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen', 'seventeen', 'eighteen', 'nineteen', 'twenty'];
 const photoFill = { width: "100%", height: "100%", objectFit: "cover", display: "block" };
-
-// A chair for the Friday note (empty = dashed: the reader's seat)
-const Chair = ({ empty, width = 34, height = 40 }) => (
-  <svg width={width} height={height} viewBox="0 0 34 40" aria-hidden="true">
-    <g fill="none" stroke="#111111" strokeWidth="2.4" strokeLinecap="square" strokeDasharray={empty ? "3 3" : undefined}>
-      <path d="M7 2 V22" /><rect x="7" y="18" width="21" height="5" fill={empty ? "none" : "#111111"} /><path d="M9 23 L6 38" /><path d="M26 23 L29 38" /><path d="M7 8 H13" />
-    </g>
-  </svg>
-);
 
 // crown: true in data/team.js → a crown on their photo in the profile card
 const Crown = () => (
@@ -108,7 +97,7 @@ export default function TeamSection({ web }) {
   const fallback = spot && (web
     ? { left: spot.cx < 1000 ? Math.round(spot.cx + spot.size / 2 + 28) : Math.round(spot.cx - spot.size / 2 - 28 - L.card.width), top: Math.max(20, Math.min(Math.round(spot.cy - 150), H - 530)) }
     : { left: 28, top: Math.max(120, Math.min(spot.cy - spot.size / 2 - 60, H - 540)) });
-  const at = cardAt || fallback, C = L.card, F = L.face, R = L.friday;
+  const at = cardAt || fallback, C = L.card, F = L.face;
   const close = () => setOpen(null);
   const btn = web ? 'btn' : undefined;
 
@@ -151,19 +140,6 @@ export default function TeamSection({ web }) {
           </div>
         );
       })}
-      {/* Friday note: four chairs taken, a dashed fifth for the reader */}
-      <div style={{ position: "absolute", top: `${L.fridayTop}px`, boxSizing: "border-box", background: "#F7C21A", border: "2px solid #111111", transform: "rotate(-2deg)", ...R.box }}>
-        <div style={{ position: "absolute", background: "#111111", color: "#F7C21A", fontFamily: FONT.hand, transform: "rotate(6deg)", ...R.psst }}>psst.</div>
-        <div style={{ fontFamily: FONT.head, fontSize: R.head, lineHeight: "0.95", textTransform: "uppercase", color: "#111111" }}>We meet<br />every Friday.</div>
-        <div style={{ marginTop: "8px", fontFamily: FONT.hand, fontSize: R.line, lineHeight: "1.1", color: "#111111" }}>there's always room for one more.</div>
-        <div style={{ marginTop: "12px", display: "flex", alignItems: "flex-end", gap: R.chairs }}>
-          <Chair {...R.chair} /><Chair {...R.chair} /><Chair {...R.chair} /><Chair {...R.chair} />
-          <div style={{ marginLeft: R.emptyGap, display: "flex", alignItems: "flex-end", gap: "4px" }}>
-            <Chair empty {...R.chair} />
-            <span style={{ fontFamily: FONT.hand, lineHeight: "1", transform: "rotate(-8deg)", ...R.yours }}>yours?</span>
-          </div>
-        </div>
-      </div>
       {/* profile card over a dimmed section */}
       {sel && (
         <>

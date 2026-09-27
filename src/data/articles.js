@@ -57,8 +57,8 @@ export const ALL_ARTICLES = [
     dek: "AquaTerra's student build program",
     tag: 'Under Aquaterra',
     featured: true,
-    cover: '',
-    alt: 'AQ Labs',
+    cover: '/editions/sep26/articles/labs/cover.jpg',
+    alt: 'AQ Labs: "summer will never be boring again", over a collage of the teams at work',
     author: null, // from Aquaterra itself: no byline
     edition: 1,
     date: 'Sep 2026',

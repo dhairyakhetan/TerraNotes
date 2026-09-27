@@ -1,6 +1,7 @@
 // Link-preview pictures for the articles: preview.jpg in each article's folder (public/editions/<id>/articles/<slug>/),
 // 1200×630 (the shape WhatsApp, Instagram, iMessage…
-// show big). Drawn like the site: the whole cover, uncropped, on the left (white mount, hard shadow); on the right the
+// show big). Drawn like the site: the whole cover, uncropped, on the left (white mount, hard shadow), hanging by a string
+// from the top edge with a clip in the tag's colour; on the right the
 // logo, the tag, the title big enough to read in a chat bubble, the dek and the byline. The build (build/siteFiles.js)
 // copies each to a content-hashed name and points that article's page at it. public/og/home.jpg (the home page's
 // preview) is made by hand, not by this script.
@@ -20,11 +21,11 @@ const FONTS = 'https://fonts.googleapis.com/css2?family=Archivo+Black&family=Cav
 
 const page = (a, coverSrc, w, h) => {
   const tag = TAGS[a.tag] || { color: '#F7C21A', ink: '#111111' };
-  const ch = 530, cw = Math.min(530, Math.round((w / h) * ch)), cht = Math.round((h / w) * cw);
+  const ch = 530, cw = Math.min(530, Math.round((w / h) * ch)), cht = Math.round((h / w) * cw), top = Math.round((630 - cht - 30) / 2) + 16;
   return `<!doctype html><html><head><link rel="stylesheet" href="${FONTS}"><style>
   *{box-sizing:border-box} body{margin:0;width:1200px;height:630px;background:#F3EEE4;overflow:hidden;position:relative;font-family:'Space Mono',monospace}
-  .wire{position:absolute;left:0;right:0;top:30px;height:3px;background:#8E7A5E}
-  .cover{position:absolute;left:56px;top:${Math.round((630 - cht - 30) / 2) + 4}px;background:#fff;border:3px solid #111;box-shadow:12px 12px 0 #111;padding:12px;transform:rotate(-2deg)}
+  .rope{position:absolute;left:50%;bottom:100%;width:2.5px;height:${top + 40}px;margin-left:-1px;background:#5B3A1E}
+  .cover{position:absolute;left:56px;top:${top}px;background:#fff;border:3px solid #111;box-shadow:12px 12px 0 #111;padding:12px;transform:rotate(-2deg)}
   .cover img{display:block;width:${cw}px;height:${cht}px;object-fit:cover}
   .peg{position:absolute;left:50%;top:-14px;width:44px;height:18px;margin-left:-22px;background:${tag.color};border:2.5px solid #111}
   .right{position:absolute;left:${56 + cw + 24 + 70}px;right:56px;top:64px;bottom:52px;display:flex;flex-direction:column}
@@ -35,8 +36,7 @@ const page = (a, coverSrc, w, h) => {
   .dek{margin-top:16px;font:600 34px/1.05 'Caveat',cursive;color:#5B3A1E}
   .by{margin-top:auto;font-size:17px;letter-spacing:2px;text-transform:uppercase;color:#111}
   </style></head><body>
-  <div class="wire"></div>
-  <div class="cover"><div class="peg"></div><img src="${coverSrc}"></div>
+  <div class="cover"><div class="rope"></div><div class="peg"></div><img src="${coverSrc}"></div>
   <div class="right">
     <div class="logo"><img class="g" src="${data('brand/aquaterra-globe.png', 'image/png')}"><div><img class="w" src="${data('brand/aquaterra-wordmark.webp', 'image/webp')}"><span>TerraNotes</span></div></div>
     <div class="tag">${esc(a.tag)}</div>
