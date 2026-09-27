@@ -121,10 +121,10 @@ const Play = ({ size, fill }) => <svg width={size} height={size * 1.1} viewBox="
 
 // A book on the shelf (labs.css "the bookshelf"): the slot is the link; the book inside it is what moves (pressed: it
 // sinks into the shelf for a moment before its chapter opens)
-function Book({ t, i, size: [w, h, fs], web, href, onClick, pressed }) {
+function Book({ t, i, size: [w, h, fs], web, href, onClick, pressed, ox }) {
   const rib = web ? [18, 56, 20, 56] : [14, 42, 16, 42];
   return (
-    <a className={pressed ? 'bslot pressed' : 'bslot'} href={href} onClick={onClick} aria-label={`${pad2(i + 1)} ${t.name}`}>
+    <a className={pressed ? 'bslot pressed' : 'bslot'} href={href} onClick={onClick} style={{ '--ox': `${ox}px` }} aria-label={`${pad2(i + 1)} ${t.name}`}>
       <span className="book" style={{ '--c': t.c, '--tc': t.tc, width: `${w}px`, height: `${h}px` }}>
         <i className="ft" /><i className="fl" /><i className="fr" /><i className="fb" />
         <span className="sp">
@@ -314,10 +314,9 @@ export default function LabsPage({ article: a, web, chapter }) {
     root.querySelectorAll('.rv').forEach((s) => (calm() ? s.classList.add('in') : seen.observe(s)));
     return () => { spy.disconnect(); seen.disconnect(); };
   }, [web]);
-  useEffect(() => { // the Cirqle orbit only turns while it's near the screen
-    const el = main.current.querySelector('.cq');
-    const io = new IntersectionObserver(([e]) => el.classList.toggle('off-screen', !e.isIntersecting), { rootMargin: '200px 0px' });
-    io.observe(el);
+  useEffect(() => { // the Cirqle orbit turns and the intro's prints drift only while they're near the screen
+    const io = new IntersectionObserver((es) => es.forEach((e) => e.target.classList.toggle('off-screen', !e.isIntersecting)), { rootMargin: '200px 0px' });
+    main.current.querySelectorAll('.cq, .lb-intro').forEach((el) => io.observe(el));
     return () => io.disconnect();
   }, [ch, web]);
   useEffect(() => { // phone: a chapter opened from a search shows its matches
@@ -332,7 +331,17 @@ export default function LabsPage({ article: a, web, chapter }) {
 
   // ---- the pieces, per layout
   const W = (phone, webV) => (web ? webV : phone);
-  const books = (from, to) => TEAMS.slice(from, to).map((t, k) => <Book key={t.id} t={t} i={from + k} size={BOOKS[web ? 'web' : 'phone'][from + k]} web={web} href={`${base}/${t.id}`} onClick={onBook(t.id)} pressed={pressed === t.id} />);
+  // a row of books. Each book is drawn in its own 3D scene (so no face of one book can be drawn through another), with
+  // the shelf's viewpoint: ox = the shelf's middle, seen from the book's slot (the row is centred, 6px apart)
+  const books = (from, to) => {
+    const sizes = BOOKS[web ? 'web' : 'phone'].slice(from, to), row = web ? 872 : 330;
+    let left = (row - sizes.reduce((sum, [w]) => sum + w, 0) - 6 * (sizes.length - 1)) / 2;
+    return TEAMS.slice(from, to).map((t, k) => {
+      const ox = row / 2 - left;
+      left += sizes[k][0] + 6;
+      return <Book key={t.id} t={t} i={from + k} size={sizes[k]} web={web} href={`${base}/${t.id}`} onClick={onBook(t.id)} pressed={pressed === t.id} ox={ox} />;
+    });
+  };
   const prints = PRINTS[web ? 'web' : 'phone'].map(([f, label, { rotate, ...box }, h]) => (
     <figure key={f + label} className="print" style={{ ...box, transform: `rotate(${rotate})` }}><img src={`${dir}/${f}`} alt="" style={{ height: `${h}px` }} /><span>{label}</span></figure>
   ));

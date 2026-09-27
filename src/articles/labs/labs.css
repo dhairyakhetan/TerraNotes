@@ -3,8 +3,8 @@
    (Neutral Face, Eina, JetBrains Mono, with Instrument Serif and Caveat), their palette, rounded cards and pills.
    Everything is scoped to .labs; class names must not match any in src/styles/ (hence .lbtn, .lb-*).
    .labs-web = the 1440px artboard, .labs-phone = 390px.
-   Motion: one endless loop (the Cirqle orbit, .spin: transform only), stopped by reduced motion, .lite, .off-screen and
-   html[data-nav] at the bottom; the rest are hover / one-off transitions. */
+   Motion: two endless loops (the Cirqle orbit, .spin: transform only; web's drifting prints: translate only), stopped
+   by reduced motion, .lite, .off-screen and html[data-nav] at the bottom; the rest are hover / one-off transitions. */
 @font-face{font-family:'Neutral Face';src:url('/fonts/neutral-face.woff2') format('woff2');font-weight:400;font-display:swap}
 @font-face{font-family:'Neutral Face';src:url('/fonts/neutral-face-bold.woff2') format('woff2');font-weight:700 900;font-display:swap}
 @font-face{font-family:'Eina';src:url('/fonts/eina-regular.woff2') format('woff2');font-weight:400 500;font-display:swap}
@@ -81,6 +81,15 @@
 .labs-web .print{padding:8px 8px 30px;box-shadow:0 18px 34px rgba(0,0,0,.55),0 2px 4px rgba(0,0,0,.4);transition:transform .4s cubic-bezier(.2,.9,.25,1),box-shadow .4s ease}
 .labs-web .print span{bottom:4px;font-size:19px}
 .labs-web .print:hover{transform:rotate(0deg) scale(1.08) !important;z-index:5;box-shadow:0 24px 44px rgba(0,0,0,.6)}
+/* web: the prints drift about a little, each on its own path and pace (translate only, so they keep their tilt) */
+.labs-web .print{animation:lbDrift 9s ease-in-out infinite alternate}
+.labs-web .print:nth-child(2){animation-name:lbDrift2;animation-duration:11s;animation-delay:-3s}
+.labs-web .print:nth-child(3){animation-duration:10s;animation-delay:-6s;animation-direction:alternate-reverse}
+.labs-web .print:nth-child(4){animation-name:lbDrift2;animation-duration:8.5s;animation-delay:-2s}
+.labs-web .print:nth-child(5){animation-duration:12s;animation-delay:-8s}
+.labs-web .print:nth-child(6){animation-name:lbDrift2;animation-duration:9.5s;animation-delay:-5s;animation-direction:alternate-reverse}
+@keyframes lbDrift{0%{translate:0 0}33%{translate:6px -9px}66%{translate:-5px -4px}100%{translate:3px 7px}}
+@keyframes lbDrift2{0%{translate:0 0}40%{translate:-7px -6px}75%{translate:5px -10px}100%{translate:-3px 5px}}
 .labs-phone .print{padding:6px 6px 22px;box-shadow:0 14px 26px rgba(0,0,0,.55),0 2px 4px rgba(0,0,0,.4)}
 .labs-phone .print span{bottom:2px;font-size:15px}
 .labs .showpill{position:relative;border:1.5px solid #1B8A5A;border-radius:999px;color:#5FD39E}
@@ -91,30 +100,30 @@
 /* the bookshelf, in real 3D: each book is a spine (.sp: lit and shaded like a rounded hardcover, ribs, rules, glyph,
    title, a library tag) with its top (.ft, the pages between the covers), sides (.fl .fr) and back (.fb) folded back
    into the page. --d = how deep the books are, --lift / --pop = how far a pulled book rises and comes forward.
-   Each book sits in a slot (the link: its whole column, which never moves, so hovering holds the book out steadily). */
+   Each book sits in a slot (the link: its whole column, which never moves, so hovering holds the book out steadily).
+   Each slot is its own 3D scene, flattened into one layer (perspective from the shelf's viewpoint: --ox, set by
+   LabsPage.jsx), so books never have their faces sorted against each other; a pulled book simply lies on top. */
 .labs .shelf{position:relative;background:linear-gradient(180deg,#2B2925,#1C1B18);box-shadow:0 40px 70px rgba(0,0,0,.55)}
 .labs-web .shelf{margin-top:24px;width:900px;padding:14px 14px 0;border-radius:8px 8px 0 0}
 .labs-phone .shelf{margin-top:18px;width:350px;padding:10px 10px 0;border-radius:6px 6px 0 0;box-shadow:0 30px 50px rgba(0,0,0,.5)}
 .labs .stage{position:relative;overflow:hidden;background:linear-gradient(180deg,#070706 0,#171614 100%);box-shadow:inset 0 16px 22px -10px rgba(0,0,0,.85)}
-.labs-web .stage{height:430px;perspective:1250px;perspective-origin:50% -55%}
-.labs-phone .stage{height:300px;perspective:760px;perspective-origin:50% -55%}
-.labs .brow{position:absolute;left:0;right:0;top:0;bottom:0;display:flex;align-items:flex-end;justify-content:center;gap:6px;transform-style:preserve-3d}
+.labs-web .stage{height:430px}
+.labs-phone .stage{height:300px}
+.labs .brow{position:absolute;left:0;right:0;top:0;bottom:0;display:flex;align-items:flex-end;justify-content:center;gap:6px;perspective-origin:50% -55%}
+.labs-web .brow,.labs-web .bslot{perspective:1250px}
+.labs-phone .brow,.labs-phone .bslot{perspective:760px}
 .labs-web .brow{--d:132px;--lift:-62px;--pop:150px}
 .labs-phone .brow{--d:92px}
 .labs .floor{position:absolute;left:-60px;right:-60px;bottom:0;height:calc(var(--d) + 30px);transform-origin:50% 100%;transform:rotateX(90deg);background:linear-gradient(0deg,#4B463D 0,#34312B 40%,#1C1B18 100%)}
 .labs .plank{position:relative;background:linear-gradient(180deg,#524C42 0,#3A362F 3px,#221F1B 100%);border-radius:0 0 3px 3px;box-shadow:0 16px 26px rgba(0,0,0,.6)}
 .labs-web .plank{height:25px}
 .labs-phone .plank{height:20px}
-.labs .bslot{position:relative;flex:none;height:100%;display:flex;align-items:flex-end;transform-style:preserve-3d;cursor:pointer;outline:none;-webkit-tap-highlight-color:transparent}
+.labs .bslot{position:relative;flex:none;height:100%;display:flex;align-items:flex-end;perspective-origin:var(--ox) -55%;cursor:pointer;outline:none;-webkit-tap-highlight-color:transparent}
 .labs .book{position:relative;display:block;transform-style:preserve-3d;transition:transform .5s cubic-bezier(.2,.9,.25,1);color:var(--tc);pointer-events:none}
 .labs-web .bslot:hover,.labs-web .bslot:focus-visible{z-index:5}
 .labs-web .bslot:hover .book,.labs-web .bslot:focus-visible .book{transform:translateZ(var(--pop)) translateY(var(--lift))}
 .labs-web .bslot:hover .sp,.labs-web .bslot:focus-visible .sp{box-shadow:-18px 22px 34px rgba(0,0,0,.65)}
-/* only the slot takes the pointer (a pulled book overhangs its neighbours' slots). And while a book is out, the book to
-   its left hides its right side: the pulled book covers it anyway, and Chrome would draw a strip of it through the
-   pulled book. It comes back once the book is home (.5s). */
-.labs-web .book .fr{transition:visibility 0s .5s}
-.labs-web .bslot:has(+ .bslot:is(:hover,:focus-visible)) .book .fr{visibility:hidden;transition-delay:0s}
+/* (the book itself ignores the pointer: only its slot takes it, as a pulled book overhangs its neighbours' slots) */
 .labs .bslot:focus-visible .sp{outline:3px solid #3DA9FC;outline-offset:3px}
 /* pressed: the book sinks back into the shelf and darkens a touch (phone: .pressed, held briefly before the chapter
    opens; web: while the mouse button is down on a pulled-out book) */
@@ -305,10 +314,10 @@
 .labs .pick[disabled]{opacity:.4;cursor:default}
 
 /* ===== stopping the motion ===== */
-html[data-nav] .labs .cq :is(.spin,.onode){animation-play-state:paused}
-.lite .labs .cq :is(.spin,.onode){animation:none}
+html[data-nav] .labs :is(.cq .spin,.cq .onode,.print){animation-play-state:paused}
+.lite .labs :is(.cq .spin,.cq .onode,.print){animation:none}
 @media (prefers-reduced-motion: reduce){
-  .labs .cq :is(.spin,.onode){animation:none}
+  .labs :is(.cq .spin,.cq .onode,.print){animation:none}
   .labs :is(.tab,.tab .t,.book,.book .sp,.lbtn,.print,.browser,.sheet,.lift,.hcard,.zoom > img,.browser img,.sheet img){transition:none !important}
   .labs-web .rv > *{opacity:1;transform:none;transition:none}
   .labs-phone .chap::before{display:none}
