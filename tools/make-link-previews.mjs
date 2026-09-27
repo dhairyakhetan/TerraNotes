@@ -38,7 +38,7 @@ const page = (a, coverSrc, w, h) => {
   </style></head><body>
   <div class="cover"><div class="rope"></div><div class="peg"></div><img src="${coverSrc}"></div>
   <div class="right">
-    <div class="logo"><img class="g" src="${data('brand/aquaterra-globe.png', 'image/png')}"><div><img class="w" src="${data('brand/aquaterra-wordmark.webp', 'image/webp')}"><span>TerraNotes</span></div></div>
+    <div class="logo"><img class="g" src="${data('brand/aquaterra-globe.webp', 'image/webp')}"><div><img class="w" src="${data('brand/aquaterra-wordmark.webp', 'image/webp')}"><span>TerraNotes</span></div></div>
     <div class="tag">${esc(a.tag)}</div>
     <h1 id="t">${esc(a.title)}</h1>
     <div class="dek">${esc(a.dek)}</div>
@@ -62,7 +62,7 @@ for (const a of ALL_ARTICLES.filter((x) => x.cover)) {
   await p.evaluate(() => { const t = document.getElementById('t'); let s = 64; while (t.getBoundingClientRect().height > s * 0.98 * 4 + 4 && s > 34) { s -= 2; t.style.fontSize = `${s}px`; } });
   const file = pub(`${articleFolder(a).slice(1)}/preview.jpg`);
   fs.mkdirSync(path.dirname(file), { recursive: true });
-  await p.screenshot({ path: file, type: 'jpeg', quality: 90 });
+  await p.screenshot({ path: file, type: 'jpeg', quality: 82 });
   console.log(articleFolder(a), Math.round(fs.statSync(file).size / 1024), 'KB');
 }
 await browser.close();

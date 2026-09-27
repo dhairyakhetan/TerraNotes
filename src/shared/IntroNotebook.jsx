@@ -22,7 +22,7 @@ export default function IntroNotebook() {
     window.aqIntro = true; // the footer video starts downloading now too (SiteFooter)
     dispatchEvent(new Event('aq-intro'));
     // fetch what the pages will need while the notebook plays
-    for (const src of ['/brand/aquaterra-globe.png', '/brand/aquaterra-wordmark.webp', ...ARTICLES.map((a) => a.cover), ...PHOTOS.map((p) => p.photo)].filter(Boolean)) {
+    for (const src of ['/brand/aquaterra-globe.webp', '/brand/aquaterra-wordmark.webp', ...ARTICLES.map((a) => a.cover), ...PHOTOS.map((p) => p.photo)].filter(Boolean)) {
       const img = new Image();
       img.src = src;
     }
@@ -73,11 +73,11 @@ export default function IntroNotebook() {
               {/* the cover: its outside, then (once it swings past halfway) its inside with the logo */}
               <div className="nb-cover">
                 <div className="nb-face nb-front">
-                  <img src="/brand/aquaterra-globe.png" alt="" className="nb-front-logo" />
+                  <img src="/brand/aquaterra-globe.webp" alt="" className="nb-front-logo" />
                   <div className="nb-label">TerraNotes<span>issue 01</span></div>
                 </div>
                 <div className="nb-face nb-back">
-                  <img src="/brand/aquaterra-globe.png" alt="" className="nb-logo" />
+                  <img src="/brand/aquaterra-globe.webp" alt="" className="nb-logo" />
                   <div className="nb-word"><img className="nb-wordmark" src="/brand/aquaterra-wordmark.webp" alt="Aquaterra" /></div>
                 </div>
               </div>
