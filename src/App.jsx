@@ -63,7 +63,7 @@ function ArticleRoute({ web }) {
   if (pathname !== here) return <Navigate to={here + search + hash} replace />;
   if (demo) return <DemoPage src={`${articleFolder(a)}/${a.demos[chapter]}/`} name={chapter.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())} />;
   const key = articleLink(a); // remount per article so its entrance replays
-  if (a.page) { const Own = PAGES[a.page]; return <Own key={key} article={a} web={web} />; }
+  if (a.page) { const Own = PAGES[a.page]; return <Own key={key} article={a} web={web} chapter={chapter || null} />; }
   const Page = web ? WebArticle : PhoneArticle;
   const same = ALL_ARTICLES.filter((x) => x.edition === a.edition);
   return <Page key={key} article={a} next={same[(same.indexOf(a) + 1) % same.length]} />;

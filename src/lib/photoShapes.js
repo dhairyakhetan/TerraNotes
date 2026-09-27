@@ -1,20 +1,21 @@
 import { useEffect, useState } from 'react';
 import { PHOTOS } from '../data/photos.js';
 
-// Each PHOTOS entry's shape (width / height) once its image has loaded, null until then, clamped to min…max so a very
-// tall or wide photo can't wreck the layout. The photo wall frames and the viewer size themselves from it.
-export function usePhotoShapes(min, max) {
-  const [shapes, setShapes] = useState(() => PHOTOS.map(() => null));
+// Each photo's shape (width / height) once its image has loaded, null until then, clamped to min…max so a very tall
+// or wide photo can't wreck the layout. The photo wall frames and the viewer size themselves from it.
+// photos: [{ photo }] (default the photo wall, data/photos.js; keep the array stable).
+export function usePhotoShapes(min, max, photos = PHOTOS) {
+  const [shapes, setShapes] = useState(() => photos.map(() => null));
   useEffect(() => {
     let live = true;
-    PHOTOS.forEach((p, i) => {
+    photos.forEach((p, i) => {
       if (!p.photo) return;
       const img = new Image();
       img.onload = () => live && img.naturalHeight && setShapes((s) => s.map((v, k) => (k === i ? Math.min(max, Math.max(min, img.naturalWidth / img.naturalHeight)) : v)));
       img.src = p.photo;
     });
     return () => { live = false; };
-  }, [min, max]);
+  }, [min, max, photos]);
   return shapes;
 }
 

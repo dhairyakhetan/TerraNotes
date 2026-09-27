@@ -7,10 +7,12 @@ import { useGallery } from '../lib/useGallery.js';
 import { usePhotoShapes } from '../lib/photoShapes.js';
 import { FONT } from '../styles/fonts.js';
 
-// The full-screen photo viewer opened from the photo wall, both layouts: one polaroid at a time on a sliding track,
+// The full-screen photo viewer opened from the photo wall (and AQ Labs' Karyaarth stills), both layouts: one polaroid at a time on a sliding track,
 // swipe / drag (lib/useGallery.js), the arrows, the thumbnails or ← → keys; Esc or ✕ closes (onClose). The page
 // behind can't scroll. Each photo shows whole at its own shape, --ph tall (styles/phone.css / web.css: shrinks on
 // short screens). closing = playing its exit (the home page keeps it mounted meanwhile, lib/usePresence.js).
+// photos: [{ photo, caption, place, tint }] (default the photo wall, data/photos.js; keep the array stable), title on
+// top, label = what one photo is called ("Highlight 01"), count = the counter's word ("HIGHLIGHTS · 01 / 05").
 const EASE = 'cubic-bezier(0.32, 0.72, 0, 1)';
 const PHONE = {
   cls: 'photo-viewer', W: 390, press: 'press', tilts: ['-1.5deg', '1.2deg', '-0.8deg', '1.6deg', '-1.2deg'], drag: { far: 70, flick: { v: 0.45, min: 12 } },
@@ -31,9 +33,9 @@ const WEB = {
   dots: { h: 8, on: 26, off: 9, gap: "9px", top: "calc(var(--ph) + 314px)" }, thumb: { size: "64px", pad: "4px", gap: "14px", top: "calc(var(--ph) + 346px)" },
 };
 
-export default function PhotoViewer({ web, start = 0, closing, onClose }) {
-  const L = web ? WEB : PHONE, n = PHOTOS.length;
-  const shapes = usePhotoShapes(0.2, 5);
+export default function PhotoViewer({ web, photos = PHOTOS, title = 'Photo wall', label = 'Highlight', count = 'Highlights', start = 0, closing, onClose }) {
+  const L = web ? WEB : PHONE, n = photos.length;
+  const shapes = usePhotoShapes(0.2, 5, photos);
   const { cur, go, dx, dragging, prog, nb, handlers } = useGallery(n, start, { width: L.W, ...L.drag });
   useEffect(() => { lockScroll(); return unlockScroll; }, []);
   useEffect(() => {
@@ -54,7 +56,7 @@ export default function PhotoViewer({ web, start = 0, closing, onClose }) {
   };
   const dots = (
     <div aria-hidden="true" style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: L.dots.gap }}>
-      {PHOTOS.map((p, i) => {
+      {photos.map((p, i) => {
         // the active dot is a pill that hands over to its neighbour while dragging
         const d = L.dots, w = i === cur ? d.on - (d.on - d.off) * Math.abs(prog) : i === nb ? d.off + (d.on - d.off) * Math.abs(prog) : d.off;
         const lit = (i === cur && Math.abs(prog) < 0.5) || (i === nb && Math.abs(prog) >= 0.5);
@@ -64,7 +66,7 @@ export default function PhotoViewer({ web, start = 0, closing, onClose }) {
   );
   const track = (
     <div className="gal-track" style={{ display: "flex", width: `${n * L.W}px`, height: "100%", transform: `translate3d(${-cur * L.W + dx}px, 0, 0)`, transition: tr, willChange: "transform" }}>
-      {PHOTOS.map((p, i) => (
+      {photos.map((p, i) => (
         <div key={i} className="gal-slide" aria-hidden={i === cur ? 'false' : 'true'} style={{ width: `${L.W}px`, flexShrink: "0", boxSizing: "border-box", ...L.slide, transform: `scale(${i === cur ? 1 : L.dim[0]})`, opacity: i === cur ? 1 : L.dim[1], transition: tr }}>
           <figure style={{ position: "relative", margin: web ? "0" : "0 auto", width: p.photo ? "fit-content" : web ? "760px" : "auto", maxWidth: web ? "1000px" : "100%", transform: `rotate(${L.tilts[i % L.tilts.length]})` }}>
             <div style={{ position: "absolute", left: "50%", background: "#C9A57A", border: "1.5px solid #111111", boxSizing: "border-box", zIndex: "2", ...L.peg }} />
@@ -74,7 +76,7 @@ export default function PhotoViewer({ web, start = 0, closing, onClose }) {
                 : <div style={{ height: "var(--ph)", background: p.tint, display: "flex", alignItems: "center", justifyContent: "center", fontSize: L.emptyFont, color: "#F3EEE4" }}>{`[photo ${i + 1}]`}</div>}
               <figcaption style={{ width: "0", minWidth: "100%", boxSizing: "border-box", padding: web ? "14px 4px 16px" : "10px 2px 12px", ...(web && { display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "baseline", gap: "20px" }) }}>
                 <div style={{ fontFamily: FONT.hand, lineHeight: "1.1", color: "#111111", ...L.caption }}>{p.caption || "[caption — what's happening here]"}</div>
-                <div style={{ marginTop: web ? undefined : "4px", fontFamily: FONT.mono, textTransform: "uppercase", color: "#6B665C", ...L.place }}>{`Highlight ${pad2(i + 1)}${p.place ? ` · ${p.place}` : ''}`}</div>
+                <div style={{ marginTop: web ? undefined : "4px", fontFamily: FONT.mono, textTransform: "uppercase", color: "#6B665C", ...L.place }}>{`${label} ${pad2(i + 1)}${p.place ? ` · ${p.place}` : ''}`}</div>
               </figcaption>
             </div>
           </figure>
@@ -84,9 +86,9 @@ export default function PhotoViewer({ web, start = 0, closing, onClose }) {
   );
 
   return (
-    <div className={`${L.cls} ${closing ? 'viewer-out' : 'viewer-in'}`} role="dialog" aria-label="Photo highlights" style={{ position: "fixed", left: "0", right: "0", top: "0", margin: "0 auto", width: `${L.W}px`, zIndex: "90", background: "#111111", color: "#F3EEE4" }}>
-      <div style={{ position: "absolute", fontFamily: FONT.serif, lineHeight: "1", ...L.title }}>Photo wall</div>
-      <div style={{ position: "absolute", fontFamily: FONT.mono, color: "#BDB6A6", ...L.count }}>HIGHLIGHTS ·{" "}<span style={{ color: "#F7C21A" }}>{pad2(cur + 1)}</span>{" "}{`/ ${pad2(n)}`}</div>
+    <div className={`${L.cls} ${closing ? 'viewer-out' : 'viewer-in'}`} role="dialog" aria-label={`${title}: photos`} style={{ position: "fixed", left: "0", right: "0", top: "0", margin: "0 auto", width: `${L.W}px`, zIndex: "90", background: "#111111", color: "#F3EEE4" }}>
+      <div style={{ position: "absolute", fontFamily: FONT.serif, lineHeight: "1", ...L.title }}>{title}</div>
+      <div style={{ position: "absolute", fontFamily: FONT.mono, color: "#BDB6A6", textTransform: "uppercase", ...L.count }}>{count} ·{" "}<span style={{ color: "#F7C21A" }}>{pad2(cur + 1)}</span>{" "}{`/ ${pad2(n)}`}</div>
       <button className={L.press} onClick={onClose} aria-label="Close photos" autoFocus={web} style={{ "--c": "#E9A23B", position: "absolute", ...button, ...L.close }}>
         <CloseIcon size={L.closeIcon} />
       </button>
@@ -107,11 +109,12 @@ export default function PhotoViewer({ web, start = 0, closing, onClose }) {
         </>
       )}
       {web && <div className="viewer-bits" style={{ position: "absolute", left: "0", top: L.dots.top, width: "1440px" }}>{dots}</div>}
-      <div className="viewer-bits" style={{ position: "absolute", left: "0", top: L.thumb.top, width: `${L.W}px`, display: "flex", justifyContent: "center", gap: L.thumb.gap }}>
-        {PHOTOS.map((p, i) => {
+      {/* thumbnails: centred; more than fit scroll sideways */}
+      <div className="viewer-bits" style={{ position: "absolute", left: "0", top: L.thumb.top, width: `${L.W}px`, display: "flex", justifyContent: "safe center", gap: L.thumb.gap, overflowX: "auto", scrollbarWidth: "none", boxSizing: "border-box", padding: "8px 20px 6px", marginTop: "-8px" }}>
+        {photos.map((p, i) => {
           const on = i === cur;
           return (
-            <button key={i} onClick={() => go(i)} aria-label={`Show photo ${i + 1}`} aria-current={on ? 'true' : 'false'} style={{ width: L.thumb.size, height: L.thumb.size, padding: L.thumb.pad, boxSizing: "border-box", background: "#FFFFFF", border: `2px solid ${on ? '#F7C21A' : '#3A3A36'}`, boxShadow: on ? '4px 4px 0 #E9A23B' : 'none', transform: `translateY(${on ? -6 : 0}px)`, opacity: on ? 1 : 0.55, transition: `transform 300ms ${EASE}, opacity 300ms ease, border-color 150ms ease` }}>
+            <button key={i} onClick={() => go(i)} aria-label={`Show photo ${i + 1}`} aria-current={on ? 'true' : 'false'} style={{ flexShrink: "0", width: L.thumb.size, height: L.thumb.size, padding: L.thumb.pad, boxSizing: "border-box", background: "#FFFFFF", border: `2px solid ${on ? '#F7C21A' : '#3A3A36'}`, boxShadow: on ? '4px 4px 0 #E9A23B' : 'none', transform: `translateY(${on ? -6 : 0}px)`, opacity: on ? 1 : 0.55, transition: `transform 300ms ${EASE}, opacity 300ms ease, border-color 150ms ease` }}>
               {p.photo ? <img src={p.photo} alt="" style={{ display: "block", width: "100%", height: "100%", objectFit: "cover" }} /> : <span style={{ display: "block", width: "100%", height: "100%", background: p.tint }} />}
             </button>
           );
