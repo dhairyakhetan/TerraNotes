@@ -13,5 +13,5 @@ export default function DemoPage({ src, name }) {
     html.scrollbarGutter = 'auto'; // base.css keeps a scrollbar's strip free; the frame takes the whole window
     return () => { [html.overflow, html.scrollbarGutter] = was; };
   }, [name]);
-  return <iframe src={src} title={`${name}, the demo`} allow="autoplay; fullscreen" style={{ position: "fixed", inset: "0", width: "100%", height: "100%", border: "0", background: "#111111" }} />;
+  return <iframe src={src} title={`${name}, the demo`} allow="autoplay; fullscreen" style={{ position: "fixed", inset: "0", width: "100%", height: "100%", border: "0", background: "var(--ink)" }} />;
 }

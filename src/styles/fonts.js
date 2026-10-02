@@ -1,9 +1,10 @@
-// The font stacks, for inline styles (all loaded from Google Fonts in index.html). What each is for: CLAUDE.md.
+// The font stacks, for inline styles: CSS variables set from the edition's look (src/editions/<id>/look.js fonts,
+// lib/edition.js), so each edition can have its own type. What each is for: CLAUDE.md.
 export const FONT = {
-  head: "'Archivo Black', Impact, sans-serif", // headings, titles, big numbers (always uppercase)
-  mono: "'Space Mono', monospace",             // labels, meta lines, buttons (uppercase, letter-spaced)
-  hand: "'Caveat', cursive",                   // handwritten notes, deks, captions
-  serif: "'Instrument Serif', Georgia, serif", // "Photo wall", "TerraNotes", the intro headline
-  body: "'Figtree', system-ui, sans-serif",    // UI body text
-  read: "'Newsreader', Georgia, serif",        // article paragraphs
+  head: 'var(--font-head)', // headings, titles, big numbers (always uppercase)
+  mono: 'var(--font-mono)', // labels, meta lines, buttons (uppercase, letter-spaced)
+  hand: 'var(--font-hand)', // handwritten notes, deks, captions
+  serif: 'var(--font-serif)', // "Photo wall", "TerraNotes", the intro headline
+  body: 'var(--font-body)', // UI body text
+  read: 'var(--font-read)', // article paragraphs
 };

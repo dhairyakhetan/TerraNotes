@@ -10,7 +10,8 @@ npm run build    # → dist/
 npm run preview  # serve the build
 ```
 
-- **Content:** everything is in `src/data/`. Each file explains its fields at the top.
+- **Content:** each monthly edition has its own folder, `src/editions/<id>/`: its articles, photo wall, words, team and
+  look (colours and fonts), kept for good. Site-wide bits are in `src/data/`. Each file explains its fields at the top.
 - **Code, design system and conventions:** see [`CLAUDE.md`](CLAUDE.md).
 
 ## Deploy

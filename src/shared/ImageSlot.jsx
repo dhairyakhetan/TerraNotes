@@ -5,9 +5,9 @@ import { PhotoIcon } from './Icons.jsx';
 // cards; icon / font = placeholder icon and label sizes.
 export default function ImageSlot({ src, alt, label = alt, box, dark, icon = 18, font = '11px' }) {
   if (src) return <img src={src} alt={alt} style={{ objectPosition: "50% 12%", ...box, display: "block", width: box.width || "100%", boxSizing: "border-box", objectFit: "cover" }} />;
-  const ink = dark ? "#CFCFCF" : "#444";
+  const ink = dark ? "var(--slotDarkInk)" : "var(--slotInk)";
   return (
-    <div style={{ ...box, background: dark ? "#262626" : "#F2F1ED", border: `1.5px dashed ${dark ? "#5A5A5A" : "#B9B5AA"}`, boxSizing: "border-box", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "4px", fontSize: font, color: ink }}>
+    <div style={{ ...box, background: dark ? "var(--slotDark)" : "var(--blank)", border: `1.5px dashed ${dark ? "var(--slotDarkLine)" : "var(--slotLine)"}`, boxSizing: "border-box", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "4px", fontSize: font, color: ink }}>
       <PhotoIcon size={icon} color={ink} />
       <span>{label}</span>
     </div>

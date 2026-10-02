@@ -1,24 +1,30 @@
+import { useLayoutEffect } from 'react';
 import { Navigate, Route, Routes, useLocation, useParams } from 'react-router';
 import PhoneHome from './phone/PhoneHome.jsx';
 import PhoneArticle from './phone/PhoneArticle.jsx';
 import WebHome from './web/WebHome.jsx';
 import WebArticle from './web/WebArticle.jsx';
-import { EditionPage, EditionsPage } from './pages/EditionsPage.jsx';
+import { EditionsPage } from './pages/EditionsPage.jsx';
 import DemoPage from './pages/DemoPage.jsx';
 import LabsPage from './articles/labs/LabsPage.jsx';
 import NotFoundPage from './pages/NotFoundPage.jsx';
 import ErrorBoundary from './shared/ErrorBoundary.jsx';
 import SiteFooter from './shared/SiteFooter.jsx';
 import BuddyGames from './shared/buddy/BuddyGames.jsx';
+import { DraftTape } from './shared/Tapes.jsx';
 import { ALL_ARTICLES } from './data/articles.js';
-import { LATEST, articleFolder, articleLink, editionById, editionLink, editionOf } from './data/editions.js';
+import { LATEST, articleFolder, articleLink, editionById, editionLink, editionOf, homeLink, isDraft } from './data/editions.js';
+import { editionData } from './editions/index.js';
+import { OWN_PAGES } from './editions/pages.js';
+import { EditionContext, applyLook } from './lib/edition.js';
 import { useIsWeb } from './lib/layoutMode.js';
-import { SECTIONS, isDemoPath } from './lib/routes.js';
+import { SECTIONS, editionAt, isDemoPath } from './lib/routes.js';
 import { ScrollMemory } from './lib/scrollMemory.js';
 
 // The routes, per layout (lib/layoutMode.js: 900px+ wide = web, else phone):
-//   /                         home (PhoneHome / WebHome)
+//   /                         home (PhoneHome / WebHome): the latest edition's
 //   /articles /photos /words /members   the home page, opened at that section (lib/scrollMemory.js scrolls)
+//   /<id>, /<id>/photos…      an older edition's home page (or a draft's), e.g. /sep26: its own look and content
 //   /articles/<slug>          an article in the latest edition (PhoneArticle / WebArticle, or its own page: PAGES);
 //                             `next` = the following one in its edition
 //   /<id>/articles/<slug>     an article in an older edition, e.g. /sep26/articles/labs (data/editions.js). Either
@@ -26,22 +32,29 @@ import { ScrollMemory } from './lib/scrollMemory.js';
 //   <article>/<chapter>       an own-page article opened at a chapter (its `chapters`), e.g. /articles/labs/photon
 //   <article>/<chapter>/demo  a demo web app kept in the article's folder (its `demos`), full-window with nothing
 //                             else of the site around it (pages/DemoPage.jsx), e.g. /articles/labs/wisdom-woods/demo
-//   /editions, /<id>          every edition / a previous one (pages/EditionsPage.jsx); old /editions/<n> redirects
+//   /editions                 every edition (pages/EditionsPage.jsx); old /editions/<n> redirects
 //   anything else             404 (pages/NotFoundPage.jsx)
-// Any address with ?by=<writer> goes to /articles?by=<writer> (that writer's articles first, lib/byWriter.js).
+// Any address with ?by=<writer> goes to its edition's /articles?by=<writer> (that writer's articles first,
+// lib/byWriter.js).
+// Every page belongs to an edition (lib/routes.js editionAt: /sep26… is September's, the rest the latest's): its look
+// goes on the page and its content reaches the components through useEdition() (lib/edition.js).
 // Around them: the skip link, the crash card, the footer and Buddy's games popup (these last two outlive navigation).
 
 // Articles with their own page instead of the usual layout (an article's `page` in data/articles.js)
 const PAGES = { labs: LabsPage };
+// The home page and article page to draw for an edition: its own (src/editions/pages.js), else the shared one
+const SHARED = { home: { web: WebHome, phone: PhoneHome }, article: { web: WebArticle, phone: PhoneArticle } };
+const pageFor = (n, kind, web) => { const k = web ? 'web' : 'phone'; return OWN_PAGES[editionData(n).id]?.[kind]?.[k] || SHARED[kind][k]; };
 
-// / and /articles, /photos… (the home page: one route, so the address can change in place without a remount) or an
-// edition's id (/sep26: that edition, or home if it's the latest)
-function SectionRoute({ web }) {
-  const { section } = useParams();
-  if (!section || SECTIONS.includes(section)) return web ? <WebHome /> : <PhoneHome />;
-  const e = editionById(section);
-  if (!e) return <NotFoundPage web={web} />;
-  return e.number === LATEST ? <Navigate to="/" replace /> : <EditionPage web={web} n={e.number} />;
+// A home page: / and /articles, /photos… (the latest edition's), or /sep26 and /sep26/photos… (an older edition's or a
+// draft's; the latest's id goes to /). One route, so the address can change in place without a remount.
+function HomeRoute({ web }) {
+  const { first, second } = useParams();
+  const e = first && editionById(first), section = e ? second : first;
+  if ((!e && second) || (section && !SECTIONS.includes(section))) return <NotFoundPage web={web} />;
+  if (e && e.number === LATEST) return <Navigate to={homeLink(LATEST, section)} replace />;
+  const n = e ? e.number : LATEST, Home = pageFor(n, 'home', web);
+  return <Home key={n} />; // another edition's home page is a new page (fresh words game, entrance)
 }
 
 function OldEditionRoute({ web }) {
@@ -55,7 +68,7 @@ function ArticleRoute({ web }) {
   const { pathname, search, hash } = useLocation();
   const n = edition ? editionById(edition)?.number : LATEST;
   // an older edition's article at the clean address it had while it was the latest is still found (then redirected)
-  const a = ALL_ARTICLES.find((x) => x.slug === slug && x.edition === n) || (!edition && ALL_ARTICLES.findLast((x) => x.slug === slug));
+  const a = ALL_ARTICLES.find((x) => x.slug === slug && x.edition === n) || (!edition && ALL_ARTICLES.findLast((x) => x.slug === slug && !isDraft(x.edition)));
   const [chapter, demo, more] = (rest || '').split('/').filter(Boolean);
   const ok = a && !more && (!chapter || (a.chapters?.includes(chapter) && (!demo || (demo === 'demo' && a.demos?.[chapter]))));
   if (!ok) return <NotFoundPage web={web} />;
@@ -64,9 +77,16 @@ function ArticleRoute({ web }) {
   if (demo) return <DemoPage src={`${articleFolder(a)}/${a.demos[chapter]}/`} name={chapter.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())} />;
   const key = articleLink(a); // remount per article so its entrance replays
   if (a.page) { const Own = PAGES[a.page]; return <Own key={key} article={a} web={web} chapter={chapter || null} />; }
-  const Page = web ? WebArticle : PhoneArticle;
+  const Page = pageFor(a.edition, 'article', web);
   const same = ALL_ARTICLES.filter((x) => x.edition === a.edition);
   return <Page key={key} article={a} next={same[(same.indexOf(a) + 1) % same.length]} />;
+}
+
+// Puts the page's edition's look on <html> (lib/edition.js). Placed before the routes, so it runs before the page's own
+// layout effects (they measure text drawn in the look's fonts).
+function Look({ edition }) {
+  useLayoutEffect(() => applyLook(edition), [edition]);
+  return null;
 }
 
 // "Skip to main content": hidden until focused with the keyboard; moves focus past the page's header.
@@ -85,18 +105,21 @@ function SkipLink() {
 export default function App() {
   const { pathname, search } = useLocation();
   const web = useIsWeb();
-  const toWriter = pathname !== '/articles' && new URLSearchParams(search).get('by');
+  const edition = editionData(editionAt(pathname));
+  const writers = homeLink(edition.number, 'articles'); // where ?by= lists a writer's articles first
+  const toWriter = pathname !== writers && new URLSearchParams(search).get('by');
   const bare = isDemoPath(pathname); // a demo tab: the demo alone
   return (
-    <>
+    <EditionContext.Provider value={edition}>
+      <Look edition={edition} />
       {!bare && <SkipLink />}
       <ScrollMemory />
       <ErrorBoundary resetKey={pathname}>
-        {toWriter ? <Navigate to={{ pathname: '/articles', search }} replace /> : (
+        {toWriter ? <Navigate to={{ pathname: writers, search }} replace /> : (
           <Routes>
             <Route path="/editions" element={<EditionsPage web={web} />} />
             <Route path="/editions/:n" element={<OldEditionRoute web={web} />} />
-            <Route path="/:section?" element={<SectionRoute web={web} />} />
+            <Route path="/:first?/:second?" element={<HomeRoute web={web} />} />
             <Route path="/articles/:slug/*" element={<ArticleRoute web={web} />} />
             <Route path="/:edition/articles/:slug/*" element={<ArticleRoute web={web} />} />
             <Route path="*" element={<NotFoundPage web={web} />} />
@@ -105,6 +128,7 @@ export default function App() {
       </ErrorBoundary>
       {!bare && <SiteFooter />}
       {!bare && <BuddyGames />}
-    </>
+      {edition.draft && !bare && <DraftTape />}
+    </EditionContext.Provider>
   );
 }

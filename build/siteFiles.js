@@ -1,18 +1,24 @@
-// Vite plugin (build only): after the app is bundled, writes the extra files a static host needs, all from src/data:
+// Vite plugin (build only): after the app is bundled, writes the extra files a static host needs, all from src/data and
+// src/editions (drafts are left out: their pages only exist in the app, at their own address):
 // - an .html per article at its address (articles/<slug>.html, older editions <id>/articles/<slug>.html; also one per
 //   chapter and demo of an own-page article, <article>/<chapter>.html and <article>/<chapter>/demo.html; served
 //   without .html via cleanUrls in vercel.json): its own title, description, link-preview tags (image: preview.jpg in
 //   the article's folder, public/editions/<id>/articles/<slug>/, copied to a content-hashed name so chat apps don't
 //   keep showing an old picture) and its text (build/staticCopy.js) for crawlers that don't run JavaScript;
-// - photos.html, words.html, members.html, editions.html, articles.html, index.html with their own titles and text;
+// - index.html, articles.html, photos.html, words.html, members.html (the latest edition's home page and its sections),
+//   the same for each older edition under its id (sep26.html, sep26/photos.html…), and editions.html, with their own
+//   titles and text;
 // - 404.html, robots.txt, sitemap.xml, llms.txt / llms-full.txt (the site and every article as plain text for AIs).
 import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
-import { ALL_ARTICLES as ARTICLES } from '../src/data/articles.js';
-import { articleFolder, articleLink } from '../src/data/editions.js';
+import { ALL_ARTICLES } from '../src/data/articles.js';
+import { LATEST, PUBLISHED, articleFolder, articleLink, editionName, homeLink, isDraft } from '../src/data/editions.js';
 import { SITE } from '../src/data/site.js';
-import { articleHtml, pageHtml, withContent } from './staticCopy.js';
+import { editionData } from '../src/editions/index.js';
+import { articleHtml, editionsHtml, homeHtml, withContent } from './staticCopy.js';
+
+const ARTICLES = ALL_ARTICLES.filter((a) => !isDraft(a.edition));
 
 const esc = (t) => String(t).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 const setMeta = (html, attr, name, value) => html.replace(new RegExp(`(<meta ${attr}="${name}" content=")[^"]*(")`), `$1${esc(value)}$2`);
@@ -57,21 +63,29 @@ export default function siteFiles(host) {
         }
       }
 
-      const TITLES = { '/': '', '/articles': 'All articles', '/photos': 'Photo wall', '/words': 'Words we should bring back', '/members': 'Meet the team', '/editions': 'Editions' };
-      for (const [p, name] of Object.entries(TITLES)) {
-        let html = name ? setMeta(setTitle(base, `Aquaterra — ${name}`), 'property', 'og:title', `${name} · TerraNotes`) : base;
-        html = setMeta(html, 'property', 'og:url', url(p));
-        out(p === '/' ? 'index.html' : `${p.slice(1)}.html`, withContent(html, pageHtml[p]()));
+      // each edition's home page and its sections (an older edition's: under its id, its edition in the title)
+      const TITLES = { '': '', articles: 'All articles', photos: 'Photo wall', words: 'Words we should bring back', members: 'Meet the team' };
+      const pages = [];
+      for (const e of [...PUBLISHED].reverse()) { // newest first
+        const old = e.number !== LATEST && `${editionName(e.number)} · ${e.month}`;
+        for (const [section, name] of Object.entries(TITLES)) {
+          const p = homeLink(e.number, section), title = [name, old].filter(Boolean).join(' · ');
+          let html = title ? setMeta(setTitle(base, `Aquaterra — ${title}`), 'property', 'og:title', `${title} · TerraNotes`) : base;
+          html = setMeta(html, 'property', 'og:url', url(p));
+          out(p === '/' ? 'index.html' : `${p.slice(1)}.html`, withContent(html, homeHtml[section](editionData(e.number))));
+          if (e.number === LATEST || !section) pages.push(p); // the sitemap: the latest's sections, an older edition's home
+        }
       }
+      out('editions.html', withContent(setMeta(setMeta(setTitle(base, 'Aquaterra — Editions'), 'property', 'og:title', 'Editions · TerraNotes'), 'property', 'og:url', url('/editions')), editionsHtml()));
 
       out('404.html', setTitle(base, 'Aquaterra — not found').replace('</title>', '</title>\n    <meta name="robots" content="noindex" />'));
-      const paths = [...Object.keys(TITLES), ...ARTICLES.map(articleLink)];
+      const paths = [...pages, '/editions', ...ARTICLES.map(articleLink)];
       out('sitemap.xml', `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${paths.map((p) => `  <url><loc>${url(p)}</loc></url>`).join('\n')}\n</urlset>\n`);
       out('robots.txt', ['# TerraNotes by Aquaterra: every page is open to crawlers.', '# A plain-text guide to the site and its articles, for AI assistants: /llms.txt (full text: /llms-full.txt)', 'User-agent: *', 'Allow: /', '', `Sitemap: ${url('/sitemap.xml')}`, ''].join('\n'));
 
       // llms.txt (llmstxt.org): what the site is and where everything is; llms-full.txt: every article in full
       const line = (a) => `${a.dek}${a.author ? ` (by ${a.author}` : ' ('}${a.date ? `${a.author ? ', ' : ''}${a.date}` : ''}, ${a.readTime} min read)`;
-      const intro = ['# TerraNotes by Aquaterra', '', `> ${SITE.intro} Notes from where the land meets the water.`, '',
+      const intro = ['# TerraNotes by Aquaterra', '', `> ${editionData(LATEST).intro} Notes from where the land meets the water.`, '',
         `TerraNotes is the monthly digital magazine of Aquaterra (${SITE.footerNote}; main site: ${SITE.website}). It is written, photographed and designed by its members. Each article has its own page; the home page also holds the photo wall, a words mini game and the team.`, ''];
       out('llms.txt', [...intro, '## Articles', '', ...ARTICLES.map((a) => `- [${a.title}](${url(articleLink(a))}): ${line(a)}`), '', '## Pages', '',
         `- [Home](${url('/')}): the latest articles, photo wall, words game and team`,

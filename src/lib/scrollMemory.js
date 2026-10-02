@@ -1,18 +1,18 @@
 import { useEffect, useLayoutEffect, useRef } from 'react';
 import { useLocation, useNavigate, useNavigationType } from 'react-router';
 import { calm } from './motion.js';
-import { isHomePath, keepFrom, noteFrom, sectionOf } from './routes.js';
+import { keepFrom, noteFrom, sameHome, sectionOf } from './routes.js';
 
 // Scroll handling for every navigation. <ScrollMemory /> renders nothing; App.jsx places it BEFORE the routes so its
 // layout effect runs before the new page's (the article page measures its cover for the card flight after this scroll).
 // - Back/Forward and reload land where you were (positions saved per history entry, for the tab's session);
 // - a new page starts at the top, or at the section its address names (lib/routes.js sectionOf: /photos → the element
 //   with id="photos", /articles/labs/photon → id="photon"; also old-style #hash);
-// - a section link while already on the home page glides there instead of jumping;
+// - a section link while already on that home page glides there instead of jumping;
 // - ?by=<writer> also rewinds the web's sideways article line, since that writer's pieces now come first.
-// - Once you've scrolled a screen or more away from that section, the address drops it (/photos → /,
-//   /articles/labs/photon → /articles/labs): replaced in place, marked { quiet: true } so nothing scrolls or remounts.
-//   Not with ?by= (that address means the writer's order). Pages that change the address themselves (the AQ Labs tabs)
+// - Once you've scrolled a screen or more away from that section, the address drops it (/photos → /, /sep26/words →
+//   /sep26, /articles/labs/photon → /articles/labs): replaced in place, marked { quiet: true } so nothing scrolls or
+//   remounts. Not with ?by= (that address means the writer's order). Pages that change the address themselves (the AQ Labs tabs)
 //   navigate with replace + state { quiet: true } too.
 const KEY = 'aq-scroll';
 const saved = (() => { try { return JSON.parse(sessionStorage.getItem(KEY)) || {}; } catch { return {}; } })();
@@ -37,7 +37,7 @@ export function ScrollMemory() {
     let glide = quiet && !calm(); // a page's own section link (AQ Labs' tabs) glides there itself
     if (quiet) { keepFrom(lastKey, key); saved[spot] = Math.round(scrollY); } // same page, new address: still "opened from home", same spot
     else {
-      const behavior = type === 'PUSH' && isHomePath(lastPath || '') && isHomePath(pathname) && !calm() ? 'smooth' : 'auto';
+      const behavior = type === 'PUSH' && sameHome(lastPath || '', pathname) && !calm() ? 'smooth' : 'auto';
       glide = behavior === 'smooth';
       if (type === 'PUSH') noteFrom(key, lastPath);
       if (type === 'POP' && saved[spot] != null) window.scrollTo(0, saved[spot]);

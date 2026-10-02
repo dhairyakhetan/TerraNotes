@@ -1,10 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
-import { WORDS } from '../data/words.js';
 import { pad2 } from './format.js';
 
-// State for the "Words we should bring back" mini game (shared/WordsGameSection.jsx): 5 random words per game (never
-// the previous game's), three meanings each. A "psst." hint appears after 16 s without an answer; its clock only starts
-// once the section (ref `section`) is on screen.
+// State for the "Words we should bring back" mini game (shared/WordsGameSection.jsx): 5 random words per game from
+// `words` (the edition's WORDS; never the previous game's), three meanings each. A "psst." hint appears after 16 s
+// without an answer; its clock only starts once the section (ref `section`) is on screen.
 const ROUNDS = 5, HINT_DELAY = 16000;
 
 const shuffle = (xs) => {
@@ -12,13 +11,13 @@ const shuffle = (xs) => {
   for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; }
   return a;
 };
-const draw = (prev = []) => shuffle(WORDS.filter((w) => !prev.includes(w))).slice(0, ROUNDS);
+const draw = (words, prev = []) => shuffle(words.filter((w) => !prev.includes(w))).slice(0, ROUNDS);
 
 // Font size that keeps a word inside its cloud (Archivo Black caps run ~0.66em wide).
 export const fitWord = (word, max, width) => `${Math.min(max, Math.floor(width / (word.length * 0.66)))}px`;
 
-export function useWordsGame(section) {
-  const [s, setS] = useState(() => ({ rounds: draw(), q: 0, pick: null, score: 0, done: false, hint: false }));
+export function useWordsGame(section, words) {
+  const [s, setS] = useState(() => ({ rounds: draw(words), q: 0, pick: null, score: 0, done: false, hint: false }));
   const timer = useRef(0);
   const armHint = () => {
     clearTimeout(timer.current);
@@ -51,7 +50,7 @@ export function useWordsGame(section) {
       armHint();
     },
     restart: () => {
-      setS((p) => ({ rounds: draw(p.rounds), q: 0, pick: null, score: 0, done: false, hint: false }));
+      setS((p) => ({ rounds: draw(words, p.rounds), q: 0, pick: null, score: 0, done: false, hint: false }));
       armHint();
     },
     message: s.score === s.rounds.length ? 'all of them. you should be writing for us.' : s.score === 0 ? 'zero. that\'s why we need to bring them back.' : 'not bad. now use one in a sentence today.',
@@ -63,8 +62,8 @@ export function useWordsGame(section) {
         text,
         mark: shown ? (right ? '✓' : picked ? '✗' : letter) : letter,
         mood: shown ? (right ? 'w-right' : picked ? 'w-wrong' : '') : '',
-        bg: shown && right ? '#F7C21A' : shown && picked ? '#111111' : '#FFFFFF',
-        fg: shown && picked && !right ? '#FFFFFF' : '#111111',
+        bg: shown && right ? 'var(--yellow)' : shown && picked ? 'var(--ink)' : 'var(--card)',
+        fg: shown && picked && !right ? 'var(--card)' : 'var(--ink)',
         op: shown && !right && !picked ? 0.45 : 1,
         pick: () => {
           if (shown) return;

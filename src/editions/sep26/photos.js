@@ -1,4 +1,4 @@
-// Photo wall on the home page and its "See every photo" viewer, in order (there are 5 spots).
+// September 2026's photo wall (its home page) and its "See every photo" viewer, in order (there are 5 spots).
 //   photo: put the picture in public/editions/<edition id>/photos/ and write its path, e.g. '/editions/sep26/photos/terrace.jpg'
 //   tint:  colour shown in its place until there is a photo
 // Leave caption '' and the design's placeholder shows instead; with no place, the viewer just says "Highlight 01".

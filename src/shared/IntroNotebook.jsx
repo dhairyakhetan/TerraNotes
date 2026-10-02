@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { ARTICLES } from '../data/articles.js';
-import { PHOTOS } from '../data/photos.js';
+import { LATEST } from '../data/editions.js';
+import { editionData } from '../editions/index.js';
 import { introSeen } from '../lib/introNotebook.js';
 import { calm } from '../lib/motion.js';
 
@@ -22,7 +23,7 @@ export default function IntroNotebook() {
     window.aqIntro = true; // the footer video starts downloading now too (SiteFooter)
     dispatchEvent(new Event('aq-intro'));
     // fetch what the pages will need while the notebook plays
-    for (const src of ['/brand/aquaterra-globe.webp', '/brand/aquaterra-wordmark.webp', ...ARTICLES.map((a) => a.cover), ...PHOTOS.map((p) => p.photo)].filter(Boolean)) {
+    for (const src of ['/brand/aquaterra-globe.webp', '/brand/aquaterra-wordmark.webp', ...ARTICLES.map((a) => a.cover), ...editionData(LATEST).photos.map((p) => p.photo)].filter(Boolean)) {
       const img = new Image();
       img.src = src;
     }

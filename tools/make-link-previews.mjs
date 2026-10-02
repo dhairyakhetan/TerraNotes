@@ -1,17 +1,17 @@
 // Link-preview pictures for the articles: preview.jpg in each article's folder (public/editions/<id>/articles/<slug>/),
-// 1200×630 (the shape WhatsApp, Instagram, iMessage…
-// show big). Drawn like the site: the whole cover, uncropped, on the left (white mount, hard shadow), hanging by a string
-// from the top edge with a clip in the tag's colour; on the right the
-// logo, the tag, the title big enough to read in a chat bubble, the dek and the byline. The build (build/siteFiles.js)
-// copies each to a content-hashed name and points that article's page at it. public/og/home.jpg (the home page's
-// preview) is made by hand, not by this script.
+// 1200×630 (the shape WhatsApp, Instagram, iMessage… show big). Drawn like the site, in the article's edition's look
+// (src/editions/<id>/look.js): the whole cover, uncropped, on the left (white mount, hard shadow), hanging by a string
+// from the top edge with a clip in the tag's colour; on the right the logo, the tag, the title big enough to read in a
+// chat bubble, the dek and the byline. The build (build/siteFiles.js) copies each to a content-hashed name and points
+// that article's page at it. public/og/home.jpg (the home page's preview) is made by hand, not by this script.
 // Run after adding an article or changing a cover:  node tools/make-link-previews.mjs   (needs Playwright:
 // npm i -D playwright; env CHROMIUM = a browser to use, FONTS_DIR = serve the Google Fonts from a local folder)
 import fs from 'node:fs';
 import path from 'node:path';
 import { chromium } from 'playwright';
-import { ALL_ARTICLES, TAGS } from '../src/data/articles.js';
+import { ALL_ARTICLES, tagOf } from '../src/data/articles.js';
 import { articleFolder, editionName } from '../src/data/editions.js';
+import { editionData } from '../src/editions/index.js';
 
 const root = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..');
 const pub = (f) => path.join(root, 'public', f);
@@ -20,21 +20,21 @@ const esc = (t) => String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replac
 const FONTS = 'https://fonts.googleapis.com/css2?family=Archivo+Black&family=Caveat:wght@600&family=Instrument+Serif:ital@1&family=Space+Mono:wght@700&display=block';
 
 const page = (a, coverSrc, w, h) => {
-  const tag = TAGS[a.tag] || { color: '#F7C21A', ink: '#111111' };
+  const tag = tagOf(a), { colors: C, fonts: F, fontsCss } = editionData(a.edition).look;
   const ch = 530, cw = Math.min(530, Math.round((w / h) * ch)), cht = Math.round((h / w) * cw), top = Math.round((630 - cht - 30) / 2) + 16;
-  return `<!doctype html><html><head><link rel="stylesheet" href="${FONTS}"><style>
-  *{box-sizing:border-box} body{margin:0;width:1200px;height:630px;background:#F3EEE4;overflow:hidden;position:relative;font-family:'Space Mono',monospace}
-  .rope{position:absolute;left:50%;bottom:100%;width:2.5px;height:${top + 40}px;margin-left:-1px;background:#5B3A1E}
-  .cover{position:absolute;left:56px;top:${top}px;background:#fff;border:3px solid #111;box-shadow:12px 12px 0 #111;padding:12px;transform:rotate(-2deg)}
+  return `<!doctype html><html><head><link rel="stylesheet" href="${FONTS}">${fontsCss ? `<link rel="stylesheet" href="${fontsCss}">` : ''}<style>
+  *{box-sizing:border-box} body{margin:0;width:1200px;height:630px;background:${C.page};overflow:hidden;position:relative;font-family:${F.mono}}
+  .rope{position:absolute;left:50%;bottom:100%;width:2.5px;height:${top + 40}px;margin-left:-1px;background:${C.string}}
+  .cover{position:absolute;left:56px;top:${top}px;background:${C.card};border:3px solid ${C.ink};box-shadow:12px 12px 0 ${C.ink};padding:12px;transform:rotate(-2deg)}
   .cover img{display:block;width:${cw}px;height:${cht}px;object-fit:cover}
-  .peg{position:absolute;left:50%;top:-14px;width:44px;height:18px;margin-left:-22px;background:${tag.color};border:2.5px solid #111}
+  .peg{position:absolute;left:50%;top:-14px;width:44px;height:18px;margin-left:-22px;background:${tag.color};border:2.5px solid ${C.ink}}
   .right{position:absolute;left:${56 + cw + 24 + 70}px;right:56px;top:64px;bottom:52px;display:flex;flex-direction:column}
   .logo{display:flex;align-items:center;gap:10px}
-  .logo img.g{width:52px;height:52px} .logo img.w{height:30px;display:block} .logo span{font:italic 400 20px/1 'Instrument Serif',serif;color:#1E2723;display:block;margin-top:4px}
-  .tag{align-self:flex-start;margin-top:34px;background:${tag.color};color:${tag.ink};border:2.5px solid #111;border-radius:999px;padding:6px 16px;font-size:18px;letter-spacing:2px;text-transform:uppercase}
-  h1{margin:18px 0 0;font:400 64px/0.98 'Archivo Black',Impact,sans-serif;text-transform:uppercase;color:#111;letter-spacing:-1px}
-  .dek{margin-top:16px;font:600 34px/1.05 'Caveat',cursive;color:#5B3A1E}
-  .by{margin-top:auto;font-size:17px;letter-spacing:2px;text-transform:uppercase;color:#111}
+  .logo img.g{width:52px;height:52px} .logo img.w{height:30px;display:block} .logo span{font:italic 400 20px/1 ${F.serif};color:${C.text};display:block;margin-top:4px}
+  .tag{align-self:flex-start;margin-top:34px;background:${tag.color};color:${tag.ink};border:2.5px solid ${C.ink};border-radius:999px;padding:6px 16px;font-size:18px;letter-spacing:2px;text-transform:uppercase}
+  h1{margin:18px 0 0;font:400 64px/0.98 ${F.head};text-transform:uppercase;color:${C.ink};letter-spacing:-1px}
+  .dek{margin-top:16px;font:600 34px/1.05 ${F.hand};color:${C.hand}}
+  .by{margin-top:auto;font-size:17px;letter-spacing:2px;text-transform:uppercase;color:${C.ink}}
   </style></head><body>
   <div class="cover"><div class="rope"></div><div class="peg"></div><img src="${coverSrc}"></div>
   <div class="right">

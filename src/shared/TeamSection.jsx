@@ -2,18 +2,18 @@ import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { Link } from 'react-router';
 import { CloseIcon, PhotoIcon } from './Icons.jsx';
 import { Clip } from './Tapes.jsx';
-import { MEMBERS, TEAMS, teamsOf } from '../data/team.js';
 import { articlesBy, byLink } from '../lib/byWriter.js';
-import { firstName, instagramUrl } from '../lib/format.js';
+import { useEdition } from '../lib/edition.js';
+import { firstName, instagramUrl, teamsOf } from '../lib/format.js';
 import { webZoom } from '../lib/layoutMode.js';
 import { usePauseOffscreen } from '../lib/pauseOffscreen.js';
 import { usePresence } from '../lib/usePresence.js';
 import { faceSpots, profileTop, teamLinks, useFaceColors } from '../lib/teamLayout.js';
 import { FONT } from '../styles/fonts.js';
 
-// "Meet the team" (id="members"), both layouts: every member's face (data/team.js) floating in a honeycomb, dotted
-// lines joining each team, a legend that highlights one team, and a profile card
-// that opens level with a tapped face (bio, what their team made, their articles, Instagram, optional badge / crown).
+// "Meet the team" (id="members"), both layouts: the edition's team (src/editions/<id>/team.js), their faces floating in
+// a honeycomb, dotted lines joining each team, a legend that highlights one team, and a profile card that opens level
+// with a tapped face (bio, what their team made, their articles, Instagram, optional badge / crown).
 // PHONE and WEB hold each layout's positions and sizes; the section's height grows with the number of members.
 const PHONE = {
   faces: { rows: [[72, 196, 318], [134, 256]], sizes: [92, 80, 98, 84, 88, 96, 82, 90], nudgeX: [-6, 5, -3, 8, -8, 4, 2, -5, 7], nudgeY: [0, 16, -10, 8, 20, -6, 12, -14, 4, 18, -4], top: 510, rowH: 176 },
@@ -41,27 +41,33 @@ const WEB = {
   dim: "rgba(17,17,17,.35)",
   card: { width: 360, shadow: "9px 9px 0", padding: "22px", clip: [36, 11, "-8px"], close: { right: "12px", top: "12px" }, photo: "108px", name: "34px", role: "23px", bio: "15px", credit: "14px" },
 };
-const layoutOf = (L) => {
-  const spots = faceSpots(L.faces), bottom = Math.max(...spots.map((s) => s.cy + s.size / 2));
+const layoutOf = (L, { members, teams }) => {
+  const spots = faceSpots(L.faces, members.length), bottom = Math.max(...spots.map((s) => s.cy + s.size / 2));
   const height = L === PHONE ? bottom + 64 : Math.max(900, bottom + 110);
-  return { ...L, spots, links: teamLinks(spots, L.bend), height };
+  return { ...L, spots, links: teamLinks(spots, L.bend, members, teams), height };
 };
-const LAYOUT = { phone: layoutOf(PHONE), web: layoutOf(WEB) };
-export const TEAM_HEIGHT = { phone: LAYOUT.phone.height, web: LAYOUT.web.height }; // the home pages grow with it
+// an edition's team laid out on both layouts (worked out once per edition)
+const LAYOUTS = new WeakMap();
+const layoutFor = (edition) => {
+  if (!LAYOUTS.has(edition.members)) LAYOUTS.set(edition.members, { phone: layoutOf(PHONE, edition), web: layoutOf(WEB, edition) });
+  return LAYOUTS.get(edition.members);
+};
+// the section's height for an edition's team ('phone' / 'web'): the home pages grow with it
+export const teamHeight = (edition, layout) => layoutFor(edition)[layout].height;
 
 const NUMBER_WORDS = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen', 'seventeen', 'eighteen', 'nineteen', 'twenty'];
 const photoFill = { width: "100%", height: "100%", objectFit: "cover", display: "block" };
 
-// crown: true in data/team.js → a crown on their photo in the profile card
+// crown: true in team.js → a crown on their photo in the profile card
 const Crown = () => (
   <svg width="44" height="34" viewBox="0 0 44 34" aria-hidden="true" style={{ position: "absolute", left: "-12px", top: "-18px", transform: "rotate(-22deg)", zIndex: "1" }}>
-    <path d="M4 28 L2 8 L13 17 L22 3 L31 17 L42 8 L40 28 Z" fill="#F7C21A" stroke="#111111" strokeWidth="2.4" strokeLinejoin="round" />
-    <path d="M4 28 H40" stroke="#111111" strokeWidth="2.4" />
-    <circle cx="22" cy="21" r="2.6" fill="#F0442B" stroke="#111111" strokeWidth="1.4" /><circle cx="12" cy="23" r="1.8" fill="#3DA5F4" stroke="#111111" strokeWidth="1.2" /><circle cx="32" cy="23" r="1.8" fill="#3DA5F4" stroke="#111111" strokeWidth="1.2" />
+    <path d="M4 28 L2 8 L13 17 L22 3 L31 17 L42 8 L40 28 Z" strokeWidth="2.4" strokeLinejoin="round" style={{ fill: "var(--yellow)", stroke: "var(--ink)" }} />
+    <path d="M4 28 H40" strokeWidth="2.4" style={{ stroke: "var(--ink)" }} />
+    <circle cx="22" cy="21" r="2.6" strokeWidth="1.4" style={{ fill: "var(--red)", stroke: "var(--ink)" }} /><circle cx="12" cy="23" r="1.8" strokeWidth="1.2" style={{ fill: "var(--blue)", stroke: "var(--ink)" }} /><circle cx="32" cy="23" r="1.8" strokeWidth="1.2" style={{ fill: "var(--blue)", stroke: "var(--ink)" }} />
   </svg>
 );
 
-// badge: { img, text } in data/team.js → a small picture in the card's corner; its text slides out on hover / tap
+// badge: { img, text } in team.js → a small picture in the card's corner; its text slides out on hover / tap
 // (styles/motion.css .card-badge). The pictures are fetched and decoded once, early, so they're there when a card opens.
 const Badge = ({ b }) => (
   <button type="button" className="card-badge" aria-label={b.text}>
@@ -69,16 +75,17 @@ const Badge = ({ b }) => (
     <img src={b.img} alt="" width="24" height="24" decoding="sync" />
   </button>
 );
-const badges = [];
-const preloadBadges = () => { if (!badges.length) MEMBERS.filter((m) => m.badge).forEach((m) => { const i = new Image(); i.src = m.badge.img; i.decode?.().catch(() => {}); badges.push(i); }); };
+const badges = new Map(); // picture → its preloaded Image
+const preloadBadges = (members) => members.filter((m) => m.badge && !badges.has(m.badge.img)).forEach((m) => { const i = new Image(); i.src = m.badge.img; i.decode?.().catch(() => {}); badges.set(m.badge.img, i); });
 
 export default function TeamSection({ web }) {
-  const L = LAYOUT[web ? 'web' : 'phone'], S = L.spots, H = L.height;
-  useEffect(preloadBadges, []);
+  const edition = useEdition(), { members: MEMBERS, teams: TEAMS } = edition;
+  const L = layoutFor(edition)[web ? 'web' : 'phone'], S = L.spots, H = L.height;
+  useEffect(() => preloadBadges(MEMBERS), [MEMBERS]);
   const self = useRef(null);
   usePauseOffscreen(self);
   const [team, setTeam] = useState(null); // legend filter; null = everyone
-  const { colorFor, fade } = useFaceColors(team);
+  const { colorFor, fade } = useFaceColors(team, TEAMS);
   const [open, setOpen] = useState(null); // index of the member whose profile is open
   const [shown, leaving] = usePresence(open, 170);
   const card = useRef(null);
@@ -93,7 +100,7 @@ export default function TeamSection({ web }) {
     setCardAt({ left: Math.round((fits.length ? fits : sides).sort((a, b) => Math.abs(a + W / 2 - 720) - Math.abs(b + W / 2 - 720))[0]), top });
   }, [open]);
   const count = NUMBER_WORDS[MEMBERS.length] || String(MEMBERS.length);
-  const sel = shown != null ? MEMBERS[shown] : null, spot = sel && S[shown], color = sel ? colorFor(sel) : '#111111';
+  const sel = shown != null ? MEMBERS[shown] : null, spot = sel && S[shown], color = sel ? colorFor(sel) : 'var(--ink)';
   const fallback = spot && (web
     ? { left: spot.cx < 1000 ? Math.round(spot.cx + spot.size / 2 + 28) : Math.round(spot.cx - spot.size / 2 - 28 - L.card.width), top: Math.max(20, Math.min(Math.round(spot.cy - 150), H - 530)) }
     : { left: 28, top: Math.max(120, Math.min(spot.cy - spot.size / 2 - 60, H - 540)) });
@@ -103,11 +110,11 @@ export default function TeamSection({ web }) {
 
   return (
     <section ref={self} id="members" style={{ position: "absolute", left: "0", top: `${L.top}px`, width: `${L.width}px`, height: `${H}px` }}>
-      <div style={{ position: "absolute", top: "0", height: "2px", background: "#111111", ...L.rule }} />
-      <h2 style={{ position: "absolute", margin: "0", fontFamily: FONT.head, fontWeight: "400", textTransform: "uppercase", color: "#111111", ...L.title }}>Meet<br />the team</h2>
-      <div style={{ position: "absolute", textAlign: "right", fontFamily: FONT.mono, color: "#111111", ...L.count }}>{web ? `${count.toUpperCase()} OF US · CLICK A FACE` : <>{count.toUpperCase()} OF US<br />TAP A FACE</>}</div>
-      <p style={{ position: "absolute", margin: "0", color: "#1E2723", ...L.blurb }}>one magazine, a meeting every Friday, {count} people who are all doing something else the rest of the week. writing writes the articles, design made this site's look and layout, tech built it, and the heads keep everyone on track.</p>
-      <div style={{ position: "absolute", fontFamily: FONT.hand, lineHeight: "1.1", color: "#5B3A1E", transform: "rotate(-2deg)", ...L.note }}>nobody here is a professional. that is the point.</div>
+      <div style={{ position: "absolute", top: "0", height: "2px", background: "var(--ink)", ...L.rule }} />
+      <h2 style={{ position: "absolute", margin: "0", fontFamily: FONT.head, fontWeight: "400", textTransform: "uppercase", color: "var(--ink)", ...L.title }}>Meet<br />the team</h2>
+      <div style={{ position: "absolute", textAlign: "right", fontFamily: FONT.mono, color: "var(--ink)", ...L.count }}>{web ? `${count.toUpperCase()} OF US · CLICK A FACE` : <>{count.toUpperCase()} OF US<br />TAP A FACE</>}</div>
+      <p style={{ position: "absolute", margin: "0", color: "var(--text)", ...L.blurb }}>one magazine, a meeting every Friday, {count} people who are all doing something else the rest of the week. writing writes the articles, design made this site's look and layout, tech built it, and the heads keep everyone on track.</p>
+      <div style={{ position: "absolute", fontFamily: FONT.hand, lineHeight: "1.1", color: "var(--hand)", transform: "rotate(-2deg)", ...L.note }}>nobody here is a professional. that is the point.</div>
       <svg width={L.width} height={H} viewBox={`0 0 ${L.width} ${H}`} style={{ position: "absolute", left: "0", top: "0", pointerEvents: "none" }} aria-hidden="true" fill="none" strokeWidth={L.line[0]} strokeDasharray={L.line[1]} strokeLinecap="round">
         {L.links.map((l) => <path key={l.team} d={l.d} stroke={TEAMS[l.team].color} opacity={team == null ? 0.55 : team === l.team ? 0.95 : 0.12} style={{ transition: "opacity .25s" }} />)}
       </svg>
@@ -116,8 +123,8 @@ export default function TeamSection({ web }) {
         {Object.entries(TEAMS).map(([key, t]) => {
           const on = team === key;
           return (
-            <button key={key} className="legend-chip" onClick={() => setTeam(on ? null : key)} aria-pressed={on ? 'true' : 'false'} style={{ width: "100%", display: "flex", alignItems: "center", background: on ? '#111111' : 'transparent', color: on ? '#FFFFFF' : '#111111', border: `1.5px solid ${on ? '#111111' : 'transparent'}`, borderRadius: "999px", fontFamily: FONT.mono, fontWeight: "700", textTransform: "uppercase", textAlign: "left", ...L.chip }}>
-              <span style={{ width: L.dot, height: L.dot, flexShrink: "0", borderRadius: "50%", background: t.color, border: "1.5px solid #111111", boxSizing: "border-box" }} />
+            <button key={key} className="legend-chip" onClick={() => setTeam(on ? null : key)} aria-pressed={on ? 'true' : 'false'} style={{ width: "100%", display: "flex", alignItems: "center", background: on ? 'var(--ink)' : 'transparent', color: on ? 'var(--card)' : 'var(--ink)', border: `1.5px solid ${on ? 'var(--ink)' : 'transparent'}`, borderRadius: "999px", fontFamily: FONT.mono, fontWeight: "700", textTransform: "uppercase", textAlign: "left", ...L.chip }}>
+              <span style={{ width: L.dot, height: L.dot, flexShrink: "0", borderRadius: "50%", background: t.color, border: "1.5px solid var(--ink)", boxSizing: "border-box" }} />
               <span style={{ flexGrow: "1" }}>{t.label}</span>
               <span>{MEMBERS.filter((m) => teamsOf(m).includes(key)).length}</span>
             </button>
@@ -129,13 +136,13 @@ export default function TeamSection({ web }) {
         const m = MEMBERS[i];
         return (
           <div key={m.name} className={web ? `${s.float} face` : s.float} style={{ position: "absolute", left: `${s.cx - F.half}px`, top: `${s.cy - s.size / 2}px`, width: `${F.half * 2}px`, display: "flex", flexDirection: "column", alignItems: "center", gap: F.gap, opacity: team == null || teamsOf(m).includes(team) ? 1 : 0.18, transition: "opacity .25s" }}>
-            <button className="bub" onClick={() => setOpen(i)} aria-label={`${m.name}, ${m.role} — open profile`} style={{ width: `${s.size}px`, height: `${s.size}px`, padding: "0", borderRadius: "50%", border: "2px solid #111111", background: "#F2F1ED", boxShadow: `${F.shadow} ${colorFor(m)}`, transition: `box-shadow ${fade} ease, ${F.bump}`, overflow: "hidden", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: web ? "4px" : "3px", fontSize: F.font, color: "#444" }}>
+            <button className="bub" onClick={() => setOpen(i)} aria-label={`${m.name}, ${m.role} — open profile`} style={{ width: `${s.size}px`, height: `${s.size}px`, padding: "0", borderRadius: "50%", border: "2px solid var(--ink)", background: "var(--blank)", boxShadow: `${F.shadow} ${colorFor(m)}`, transition: `box-shadow ${fade} ease, ${F.bump}`, overflow: "hidden", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: web ? "4px" : "3px", fontSize: F.font, color: "var(--slotInk)" }}>
               {m.photo ? <img src={m.photo} alt="" loading="lazy" decoding="async" width="400" height="400" style={photoFill} /> : <><PhotoIcon size={F.icon} /><span>{firstName(m.name).toLowerCase()}</span></>}
             </button>
-            <div style={{ textAlign: "center", lineHeight: "1.1", padding: F.pad, background: "#F3EEE4" }}>
-              <div style={{ fontFamily: FONT.head, fontSize: F.name, textTransform: "uppercase", color: "#111111" }}>{m.name}</div>
+            <div style={{ textAlign: "center", lineHeight: "1.1", padding: F.pad, background: "var(--page)" }}>
+              <div style={{ fontFamily: FONT.head, fontSize: F.name, textTransform: "uppercase", color: "var(--ink)" }}>{m.name}</div>
               {/* the role hides while the legend picks a team (they'd all say the same) */}
-              {team == null && <div className="fade-in" style={{ marginTop: F.roleGap, fontFamily: FONT.mono, fontSize: F.role, letterSpacing: F.roleSpacing, textTransform: "uppercase", color: "#4A4A45" }}>{m.role}</div>}
+              {team == null && <div className="fade-in" style={{ marginTop: F.roleGap, fontFamily: FONT.mono, fontSize: F.role, letterSpacing: F.roleSpacing, textTransform: "uppercase", color: "var(--grey)" }}>{m.role}</div>}
             </div>
           </div>
         );
@@ -144,29 +151,29 @@ export default function TeamSection({ web }) {
       {sel && (
         <>
           <button className={leaving ? 'fade-out' : 'fade-in'} onClick={close} aria-label="Close profile" style={{ position: "absolute", left: "0", top: "0", width: `${L.width}px`, height: `${H}px`, border: "0", padding: "0", background: L.dim, cursor: web ? "default" : undefined }} />
-          <div ref={card} className={leaving ? 'card-lift' : 'card-drop'} role="dialog" aria-label={`${sel.name} — profile`} style={{ position: "absolute", left: `${at.left}px`, top: `${at.top}px`, width: `${C.width}px`, boxSizing: "border-box", background: "#FFFFFF", border: "2px solid #111111", boxShadow: `${C.shadow} ${color}`, padding: C.padding, display: "flex", flexDirection: "column", gap: "12px", transform: "rotate(-1deg)" }}>
+          <div ref={card} className={leaving ? 'card-lift' : 'card-drop'} role="dialog" aria-label={`${sel.name} — profile`} style={{ position: "absolute", left: `${at.left}px`, top: `${at.top}px`, width: `${C.width}px`, boxSizing: "border-box", background: "var(--card)", border: "2px solid var(--ink)", boxShadow: `${C.shadow} ${color}`, padding: C.padding, display: "flex", flexDirection: "column", gap: "12px", transform: "rotate(-1deg)" }}>
             {sel.badge && <Badge b={sel.badge} />}
             <Clip color={color} w={C.clip[0]} h={C.clip[1]} top={C.clip[2]} />
-            <button className={web ? 'btn' : 'press'} onClick={close} aria-label="Close profile" style={{ "--c": "#111111", position: "absolute", ...C.close, width: "44px", height: "44px", background: "#FFFFFF", border: "2px solid #111111", boxShadow: "3px 3px 0 #111111", padding: "0", display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <button className={web ? 'btn' : 'press'} onClick={close} aria-label="Close profile" style={{ "--c": "var(--ink)", position: "absolute", ...C.close, width: "44px", height: "44px", background: "var(--card)", border: "2px solid var(--ink)", boxShadow: "3px 3px 0 var(--ink)", padding: "0", display: "flex", alignItems: "center", justifyContent: "center" }}>
               <CloseIcon size={16} />
             </button>
             <div style={{ position: "relative", alignSelf: "flex-start" }}>
               {sel.crown && <Crown />}
-              <div style={{ width: C.photo, height: C.photo, borderRadius: "50%", border: "2px solid #111111", background: "#F2F1ED", boxShadow: `6px 5px 0 ${color}`, display: "flex", alignItems: "center", justifyContent: "center", overflow: sel.photo ? "hidden" : undefined }}>
+              <div style={{ width: C.photo, height: C.photo, borderRadius: "50%", border: "2px solid var(--ink)", background: "var(--blank)", boxShadow: `6px 5px 0 ${color}`, display: "flex", alignItems: "center", justifyContent: "center", overflow: sel.photo ? "hidden" : undefined }}>
                 {sel.photo ? <img src={sel.photo} alt={sel.name} style={photoFill} /> : <PhotoIcon size={22} />}
               </div>
             </div>
-            <div style={{ fontFamily: FONT.head, fontSize: C.name, lineHeight: "0.95", textTransform: "uppercase", color: "#111111" }}>{sel.name}</div>
-            <div style={{ fontFamily: FONT.hand, fontSize: C.role, lineHeight: "1.1", color: "#5B3A1E" }}>{sel.role}</div>
-            <p style={{ margin: "0", fontSize: C.bio, lineHeight: "1.5", color: "#333333" }}>{sel.bio || '[Two lines about them: where they work from, what they write or shoot, what they care about.]'}</p>
+            <div style={{ fontFamily: FONT.head, fontSize: C.name, lineHeight: "0.95", textTransform: "uppercase", color: "var(--ink)" }}>{sel.name}</div>
+            <div style={{ fontFamily: FONT.hand, fontSize: C.role, lineHeight: "1.1", color: "var(--hand)" }}>{sel.role}</div>
+            <p style={{ margin: "0", fontSize: C.bio, lineHeight: "1.5", color: "var(--bioText)" }}>{sel.bio || '[Two lines about them: where they work from, what they write or shoot, what they care about.]'}</p>
             {/* what each of their teams made (their own `credit` line instead, if they have one) */}
             {teamsOf(sel).map((t) => {
               const credit = sel.credit || TEAMS[t].credit;
-              return <p key={t} style={{ margin: "0", paddingLeft: "10px", borderLeft: `3px solid ${TEAMS[t].color}`, fontSize: C.credit, lineHeight: "1.45", color: "#1E2723" }}><strong style={{ fontWeight: "600" }}>{TEAMS[t].label}</strong>{` — ${credit[0].toLowerCase()}${credit.slice(1)}.`}</p>;
+              return <p key={t} style={{ margin: "0", paddingLeft: "10px", borderLeft: `3px solid ${TEAMS[t].color}`, fontSize: C.credit, lineHeight: "1.45", color: "var(--text)" }}><strong style={{ fontWeight: "600" }}>{TEAMS[t].label}</strong>{` — ${credit[0].toLowerCase()}${credit.slice(1)}.`}</p>;
             })}
             <div style={{ display: "flex", gap: "10px" }}>
-              {articlesBy(sel.name).length > 0 && <Link className={btn} to={byLink(sel.name)} onClick={web ? close : undefined} style={{ minHeight: "44px", flexGrow: "1", display: "flex", alignItems: "center", justifyContent: "center", background: "#111111", color: "#FFFFFF", border: "2px solid #111111", fontFamily: FONT.mono, fontWeight: "700", fontSize: "11px", letterSpacing: "1px", textDecoration: "none" }}>THEIR ARTICLES</Link>}
-              {sel.instagram && <a className={btn} href={instagramUrl(sel.instagram)} target="_blank" rel="noreferrer" style={{ minHeight: "44px", padding: "0 14px", display: "flex", alignItems: "center", background: "#FFFFFF", color: "#111111", border: "2px solid #111111", boxShadow: "3px 3px 0 #111111", fontFamily: FONT.mono, fontWeight: "700", fontSize: "11px", letterSpacing: "1px", textDecoration: "none" }}><span style={{ fontFamily: FONT.body, fontWeight: "700", fontSize: "13px", letterSpacing: "0", marginRight: "1px" }}>@</span>{`${sel.instagram} ↗`}</a>}
+              {articlesBy(sel.name, edition.articles).length > 0 && <Link className={btn} to={byLink(sel.name, edition.number)} onClick={web ? close : undefined} style={{ minHeight: "44px", flexGrow: "1", display: "flex", alignItems: "center", justifyContent: "center", background: "var(--ink)", color: "var(--card)", border: "2px solid var(--ink)", fontFamily: FONT.mono, fontWeight: "700", fontSize: "11px", letterSpacing: "1px", textDecoration: "none" }}>THEIR ARTICLES</Link>}
+              {sel.instagram && <a className={btn} href={instagramUrl(sel.instagram)} target="_blank" rel="noreferrer" style={{ minHeight: "44px", padding: "0 14px", display: "flex", alignItems: "center", background: "var(--card)", color: "var(--ink)", border: "2px solid var(--ink)", boxShadow: "3px 3px 0 var(--ink)", fontFamily: FONT.mono, fontWeight: "700", fontSize: "11px", letterSpacing: "1px", textDecoration: "none" }}><span style={{ fontFamily: FONT.body, fontWeight: "700", fontSize: "13px", letterSpacing: "0", marginRight: "1px" }}>@</span>{`${sel.instagram} ↗`}</a>}
             </div>
           </div>
         </>

@@ -30,10 +30,10 @@ export default function PhoneHeader({ current, edge }) {
   }, [home]);
   return (
     <>
-      <header className="site-header" style={{ position: "sticky", top: "0", zIndex: "50", width: "390px", height: "64px", boxSizing: "border-box", padding: home ? "0 10px 0 16px" : "0 10px 0 12px", background: "#F3EEE4", borderBottom: "2px solid #111111", display: "flex", alignItems: "center", gap: "4px" }}>
+      <header className="site-header" style={{ position: "sticky", top: "0", zIndex: "50", width: "390px", height: "64px", boxSizing: "border-box", padding: home ? "0 10px 0 16px" : "0 10px 0 12px", background: "var(--page)", borderBottom: "2px solid var(--ink)", display: "flex", alignItems: "center", gap: "4px" }}>
         {!home && (
-          <BackHome ref={back} style={{ height: "44px", flexShrink: "0", display: "flex", alignItems: "center", gap: "6px", paddingRight: "6px", textDecoration: "none", color: "#111111", fontFamily: FONT.hand, fontSize: "21px", lineHeight: "1", whiteSpace: "nowrap" }}>
-            <svg width="24" height="13" viewBox="0 0 30 12" fill="none" stroke="#111111" strokeWidth="1.8" strokeLinecap="round" aria-hidden="true"><path d="M29 6 C20 8 12 4 2 6" /><path d="M7 2 L2 6 L7 10" /></svg>
+          <BackHome ref={back} style={{ height: "44px", flexShrink: "0", display: "flex", alignItems: "center", gap: "6px", paddingRight: "6px", textDecoration: "none", color: "var(--ink)", fontFamily: FONT.hand, fontSize: "21px", lineHeight: "1", whiteSpace: "nowrap" }}>
+            <svg width="24" height="13" viewBox="0 0 30 12" fill="none" strokeWidth="1.8" strokeLinecap="round" aria-hidden="true" style={{ stroke: "var(--ink)" }}><path d="M29 6 C20 8 12 4 2 6" /><path d="M7 2 L2 6 L7 10" /></svg>
             back to home
           </BackHome>
         )}

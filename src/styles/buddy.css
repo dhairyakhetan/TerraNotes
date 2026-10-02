@@ -2,17 +2,17 @@
    his idle bob, his tricks, and the phone menu's "click me". */
 
 /* the hidden call button: invisible until the pointer comes near (.buddy-near) or it has keyboard focus */
-.buddy-call{width:34px;height:34px;padding:0;display:flex;align-items:center;justify-content:center;background:#FBF8F1;border:1.5px solid #111111;border-radius:50%;cursor:pointer;opacity:0;transition:opacity .25s ease,transform .25s ease}
+.buddy-call{width:34px;height:34px;padding:0;display:flex;align-items:center;justify-content:center;background:var(--cream);border:1.5px solid var(--ink);border-radius:50%;cursor:pointer;opacity:0;transition:opacity .25s ease,transform .25s ease}
 .buddy-near{opacity:.85}
 .buddy-call:hover,.buddy-call:focus-visible{opacity:1;transform:rotate(-8deg) scale(1.08)}
 .buddy-peek:not(:hover){animation:buddyPeek 1.8s ease-in-out}
 @keyframes buddyPeek{0%{opacity:0;transform:translateY(6px) rotate(0)}30%{opacity:.9;transform:translateY(0) rotate(-10deg)}45%{transform:rotate(8deg)}60%{opacity:.9;transform:rotate(-4deg)}100%{opacity:0;transform:translateY(6px)}}
-.buddy-call-label{position:absolute;right:42px;top:2px;font-family:'Caveat',cursive;font-size:24px;line-height:1;color:#7B5CE6;white-space:nowrap;pointer-events:none;opacity:0;transform:translateX(6px) rotate(-3deg);transition:opacity .25s ease,transform .25s ease}
+.buddy-call-label{position:absolute;right:42px;top:2px;font-family:var(--font-hand);font-size:24px;line-height:1;color:var(--purple);white-space:nowrap;pointer-events:none;opacity:0;transform:translateX(6px) rotate(-3deg);transition:opacity .25s ease,transform .25s ease}
 .buddy-call:hover+.buddy-call-label,.buddy-call:focus-visible+.buddy-call-label{opacity:1;transform:translateX(0) rotate(-3deg)}
 
 /* the ghost himself: a plain button */
 .buddy-ghost{display:block;padding:0;border:0;background:transparent;cursor:pointer;-webkit-tap-highlight-color:transparent}
-.buddy-ghost:focus-visible{outline:2px dashed #7B5CE6;outline-offset:4px}
+.buddy-ghost:focus-visible{outline:2px dashed var(--purple);outline-offset:4px}
 .buddy-trick{display:block;transform-origin:50% 60%}
 
 /* roping down from under the header, then the rope pulls back up and he floats */
@@ -43,7 +43,7 @@
 @keyframes bWobble{0%,100%{transform:none}20%{transform:rotate(-16deg) translateX(-6px)}40%{transform:rotate(12deg) translateX(5px)}60%{transform:rotate(-8deg)}80%{transform:rotate(4deg)}}
 
 /* phone menu: the bottom, under "TerraNotes" */
-.buddy-menu-call{position:absolute;left:14px;bottom:0;display:flex;align-items:center;gap:6px;min-height:34px;padding:0 6px;background:transparent;border:0;color:#F7C21A;font-family:'Caveat',cursive;font-size:19px;line-height:1;cursor:pointer}
+.buddy-menu-call{position:absolute;left:14px;bottom:0;display:flex;align-items:center;gap:6px;min-height:34px;padding:0 6px;background:transparent;border:0;color:var(--yellow);font-family:var(--font-hand);font-size:19px;line-height:1;cursor:pointer}
 .buddy-menu-call svg{animation:buddyBob 2s ease-in-out infinite}
 
 @media (prefers-reduced-motion: reduce){

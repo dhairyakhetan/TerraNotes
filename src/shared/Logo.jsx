@@ -8,7 +8,7 @@ export default function Logo({ globe, word, sub, dark }) {
       <img src="/brand/aquaterra-globe.webp" alt="" width={globe} height={globe} style={{ display: "block", width: `${globe}px`, height: `${globe}px` }} />
       <span style={{ display: "flex", flexDirection: "column", gap: "3px" }}>
         <img className={dark ? 'wordmark-img on-dark' : 'wordmark-img'} src="/brand/aquaterra-wordmark.webp" alt="Aquaterra" width={Math.round(word * 6.65)} height={word} style={{ display: "block", height: `${word}px`, width: "auto" }} />
-        <span style={{ fontFamily: FONT.serif, fontStyle: "italic", fontSize: `${sub}px`, lineHeight: "1", color: dark ? "#F3EEE4" : "#1E2723" }}>TerraNotes</span>
+        <span style={{ fontFamily: FONT.serif, fontStyle: "italic", fontSize: `${sub}px`, lineHeight: "1", color: dark ? "var(--page)" : "var(--text)" }}>TerraNotes</span>
       </span>
     </>
   );

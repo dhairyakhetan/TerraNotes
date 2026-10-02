@@ -1,4 +1,5 @@
-// "Words we should bring back": each game draws 5 of these at random.
+// October 2026's "Words we should bring back" (its home page; September's to start: swap in October's): each game draws
+// 5 of these at random.
 //   say:     how to say it, spelled out (capitals = the stressed part), shown under the word
 //   options: the three meanings shown
 //   answer:  which option is right (0 = first, 1 = second, 2 = third)

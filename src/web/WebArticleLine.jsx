@@ -3,8 +3,9 @@ import { Link } from 'react-router';
 import ArticleCard from '../shared/ArticleCard.jsx';
 import { ChevronIcon } from '../shared/Icons.jsx';
 import { Clip } from '../shared/Tapes.jsx';
-import { ARTICLES } from '../data/articles.js';
+import { homeLink } from '../data/editions.js';
 import { useByWriter } from '../lib/byWriter.js';
+import { useEdition } from '../lib/edition.js';
 import { pad2 } from '../lib/format.js';
 import { webZoom } from '../lib/layoutMode.js';
 import { calm } from '../lib/motion.js';
@@ -160,6 +161,7 @@ function runLine(r, pegs, width) {
 export default function WebArticleLine() {
   const refs = useRef({ hangs: [], kicks: [] }).current;
   const { by, mine, isMine, list } = useByWriter(); // ?by=<name>: that writer's pieces first, taped
+  const { number } = useEdition();
   const pegs = list.map((_, i) => peg(i));
   const width = pegs[pegs.length - 1].x + 224;
   useEffect(() => runLine(refs, pegs, width), []);
@@ -188,30 +190,30 @@ export default function WebArticleLine() {
     addEventListener('pointermove', move); addEventListener('pointerup', up); addEventListener('pointercancel', up);
   };
   const onClickCapture = (e) => { if (dragged.current) { e.preventDefault(); e.stopPropagation(); dragged.current = false; } };
-  const arrow = { width: "48px", height: "48px", padding: "0", border: "2px solid #111111", boxShadow: "4px 4px 0 #111111", display: "flex", alignItems: "center", justifyContent: "center" };
+  const arrow = { width: "48px", height: "48px", padding: "0", border: "2px solid var(--ink)", boxShadow: "4px 4px 0 var(--ink)", display: "flex", alignItems: "center", justifyContent: "center" };
 
   return (
     <>
       <section id="articles" aria-label="Articles" style={{ position: "absolute", left: "0", top: "420px", width: "1440px", height: "700px" }} />
       <svg ref={(n) => { refs.svg = n; }} width="1440" height="200" viewBox="0 0 1440 200" style={{ position: "absolute", left: "0", top: "420px", pointerEvents: "none" }} aria-hidden="true">
-        <path ref={(n) => { refs.lead = n; }} fill="none" stroke="#5B3A1E" strokeWidth="1.8" strokeLinecap="round" />
+        <path ref={(n) => { refs.lead = n; }} fill="none" strokeWidth="1.8" strokeLinecap="round" style={{ stroke: "var(--string)" }} />
       </svg>
       {/* the "Articles" label card, tied to the intro card's knot; the lead string starts at its own knot */}
       <div style={{ position: "absolute", left: "110px", top: "430px", width: "170px", height: "234px", pointerEvents: "none" }}>
-        <div style={{ position: "absolute", left: "84.3px", top: "0", width: "1.4px", height: "82px", background: "#5B3A1E" }} />
+        <div style={{ position: "absolute", left: "84.3px", top: "0", width: "1.4px", height: "82px", background: "var(--string)" }} />
         <div style={{ position: "absolute", left: "0", top: "80px", width: "170px", height: "154px", transformOrigin: "50% 0", transform: "rotate(-2.5deg)" }}>
-          <Clip color="#F0442B" w={28} h={10} top="-7px" />
-          <div style={{ width: "100%", height: "100%", boxSizing: "border-box", background: "#111111", color: "#F3EEE4", padding: "18px", border: "2px solid #111111", boxShadow: "7px 7px 0 #F0442B", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
+          <Clip color="var(--red)" w={28} h={10} top="-7px" />
+          <div style={{ width: "100%", height: "100%", boxSizing: "border-box", background: "var(--ink)", color: "var(--page)", padding: "18px", border: "2px solid var(--ink)", boxShadow: "7px 7px 0 var(--red)", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
             <h2 style={{ margin: "0", fontFamily: FONT.hand, fontWeight: "700", fontSize: "52px", lineHeight: "0.9" }}>Articles</h2>
-            <div style={{ fontFamily: FONT.mono, fontSize: "11px", letterSpacing: "1.4px", color: "#CFC8B8" }}>{`${pad2(ARTICLES.length)} PIECES`}</div>
+            <div style={{ fontFamily: FONT.mono, fontSize: "11px", letterSpacing: "1.4px", color: "var(--faint)" }}>{`${pad2(list.length)} PIECES`}</div>
           </div>
-          <div ref={(n) => { refs.knot = n; }} style={{ position: "absolute", left: "166px", top: "32px", width: "12px", height: "12px", boxSizing: "border-box", borderRadius: "50%", background: "#111111", border: "2px solid #F3EEE4", zIndex: "2" }} />
+          <div ref={(n) => { refs.knot = n; }} style={{ position: "absolute", left: "166px", top: "32px", width: "12px", height: "12px", boxSizing: "border-box", borderRadius: "50%", background: "var(--ink)", border: "2px solid var(--page)", zIndex: "2" }} />
         </div>
       </div>
       <div ref={(n) => { refs.el = n; }} className="art-scroller" onPointerDown={onPointerDown} onClickCapture={onClickCapture} onDragStart={(e) => e.preventDefault()} tabIndex={0} aria-label="All write-ups, scroll sideways" style={{ position: "absolute", left: "300px", top: "470px", width: "1140px", height: "530px", overflowX: "auto", overflowY: "hidden", userSelect: "none", WebkitUserSelect: "none" }}>
         <div style={{ position: "relative", width: `${width}px`, height: "520px" }}>
           <svg width={width} height="200" viewBox={`0 0 ${width} 200`} style={{ position: "absolute", left: "0", top: "0" }} aria-hidden="true">
-            <path ref={(n) => { refs.wire = n; }} d={wireFrom(pegs, width, 0)} fill="none" stroke="#5B3A1E" strokeWidth="1.8" />
+            <path ref={(n) => { refs.wire = n; }} d={wireFrom(pegs, width, 0)} fill="none" strokeWidth="1.8" style={{ stroke: "var(--string)" }} />
           </svg>
           {list.map((a, i) => {
             const p = pegs[i];
@@ -219,7 +221,7 @@ export default function WebArticleLine() {
               // a gentle idle sway (CSS); the inner box takes the swing from scrolling (runLine)
               <div key={a.slug} ref={(n) => { refs.hangs[i] = n; }} className="hang sway" style={{ position: "absolute", left: `${p.x - 86}px`, top: `${p.y}px`, width: "172px", height: `${p.drop + 272}px`, "--a": `${(p.swing * 0.45).toFixed(2)}deg`, "--d": `${(p.dur * 1.5).toFixed(1)}s`, animationDelay: `${(-1.3 * i).toFixed(1)}s` }}>
                 <div ref={(n) => { refs.kicks[i] = n; }} style={{ position: "absolute", inset: "0", transformOrigin: "50% 0" }}>
-                  <div style={{ position: "absolute", left: "85.3px", top: "0", width: "1.4px", height: `${p.drop + 2}px`, background: "#5B3A1E" }} />
+                  <div style={{ position: "absolute", left: "85.3px", top: "0", width: "1.4px", height: `${p.drop + 2}px`, background: "var(--string)" }} />
                   <div style={{ position: "absolute", left: "0", top: `${p.drop}px`, width: "172px", height: "272px", transform: `rotate(${p.tilt}deg)`, transformOrigin: "50% 0" }}>
                     <ArticleCard article={a} look="web" mark={isMine(a) ? by : undefined} />
                   </div>
@@ -232,16 +234,16 @@ export default function WebArticleLine() {
       <div style={{ position: "absolute", left: "300px", top: "1024px", width: "1060px", display: "flex", alignItems: "center", gap: "20px" }}>
         {by && (
           <div className="slide-in" role="status" style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-            <span style={{ background: "#F7C21A", border: "1.5px solid #111111", padding: "5px 10px", fontFamily: FONT.mono, fontWeight: "700", fontSize: "11px", letterSpacing: "1px", textTransform: "uppercase", whiteSpace: "nowrap" }}>{mine.length ? `By ${by} · ${pad2(mine.length)} first` : `Nothing by ${by} yet`}</span>
-            <Link className="btn" to="/articles" replace aria-label="Show all articles in order" style={{ minWidth: "32px", minHeight: "30px", display: "flex", alignItems: "center", justifyContent: "center", border: "1.5px solid #111111", background: "#FFFFFF", fontFamily: FONT.mono, fontWeight: "700", fontSize: "12px", textDecoration: "none", color: "#111111" }}>✕</Link>
+            <span style={{ background: "var(--yellow)", border: "1.5px solid var(--ink)", padding: "5px 10px", fontFamily: FONT.mono, fontWeight: "700", fontSize: "11px", letterSpacing: "1px", textTransform: "uppercase", whiteSpace: "nowrap" }}>{mine.length ? `By ${by} · ${pad2(mine.length)} first` : `Nothing by ${by} yet`}</span>
+            <Link className="btn" to={homeLink(number, 'articles')} replace aria-label="Show all articles in order" style={{ minWidth: "32px", minHeight: "30px", display: "flex", alignItems: "center", justifyContent: "center", border: "1.5px solid var(--ink)", background: "var(--card)", fontFamily: FONT.mono, fontWeight: "700", fontSize: "12px", textDecoration: "none", color: "var(--ink)" }}>✕</Link>
           </div>
         )}
-        <div style={{ fontFamily: FONT.mono, fontSize: "11px", letterSpacing: "1.6px", whiteSpace: "nowrap" }}>{`${pad2(ARTICLES.length)} WRITE-UPS · SCROLL SIDEWAYS`}</div>
-        <div style={{ flexGrow: "1", height: "4px", background: "#D9D1BF", position: "relative" }}>
-          <div ref={(n) => { refs.bar = n; }} style={{ position: "absolute", left: "0", top: "0", height: "4px", width: "6%", background: "#111111", transition: "width 120ms linear" }} />
+        <div style={{ fontFamily: FONT.mono, fontSize: "11px", letterSpacing: "1.6px", whiteSpace: "nowrap" }}>{`${pad2(list.length)} WRITE-UPS · SCROLL SIDEWAYS`}</div>
+        <div style={{ flexGrow: "1", height: "4px", background: "var(--rule)", position: "relative" }}>
+          <div ref={(n) => { refs.bar = n; }} style={{ position: "absolute", left: "0", top: "0", height: "4px", width: "6%", background: "var(--ink)", transition: "width 120ms linear" }} />
         </div>
-        <button ref={(n) => { refs.prev = n; }} className="btn" onClick={() => scrollBy(-624)} aria-label="Scroll write-ups left" style={{ ...arrow, background: "#FFFFFF", opacity: "0.35" }}><ChevronIcon dir="left" /></button>
-        <button ref={(n) => { refs.next = n; }} className="btn" onClick={() => scrollBy(624)} aria-label="Scroll write-ups right" style={{ ...arrow, background: "#F7C21A" }}><ChevronIcon dir="right" /></button>
+        <button ref={(n) => { refs.prev = n; }} className="btn" onClick={() => scrollBy(-624)} aria-label="Scroll write-ups left" style={{ ...arrow, background: "var(--card)", opacity: "0.35" }}><ChevronIcon dir="left" /></button>
+        <button ref={(n) => { refs.next = n; }} className="btn" onClick={() => scrollBy(624)} aria-label="Scroll write-ups right" style={{ ...arrow, background: "var(--yellow)" }}><ChevronIcon dir="right" /></button>
       </div>
     </>
   );

@@ -28,14 +28,14 @@
 .glint{position:absolute;top:-20%;left:0;width:40%;height:140%;background:linear-gradient(100deg,rgba(255,255,255,0) 0%,rgba(255,255,255,.45) 50%,rgba(255,255,255,0) 100%);transform:translateX(-160%) skewX(-12deg);animation-name:glint;animation-timing-function:ease-in-out;animation-iteration-count:infinite;pointer-events:none}
 @keyframes glint{0%,74%{transform:translateX(-160%) skewX(-12deg)}90%,100%{transform:translateX(320%) skewX(-12deg)}}
 .bulb{position:absolute;border-radius:50%;background:radial-gradient(circle closest-side,rgba(255,200,97,.75),rgba(255,200,97,0));pointer-events:none}
-.bulb::after{content:"";position:absolute;left:50%;top:50%;width:var(--core);height:var(--core);transform:translate(-50%,-50%);border-radius:50%;background:#FFE6AE}
+.bulb::after{content:"";position:absolute;left:50%;top:50%;width:var(--core);height:var(--core);transform:translate(-50%,-50%);border-radius:50%;background:var(--bulb)}
 .fk1{animation:flick 7.3s steps(1,end) infinite}
 .fk2{animation:flick 9.7s steps(1,end) infinite -3.1s}
 .fk3{animation:flick2 11.9s steps(1,end) infinite -5.4s}
 .fk4{animation:flick2 13.3s steps(1,end) infinite -8.2s}
 @keyframes flick{0%,100%{opacity:1}61%{opacity:.25}62%{opacity:.9}63.5%{opacity:.3}65%{opacity:1}}
 @keyframes flick2{0%,100%{opacity:1}28%{opacity:.4}29%{opacity:1}83%{opacity:.2}85%{opacity:.85}86%{opacity:1}}
-.spark{position:absolute;background:#FFF4D6;clip-path:polygon(50% 0,59% 41%,100% 50%,59% 59%,50% 100%,41% 59%,0 50%,41% 41%);pointer-events:none;transform:scale(0);opacity:0;animation:spark 6.5s ease-out infinite}
+.spark{position:absolute;background:var(--spark);clip-path:polygon(50% 0,59% 41%,100% 50%,59% 59%,50% 100%,41% 59%,0 50%,41% 41%);pointer-events:none;transform:scale(0);opacity:0;animation:spark 6.5s ease-out infinite}
 .sp1{animation-delay:-1s}.sp2{animation-delay:-3.8s}.sp3{animation-delay:-5.2s}.sp-late{animation-duration:8.9s}
 @keyframes spark{0%,86%,100%{transform:scale(0) rotate(0);opacity:0}90%{transform:scale(1.15) rotate(20deg);opacity:1}95%{transform:scale(.4) rotate(45deg);opacity:.6}}
 

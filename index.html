@@ -17,7 +17,9 @@
          Browsers that run the app never show it: this hides it before anything is drawn, and the app replaces it. -->
     <script>document.documentElement.classList.add('js')</script>
     <style>.js .static-copy{display:none}</style>
-    <meta name="theme-color" content="#F3EEE4" />
+    <!-- the latest edition's colours and fonts as CSS variables, filled in from its look.js (vite.config.js) -->
+    <style>%LOOK%</style>
+    <meta name="theme-color" content="%THEME_COLOR%" />
     <meta name="description" content="Terranotes by Aquaterra: notes from where the land meets the water." />
     <title>Aquaterra</title>
     <!-- link previews; %SITE_URL% = the site's address, filled in at build (vite.config.js) -->
@@ -41,6 +43,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Caveat:wght@500;700&family=Figtree:wght@400;500;600&family=Archivo+Black&family=Space+Mono:wght@400;700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet" />
     <!-- one member card's "born culer": just those letters, so it costs next to nothing -->
     <link href="https://fonts.googleapis.com/css2?family=Federant&text=borncule&display=swap" rel="stylesheet" />
+    %LOOK_FONTS%
   </head>
   <body>
     <div id="root"></div>

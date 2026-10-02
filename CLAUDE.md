@@ -1,7 +1,8 @@
 # TerraNotes (Aquaterra's monthly digital magazine): guide for Claude
 
-Vite + React 19 + React Router 8, static site on Vercel. No backend, no UI library, no CSS framework. All content
-lives in `src/data/`. Every file starts with a comment saying what it does; read that before editing it.
+Vite + React 19 + React Router 8, static site on Vercel. No backend, no UI library, no CSS framework. Each monthly
+edition has its own folder, `src/editions/<id>/`, with its look and content; site-wide content is in `src/data/`. Every
+file starts with a comment saying what it does; read that before editing it.
 
 ## Commands
 
@@ -22,8 +23,37 @@ animation). Automated browsers never get the intro.
 - **The footer links nowhere.** It has no links, by design.
 - **The console hello must never name anyone.**
 - **Writers' article text is verbatim, typos included.** Never "fix" it.
-- **No new colours** outside the palette below, unless the owner supplies them. The AQ Labs project bars use colours they supplied.
+- **Every edition keeps its look and content for good.** Once a newer edition is live, the older one's folder (`src/editions/<id>/`) is frozen: don't edit it, and don't change a shared component in a way that changes how it looks (see "Editions").
+- **No new colours** outside the edition's look (`src/editions/<id>/look.js`), unless the owner supplies them. The AQ Labs project bars use colours they supplied.
 - **Commit to `main`** unless told otherwise.
+
+## Editions
+
+TerraNotes comes out monthly, and each edition has its own look and content, kept for good: `/sep26` keeps September's
+look after October is out.
+
+- **One folder per edition**, `src/editions/<id>/` (the id comes from its month: `sep26`, `oct26`):
+  - `look.js`: its colours and fonts, by role (`LOOK.colors`, `LOOK.fonts`, `fontsCss` for fonts `index.html` doesn't load).
+  - `articles.js`: its `ARTICLES`, in order, and the `TAGS` they use. Their fields are explained at the top of `data/articles.js`.
+  - `photos.js`, `words.js`, `team.js`: its photo wall, words game and team (`TEAMS`, `MEMBERS`).
+  - `index.js`: gathers them, plus `INTRO` (the home intro card's lines).
+  - Its files (covers, photos) are in `public/editions/<id>/`.
+- **The list:** `EDITIONS` in `data/editions.js`, newest last; each folder is also registered in `src/editions/index.js`.
+  - `draft: true` = still being made: not the latest, listed nowhere (edition picker, `/editions`, sitemap), but viewable at its own address (`/oct26`) with a "Draft · not live yet" tape.
+  - Deleting the flag puts it live: it becomes the home page, and the previous edition moves under its id by itself.
+- **A page's edition comes from its address** (`editionAt` in `lib/routes.js`): `/sep26…` is September's, everything else the latest's.
+  - `App.jsx` puts that edition's look on the page and hands its content down. Components read it with `useEdition()` (`lib/edition.js`): `{ number, id, month, draft, look, tags, articles, photos, words, teams, members, intro }`.
+  - Never import an edition's own files (`src/editions/<id>/…`) in a component. Another edition's data (an article's own edition, say): `editionData(n)` from `src/editions/index.js`.
+- **Looks are CSS variables.** `lib/edition.js` sets every colour as `--<name>` and every font as `--font-<name>` on `<html>` (plus `data-edition="<id>"`). So:
+  - Shared components and CSS use `var(--ink)`, `var(--card)`…, never a hex colour. Fonts come from `FONT` (`var(--font-head)`…).
+  - SVG colours go in `style` (`style={{ stroke: "var(--ink)" }}`), not in attributes: Safari may not read a variable there.
+  - A canvas can't read CSS variables: it takes the values from `useEdition().look` (see `shared/buddy/BuddyGames.jsx`).
+  - Overlays and glows are still `rgba(…)`. Give one a look value when a month needs it changed.
+  - A new role (a colour that should differ from an existing one): add it to **every** edition's `look.js`, with the colour it had before in the older ones, so they stay the same. The build stops if any look misses a key, or uses a name the code already gives its own CSS variables (`TAKEN` in `src/editions/index.js`).
+  - The build writes the latest edition's look into `index.html` (`vite.config.js`), so the first paint is already right.
+- **More than a new look:** an edition can draw its own home page or article page. Keep a copy of the shared one in its folder, change it there, and register it in `src/editions/pages.js`.
+  - Its own CSS goes in its folder too, scoped with `[data-edition="<id>"]` or its own class, with class names no other file uses.
+- **Never change how a live or older edition looks** while making the next one. Check it: screenshot its pages at 390px and 1440px before and after your change; they must match.
 
 ## Layout model
 
@@ -35,12 +65,12 @@ Two separate layouts, chosen by window width (`lib/layoutMode.js`, `useIsWeb()`)
 | Header | `PhoneHeader` (64px, sticky; the logo glides when the back link comes or goes) + slide-in `PhoneMenu` | `WebHeader` (80px, sticky; inner pages: "← back to home" left, logo + edition picker centred, gliding over when that changes) |
 
 - **Home pages are artboards.** Everything under the header is `position: absolute` at design coordinates (px).
-  - Sections export their heights so the page grows with the data: `HANG_EXTRA` (PhoneHangingArticles) and `TEAM_HEIGHT` (TeamSection).
+  - Sections export their heights so the page grows with the data: `hangExtra(articles)` (PhoneHangingArticles) and `teamHeight(edition, layout)` (TeamSection).
   - When a section grows, move what's below it; don't reflow.
 - **Article, editions and 404 pages** are in normal document flow.
 - **Addresses follow the editions** (`data/editions.js`; each edition's id comes from its month, `sep26`):
-  - latest edition: `/articles/<slug>`; older ones: `/<id>/articles/<slug>` and `/<id>` for the edition itself.
-  - Build links with `articleLink(a)` / `editionLink(n)`, never by hand. A new edition moves the old links by itself; either address of an article redirects to its current one (`App.jsx`).
+  - latest edition: `/` and `/articles/<slug>`; older ones and drafts: `/<id>` (that edition's whole home page, in its own look) and `/<id>/articles/<slug>`.
+  - Build links with `articleLink(a)` / `editionLink(n)` / `homeLink(n, section)`, never by hand. A new edition moves the old links by itself; either address of an article redirects to its current one (`App.jsx`).
 - **Files follow the editions too:** `public/editions/<id>/` holds that edition's files, latest or not. Each article has a folder, `public/editions/<id>/articles/<slug>/`: `cover.jpg`, `preview.jpg` (link preview, made by the tool) and any photos of its own (`articleFolder(a)`). The photo wall's pictures are in `public/editions/<id>/photos/`.
 - **An article can have its own page** instead of the usual layout: `page: 'labs'` in its data and an entry in `PAGES` (`App.jsx`). It lives in `src/articles/<name>/`.
   - Its `body` is still what crawlers and AIs read.
@@ -52,10 +82,10 @@ Two separate layouts, chosen by window width (`lib/layoutMode.js`, `useIsWeb()`)
     - Books sit in fixed hover slots (`.bslot`), so the pulled-out book never flickers. Karyaarth's stills open in the site's `PhotoViewer` (it takes `photos`, `title`, `label`, `count`).
   - Its CSS (`labs.css`) is scoped to `.labs`. Its class names must not match any in `src/styles/` (it had to rename `.intro` and `.orbit`). Its loops keep the motion rules below, inside `labs.css`: transform / opacity only, stopped by reduced motion, `.lite`, `.off-screen` and `html[data-nav]`.
 - **Shared components** (`src/shared/`) take a `web` prop (or `look`) and keep a `PHONE` / `WEB` table of positions and sizes. Change a value in the right table; don't fork the component.
-- **The home page also answers at `/articles`, `/photos`, `/words` and `/members`** and scrolls to that section: element ids `articles`, `photos`, `words`, `members`. See `lib/routes.js` and `lib/scrollMemory.js`.
-- **Section addresses drop off by themselves.** Once you scroll a screen away from the section an address names (`/photos`, `/articles/labs/photon`), `lib/scrollMemory.js` replaces it with the plain page (`/`, `/articles/labs`) in place, with state `{ quiet: true }`, so nothing scrolls or remounts. `?by=` addresses stay.
+- **The home page also answers at `/articles`, `/photos`, `/words` and `/members`** (an older edition's at `/sep26/photos`…) and scrolls to that section: element ids `articles`, `photos`, `words`, `members`. See `lib/routes.js` and `lib/scrollMemory.js`.
+- **Section addresses drop off by themselves.** Once you scroll a screen away from the section an address names (`/photos`, `/sep26/words`, `/articles/labs/photon`), `lib/scrollMemory.js` replaces it with the plain page (`/`, `/sep26`, `/articles/labs`) in place, with state `{ quiet: true }`, so nothing scrolls or remounts. `?by=` addresses stay.
   - To change the address from a page without scrolling, use `navigate(path, { replace: true, state: { quiet: true } })`.
-  - The home page (`/:section?`) and an article with its chapters (`/articles/:slug/*`) are one route each, so the page survives the change.
+  - The home page (`/:first?/:second?`) and an article with its chapters (`/articles/:slug/*`) are one route each, so the page survives the change.
 - **Styling is inline** (`style={{ … }}` with string values like `"12px"`), matching the existing code.
   - CSS files only hold what inline styles can't: `:active` / `:hover`, keyframes, and shared classes.
   - Fonts come from `FONT` in `src/styles/fonts.js`. Never retype a font stack.
@@ -64,24 +94,27 @@ Two separate layouts, chosen by window width (`lib/layoutMode.js`, `useIsWeb()`)
 
 The site is "notes pegged on a line": paper cards hanging from strings, with ink borders, hard shadows, tape and handwriting.
 
-**Palette** (use these, nothing else):
+This is September 2026's look (`src/editions/sep26/look.js`); a new edition starts from a copy and changes the values.
+Use the variables, nothing else (the look lists a few more, for the photo wall, dark panels and details).
 
-| Role | Colour |
-|---|---|
-| page | `#F3EEE4` (outside the artboard: `#E6E0D3`) |
-| cards | `#FFFFFF` (soft cream `#FBF8F1`) |
-| ink / borders | `#111111` |
-| body text | `#1E2723` |
-| handwriting | `#5B3A1E` (deks `#5B4630`) |
-| string / wire | `#5B3A1E` / `#8E7A5E` |
-| accents | yellow `#F7C21A`, red `#F0442B`, blue `#3DA5F4`, green `#1E7A4C`, purple `#7B5CE6`, pink `#EE4E8A`, mint `#7FC49B` |
-| photo wall | panel `#1C2622`, amber shadow `#E9A23B` |
+**Palette:**
 
-Tag colours are in `TAGS` (`data/articles.js`) and team colours in `TEAMS` (`data/team.js`).
+| Role | Variable | Sep 2026 |
+|---|---|---|
+| page | `--page` (outside the artboard: `--outside`) | `#F3EEE4` (`#E6E0D3`) |
+| cards | `--card` (soft cream `--cream`) | `#FFFFFF` (`#FBF8F1`) |
+| ink / borders | `--ink` | `#111111` |
+| body text | `--text` | `#1E2723` |
+| handwriting | `--hand` (deks `--dek`) | `#5B3A1E` (`#5B4630`) |
+| string / wire | `--string` / `--wire` | `#5B3A1E` / `#8E7A5E` |
+| accents | `--yellow`, `--red`, `--blue`, `--green`, `--purple`, `--pink`, `--mint` | `#F7C21A`, `#F0442B`, `#3DA5F4`, `#1E7A4C`, `#7B5CE6`, `#EE4E8A`, `#7FC49B` |
+| photo wall | panel `--wall`, amber shadow `--amber` | `#1C2622`, `#E9A23B` |
 
-**Type** (`FONT`):
+Tag colours are in the edition's `TAGS` (`articles.js`) and team colours in its `TEAMS` (`team.js`).
 
-| Name | Font | Use |
+**Type** (`FONT`, the look's `fonts`):
+
+| Name | Sep 2026 | Use |
 |---|---|---|
 | `head` | Archivo Black | uppercase headings, titles, big numbers |
 | `mono` | Space Mono | uppercase labels, meta lines and buttons, letter-spacing ~1–1.8px |
@@ -91,11 +124,11 @@ Tag colours are in `TAGS` (`data/articles.js`) and team colours in `TEAMS` (`dat
 | `read` | Newsreader | article paragraphs |
 
 **Shapes:**
-- **Borders:** always `2px solid #111111`; 1.5px on small bits.
+- **Borders:** always `2px solid var(--ink)`; 1.5px on small bits.
 - **Shadows:** hard, no blur: `Npx Npx 0 <colour>`, 3–4px on buttons, 6–12px on cards. The colour carries meaning: black by default, the tag or team colour, yellow for featured.
 - **Tilt:** things sit slightly crooked, `rotate(±0.5–3deg)`.
 - **Corners:** square, except pills (`borderRadius: 999px`), faces (circles), the photo wall panel and the AQ Labs project bars.
-- **Hanging:** a 1.4px `#5B3A1E` string plus a coloured `<Clip>` (`shared/Tapes.jsx`) on the card's top edge.
+- **Hanging:** a 1.4px `var(--string)` string plus a coloured `<Clip>` (`shared/Tapes.jsx`) on the card's top edge.
 - **Tapes:** yellow with an ink border: `<ByTape>` "by <writer>", `<FeaturedTape>` "★ featured", `<LatestTag>`.
 - **Placeholders:** empty data shows a dashed placeholder (`ImageSlot`) or `[bracketed text]`. Keep that behaviour.
 
@@ -103,8 +136,8 @@ Tag colours are in `TAGS` (`data/articles.js`) and team colours in `TEAMS` (`dat
 
 | Kind | Style |
 |---|---|
-| primary | `background: "#111111", color: "#FFFFFF", border: "2px solid #111111", boxShadow: "4px 4px 0 #F7C21A"`, mono 700 11–12px uppercase, letter-spacing 1px, `minHeight: "44px", padding: "0 18px"` |
-| secondary | white background, ink text, `boxShadow: "4px 4px 0 #111111"` |
+| primary | `background: "var(--ink)", color: "var(--card)", border: "2px solid var(--ink)", boxShadow: "4px 4px 0 var(--yellow)"`, mono 700 11–12px uppercase, letter-spacing 1px, `minHeight: "44px", padding: "0 18px"` |
+| secondary | `var(--card)` background, ink text, `boxShadow: "4px 4px 0 var(--ink)"` |
 | icon | 44–48px square, white, `<CloseIcon>` / `<ChevronIcon>` from `shared/Icons.jsx` |
 
 Behaviour classes:
@@ -136,24 +169,27 @@ Popups are white cards with a hard shadow and a clip:
 ## Where things are
 
 ```
-index.html              meta / link-preview tags (%SITE_URL% filled at build), fonts, viewport switch, no-JS notice
-vite.config.js          plugins: React, %SITE_URL%, build/siteFiles.js
-build/siteFiles.js      at build: an .html per article at its address (own title + preview image), section pages, 404, sitemap, robots, llms.txt
+index.html              meta / link-preview tags (%SITE_URL% filled at build), the latest look (%LOOK%), fonts, viewport switch,
+                        no-JS notice
+vite.config.js          plugins: React, %SITE_URL% + the latest edition's look, build/siteFiles.js
+build/siteFiles.js      at build: an .html per article at its address (own title + preview image), each edition's home and section
+                        pages, 404, sitemap, robots, llms.txt (drafts left out)
 build/staticCopy.js     each page's text as plain HTML inside #root, for crawlers without JavaScript
 tools/make-link-previews.mjs   preview.jpg in each article's folder (1200×630 link preview)
 src/main.jsx            entry: router with the animated history, intro, lite class, console hello, all CSS imports (labs.css last)
-src/App.jsx             routes (phone vs web page per route, articles with their own page: PAGES, address redirects), skip link,
-                        scroll memory, error card, footer, games popup
-src/data/               ALL content (each file documents its fields at the top)
-  site.js               site URL, Aquaterra website + Instagram, intro line, footer note, footer video, bubble colours
-  articles.js           TAGS, ALL_ARTICLES (body block formats at the top), ARTICLES (latest edition), placeOf()
-  editions.js           EDITIONS (newest last), LATEST, editionId, articleLink, editionLink, articleFolder
-  team.js               TEAMS, MEMBERS (photo, bio, instagram, credit, crown, badge)
-  photos.js  words.js   photo wall; words game
+src/App.jsx             routes (phone vs web page per route, articles with their own page: PAGES, address redirects), the page's
+                        edition (its look + useEdition()), skip link, scroll memory, error card, footer, games popup, draft tape
+src/editions/           one folder per edition (see "Editions"): <id>/look.js, articles.js, photos.js, words.js, team.js, index.js
+  index.js              the folders by id, ALL_ARTICLES, editionData(n), the build's checks
+  pages.js              editions' own home / article pages (OWN_PAGES)
+src/data/               site-wide content (each file documents its fields at the top)
+  site.js               site URL, Aquaterra website + Instagram, footer note, footer video, bubble colours
+  articles.js           article fields + body block formats (top), ALL_ARTICLES, ARTICLES (latest edition), placeOf(), tagOf()
+  editions.js           EDITIONS (newest last, drafts), LATEST, PUBLISHED, editionId, articleLink, editionLink, homeLink, articleFolder
   labs.js               the AQ Labs gallery's teams (chapter ids, labels, colours)
 src/phone/              PhoneHome, PhoneHangingArticles (the strung-up cards), PhoneArticle, PhoneHeader, PhoneMenu
 src/web/                WebHome, WebArticleLine (sideways wire), WebArticle, WebHeader, WebEditionPicker
-src/pages/              EditionsPage (/editions, /<id> e.g. /sep26), NotFoundPage (404): both layouts in one file;
+src/pages/              EditionsPage (/editions), NotFoundPage (404): both layouts in one file;
                         DemoPage (an article's demo app, full-window)
 src/articles/labs/      LabsPage.jsx + labs.css: the AQ Labs gallery (the "labs" article's own page, both layouts)
 src/shared/             used by both layouts:
@@ -161,13 +197,13 @@ src/shared/             used by both layouts:
   TeamSection           "Meet the team" + profile card        PhotoWallSection, PhotoViewer, WordsGameSection
   HomeIntroCard         the home intro card                   SiteFooter    orbit banner (video bubbles) + footer bar
   IntroNotebook         the opening animation                 ErrorBoundary crash card
-  Tapes                 Clip, ByTape, FeaturedTape, LatestTag  Icons         Globe, Instagram, Close, Chevron, Photo, Menu
+  Tapes                 Clip, ByTape, FeaturedTape, LatestTag, DraftTape    Icons   Globe, Instagram, Close, Chevron, Photo, Menu
   ImageSlot  Logo  BackHome                                    buddy/        Buddy (easter-egg ghost), Ghost, BuddyGames
 src/lib/                logic only, no JSX:
-  layoutMode   routes   scrollMemory   animatedHistory   cardFlight   motion (calm, LITE)   fitTitle
+  edition (useEdition, applyLook)   layoutMode   routes   scrollMemory   animatedHistory   cardFlight   motion (calm, LITE)   fitTitle
   byWriter (?by=)   teamLayout   photoShapes   useGallery   useWordsGame   usePresence   pauseOffscreen
-  scrollLock   buddyState   introNotebook   consoleHello   format (pad2, firstName, instagramUrl)
-src/styles/             fonts.js (FONT) · base.css (resets, press / focus states) · loops.css (endless animations)
+  scrollLock   buddyState   introNotebook   consoleHello   format (pad2, firstName, instagramUrl, teamsOf)
+src/styles/             fonts.js (FONT: the look's font variables) · base.css (resets, press / focus states) · loops.css (endless animations)
                         motion.css (one-shot) · phone.css · web.css · footer.css · intro.css · buddy.css
 public/                 editions/<id>/ (articles/<slug>/: cover, preview, own photos · photos/: the photo wall)
                         brand/ (globe, wordmark) · team/ (faces, 400px WebP) · badges/ · fonts/ (AQ Labs' own fonts)
@@ -177,13 +213,18 @@ public/                 editions/<id>/ (articles/<slug>/: cover, preview, own ph
 ## Common jobs
 
 - **New article:**
-  1. Add an entry to `ALL_ARTICLES` (fields at the top of `data/articles.js`) and put the cover in its folder: `public/editions/<id>/articles/<slug>/cover.jpg`.
+  1. Add an entry to its edition's `ARTICLES` (`src/editions/<id>/articles.js`; fields at the top of `data/articles.js`) and put the cover in its folder: `public/editions/<id>/articles/<slug>/cover.jpg`.
   2. Run `node tools/make-link-previews.mjs`.
   - Both layouts pick it up. Phone cards past the sixth hang in pairs; the web line grows.
-- **New edition:** add it to `EDITIONS`, then set its articles' `edition` and put their files in `public/editions/<new id>/`. The previous edition's links move under its id by themselves; nothing else to change.
-- **New member:** add them to `MEMBERS` with a square ~400px WebP in `public/team/`. The faces lay themselves out.
+- **New edition** (e.g. November, `nov26`):
+  1. Copy the newest folder in `src/editions/` to `src/editions/nov26/` and update its header comments.
+  2. Register it in `src/editions/index.js`, and add `{ number: 3, month: 'November 2026', draft: true }` to `EDITIONS`.
+  3. Fill it in: its articles, photo wall, words, team, `INTRO`, and its look (`look.js`: colours and fonts from the owner). Files go in `public/editions/nov26/`. Preview it at `/nov26` (both widths).
+  4. Going live: delete `draft: true`. The previous edition moves to `/<its id>` with its own look; nothing else to change.
+- **New member:** add them to the edition's `MEMBERS` (`team.js`) with a square ~400px WebP in `public/team/`. The faces lay themselves out.
 - **New block type in articles:**
   1. Render it in `shared/ArticleBody.jsx` (both sizes, `web` = ×1.25).
   2. Document it at the top of `data/articles.js`.
   3. Add its text to `build/staticCopy.js` and the `llms-full.txt` builder in `build/siteFiles.js`.
+- **Restyle an edition:** change the values in its `look.js`. For a role that should split from another (say, a different string colour), add a new key to every edition's look (see "Editions"). For a whole new layout, give it its own pages (`src/editions/pages.js`).
 - **Site address changes:** edit `SITE.url` in `data/site.js`. Nothing else hard-codes it.

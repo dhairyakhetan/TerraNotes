@@ -1,5 +1,5 @@
-// The team ("Meet the team", shared/TeamSection.jsx), in the order their faces appear. The faces lay themselves out,
-// so add or remove freely.
+// September 2026's team ("Meet the team", shared/TeamSection.jsx), in the order their faces appear. The faces lay
+// themselves out, so add or remove freely.
 //   name, role: shown under the face and on the profile card
 //   photo:     put the picture in public/team/ and write its path, e.g. '/team/ananya.webp' (square, ~400px, WebP: faces
 //              show small, so a big original only slows the page down)
@@ -41,7 +41,3 @@ export const MEMBERS = [
   { name: 'Priyadarshini Hazra', role: 'Writing team', team: 'writing', photo: '/team/priyadarshini.webp', bio: 'Writing things I’d want to read myself.', instagram: 'pr1yadxrshini_' },
   { name: 'Rishavi Banerjee', role: 'Writing team', team: 'writing', photo: '/team/rishavi.webp', bio: 'Writer at heart, storyteller by nature, finding meaning in every word', instagram: 'the_awful_moon' },
 ];
-
-// Every team someone is in, and the colour they wear (their first team's).
-export const teamsOf = (m) => [].concat(m.team);
-export const colorOf = (m) => TEAMS[teamsOf(m)[0]].color;

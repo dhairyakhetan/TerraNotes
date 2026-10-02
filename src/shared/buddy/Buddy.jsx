@@ -1,7 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router';
 import Ghost from './Ghost.jsx';
+import { editionLink } from '../../data/editions.js';
 import { callBuddy, openGames, useBuddy } from '../../lib/buddyState.js';
+import { useEdition } from '../../lib/edition.js';
 import { FONT } from '../../styles/fonts.js';
 
 // Buddy, a little green ghost (an easter egg). Called from a hidden button in the web home page's top-right corner
@@ -39,11 +41,11 @@ function TapGhost({ size, bubbleStyle }) {
         </span>
       </button>
       {ask && (
-        <div className="card-drop buddy-bubble" style={{ position: "absolute", zIndex: "8", width: "164px", boxSizing: "border-box", background: "#FFFFFF", border: "2px solid #111111", boxShadow: "4px 4px 0 #7B5CE6", padding: "8px 10px 10px", ...bubbleStyle }}>
-          <div style={{ fontFamily: FONT.hand, fontSize: "22px", lineHeight: "1", color: "#111111" }}>wanna play?</div>
+        <div className="card-drop buddy-bubble" style={{ position: "absolute", zIndex: "8", width: "164px", boxSizing: "border-box", background: "var(--card)", border: "2px solid var(--ink)", boxShadow: "4px 4px 0 var(--purple)", padding: "8px 10px 10px", ...bubbleStyle }}>
+          <div style={{ fontFamily: FONT.hand, fontSize: "22px", lineHeight: "1", color: "var(--ink)" }}>wanna play?</div>
           <div style={{ display: "flex", gap: "6px", marginTop: "8px" }}>
             {[['snake', 'Snake'], ['float', 'Float']].map(([g, label]) => (
-              <button key={g} className="press" onClick={() => play(g)} style={{ "--c": "#111111", ...MONO, flex: "1", fontSize: "10px", minHeight: "36px", padding: "0", background: g === 'snake' ? '#7FC49B' : '#3DA5F4', color: "#111111", border: "2px solid #111111", boxShadow: "2px 2px 0 #111111" }}>{label}</button>
+              <button key={g} className="press" onClick={() => play(g)} style={{ "--c": "var(--ink)", ...MONO, flex: "1", fontSize: "10px", minHeight: "36px", padding: "0", background: g === 'snake' ? 'var(--mint)' : 'var(--blue)', color: "var(--ink)", border: "2px solid var(--ink)", boxShadow: "2px 2px 0 var(--ink)" }}>{label}</button>
             ))}
           </div>
         </div>
@@ -93,12 +95,12 @@ export function WebBuddy() {
       {!here && <CallButton />}
       {here && (
         <div className={fresh ? 'buddy-arrive' : undefined} style={{ position: "absolute", left: "1296px", top: "80px", width: "64px", zIndex: "6" }}>
-          {fresh && rope && <div className="buddy-line" onAnimationEnd={() => setRope(false)} style={{ position: "absolute", left: "31px", top: "0", width: "2px", height: "114px", background: "#8E7A5E" }} />}
+          {fresh && rope && <div className="buddy-line" onAnimationEnd={() => setRope(false)} style={{ position: "absolute", left: "31px", top: "0", width: "2px", height: "114px", background: "var(--wire)" }} />}
           <div className="buddy-hang" style={{ paddingTop: "108px" }}>
             <div className="buddy-bob">
               <TapGhost size={64} bubbleStyle={{ right: "0", top: "84px" }} />
             </div>
-            <div className={fresh ? 'buddy-note buddy-note-late' : 'buddy-note'} style={{ position: "absolute", right: "74px", top: "118px", fontFamily: FONT.hand, fontSize: "21px", color: "#5B3A1E", transform: "rotate(-6deg)", whiteSpace: "nowrap", pointerEvents: "none" }}>tap him →</div>
+            <div className={fresh ? 'buddy-note buddy-note-late' : 'buddy-note'} style={{ position: "absolute", right: "74px", top: "118px", fontFamily: FONT.hand, fontSize: "21px", color: "var(--hand)", transform: "rotate(-6deg)", whiteSpace: "nowrap", pointerEvents: "none" }}>tap him →</div>
           </div>
         </div>
       )}
@@ -112,7 +114,7 @@ export function PhoneBuddy() {
   if (!here) return null;
   return (
     <div className={fresh ? 'buddy-float-in' : undefined} style={{ position: "absolute", left: "298px", top: "170px", width: "70px", zIndex: "5" }}>
-      <div style={{ fontFamily: FONT.hand, fontSize: "18px", color: "#5B3A1E", transform: "rotate(6deg)", whiteSpace: "nowrap", pointerEvents: "none", textAlign: "center", marginBottom: "4px" }}>tap him</div>
+      <div style={{ fontFamily: FONT.hand, fontSize: "18px", color: "var(--hand)", transform: "rotate(6deg)", whiteSpace: "nowrap", pointerEvents: "none", textAlign: "center", marginBottom: "4px" }}>tap him</div>
       <div className="buddy-bob" style={{ display: "flex", justifyContent: "center" }}>
         <TapGhost size={46} bubbleStyle={{ right: "0", top: "60px" }} />
       </div>
@@ -120,14 +122,15 @@ export function PhoneBuddy() {
   );
 }
 
-// Phone menu, at the bottom under "TerraNotes": "click me". Calls him, closes the menu and heads home.
+// Phone menu, at the bottom under "TerraNotes": "click me". Calls him, closes the menu and heads to the edition's home.
 export function MenuCall({ onClose }) {
   const nav = useNavigate();
   const { pathname } = useLocation();
+  const home = editionLink(useEdition().number);
   const go = () => {
     callBuddy();
     onClose?.();
-    if (pathname !== '/') nav('/');
+    if (pathname !== home) nav(home);
     setTimeout(() => scrollTo({ top: 0, behavior: 'smooth' }), 60);
   };
   return (

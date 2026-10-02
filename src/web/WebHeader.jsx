@@ -4,24 +4,27 @@ import BackHome from '../shared/BackHome.jsx';
 import Logo from '../shared/Logo.jsx';
 import WebEditionPicker from './WebEditionPicker.jsx';
 import { calm } from '../lib/motion.js';
+import { homeLink } from '../data/editions.js';
+import { useEdition } from '../lib/edition.js';
 import { isHomePath } from '../lib/routes.js';
 import { FONT } from '../styles/fonts.js';
 
-// The sticky 80px web header on every web page. Home: logo + edition picker on the left, the home page's sections
-// (/articles, /photos… glide there) on the right. Every other page: "← back to home" on the left, the logo + picker
-// in the middle. When that changes from one page to the next, it moves: the logo and picker glide over (FLIP,
-// transform only) while the back link slides in, or fades out on the way home. Between two pages with the same
-// header nothing moves, and on web the page transition doesn't crossfade the header (styles/motion.css).
+// The sticky 80px web header on every web page. Home: logo + edition picker on the left, the sections of the page's
+// edition's home page (/articles, /photos…; /sep26/photos… for an older one; glide there) on the right. Every other
+// page: "← back to home" on the left, the logo + picker in the middle. When that changes from one page to the next, it
+// moves: the logo and picker glide over (FLIP, transform only) while the back link slides in, or fades out on the way
+// home. Between two pages with the same header nothing moves, and on web the page transition doesn't crossfade the
+// header (styles/motion.css).
 // wire: the page's wire runs right along the header's bottom edge (article pages). At the top of the page the wire is
 // that edge, so the header's own border stays hidden; it shows once the page is scrolled and the wire has gone.
 const NAV = [['articles', 'Articles'], ['photos', 'Photo wall'], ['words', 'Words'], ['members', 'Members']];
 const EASE = 'cubic-bezier(0.32, 0.72, 0, 1)';
 const PAD = 48; // the header's side padding: where the back link (home: the logo) starts
-const BACK = { minHeight: "44px", display: "flex", alignItems: "center", fontFamily: FONT.hand, fontSize: "24px", color: "#111111", textDecoration: "none", whiteSpace: "nowrap" };
+const BACK = { minHeight: "44px", display: "flex", alignItems: "center", fontFamily: FONT.hand, fontSize: "24px", color: "var(--ink)", textDecoration: "none", whiteSpace: "nowrap" };
 let hadBack = null; // did the previous page's header show the back link? (null: first page of the visit)
 
 export default function WebHeader({ wire }) {
-  const back = !isHomePath(useLocation().pathname);
+  const back = !isHomePath(useLocation().pathname), { number } = useEdition();
   const [before] = useState(() => hadBack);
   const moving = before !== null && before !== back && !calm();
   const [ghost, setGhost] = useState(moving && !back); // on the way home: the old back link, fading out
@@ -45,7 +48,7 @@ export default function WebHeader({ wire }) {
   }, []);
 
   return (
-    <header className="site-header" style={{ position: "sticky", top: "0", zIndex: "50", width: "1440px", height: "80px", boxSizing: "border-box", padding: `0 ${PAD}px`, background: "#F3EEE4", backgroundClip: "padding-box", borderBottom: `2px solid ${scrolled ? "#111111" : "transparent"}`, display: "flex", alignItems: "center", gap: "24px" }}>
+    <header className="site-header" style={{ position: "sticky", top: "0", zIndex: "50", width: "1440px", height: "80px", boxSizing: "border-box", padding: `0 ${PAD}px`, background: "var(--page)", backgroundClip: "padding-box", borderBottom: `2px solid ${scrolled ? "var(--ink)" : "transparent"}`, display: "flex", alignItems: "center", gap: "24px" }}>
       {back && <span ref={link} style={{ display: "flex" }}><BackHome className="lift-link" style={BACK}>← back to home</BackHome></span>}
       {ghost && <span ref={gone} aria-hidden="true" style={{ ...BACK, position: "absolute", left: `${PAD}px`, top: "0", bottom: "0", pointerEvents: "none" }}>← back to home</span>}
       <div ref={group} style={{ display: "flex", alignItems: "center", gap: "24px", ...(back && { position: "absolute", left: "50%", top: "0", bottom: "0", translate: "-50% 0" }) }}>
@@ -56,7 +59,7 @@ export default function WebHeader({ wire }) {
       </div>
       <span style={{ flexGrow: "1" }} />
       <nav aria-label="Main" style={{ display: "flex", alignItems: "center", gap: "24px" }}>
-        {NAV.map(([id, label]) => <Link key={id} className="nav-link" to={`/${id}`} style={{ fontFamily: FONT.mono, fontWeight: "700", fontSize: "12px", letterSpacing: "1.6px", textTransform: "uppercase", color: "#111111" }}>{label}</Link>)}
+        {NAV.map(([id, label]) => <Link key={id} className="nav-link" to={homeLink(number, id)} style={{ fontFamily: FONT.mono, fontWeight: "700", fontSize: "12px", letterSpacing: "1.6px", textTransform: "uppercase", color: "var(--ink)" }}>{label}</Link>)}
       </nav>
     </header>
   );

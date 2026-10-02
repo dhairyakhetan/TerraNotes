@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { CloseIcon, ChevronIcon } from '../Icons.jsx';
 import { usePresence } from '../../lib/usePresence.js';
+import { useEdition } from '../../lib/edition.js';
 import { FONT } from '../../styles/fonts.js';
 import { lockScroll, unlockScroll } from '../../lib/scrollLock.js';
 import { drawGhost } from './Ghost.jsx';
@@ -22,15 +23,17 @@ function setup(c, w, h) {
   const g = c.getContext('2d'); g.setTransform(dpr, 0, 0, dpr, 0, 0);
   return g;
 }
-const card = (g, w, h, lines, shift = 0) => {
+// the dimmed "ready" / "game over" card over a game; K = the look's colours
+const card = (g, K, w, h, lines, shift = 0) => {
   g.fillStyle = 'rgba(17,17,17,.62)'; g.fillRect(0, 0, w, h);
-  g.textAlign = 'center'; g.fillStyle = '#F3EEE4';
+  g.textAlign = 'center'; g.fillStyle = K.page;
   lines.forEach(([text, font, y]) => { g.font = font; g.fillText(text, w / 2, h / 2 + y + shift); });
 };
 
 // ---------------------------------------------------------------- Snake
 const DIRS = { ArrowUp: [0, -1], ArrowDown: [0, 1], ArrowLeft: [-1, 0], ArrowRight: [1, 0], w: [0, -1], s: [0, 1], a: [-1, 0], d: [1, 0] };
 function Snake({ W, small }) {
+  const { colors: K, fonts: F } = useEdition().look; // a canvas can't read CSS variables: the values themselves
   const [held, setHeld] = useState(null); // big screens: the on-screen key lights up while its key is held
   const cv = useRef(null);
   const turn = useRef(null);
@@ -62,25 +65,25 @@ function Snake({ W, small }) {
       if (head[0] === food[0] && head[1] === food[1]) { pts++; setScore(pts); food = free(); } else snake.pop();
     };
     const draw = (t) => {
-      g.fillStyle = '#F3EEE4'; g.fillRect(0, 0, W, W);
-      g.fillStyle = '#E6E0D3';
+      g.fillStyle = K.page; g.fillRect(0, 0, W, W);
+      g.fillStyle = K.outside;
       for (let x = 0; x < N; x++) for (let y = 0; y < N; y++) { g.beginPath(); g.arc((x + 0.5) * C, (y + 0.5) * C, 1.3, 0, Math.PI * 2); g.fill(); }
       // food: a little yellow star, twinkling
       const [fx, fy] = food, s = C * (0.34 + Math.sin(t / 180) * 0.04);
       g.save(); g.translate((fx + 0.5) * C, (fy + 0.5) * C); g.rotate(t / 900); g.beginPath();
       for (let i = 0; i < 10; i++) { const r = i % 2 ? s * 0.45 : s; g.lineTo(Math.cos((i * Math.PI) / 5) * r, Math.sin((i * Math.PI) / 5) * r); }
-      g.closePath(); g.fillStyle = '#F7C21A'; g.fill(); g.strokeStyle = '#111111'; g.lineWidth = 1.5; g.stroke(); g.restore();
+      g.closePath(); g.fillStyle = K.yellow; g.fill(); g.strokeStyle = K.ink; g.lineWidth = 1.5; g.stroke(); g.restore();
       // tail: wisps that get smaller and fainter
       for (let i = snake.length - 1; i > 0; i--) {
         const [x, y] = snake[i], k = 1 - i / (snake.length + 2);
-        g.globalAlpha = 0.3 + 0.6 * k; g.fillStyle = '#1E7A4C';
+        g.globalAlpha = 0.3 + 0.6 * k; g.fillStyle = K.green;
         g.beginPath(); g.arc((x + 0.5) * C, (y + 0.5) * C, C * (0.24 + 0.16 * k), 0, Math.PI * 2); g.fill();
       }
       g.globalAlpha = 1;
       const [hx, hy] = snake[0];
-      drawGhost(g, (hx + 0.5) * C, (hy + 0.42) * C, C * 0.38, { look: dir, t: t / 1000, face: state === 'over' ? 'boo' : 'happy' });
-      if (state === 'ready') card(g, W, W, [['SNAKE, BUT SPOOKY', `700 ${Math.round(W / 16)}px 'Space Mono', monospace`, -8], ['arrows, WASD or swipe to start', `${Math.round(W / 14)}px Caveat, cursive`, 24]]);
-      if (state === 'over') card(g, W, W, [[`BOO. ${pts} ${pts === 1 ? 'STAR' : 'STARS'}`, `700 ${Math.round(W / 14)}px 'Space Mono', monospace`, -8], [`best ${Math.max(pts, best('aq-snake-best'))}`, `${Math.round(W / 14)}px Caveat, cursive`, 22]], -30);
+      drawGhost(g, (hx + 0.5) * C, (hy + 0.42) * C, C * 0.38, K, { look: dir, t: t / 1000, face: state === 'over' ? 'boo' : 'happy' });
+      if (state === 'ready') card(g, K, W, W, [['SNAKE, BUT SPOOKY', `700 ${Math.round(W / 16)}px ${F.mono}`, -8], ['arrows, WASD or swipe to start', `${Math.round(W / 14)}px ${F.hand}`, 24]]);
+      if (state === 'over') card(g, K, W, W, [[`BOO. ${pts} ${pts === 1 ? 'STAR' : 'STARS'}`, `700 ${Math.round(W / 14)}px ${F.mono}`, -8], [`best ${Math.max(pts, best('aq-snake-best'))}`, `${Math.round(W / 14)}px ${F.hand}`, 22]], -30);
     };
     const loop = (t) => {
       raf = requestAnimationFrame(loop);
@@ -109,7 +112,7 @@ function Snake({ W, small }) {
   const pad = (label, d, dir) => {
     const on = !small && held === d.join();
     return (
-      <button className="press" aria-label={label} onClick={() => turn.current?.(d)} style={{ "--c": "#111111", width: "52px", height: "44px", padding: "0", background: on ? "#F7C21A" : "#FFFFFF", border: "2px solid #111111", boxShadow: on ? "1px 1px 0 #111111" : "3px 3px 0 #111111", transform: on ? "translate(2px, 2px)" : "none", display: "flex", alignItems: "center", justifyContent: "center" }}>
+      <button className="press" aria-label={label} onClick={() => turn.current?.(d)} style={{ "--c": "var(--ink)", width: "52px", height: "44px", padding: "0", background: on ? "var(--yellow)" : "var(--card)", border: "2px solid var(--ink)", boxShadow: on ? "1px 1px 0 var(--ink)" : "3px 3px 0 var(--ink)", transform: on ? "translate(2px, 2px)" : "none", display: "flex", alignItems: "center", justifyContent: "center" }}>
         <ChevronIcon dir={dir} size={18} />
       </button>
     );
@@ -118,9 +121,9 @@ function Snake({ W, small }) {
     <>
       <Scores score={score} top={top} unit="stars" />
       <div style={{ position: "relative" }}>
-        <canvas ref={cv} style={{ display: "block", width: `${W}px`, height: `${W}px`, border: "2px solid #111111", touchAction: "none" }} />
+        <canvas ref={cv} style={{ display: "block", width: `${W}px`, height: `${W}px`, border: "2px solid var(--ink)", touchAction: "none" }} />
         {over && (
-          <button className="press card-drop" onClick={() => again.current?.()} style={{ "--c": "#111111", ...MONO, position: "absolute", left: "50%", top: "58%", marginLeft: "-70px", width: "140px", minHeight: "44px", fontSize: "12px", background: "#F7C21A", color: "#111111", border: "2px solid #111111", boxShadow: "4px 4px 0 #111111" }}>Play again</button>
+          <button className="press card-drop" onClick={() => again.current?.()} style={{ "--c": "var(--ink)", ...MONO, position: "absolute", left: "50%", top: "58%", marginLeft: "-70px", width: "140px", minHeight: "44px", fontSize: "12px", background: "var(--yellow)", color: "var(--ink)", border: "2px solid var(--ink)", boxShadow: "4px 4px 0 var(--ink)" }}>Play again</button>
         )}
       </div>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 52px)", gap: "6px", justifyContent: "center", marginTop: "12px" }}>
@@ -132,8 +135,9 @@ function Snake({ W, small }) {
 }
 
 // ---------------------------------------------------------------- Float
-const POSTS = ['#F0442B', '#3DA5F4', '#F7C21A', '#7FC49B', '#7B5CE6', '#EE4E8A'];
+const POSTS = ['red', 'blue', 'yellow', 'mint', 'purple', 'pink']; // the look's colours
 function Float({ W, H }) {
+  const { colors: K, fonts: F } = useEdition().look;
   const cv = useRef(null);
   const tap = useRef(null);
   const [score, setScore] = useState(0);
@@ -172,24 +176,24 @@ function Float({ W, H }) {
       }
     };
     const draw = () => {
-      const sky = g.createLinearGradient(0, 0, 0, H); sky.addColorStop(0, '#F3EEE4'); sky.addColorStop(1, '#E6E0D3');
+      const sky = g.createLinearGradient(0, 0, 0, H); sky.addColorStop(0, K.page); sky.addColorStop(1, K.outside);
       g.fillStyle = sky; g.fillRect(0, 0, W, H);
       // a far-off wire, for home
       g.strokeStyle = 'rgba(91,58,30,.35)'; g.lineWidth = 1.5; g.beginPath(); g.moveTo(0, H * 0.14); g.quadraticCurveTo(W / 2, H * 0.2, W, H * 0.13); g.stroke();
       for (const p of s.posts) {
         for (const [y0, y1, cap] of [[-4, p.gy - GAP / 2, p.gy - GAP / 2 - 14], [p.gy + GAP / 2, H + 4, p.gy + GAP / 2]]) {
-          g.fillStyle = '#1E2723'; g.fillRect(p.x, y0, PW, y1 - y0);
-          g.fillStyle = p.c; g.strokeStyle = '#111111'; g.lineWidth = 2; g.fillRect(p.x - 5, cap, PW + 10, 14); g.strokeRect(p.x - 5, cap, PW + 10, 14);
+          g.fillStyle = K.text; g.fillRect(p.x, y0, PW, y1 - y0);
+          g.fillStyle = K[p.c]; g.strokeStyle = K.ink; g.lineWidth = 2; g.fillRect(p.x - 5, cap, PW + 10, 14); g.strokeRect(p.x - 5, cap, PW + 10, 14);
         }
       }
-      s.puffs.forEach((p) => { g.globalAlpha = Math.max(0, p.life) * 0.8; g.fillStyle = '#FBF8F1'; g.strokeStyle = 'rgba(17,17,17,.4)'; g.lineWidth = 1; g.beginPath(); g.arc(p.x, p.y, p.r, 0, Math.PI * 2); g.fill(); g.stroke(); });
+      s.puffs.forEach((p) => { g.globalAlpha = Math.max(0, p.life) * 0.8; g.fillStyle = K.cream; g.strokeStyle = 'rgba(17,17,17,.4)'; g.lineWidth = 1; g.beginPath(); g.arc(p.x, p.y, p.r, 0, Math.PI * 2); g.fill(); g.stroke(); });
       g.globalAlpha = 1;
       const tilt = Math.max(-0.35, Math.min(0.5, s.vy / (H * 1.6)));
-      drawGhost(g, X, s.y, R, { t, tilt, look: [1, s.vy > 0 ? 0.6 : -0.4], face: s.state === 'over' ? 'boo' : 'happy', sx: 1 + s.squash * 0.14, sy: 1 - s.squash * 0.12 });
-      g.textAlign = 'center'; g.fillStyle = '#111111'; g.font = `700 ${Math.round(W / 9)}px 'Archivo Black', Impact, sans-serif`;
+      drawGhost(g, X, s.y, R, K, { t, tilt, look: [1, s.vy > 0 ? 0.6 : -0.4], face: s.state === 'over' ? 'boo' : 'happy', sx: 1 + s.squash * 0.14, sy: 1 - s.squash * 0.12 });
+      g.textAlign = 'center'; g.fillStyle = K.ink; g.font = `700 ${Math.round(W / 9)}px ${F.head}`;
       if (s.state === 'playing') g.fillText(String(s.pts), W / 2, H * 0.12);
-      if (s.state === 'ready') card(g, W, H, [['FLOAT', `700 ${Math.round(W / 11)}px 'Space Mono', monospace`, -10], ['tap, click or space to float up', `${Math.round(W / 15)}px Caveat, cursive`, 26]]);
-      if (s.state === 'over') card(g, W, H, [[`BOO. ${s.pts} ${s.pts === 1 ? 'POST' : 'POSTS'}`, `700 ${Math.round(W / 13)}px 'Space Mono', monospace`, -10], ['tap to float again', `${Math.round(W / 15)}px Caveat, cursive`, 26]]);
+      if (s.state === 'ready') card(g, K, W, H, [['FLOAT', `700 ${Math.round(W / 11)}px ${F.mono}`, -10], ['tap, click or space to float up', `${Math.round(W / 15)}px ${F.hand}`, 26]]);
+      if (s.state === 'over') card(g, K, W, H, [[`BOO. ${s.pts} ${s.pts === 1 ? 'POST' : 'POSTS'}`, `700 ${Math.round(W / 13)}px ${F.mono}`, -10], ['tap to float again', `${Math.round(W / 15)}px ${F.hand}`, 26]]);
     };
     const loop = (now) => {
       raf = requestAnimationFrame(loop);
@@ -206,7 +210,7 @@ function Float({ W, H }) {
   return (
     <>
       <Scores score={score} top={top} unit="posts" />
-      <canvas ref={cv} aria-label="Float: tap to float up" style={{ display: "block", width: `${W}px`, height: `${H}px`, border: "2px solid #111111", touchAction: "none", cursor: "pointer" }} />
+      <canvas ref={cv} aria-label="Float: tap to float up" style={{ display: "block", width: `${W}px`, height: `${H}px`, border: "2px solid var(--ink)", touchAction: "none", cursor: "pointer" }} />
     </>
   );
 }
@@ -214,7 +218,7 @@ function Float({ W, H }) {
 function Scores({ score, top, unit }) {
   return (
     <div style={{ ...MONO, display: "flex", justifyContent: "space-between", fontSize: "10.5px", margin: "0 0 8px" }}>
-      <span>{`${score} ${unit}`}</span><span style={{ color: "#6B665C" }}>{`best ${top}`}</span>
+      <span>{`${score} ${unit}`}</span><span style={{ color: "var(--muted)" }}>{`best ${top}`}</span>
     </div>
   );
 }
@@ -239,15 +243,15 @@ export default function BuddyGames() {
   const small = window.innerWidth < 600 || document.documentElement.dataset.layout === 'phone';
   const W = small ? 290 : 400, H = small ? 360 : 460;
   const tab = (id, label) => (
-    <button onClick={() => setGame(id)} aria-pressed={shown === id ? 'true' : 'false'} style={{ ...MONO, fontSize: "11px", minHeight: "40px", padding: "0 14px", border: "2px solid #111111", background: shown === id ? '#111111' : '#FFFFFF', color: shown === id ? '#F3EEE4' : '#111111', cursor: "pointer" }}>{label}</button>
+    <button onClick={() => setGame(id)} aria-pressed={shown === id ? 'true' : 'false'} style={{ ...MONO, fontSize: "11px", minHeight: "40px", padding: "0 14px", border: "2px solid var(--ink)", background: shown === id ? 'var(--ink)' : 'var(--card)', color: shown === id ? 'var(--page)' : 'var(--ink)', cursor: "pointer" }}>{label}</button>
   );
   return (
     <div className={leaving ? 'fade-out' : 'fade-in'} onClick={(e) => { if (e.target === e.currentTarget) setGame(null); }} style={{ position: "fixed", inset: "0", zIndex: "900", display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(17,17,17,.55)", padding: "12px" }}>
-      <div className={leaving ? 'card-lift' : 'card-drop'} role="dialog" aria-label="Buddy's games" style={{ position: "relative", boxSizing: "border-box", background: "#FBF8F1", border: "2px solid #111111", boxShadow: "8px 8px 0 #7B5CE6", padding: small ? "14px" : "20px", transform: "rotate(-0.6deg)", maxHeight: "calc(100dvh - 24px)", overflowY: "auto" }}>
+      <div className={leaving ? 'card-lift' : 'card-drop'} role="dialog" aria-label="Buddy's games" style={{ position: "relative", boxSizing: "border-box", background: "var(--cream)", border: "2px solid var(--ink)", boxShadow: "8px 8px 0 var(--purple)", padding: small ? "14px" : "20px", transform: "rotate(-0.6deg)", maxHeight: "calc(100dvh - 24px)", overflowY: "auto" }}>
         <div className="no-cascade" style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "12px" }}>
           {tab('snake', 'Snake')}{tab('float', 'Float')}
-          <span style={{ flexGrow: "1", fontFamily: FONT.hand, fontSize: "20px", color: "#5B3A1E", textAlign: "right", paddingRight: "8px" }}>{shown === 'snake' ? 'eat the stars' : 'mind the posts'}</span>
-          <button className="press" onClick={() => setGame(null)} aria-label="Close the games" style={{ "--c": "#111111", width: "40px", height: "40px", flexShrink: "0", padding: "0", background: "#FFFFFF", border: "2px solid #111111", boxShadow: "3px 3px 0 #111111", display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <span style={{ flexGrow: "1", fontFamily: FONT.hand, fontSize: "20px", color: "var(--hand)", textAlign: "right", paddingRight: "8px" }}>{shown === 'snake' ? 'eat the stars' : 'mind the posts'}</span>
+          <button className="press" onClick={() => setGame(null)} aria-label="Close the games" style={{ "--c": "var(--ink)", width: "40px", height: "40px", flexShrink: "0", padding: "0", background: "var(--card)", border: "2px solid var(--ink)", boxShadow: "3px 3px 0 var(--ink)", display: "flex", alignItems: "center", justifyContent: "center" }}>
             <CloseIcon size={14} weight={2.8} />
           </button>
         </div>

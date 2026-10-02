@@ -2,7 +2,7 @@ import { flushSync } from 'react-dom';
 import { UNSAFE_createBrowserHistory as createBrowserHistory } from 'react-router';
 import { flyBack, rememberBox } from './cardFlight.js';
 import { calm } from './motion.js';
-import { isHomePath, slugOf } from './routes.js';
+import { isHomePath, sameHome, slugOf } from './routes.js';
 
 // A drop-in replacement for React Router's browser history (main.jsx) that animates every page change: links,
 // navigate(), and the browser's Back/Forward.
@@ -10,13 +10,14 @@ import { isHomePath, slugOf } from './routes.js';
 //   the transition (cardFlight.js); the pages swap instantly. Adding a crossfade too played it twice (Safari
 //   snapshots the new page before the flight starts).
 // - Anything else: a short view-transition crossfade (styles/motion.css, html[data-nav]), header held still.
-// - No animation between home sections, with reduced motion, in a hidden tab, or without view-transition support.
+// - No animation between one home page's sections (/ and /photos), with reduced motion, in a hidden tab, or without
+//   view-transition support.
 const pathOf = (to) => (typeof to === 'string' ? new URL(to, location.href).pathname : to.pathname || location.pathname);
 
 let seq = 0;
 function swap(from, to, update, backwards = false) {
   // (also none when an article's other address redirects to it, e.g. /sep26/articles/labs → /articles/labs)
-  if (!document.startViewTransition || calm() || from === to || (isHomePath(from) && isHomePath(to)) || (slugOf(from) && slugOf(from) === slugOf(to)) || document.visibilityState !== 'visible') {
+  if (!document.startViewTransition || calm() || from === to || sameHome(from, to) || (slugOf(from) && slugOf(from) === slugOf(to)) || document.visibilityState !== 'visible') {
     update();
     return;
   }

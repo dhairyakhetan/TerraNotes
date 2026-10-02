@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router';
 import PhoneHeader from '../../phone/PhoneHeader.jsx';
 import WebHeader from '../../web/WebHeader.jsx';
 import PhotoViewer from '../../shared/PhotoViewer.jsx';
-import { TAGS } from '../../data/articles.js';
+import { tagOf } from '../../data/articles.js';
 import { articleFolder, articleLink } from '../../data/editions.js';
 import { LABS_TEAMS as TEAMS } from '../../data/labs.js';
 import { pad2 } from '../../lib/format.js';
@@ -718,7 +718,7 @@ export default function LabsPage({ article: a, web, chapter }) {
 
   const page = (
     <div className={`labs ${web ? 'labs-web' : 'labs-phone'}`} style={{ width: web ? "1440px" : "390px" }}>
-      {web ? <WebHeader /> : <PhoneHeader current="article" edge={TAGS[a.tag].color} />}
+      {web ? <WebHeader /> : <PhoneHeader current="article" edge={tagOf(a).color} />}
       <Tabs web={web} active={web ? active : ch} hits={web ? hits : null} base={base} onTab={onTab} search={web ? <WebFind main={main} onHits={setHits} /> : null} />
       <main ref={main} style={{ display: "flex", flexDirection: "column" }}>
         {(web || !ch) && intro}

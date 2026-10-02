@@ -1,7 +1,7 @@
 import { Link } from 'react-router';
 import ImageSlot from './ImageSlot.jsx';
 import { ByTape, Clip, FeaturedTape } from './Tapes.jsx';
-import { placeOf, TAGS } from '../data/articles.js';
+import { placeOf, tagOf } from '../data/articles.js';
 import { articleLink } from '../data/editions.js';
 import { pad2 } from '../lib/format.js';
 import { flight } from '../lib/cardFlight.js';
@@ -23,7 +23,7 @@ const LOOKS = {
 // The tag's coloured pill. fit: a long tag tightens (and, web cards, shrinks by `shrink`) before it can reach the
 // number beside it; ellipsis as a last resort.
 export function TagPill({ a, size, pad, lh, fit, shrink = 1 }) {
-  const t = TAGS[a.tag], long = fit && a.tag.length > 11;
+  const t = tagOf(a), long = fit && a.tag.length > 11;
   return <span style={{ background: t.color, color: t.ink, fontFamily: FONT.mono, fontWeight: "700", fontSize: long ? `${parseFloat(size) * shrink}px` : size, letterSpacing: long ? "0.2px" : "1px", textTransform: "uppercase", padding: pad, borderRadius: "999px", lineHeight: lh, ...(fit && { minWidth: "0", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }) }}>{a.tag}</span>;
 }
 
@@ -33,7 +33,7 @@ export function TagRow({ a, look = 'phone' }) {
   return (
     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "6px", flexShrink: "0" }}>
       <TagPill a={a} size={L.pill} pad={L.pillPad} lh={L.lh} fit shrink={L.shrink} />
-      <span style={{ fontFamily: FONT.mono, fontSize: L.num, letterSpacing: "1px", color: "#111111", whiteSpace: "nowrap", flexShrink: "0" }}>{`${pad2(i + 1)}${L.sep}${pad2(n)}`}</span>
+      <span style={{ fontFamily: FONT.mono, fontSize: L.num, letterSpacing: "1px", color: "var(--ink)", whiteSpace: "nowrap", flexShrink: "0" }}>{`${pad2(i + 1)}${L.sep}${pad2(n)}`}</span>
     </div>
   );
 }
@@ -45,15 +45,15 @@ export default function ArticleCard({ article: a, look = 'phone', mark, classNam
   const [cw, ch, ctop] = L.clip;
   return (
     <Link to={articleLink(a)} className={className ?? (L.w ? 'card-link' : undefined)} {...flight(a)}
-      style={{ ...(L.w && { position: "absolute", left: "0", top: "0", width: `${L.w}px`, height: `${L.h}px` }), ...style, display: "block", textDecoration: "none", color: "#111111" }}>
+      style={{ ...(L.w && { position: "absolute", left: "0", top: "0", width: `${L.w}px`, height: `${L.h}px` }), ...style, display: "block", textDecoration: "none", color: "var(--ink)" }}>
       {mark && <ByTape name={mark} />}
       {a.featured && <FeaturedTape />}
-      <Clip color={TAGS[a.tag].color} w={cw} h={ch} top={ctop} />
-      <article style={{ width: "100%", height: "100%", boxSizing: "border-box", background: "#FFFFFF", border: "2px solid #111111", boxShadow: `${L.shadow}px ${L.shadow}px 0 ${a.featured ? "#F7C21A" : "#111111"}`, padding: `${L.pad}px`, display: "flex", flexDirection: "column", gap: `${L.gap}px`, overflow: "hidden" }}>
+      <Clip color={tagOf(a).color} w={cw} h={ch} top={ctop} />
+      <article style={{ width: "100%", height: "100%", boxSizing: "border-box", background: "var(--card)", border: "2px solid var(--ink)", boxShadow: `${L.shadow}px ${L.shadow}px 0 ${a.featured ? "var(--yellow)" : "var(--ink)"}`, padding: `${L.pad}px`, display: "flex", flexDirection: "column", gap: `${L.gap}px`, overflow: "hidden" }}>
         <ImageSlot src={a.cover} alt={a.alt} box={{ height: `${img}px`, minHeight: coverFloor(img) }} icon={L.icon} font={L.iconFont} />
         <TagRow a={a} look={look} />
-        <h3 ref={title} style={{ flexShrink: "0", margin: "0", fontFamily: FONT.head, fontWeight: "400", fontSize: `${titlePx}px`, lineHeight: "0.95", letterSpacing: "-0.3px", textTransform: "uppercase", color: "#111111" }}>{a.title}</h3>
-        <p style={{ flexShrink: "0", margin: "0", fontFamily: FONT.hand, fontSize: `${dekPx}px`, lineHeight: "1.1", color: "#5B4630" }}>{a.dek}</p>
+        <h3 ref={title} style={{ flexShrink: "0", margin: "0", fontFamily: FONT.head, fontWeight: "400", fontSize: `${titlePx}px`, lineHeight: "0.95", letterSpacing: "-0.3px", textTransform: "uppercase", color: "var(--ink)" }}>{a.title}</h3>
+        <p style={{ flexShrink: "0", margin: "0", fontFamily: FONT.hand, fontSize: `${dekPx}px`, lineHeight: "1.1", color: "var(--dek)" }}>{a.dek}</p>
         {L.footer && (
           <div style={{ flexShrink: "0", marginTop: "auto", display: "flex", justifyContent: "space-between", fontFamily: FONT.mono, fontSize: "11px", letterSpacing: "1px", textTransform: "uppercase" }}>
             <span>{a.author === null ? 'Aquaterra' : a.author || '[Author]'}</span>

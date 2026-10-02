@@ -1,20 +1,23 @@
 import { useSearchParams } from 'react-router';
-import { ARTICLES } from '../data/articles.js';
-import { MEMBERS } from '../data/team.js';
+import { homeLink } from '../data/editions.js';
 import { firstName } from './format.js';
+import { useEdition } from './edition.js';
 
-// "Their articles": /articles?by=<first name> (e.g. ?by=diti; a full name works too) lists that writer's pieces first,
-// each with a yellow "by …" tape (shared/Tapes.jsx), on both layouts' article lines.
+// "Their articles": /articles?by=<first name> (e.g. ?by=diti; a full name works too; an older edition's:
+// /sep26/articles?by=…) lists that writer's pieces in that edition first, each with a yellow "by …" tape
+// (shared/Tapes.jsx), on both layouts' article lines.
 const key = (name) => firstName(name).toLowerCase();
-export const byLink = (name) => `/articles?by=${key(name)}`;
-export const articlesBy = (name) => ARTICLES.filter((a) => a.author === name);
+export const byLink = (name, n) => `${homeLink(n, 'articles')}?by=${key(name)}`;
+export const articlesBy = (name, articles) => articles.filter((a) => a.author === name);
 
-// → { by: the writer's full name or '', mine: their articles, isMine(a), list: every article, theirs first }
+// The page's edition's articles → { by: the writer's full name or '', mine: their articles, isMine(a), list: every
+// article, theirs first }
 export function useByWriter() {
   const [q] = useSearchParams();
+  const { articles, members } = useEdition();
   const want = (q.get('by') || '').trim().toLowerCase();
-  const by = (want && [...MEMBERS.map((m) => m.name), ...ARTICLES.map((a) => a.author)].find((n) => n && (key(n) === want || n.toLowerCase() === want))) || '';
+  const by = (want && [...members.map((m) => m.name), ...articles.map((a) => a.author)].find((n) => n && (key(n) === want || n.toLowerCase() === want))) || '';
   const isMine = (a) => !!by && a.author === by;
-  const mine = ARTICLES.filter(isMine);
-  return { by, mine, isMine, list: by ? [...mine, ...ARTICLES.filter((a) => !isMine(a))] : ARTICLES };
+  const mine = articles.filter(isMine);
+  return { by, mine, isMine, list: by ? [...mine, ...articles.filter((a) => !isMine(a))] : articles };
 }

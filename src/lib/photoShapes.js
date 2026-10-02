@@ -1,10 +1,9 @@
 import { useEffect, useState } from 'react';
-import { PHOTOS } from '../data/photos.js';
 
 // Each photo's shape (width / height) once its image has loaded, null until then, clamped to min…max so a very tall
 // or wide photo can't wreck the layout. The photo wall frames and the viewer size themselves from it.
-// photos: [{ photo }] (default the photo wall, data/photos.js; keep the array stable).
-export function usePhotoShapes(min, max, photos = PHOTOS) {
+// photos: [{ photo }] (e.g. the edition's photo wall; keep the array stable).
+export function usePhotoShapes(min, max, photos) {
   const [shapes, setShapes] = useState(() => photos.map(() => null));
   useEffect(() => {
     let live = true;

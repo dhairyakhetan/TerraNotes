@@ -1,38 +1,41 @@
 import { useEffect, useRef, useState } from 'react';
 import PhoneHeader from './PhoneHeader.jsx';
-import PhoneHangingArticles, { HANG_EXTRA } from './PhoneHangingArticles.jsx';
+import PhoneHangingArticles, { hangExtra } from './PhoneHangingArticles.jsx';
 import HomeIntroCard from '../shared/HomeIntroCard.jsx';
 import PhotoWallSection from '../shared/PhotoWallSection.jsx';
 import PhotoViewer from '../shared/PhotoViewer.jsx';
 import WordsGameSection from '../shared/WordsGameSection.jsx';
-import TeamSection, { TEAM_HEIGHT } from '../shared/TeamSection.jsx';
+import TeamSection, { teamHeight } from '../shared/TeamSection.jsx';
 import { PhoneBuddy } from '../shared/buddy/Buddy.jsx';
+import { homeTitle, useEdition } from '../lib/edition.js';
 import { usePauseOffscreen } from '../lib/pauseOffscreen.js';
 import { usePresence } from '../lib/usePresence.js';
 import { FONT } from '../styles/fonts.js';
 
-// The phone home page (also at /articles, /photos, /words, /members, scrolled to that section): a 390px page where
-// everything under the sticky header is absolutely placed. Top to bottom: intro card, hanging articles, photo wall,
-// words game, team. The hanging articles keep page coordinates (their box starts at the page's top-left) and run
-// HANG_EXTRA taller than the original design, so everything after them sits in a box moved down by that much.
+// The phone home page of an edition (the latest's at /, also at /articles, /photos, /words, /members, scrolled to that
+// section; an older one's at /sep26…): a 390px page where everything under the sticky header is absolutely placed.
+// Top to bottom: intro card, hanging articles, photo wall, words game, team. The hanging articles keep page
+// coordinates (their box starts at the page's top-left) and run hangExtra taller than the original design, so
+// everything after them sits in a box moved down by that much.
 export default function PhoneHome() {
   const [photo, setPhoto] = useState(null); // index open in the photo viewer
   const [shownPhoto, photoLeaving] = usePresence(photo, 180);
-  useEffect(() => { document.title = 'Aquaterra'; }, []);
+  const edition = useEdition(), extra = hangExtra(edition.articles);
+  useEffect(() => { document.title = homeTitle(edition); }, [edition]);
   const hangers = useRef(null);
   usePauseOffscreen(hangers); // the swinging cards hold still once scrolled away
 
   return (
     <>
-      <div id="top" className="page-home" style={{ position: "relative", width: "390px", height: `${2480 + TEAM_HEIGHT.phone + HANG_EXTRA}px`, margin: "0 auto", overflow: "clip", background: "#F3EEE4", fontFamily: FONT.body, color: "#1E2723" }}>
+      <div id="top" className="page-home" style={{ position: "relative", width: "390px", height: `${2480 + teamHeight(edition, 'phone') + extra}px`, margin: "0 auto", overflow: "clip", background: "var(--page)", fontFamily: FONT.body, color: "var(--text)" }}>
         <PhoneHeader current="home" />
         <PhoneBuddy />
         <HomeIntroCard />
         <div id="articles" aria-hidden="true" style={{ position: "absolute", left: "0", top: "236px", width: "1px", height: "1px" }} />
-        <div ref={hangers} style={{ position: "absolute", left: "0", top: "0", width: "390px", height: `${1100 + HANG_EXTRA}px`, pointerEvents: "none" }}>
+        <div ref={hangers} style={{ position: "absolute", left: "0", top: "0", width: "390px", height: `${1100 + extra}px`, pointerEvents: "none" }}>
           <PhoneHangingArticles />
         </div>
-        <div style={{ position: "absolute", left: "0", top: `${HANG_EXTRA}px`, width: "390px", height: "0" }}>
+        <div style={{ position: "absolute", left: "0", top: `${extra}px`, width: "390px", height: "0" }}>
           <PhotoWallSection onOpen={setPhoto} />
           <WordsGameSection />
           <TeamSection />
