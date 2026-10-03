@@ -11,7 +11,7 @@ import { withBase } from '../lib/base.js';
 
 export const EDITIONS = [
   { number: 1, month: 'September 2026' },
-  { number: 2, month: 'October 2026', draft: true },
+  { number: 2, month: 'October 2026' },
 ];
 
 export const PUBLISHED = EDITIONS.filter((e) => !e.draft);

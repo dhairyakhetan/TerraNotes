@@ -1,5 +1,4 @@
-// October 2026 (Edition 02): everything its pages show, gathered for src/editions/index.js. A draft for now
-// (data/editions.js): see it at /oct26 while it's being made.
+// October 2026 (Edition 02), the Pujo issue: everything its pages show, gathered for src/editions/index.js.
 export { LOOK } from './look.js';
 export { TAGS, ARTICLES } from './articles.js';
 export { PHOTOS } from './photos.js';

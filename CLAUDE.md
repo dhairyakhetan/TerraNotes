@@ -165,7 +165,7 @@ The site is "notes pegged on a line": paper cards hanging from strings, with ink
 Each edition has a theme, a vibe for the whole page, not just colours: September 2026 is **"exam season"**, a school
 notebook (`src/editions/sep26/`: `look.js` colours, `look.css` ruled paper with a red margin and punch holes on the pages
 with `class="page-sheet"`, `Decor.jsx` doodles on the home pages: sticky note, coffee ring, star, paper plane). October
-2026 (a draft, `/oct26`) is **"Pujo"**, Durga Puja: laal-paar saree cream and alta red, maroon ink, sindoor handwriting,
+2026 (the latest edition) is **"Pujo"**, Durga Puja: laal-paar saree cream and alta red, maroon ink, sindoor handwriting,
 marigold strings, a pandal-night photo wall, Rozha One headings; `look.css` the saree border and an alpana dot pattern;
 `Decor.jsx` a marigold toran, alpana, dhak, conch and a "Subho Sharodiya!" tag; Pujo words; two sample articles. A new edition starts from a copy of the newest look and changes the values; its own CSS and
 doodles are registered in `src/editions/pages.js` (`EDITION_CSS`, `DECOR`).

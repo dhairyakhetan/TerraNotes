@@ -15,8 +15,8 @@ export const TAGS = {
   'Under Aquaterra': { color: '#F4B400', ink: '#3A0B0E' },
 };
 
-// Two sample pieces, written to show off the Pujo look while the edition is a draft (from Aquaterra itself: no
-// writer). Swap them for the writers' articles before October goes live.
+// Two sample pieces, written to show off the Pujo look (from Aquaterra itself: no writer). Swap them for the
+// writers' articles.
 export const ARTICLES = [
   {
     slug: 'pandal-hopping-field-guide',
