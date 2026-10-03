@@ -265,6 +265,7 @@ export default function BuddyGames({ first = null }) {
   if (!shown) return null;
   const small = window.innerWidth < 600 || document.documentElement.dataset.layout === 'phone';
   const W = small ? 290 : 400, H = small ? 360 : 460;
+  const fw = small ? Math.min(360, innerWidth - 56) : Math.min(1040, innerWidth - 120); // Fling: as big as the window allows
   const tab = (id, label) => (
     <button onClick={() => setGame(id)} aria-pressed={shown === id ? 'true' : 'false'} style={{ ...MONO, fontSize: "11px", minHeight: "40px", padding: "0 14px", border: "2px solid var(--ink)", background: shown === id ? 'var(--ink)' : 'var(--card)', color: shown === id ? 'var(--page)' : 'var(--ink)', cursor: "pointer" }}>{label}</button>
   );
@@ -278,7 +279,7 @@ export default function BuddyGames({ first = null }) {
             <CloseIcon size={14} weight={2.8} />
           </button>
         </div>
-        <div className="no-cascade" key={shown}>{shown === 'snake' ? <Snake W={W} small={small} /> : shown === 'float' ? <Float W={W} H={H} /> : <Fling W={small ? 330 : 600} H={small ? 250 : 340} />}</div>
+        <div className="no-cascade" key={shown}>{shown === 'snake' ? <Snake W={W} small={small} /> : shown === 'float' ? <Float W={W} H={H} /> : <Fling W={fw} H={small ? Math.round(fw * 0.62) : Math.round(Math.min(fw * 0.5, innerHeight - 280))} />}</div>
       </div>
     </div>
   );

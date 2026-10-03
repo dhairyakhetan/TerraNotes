@@ -7,33 +7,38 @@ import { FONT } from '../../styles/fonts.js';
 // slingshot (the further, the harder), let go, and knock down towers of planks to pop the grumpy gremlins hiding in
 // them. Three Buddies a level; a level is cleared when every gremlin is gone (each unused Buddy is a bonus), else it's
 // a retry. Real physics (matter-js, fetched only when this tab opens): planks topple, slide and break when hit hard
-// enough; a gremlin pops on a hard enough knock, from Buddy, a plank or a fall. Points: gremlin 5000, plank 500
-// (glass 300), unused Buddy 10000. The world is 900 × 500, drawn scaled into the canvas; the canvas only draws while
+// enough; a gremlin pops on a hard enough knock, from Buddy, a plank or a fall. Points: gremlin 5000, stone 800, wood
+// 500, glass 300, unused Buddy 10000. No sleeping bodies: a plank left unheld falls. The world is 1200 × 540, drawn scaled into the canvas; the canvas only draws while
 // the popup is open. Best score in localStorage ('aq-fling-best').
 // What tells you what to do: a banner at each level's start (how many gremlins to pop), a pulsing ring and "drag me"
 // on Buddy while he waits, and, while you pull, the reach of the band, a dotted line of where he'll fly and a power
 // meter; Buddies and gremlins left in the corner; a line after each turn ("missed: pull further", "2 gremlins left");
 // buttons drawn on the cleared / out-of-Buddies cards; the cursor changes over Buddy; Restart level under the canvas.
-const WW = 900, WH = 500, GROUND = 460, SLING = { x: 150, y: 368 }, PULL = 92, POWER = 0.25, BR = 17;
-// levels: [kind, x, y (centre), w, h] for planks ('wood' / 'glass'), [ 'gremlin', x, y, r ]
+const WW = 1200, WH = 540, GROUND = 490, BASE = GROUND - 30, SLING = { x: 160, y: BASE - 92 }, PULL = 100, POWER = 0.25, BR = 17;
+// the slingshot stands on a mound at the left (BASE is its top), the gremlins' forts far out at the right, like Angry Birds
+// levels: [kind, x, y (centre), w, h] for blocks ('wood' / 'glass' / 'stone'), [ 'gremlin', x, y, r ]
 const LEVELS = [
-  [ // a hut: two posts, a roof, a gremlin inside and one on top
-    ['wood', 650, 400, 20, 120], ['wood', 770, 400, 20, 120], ['wood', 710, 330, 170, 20], ['gremlin', 710, 440, 18],
-    ['glass', 710, 290, 20, 60], ['gremlin', 710, 240, 16],
+  [ // a hut with a gremlin inside and one on the roof, and a glass stand with a third
+    ['wood', 860, 440, 20, 100], ['wood', 960, 440, 20, 100], ['wood', 910, 380, 140, 20], ['gremlin', 910, 472, 18],
+    ['glass', 910, 355, 30, 30], ['gremlin', 910, 325, 15],
+    ['glass', 1050, 450, 20, 80], ['glass', 1090, 450, 20, 80], ['wood', 1070, 402, 70, 16], ['gremlin', 1070, 379, 15],
   ],
-  [ // two towers and a bridge
-    ['wood', 610, 410, 20, 100], ['wood', 670, 410, 20, 100], ['wood', 640, 350, 90, 20], ['gremlin', 640, 440, 16],
-    ['wood', 770, 400, 20, 120], ['wood', 840, 400, 20, 120], ['wood', 805, 330, 100, 20], ['gremlin', 805, 440, 16],
-    ['glass', 720, 320, 220, 16], ['glass', 650, 290, 20, 44], ['glass', 790, 290, 20, 44], ['gremlin', 720, 290, 18],
+  [ // a two-floor fort with a stone block on top
+    ['wood', 820, 445, 20, 90], ['wood', 920, 445, 20, 90], ['wood', 1020, 445, 20, 90], ['wood', 920, 391, 230, 18],
+    ['gremlin', 870, 474, 16], ['gremlin', 970, 474, 16],
+    ['glass', 840, 347, 20, 70], ['glass', 1000, 347, 20, 70], ['wood', 920, 303, 190, 18], ['gremlin', 920, 365, 17],
+    ['stone', 920, 274, 40, 40], ['gremlin', 920, 240, 14],
   ],
-  [ // a castle: glass below, wood above, three gremlins
-    ['glass', 610, 420, 20, 80], ['glass', 690, 420, 20, 80], ['glass', 770, 420, 20, 80], ['glass', 850, 420, 20, 80],
-    ['wood', 650, 370, 100, 20], ['wood', 810, 370, 100, 20], ['wood', 730, 370, 60, 20],
-    ['gremlin', 650, 442, 15], ['gremlin', 810, 442, 15],
-    ['wood', 670, 320, 20, 80], ['wood', 790, 320, 20, 80], ['wood', 730, 270, 160, 20], ['gremlin', 730, 345, 17],
-    ['glass', 730, 230, 20, 60],
+  [ // a castle: stone towers either side, a two-floor keep in the middle
+    ['stone', 800, 435, 24, 110], ['stone', 800, 372, 60, 16], ['gremlin', 800, 349, 15],
+    ['stone', 1100, 435, 24, 110], ['stone', 1100, 372, 60, 16], ['gremlin', 1100, 349, 15],
+    ['wood', 880, 440, 20, 100], ['glass', 950, 440, 20, 100], ['wood', 1020, 440, 20, 100], ['wood', 950, 381, 170, 18],
+    ['gremlin', 915, 474, 16], ['gremlin', 985, 474, 16],
+    ['wood', 895, 332, 20, 80], ['wood', 1005, 332, 20, 80], ['wood', 950, 283, 140, 18], ['gremlin', 950, 355, 17],
+    ['glass', 950, 249, 20, 50], ['gremlin', 950, 210, 14],
   ],
 ];
+const HP = { gremlin: 1, glass: 3, wood: 8, stone: 16 }, PTS = { gremlin: 5000, glass: 300, wood: 500, stone: 800 };
 const best = () => { try { return Number(localStorage.getItem('aq-fling-best')) || 0; } catch { return 0; } };
 const keep = (v) => { try { localStorage.setItem('aq-fling-best', String(v)); } catch { /* private mode */ } };
 
@@ -50,26 +55,30 @@ export default function Fling({ W, H }) {
       c.width = Math.round(W * dpr); c.height = Math.round(H * dpr);
       const g = c.getContext('2d'), k = W / WW; // world → canvas
       const T = WH - H / k; // the top of what the canvas shows (a tall canvas shows sky above the world's top)
-      const u = (px) => Math.round(px * Math.min(1.8, Math.max(1, 0.62 / k))); // the drawn text and guides: bigger on a small canvas, so they stay readable
+      const u = (px) => Math.round(px * Math.min(2.4, Math.max(1, 0.62 / k))); // the drawn text and guides: bigger on a small canvas, so they stay readable
       g.setTransform(dpr * k, 0, 0, dpr * k, 0, (H / k - WH) * dpr * k); // the world's floor sits at the canvas's bottom
-      const engine = M.Engine.create({ positionIterations: 10, velocityIterations: 8, enableSleeping: true });
+      const engine = M.Engine.create({ positionIterations: 10, velocityIterations: 8 });
       engine.gravity.y = 2; // twice matter's default: Buddy arcs and drops, not flies flat
       let s; // the game's state
+      const s0 = {}; // what stays across levels (the mound's outline)
       const total = { pts: 0 };
       const add = (n, x, y) => { total.pts += n; setScore(total.pts); s.pops.push({ x, y, text: String(n), life: 1 }); };
 
       const build = (lv) => {
         M.Composite.clear(engine.world, false);
         M.Composite.add(engine.world, M.Bodies.rectangle(WW / 2, GROUND + 40, WW * 3, 80, { isStatic: true, label: 'ground', friction: 0.9 }));
+        const mound = M.Bodies.trapezoid(SLING.x, GROUND - 15, 320, GROUND - BASE, 0.4, { isStatic: true, label: 'ground', friction: 0.9 });
+        M.Body.setPosition(mound, { x: SLING.x, y: mound.position.y + GROUND - mound.bounds.max.y });
+        M.Composite.add(engine.world, mound); s0.mound = mound.vertices;
         const things = LEVELS[lv].map(([kind, x, y, w, h]) => {
           const b = kind === 'gremlin'
             ? M.Bodies.circle(x, y, w, { density: 0.0012, friction: 0.6, restitution: 0.2, label: 'gremlin' })
-            : M.Bodies.rectangle(x, y, w, h, { density: kind === 'glass' ? 0.0011 : 0.0016, friction: 0.8, restitution: 0.05, label: kind });
-          b.hp = kind === 'gremlin' ? 1 : kind === 'glass' ? 3 : 8; b.kind = kind; b.r = kind === 'gremlin' ? w : 0;
+            : M.Bodies.rectangle(x, y, w, h, { density: kind === 'glass' ? 0.0011 : kind === 'stone' ? 0.003 : 0.0016, friction: 0.8, restitution: 0.05, label: kind });
+          b.hp = HP[kind]; b.kind = kind; b.r = kind === 'gremlin' ? w : 0;
           return b;
         });
         M.Composite.add(engine.world, things);
-        s = { lv, birds: 3, state: 'aim', ghost: null, pull: null, trail: [], since: 0, calm: 0.8, pops: [], bits: [], t: 0, banner: 2.2, note: null, hit: 0, grabbed: s?.grabbed || false, start: total.pts };
+        s = { lv, birds: 3, broke: 0, state: 'aim', ghost: null, pull: null, trail: [], since: 0, calm: 0.8, pops: [], bits: [], t: 0, banner: 2.2, note: null, hit: 0, grabbed: s?.grabbed || false, start: total.pts };
         setFailed(false);
       };
       build(0);
@@ -92,8 +101,8 @@ export default function Fling({ W, H }) {
         b.dead = true;
         M.Composite.remove(engine.world, b);
         const { x, y } = b.position;
-        add(b.kind === 'gremlin' ? 5000 : b.kind === 'glass' ? 300 : 500, x, y - 20);
-        if (b.kind === 'gremlin') s.hit++;
+        add(PTS[b.kind], x, y - 20);
+        if (b.kind === 'gremlin') s.hit++; else s.broke++;
         for (let i = 0; i < 8; i++) s.bits.push({ x, y, vx: (Math.random() - 0.5) * 260, vy: -Math.random() * 260, life: 1, kind: b.kind });
       };
       const gremlins = () => M.Composite.allBodies(engine.world).filter((b) => b.kind === 'gremlin' && !b.dead);
@@ -104,12 +113,12 @@ export default function Fling({ W, H }) {
         const ghost = M.Bodies.circle(p.x, p.y, BR, { density: 0.004, friction: 0.5, restitution: 0.35, frictionAir: 0.004, label: 'buddy' });
         M.Composite.add(engine.world, ghost);
         M.Body.setVelocity(ghost, { x: (SLING.x - p.x) * POWER, y: (SLING.y - p.y) * POWER });
-        s.ghost = ghost; s.birds--; s.state = 'flying'; s.since = 0; s.trail = []; s.hit = 0; s.grabbed = true; s.note = null;
+        s.ghost = ghost; s.birds--; s.state = 'flying'; s.since = 0; s.trail = []; s.hit = 0; s.broke = 0; s.grabbed = true; s.note = null;
       };
       // a turn ends when everything has (nearly) stopped, Buddy has left the world, or 9 s have passed
       const settle = (dt) => {
         s.since += dt;
-        const moving = M.Composite.allBodies(engine.world).some((b) => !b.isStatic && !b.isSleeping && b.speed > 0.25);
+        const moving = M.Composite.allBodies(engine.world).some((b) => !b.isStatic && b.speed > 0.3);
         const out = s.ghost && (s.ghost.position.x > WW + 60 || s.ghost.position.x < -60);
         if ((s.since > 1.2 && !moving) || out || s.since > 9) {
           if (s.ghost) { M.Composite.remove(engine.world, s.ghost); s.ghost = null; }
@@ -120,7 +129,7 @@ export default function Fling({ W, H }) {
           } else if (s.birds > 0) {
             const n = gremlins().length;
             s.state = 'aim';
-            s.note = { text: s.hit ? `nice! ${n} gremlin${n === 1 ? '' : 's'} left` : 'missed: aim with the dots, pull further', life: 2.6 };
+            s.note = { text: s.hit ? `nice! ${n} gremlin${n === 1 ? '' : 's'} left` : s.broke ? `close! ${n} gremlin${n === 1 ? '' : 's'} left` : 'missed: aim with the dots, pull further', life: 2.6 };
           }
           else { s.state = 'failed'; setFailed(true); if (total.pts > best()) { keep(total.pts); setTop(total.pts); } }
         }
@@ -143,15 +152,16 @@ export default function Fling({ W, H }) {
         const v = b.vertices;
         g.beginPath(); g.moveTo(v[0].x, v[0].y); for (let i = 1; i < v.length; i++) g.lineTo(v[i].x, v[i].y); g.closePath();
         if (b.kind === 'glass') { g.fillStyle = K.cream; g.globalAlpha = 0.85; g.fill(); g.globalAlpha = 1; g.strokeStyle = K.blue; g.lineWidth = 2.5; g.stroke(); }
+        else if (b.kind === 'stone') { g.fillStyle = K.wire; g.fill(); ink(); g.stroke(); }
         else { g.fillStyle = K.peg; g.fill(); ink(); g.stroke(); }
-        if (b.hp < (b.kind === 'glass' ? 3 : 8)) { // cracked
+        if (b.hp < HP[b.kind]) { // cracked
           const { x, y } = b.position; g.save(); g.translate(x, y); g.rotate(b.angle); ink(1.4); g.beginPath(); g.moveTo(-6, -8); g.lineTo(2, 0); g.lineTo(-3, 8); g.stroke(); g.restore();
         }
       };
       const drawSling = (front) => {
         const bx = SLING.x, by = SLING.y;
         if (!front) { // back post and band
-          g.fillStyle = K.peg; ink(); g.beginPath(); g.moveTo(bx - 6, GROUND); g.lineTo(bx - 4, by + 40); g.lineTo(bx + 14, by - 4); g.lineTo(bx + 20, by); g.lineTo(bx + 6, by + 44); g.lineTo(bx + 8, GROUND); g.closePath(); g.fill(); g.stroke();
+          g.fillStyle = K.peg; ink(); g.beginPath(); g.moveTo(bx - 6, BASE); g.lineTo(bx - 4, by + 40); g.lineTo(bx + 14, by - 4); g.lineTo(bx + 20, by); g.lineTo(bx + 6, by + 44); g.lineTo(bx + 8, BASE); g.closePath(); g.fill(); g.stroke();
         }
         const hold = s.pull || (s.state === 'aim' ? SLING : null);
         if (hold) { g.strokeStyle = K.ink; g.lineWidth = 5; g.beginPath(); g.moveTo(front ? bx - 10 : bx + 16, by); g.lineTo(hold.x, hold.y); g.stroke(); }
@@ -206,6 +216,7 @@ export default function Fling({ W, H }) {
         g.fillStyle = sky; g.fillRect(-400, -400, WW + 800, WH + 800);
         g.fillStyle = K.green; g.globalAlpha = 0.35; g.fillRect(-400, GROUND, WW + 800, 8); g.globalAlpha = 1;
         g.fillStyle = K.text; g.fillRect(-400, GROUND + 8, WW + 800, 400);
+        if (s0.mound) { const v = s0.mound; g.fillStyle = K.green; g.globalAlpha = 0.35; g.beginPath(); g.moveTo(v[0].x, v[0].y); for (const q of v) g.lineTo(q.x, q.y); g.closePath(); g.fill(); g.globalAlpha = 1; }
         // the last shot's path, in dots
         g.fillStyle = K.ink; s.trail.forEach((p, i) => { if (i % 2) return; g.globalAlpha = 0.35; g.beginPath(); g.arc(p.x, p.y, 3, 0, Math.PI * 2); g.fill(); }); g.globalAlpha = 1;
         if (s.state === 'aim') { // the band's reach, and while pulling, where he'll fly
@@ -233,9 +244,9 @@ export default function Fling({ W, H }) {
         }
         if (s.pull) power(s.pull);
         // Buddies still waiting
-        for (let i = 0; i < Math.max(0, s.birds - (s.state === 'aim' ? 1 : 0)); i++) drawGhost(g, SLING.x - 50 - i * 34, GROUND - 16, 12, K, { t: s.t + i, look: [1, 0] });
+        for (let i = 0; i < Math.max(0, s.birds - (s.state === 'aim' ? 1 : 0)); i++) drawGhost(g, SLING.x - 50 - i * 34, BASE - 13, 12, K, { t: s.t + i, look: [1, 0] });
         // bits and points
-        s.bits.forEach((p) => { g.globalAlpha = Math.max(0, p.life); g.fillStyle = p.kind === 'gremlin' ? K.green : p.kind === 'glass' ? K.blue : K.peg; g.fillRect(p.x - 3, p.y - 3, 6, 6); });
+        s.bits.forEach((p) => { g.globalAlpha = Math.max(0, p.life); g.fillStyle = p.kind === 'gremlin' ? K.green : p.kind === 'glass' ? K.blue : p.kind === 'stone' ? K.wire : K.peg; g.fillRect(p.x - 3, p.y - 3, 6, 6); });
         g.globalAlpha = 1;
         g.textAlign = 'center';
         s.pops.forEach((p) => { g.globalAlpha = Math.max(0, p.life); g.fillStyle = K.ink; g.font = `700 ${u(22)}px ${F.mono}`; g.fillText(p.text, p.x, p.y - (1 - p.life) * 40); });
@@ -279,19 +290,20 @@ export default function Fling({ W, H }) {
       const world = (e) => { const r = c.getBoundingClientRect(); const wx = ((e.clientX - r.left) / r.width) * W / k, wy = ((e.clientY - r.top) / r.height) * H / k - (H / k - WH); return { x: wx, y: wy }; };
       const aimAt = (p) => { const dx = p.x - SLING.x, dy = p.y - SLING.y, d = Math.hypot(dx, dy), m = Math.min(1, PULL / (d || 1)); return { x: SLING.x + dx * m, y: SLING.y + dy * m }; };
       let dragging = false;
+      const grab = Math.max(90, 40 / k);
       const down = (e) => {
         e.preventDefault();
         if (s.state === 'clear') { const next = s.lv + 1 < LEVELS.length ? s.lv + 1 : 0; if (!next) { total.pts = 0; setScore(0); } build(next); return; }
         if (s.state === 'failed') { build(s.lv); return; }
         if (s.state !== 'aim' || s.calm > 0) return;
         const p = world(e);
-        if (Math.hypot(p.x - SLING.x, p.y - SLING.y) > 90) return; // grab Buddy (generously)
+        if (Math.hypot(p.x - SLING.x, p.y - SLING.y) > grab) return; // grab Buddy (generously)
         dragging = true; c.setPointerCapture?.(e.pointerId); s.pull = aimAt(p); c.style.cursor = 'grabbing';
       };
       const move = (e) => {
         if (dragging) { s.pull = aimAt(world(e)); s.banner = Math.min(s.banner, 0.3); return; }
         const p = world(e);
-        c.style.cursor = s.state === 'clear' || s.state === 'failed' ? 'pointer' : s.state === 'aim' && Math.hypot(p.x - SLING.x, p.y - SLING.y) < 90 ? 'grab' : 'default';
+        c.style.cursor = s.state === 'clear' || s.state === 'failed' ? 'pointer' : s.state === 'aim' && Math.hypot(p.x - SLING.x, p.y - SLING.y) < grab ? 'grab' : 'default';
       };
       const up = () => { if (!dragging) return; dragging = false; launch(); };
       restart.current = () => { total.pts = s.start; setScore(total.pts); build(s.lv); };
