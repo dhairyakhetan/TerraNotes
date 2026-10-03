@@ -1,12 +1,13 @@
 import { useEffect, useRef, useState } from 'react';
 import { pageZoom } from '../../lib/layoutMode.js';
 import { FONT } from '../../styles/fonts.js';
+import { RULE } from './ruled.js';
 
 // September 2026's diary, under "Meet the team" (src/editions/pages.js TEAM_NOTE; shared/TeamSection.jsx places it:
 // web under the legend, phone beside it). Like Tom Riddle's diary: stay on the section a while and a line writes
 // itself out in a neat copperplate script (the look's script font), letter by letter, sits a moment, then sinks back
 // into the page; another comes a little later, picked at random. It writes on the notebook's ruled lines: its line
-// height is the ruling's, and it shifts itself so the script's baseline sits on a line (RULE below = look.css).
+// height is the ruling's, and it shifts itself so the script's baseline sits on a line (RULE: ruled.js = look.css).
 // Only while it's on screen: scrolling away wipes it
 // and holds the clock. Reduced motion: lines appear and go without the writing. Fun only, so hidden from screen readers.
 const LINES = [
@@ -25,8 +26,6 @@ const LINES = [
   'the ink remembers.',
   'ok fine, you can stay',
 ];
-// the ruling in look.css: first line's tile starts this far down the .page-sheet, one line every `gap` px
-const RULE = { web: { start: 128, gap: 48 }, phone: { start: 104, gap: 40 } };
 const FIRST = 6000, GAP = [7000, 14000], HOLD = 3200, SINK = 1600, PER = 70; // ms; PER: one letter's stroke
 
 export default function Diary({ style, size, web }) {
