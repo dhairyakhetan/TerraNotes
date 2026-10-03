@@ -231,14 +231,14 @@ export default function WebArticleLine() {
           })}
         </div>
       </div>
-      <div style={{ position: "absolute", left: "300px", top: "1024px", width: "1060px", display: "flex", alignItems: "center", gap: "20px" }}>
+      <div data-ruled="" style={{ position: "absolute", left: "300px", top: "1024px", width: "1060px", display: "flex", alignItems: "center", gap: "20px" }}>
         {by && (
           <div className="slide-in" role="status" style={{ display: "flex", alignItems: "center", gap: "8px" }}>
             <span style={{ background: "var(--yellow)", border: "1.5px solid var(--ink)", padding: "5px 10px", fontFamily: FONT.mono, fontWeight: "700", fontSize: "11px", letterSpacing: "1px", textTransform: "uppercase", whiteSpace: "nowrap" }}>{mine.length ? `By ${by} · ${pad2(mine.length)} first` : `Nothing by ${by} yet`}</span>
             <Link className="btn" to={homeLink(number, 'articles')} replace aria-label="Show all articles in order" style={{ minWidth: "32px", minHeight: "30px", display: "flex", alignItems: "center", justifyContent: "center", border: "1.5px solid var(--ink)", background: "var(--card)", fontFamily: FONT.mono, fontWeight: "700", fontSize: "12px", textDecoration: "none", color: "var(--ink)" }}>✕</Link>
           </div>
         )}
-        <div style={{ fontFamily: FONT.mono, fontSize: "11px", letterSpacing: "1.6px", whiteSpace: "nowrap" }}>{`${pad2(list.length)} WRITE-UPS · SCROLL SIDEWAYS`}</div>
+        <div data-ruled-base="" style={{ fontFamily: FONT.mono, fontSize: "11px", letterSpacing: "1.6px", whiteSpace: "nowrap" }}>{`${pad2(list.length)} WRITE-UPS · SCROLL SIDEWAYS`}</div>
         <div style={{ flexGrow: "1", height: "4px", background: "var(--rule)", position: "relative" }}>
           <div ref={(n) => { refs.bar = n; }} style={{ position: "absolute", left: "0", top: "0", height: "4px", width: "6%", background: "var(--ink)", transition: "width 120ms linear" }} />
         </div>

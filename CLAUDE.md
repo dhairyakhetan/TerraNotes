@@ -186,7 +186,9 @@ The site is "notes pegged on a line": paper cards hanging from strings, with ink
 
 Each edition has a theme, a vibe for the whole page, not just colours: September 2026 is **"exam season"**, a school
 notebook (`src/editions/sep26/`: `look.js` colours, `look.css` ruled paper with a red margin and punch holes on the pages
-with `class="page-sheet"`, `Decor.jsx` doodles on the home pages: sticky note, coffee ring, star, paper plane, moving a little; `Diary.jsx`, a
+with `class="page-sheet"`; its home pages write on those lines: text straight on the paper carries `data-ruled` ("1"/"2": rules per
+line) and `lib/ruled.js` `useRuledPage` sets each block's first baseline on a rule, clear of the margin, "Meet the team" via
+`TEAM_FIT` in `sep26/ruled.js`, the ruling's numbers in `RULED` (`pages.js`); `Decor.jsx` doodles on the home pages: sticky note, coffee ring, star, paper plane, moving a little; `Diary.jsx`, a
 Tom Riddle-style diary under "Meet the team" that writes random lines in a script font after you stay a while). October
 2026 (the latest edition) is **"Pujo"**, Durga Puja: laal-paar saree cream and alta red, maroon ink, sindoor handwriting,
 marigold strings, a pandal-night photo wall, Rozha One headings; `look.css` the saree border and an alpana dot pattern;

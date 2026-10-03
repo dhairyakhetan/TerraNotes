@@ -23,8 +23,8 @@ export const DECOR = { sep26: Sep26Decor, oct26: Oct26Decor };
 // - TEAM_NOTE: a component drawn in its "Meet the team" section ({ style, size }: where and how big, from
 //   shared/TeamSection.jsx: web under the legend, phone beside it), e.g. September's diary
 export const TEAM_NOTE = { sep26: Sep26Diary };
-// - TEAM_RULE / TEAM_FIT: for an edition whose pages are ruled paper: its ruling ({ web, phone }: { start, gap, margin })
-//   and its "Meet the team" text laid out on it (overrides for shared/TeamSection.jsx's tables; the section then sets
-//   each block's baseline on a ruled line, lib/ruled.js)
-export const TEAM_RULE = { sep26: Sep26Rule };
+// - RULED / TEAM_FIT: for an edition whose pages are ruled paper: its ruling ({ web, phone }: { start, gap, margin }),
+//   which the home pages write on (lib/ruled.js useRuledPage: every [data-ruled] element), and its "Meet the team"
+//   text laid out on it (overrides for shared/TeamSection.jsx's tables; the section sets its own blocks' baselines)
+export const RULED = { sep26: Sep26Rule };
 export const TEAM_FIT = { sep26: Sep26TeamFit };

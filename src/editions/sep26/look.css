@@ -38,3 +38,14 @@ html[data-edition="sep26"] .web .page-sheet,:host([data-edition="sep26"]) .web .
 .diary-sink{animation:diary-sink 1.6s ease-in forwards}
 @keyframes diary-sink{to{opacity:0;translate:0 5px}}
 @media (prefers-reduced-motion: reduce){.diary-ch{animation:none;opacity:.88}.diary-sink{animation:none;opacity:0}}
+
+/* writing on the lines (lib/ruled.js useRuledPage moves each [data-ruled] block so its first baseline sits on a rule;
+   these give its lines the ruling's spacing, so the rest follow): --gap = one rule (RULE in ruled.js) */
+html[data-edition="sep26"] .page-sheet,:host([data-edition="sep26"]) .page-sheet{--gap:40px}
+html[data-edition="sep26"] .web .page-sheet,:host([data-edition="sep26"]) .web .page-sheet{--gap:48px}
+html[data-edition="sep26"] .page-sheet [data-ruled="1"],:host([data-edition="sep26"]) .page-sheet [data-ruled="1"]{line-height:var(--gap) !important;transform:none !important}
+html[data-edition="sep26"] .page-sheet [data-ruled="2"],:host([data-edition="sep26"]) .page-sheet [data-ruled="2"]{line-height:calc(var(--gap) * 2) !important;transform:none !important}
+/* web "Words we should bring back.": its two lines take two rules each, so the score goes a line lower */
+html[data-edition="sep26"] .web [data-rid="words-score"],:host([data-edition="sep26"]) .web [data-rid="words-score"]{top:226px !important}
+/* web "Land. Water. City.": its lines take two rules each, so it starts a rule lower, clear of the label above */
+html[data-edition="sep26"] .web [data-rid="hero"],:host([data-edition="sep26"]) .web [data-rid="hero"]{top:208px !important}

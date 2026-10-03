@@ -12,7 +12,7 @@ import { useDialogA11y } from '../lib/useDialogA11y.js';
 import { faceSpots, profileTop, teamLinks, useFaceColors } from '../lib/teamLayout.js';
 import { FONT } from '../styles/fonts.js';
 import { useReveal } from '../lib/reveal.js';
-import { TEAM_NOTE, TEAM_RULE, TEAM_FIT } from '../editions/pages.js';
+import { TEAM_NOTE, RULED, TEAM_FIT } from '../editions/pages.js';
 import { useRuleSnap } from '../lib/ruled.js';
 import { hangExtra } from '../phone/PhoneHangingArticles.jsx';
 
@@ -105,7 +105,7 @@ export default function TeamSection({ web }) {
   usePauseOffscreen(self);
   // an edition on ruled paper (September's notebook): each text block's first baseline is put on a ruled line, as the
   // diary does (lib/ruled.js); `probe` marks where a block's baseline is, `snap` is the shift it gets
-  const rule = TEAM_RULE[edition.id]?.[web ? 'web' : 'phone'];
+  const rule = RULED[edition.id]?.[web ? 'web' : 'phone'];
   const probes = useRef({});
   const tops = { title: parseFloat(L.title.top), count: parseFloat(L.count.top), blurb: parseFloat(L.blurb.top), note: parseFloat(L.note.top), legend: parseFloat(L.legend.top) };
   const shifts = useRuleSnap(rule, L.top + (web ? 0 : hangExtra(edition.articles)), tops, probes, web);

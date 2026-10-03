@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { RULED } from '../editions/pages.js';
 import { pageZoom } from './layoutMode.js';
 
 // Writing on ruled paper (September 2026's notebook pages: src/editions/sep26/look.css draws the ruling, and
@@ -35,4 +36,44 @@ export function useRuleSnap(rule, base, tops, probes, key) {
     return () => { gone = true; };
   }, [key]);
   return shifts;
+}
+
+// Where a node's layout box sits inside `root` (offsetTop / offsetLeft up the chain: transforms don't count, so a
+// shift already applied, or a section's rise-in, can't throw it off), or null if `root` isn't one of its offsetParents.
+const offsetIn = (node, root) => {
+  let top = 0, left = 0, n = node;
+  while (n && n !== root) { top += n.offsetTop; left += n.offsetLeft; n = n.offsetParent; }
+  return n === root ? { top, left } : null;
+};
+
+// A whole home page written on the edition's ruled paper (src/editions/pages.js RULED; nothing for an edition without
+// one). Every element inside `sheet` (the .page-sheet) marked `data-ruled` is shifted so its first baseline sits on a
+// ruled line, and, when it would start on or left of the red margin, to just clear of it. The baseline is measured
+// with a 0-high box put at the start of the element (or of its `[data-ruled-base]` child, for a row whose text isn't
+// its first thing) and taken out again at once. The value of `data-ruled` is how many rules one line of its text
+// takes ("1", "2"; empty: leave its line height alone): the edition's look.css sets that line height, so the lines
+// after the first follow. Measured again when the fonts arrive and when `key` changes.
+export function useRuledPage(sheet, edition, web, key) {
+  const rule = RULED[edition.id]?.[web ? 'web' : 'phone'];
+  useEffect(() => {
+    if (!rule) return undefined;
+    let gone = false;
+    const fit = () => {
+      const root = sheet.current;
+      if (gone || !root) return;
+      for (const el of root.querySelectorAll('[data-ruled]')) {
+        const at = el.querySelector('[data-ruled-base]') || el, probe = document.createElement('span');
+        probe.style.cssText = 'display:inline-block;width:0;height:0';
+        at.prepend(probe);
+        const base = offsetIn(probe, root), box = offsetIn(el, root);
+        probe.remove();
+        if (!base || !box) continue;
+        const dx = box.left < rule.margin + 8 ? rule.margin + 24 - box.left : 0;
+        el.style.translate = `${dx}px ${ruledShift(base.top, rule)}px`;
+      }
+    };
+    fit(); document.fonts?.ready.then(fit);
+    const late = setTimeout(fit, 1200); // after late layout (titles fitted, images sized)
+    return () => { gone = true; clearTimeout(late); };
+  }, [edition.id, web, key]);
 }
