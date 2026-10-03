@@ -1,7 +1,8 @@
 // October 2026's decorations on the home pages (src/editions/pages.js DECOR; the page draws them first, so its cards
 // sit on top), for the Pujo issue: a toran of marigolds and mango leaves across the top, an alpana rosette half under
 // the intro card, a dhak with its kash plume, a conch shell, and a marigold tag saying "Subho Sharodiya!" (happy
-// autumn festival). Positions are on the home artboard (web 1440, phone 390), in the empty spots between sections.
+// autumn festival). Positions are on the home artboard (web 1440, phone 390), in the empty spots between sections and
+// clear of Buddy's corner (top right: his call button, the ghost and "tap him", shared/buddy/Buddy.jsx).
 // Decoration only: hidden from screen readers. Colours: the look's (var(--yellow) marigold, var(--red) alta…).
 import { FONT } from '../../styles/fonts.js';
 
@@ -61,7 +62,7 @@ export default function Oct26Decor({ web }) {
         <>
           <Toran width={1440} top={80} swags={4} sag={26} />
           <Alpana left={330} top={360} d={170} />
-          <Tag left={1246} top={150} w={140} size={24} deg={5} />
+          <Tag left={1262} top={452} w={128} size={20} deg={5} />
           <Dhak left={1000} top={340} s={64} />
           <Conch left={1170} top={950} s={120} />
         </>
@@ -69,7 +70,7 @@ export default function Oct26Decor({ web }) {
         <>
           <Toran width={390} top={64} swags={2} sag={14} />
           <Alpana left={-40} top={270} d={120} />
-          <Tag left={288} top={252} w={94} size={17} deg={6} />
+          <Tag left={292} top={266} w={86} size={15} deg={6} />
         </>
       )}
     </div>
