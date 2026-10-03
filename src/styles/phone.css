@@ -1,9 +1,7 @@
 /* The phone layout (narrower than 900px; src/phone/). Drawn at 390px and scaled to the window (CSS zoom = --phone-zoom,
    set by lib/layoutMode.js; ×1 on phones, which the viewport tag pins to 390px). App.jsx wraps the pages in .phone;
    the menu sits outside the page, so it takes the zoom itself. */
-.phone,.menu-sheet,.aq-dock{zoom:var(--phone-zoom,1)}
-/* AQ's dock (phone/PhoneHeader.jsx) floats over the foot of the screen: the footer's last lines stay clear of it */
-html[data-layout="phone"] .site-footer,:host([data-layout="phone"]) .site-footer{padding-bottom:calc(2rem + 84px * var(--phone-zoom,1))}
+.phone,.menu-sheet{zoom:var(--phone-zoom,1)}
 html[data-layout="phone"]{scroll-padding-top:calc(64px * var(--phone-zoom,1))}
 
 /* Phone-only sizing for the full-screen popups. Both fill the visible screen (dvh where supported), counted in the

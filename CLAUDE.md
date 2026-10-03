@@ -66,9 +66,11 @@ The magazine also runs inside AQ's main website (the `dhairyakhetan/fah` repo), 
   `out/terranotes-for-aq.zip` to hand over. Never edit those folders in fah: the next export replaces them.
 - **`src/host.js` is what differs:** AQ's copy says `{ base: '/terranotes', embedded: true }`. AQ-only behaviour checks
   `HOST.embedded` (the phone "call Buddy" button, no own footer or skip link, AQ Labs running full width,
-  card covers from `cover-card.webp`, AQ's nav links as AQ routes); AQ-only styles are rules that start with `:host`.
-- **It draws inside a shadow root** (`src/TerraNotesRoot.jsx`), above AQ's footer. Its header is AQ's nav with the
-  magazine inside it, so AQ hides its own bars on `/terranotes` (`shared/AQNav.jsx` says what AQ's side does). So, in all code:
+  card covers from `cover-card.webp`, and `shared/InsideAQ.jsx`: the other editions on a card at the end of the home
+  pages and a "← Terra Notes" pill under AQ's nav, standing in for the hidden header); AQ-only styles are rules that
+  start with `:host`.
+- **It draws inside a shadow root** (`src/TerraNotesRoot.jsx`), under AQ's own nav, dock and footer. AQ hides the
+  magazine's header (`:host header.site-header{visibility:hidden}` in `styles/base.css`). So, in all code:
   - Router pieces come from `src/router.jsx` (it adds and strips the `/terranotes` prefix), never from `react-router`.
   - Elements the magazine drew are found with `byId` / `$` (`lib/dom.js`), never `document.getElementById` /
     `querySelector`. Pop-ups portal into `portalRoot()`. Outside-click checks use `e.composedPath().includes(el)`.
@@ -105,7 +107,7 @@ Two separate layouts, chosen by window width (`lib/layoutMode.js`, `useIsWeb()`)
 | | Phone (`src/phone/`) | Web (`src/web/`) |
 |---|---|---|
 | Width | **390px**, drawn at `--phone-zoom`. Phones and upright tablets are pinned to 390px by the viewport tag in `index.html` (inside AQ's website: `TerraNotesRoot.jsx`, while the magazine shows) | **1440px**, drawn at `--web-zoom` |
-| Header | `PhoneHeader`: AQ's nav (64px sticky top pill: globe, "← Terra Notes" off home, search / log in / ⋯; AQ's bottom dock, whose lit "notes" tab opens the slide-in `PhoneMenu`) | `WebHeader` (80px, sticky): AQ's nav pill with its "terra notes" item opened up into the magazine's bar ("Terra Notes" / "← Terra Notes", sections, edition picker) |
+| Header | `PhoneHeader` (64px, sticky; the logo glides when the back link comes or goes) + slide-in `PhoneMenu` | `WebHeader` (80px, sticky, kept slim: logo + edition picker; inner pages: "← back to home" left, logo + picker centred, gliding over when that changes) |
 
 - **Home pages are artboards.** Everything under the header is `position: absolute` at design coordinates (px).
   - Sections export their heights so the page grows with the data: `hangExtra(articles)` (PhoneHangingArticles) and `teamHeight(edition, layout)` (TeamSection).
@@ -124,7 +126,6 @@ Two separate layouts, chosen by window width (`lib/layoutMode.js`, `useIsWeb()`)
     - Built from the AQ Labs design. Web: one long scroll (intro with a 3D bookshelf, then every chapter), sticky chapter tabs as a floating glass pill (as on AQ's website). Phone: one chapter at a time (the shelf is the start; `/articles/labs/<id>` opens a chapter as its own page, so Back returns to the shelf); search lives in the "view all projects" sheet.
     - Books sit in fixed hover slots (`.bslot`), so the pulled-out book never flickers. Karyaarth's stills open in the site's `PhotoViewer` (it takes `photos`, `title`, `label`, `count`).
   - Its CSS (`labs.css`) is scoped to `.labs`. Its class names must not match any in `src/styles/` (it had to rename `.intro` and `.orbit`). Its loops keep the motion rules below, inside `labs.css`: transform / opacity only, stopped by reduced motion, `.tn-lite`, `.off-screen` and `html[data-tn-nav]` (with their `:host` twins). It brings its own stylesheet (`labs.css?inline`, a `<style>` beside the page), so it loads with the gallery.
-- **AQ's nav** (`data/aqNav.js`, `shared/AQNav.jsx`) is the magazine's header on both sites: AQ's links go to AQ's site (inside AQ, its routes), and search / log in / ⋯ are placeholders that fire a cancelable `aq-nav` event AQ's code answers (unanswered, they open that page on AQ's site). The notes for Claude in AQ's repo are at the top of `shared/AQNav.jsx`.
 - **Shared components** (`src/shared/`) take a `web` prop (or `look`) and keep a `PHONE` / `WEB` table of positions and sizes. Change a value in the right table; don't fork the component.
 - **The home page also answers at `/articles`, `/photos`, `/words` and `/members`** (an older edition's at `/sep26/photos`…) and scrolls to that section: element ids `articles`, `photos`, `words`, `members`. See `lib/routes.js` and `lib/scrollMemory.js`.
 - **Section addresses drop off by themselves.** Once you scroll a screen away from the section an address names (`/photos`, `/sep26/words`, `/articles/labs/photon`), `lib/scrollMemory.js` replaces it with the plain page (`/`, `/sep26`, `/articles/labs`) in place, with state `{ quiet: true }`, so nothing scrolls or remounts. `?by=` addresses stay.

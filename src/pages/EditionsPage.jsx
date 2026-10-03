@@ -3,6 +3,7 @@ import { Link } from '../router.jsx';
 import PhoneHeader from '../phone/PhoneHeader.jsx';
 import WebHeader from '../web/WebHeader.jsx';
 import { LatestTag } from '../shared/Tapes.jsx';
+import { BackToMagazine } from '../shared/InsideAQ.jsx';
 import { LATEST, PUBLISHED, articleLink, editionLink, editionName, editionOf, nextMonth } from '../data/editions.js';
 import { editionData } from '../editions/index.js';
 import { pad2 } from '../lib/format.js';
@@ -22,6 +23,7 @@ function Frame({ web, title, children }) {
       <div className="web">
         <div style={{ position: "relative", width: "1440px", margin: "0 auto", overflow: "clip", background: "var(--page)", color: "var(--ink)", fontFamily: FONT.body, paddingBottom: "100px" }}>
           <WebHeader />
+          <BackToMagazine web />
           <div style={{ width: "1000px", margin: "0 auto", paddingTop: "60px" }}>{children}</div>
         </div>
       </div>
@@ -30,6 +32,7 @@ function Frame({ web, title, children }) {
   return (
     <div style={{ position: "relative", width: "390px", margin: "0 auto", overflow: "clip", background: "var(--page)", color: "var(--ink)", fontFamily: FONT.body, paddingBottom: "70px" }}>
       <PhoneHeader current="editions" />
+      <BackToMagazine />
       <div style={{ padding: "30px 20px 0" }}>{children}</div>
     </div>
   );

@@ -1,6 +1,7 @@
 import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from '../../router.jsx';
 import PhoneHeader from '../../phone/PhoneHeader.jsx';
+import { BackToMagazine } from '../../shared/InsideAQ.jsx';
 import WebHeader from '../../web/WebHeader.jsx';
 import PhotoViewer from '../../shared/PhotoViewer.jsx';
 import { tagOf } from '../../data/articles.js';
@@ -684,6 +685,7 @@ export default function LabsPage({ article: a, web, chapter }) {
   const page = (
     <div className={`labs ${web ? 'labs-web' : 'labs-phone'}`} style={HOST.embedded ? undefined : { width: web ? "1440px" : "390px" }}>
       {web ? <WebHeader /> : <PhoneHeader current="article" edge={tagOf(a).color} />}
+      {web && <BackToMagazine web />} {/* inside AQ (phone: AQ Labs' own tabs sit there) */}
       <Tabs web={web} active={web ? active : ch} base={base} onTab={onTab} />
       {/* inside AQ, whose page has its own <main>: a region, so there is one main landmark */}
       <Main ref={main} {...(HOST.embedded && { role: 'region', 'aria-label': 'AQ Labs' })} style={{ display: "flex", flexDirection: "column" }}>

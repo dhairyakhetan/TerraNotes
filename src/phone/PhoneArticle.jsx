@@ -1,5 +1,6 @@
 import { useEffect, useLayoutEffect, useRef } from 'react';
 import PhoneHeader from './PhoneHeader.jsx';
+import { BackToMagazine } from '../shared/InsideAQ.jsx';
 import ArticleCard, { TagPill } from '../shared/ArticleCard.jsx';
 import ArticleBody, { AuthorBox } from '../shared/ArticleBody.jsx';
 import BackHome from '../shared/BackHome.jsx';
@@ -25,6 +26,7 @@ export default function PhoneArticle({ article: a, next }) {
   return (
     <div className="page-article" style={{ position: "relative", width: "390px", margin: "0 auto", overflow: "clip", background: "var(--page)", fontFamily: FONT.body, color: "var(--ink)" }}>
       <PhoneHeader current="article" edge={tag.color} />
+      <BackToMagazine />
       <div style={{ position: "absolute", left: "0", top: "100px", width: "390px", height: "2px", background: "var(--string)" }} />
       <div ref={hero} className="hero-drop" style={{ position: "relative", margin: "70px 0 0 16px", width: "358px", minHeight: "484px", transformOrigin: "50% -32px" }}>
         <div className="hero-sway" style={{ transformOrigin: "50% -32px", transform: "rotate(-0.8deg)" }}>

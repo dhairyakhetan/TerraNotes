@@ -3,15 +3,13 @@ import { Link } from '../router.jsx';
 import { LatestTag } from '../shared/Tapes.jsx';
 import { LATEST, PUBLISHED, editionLink, editionName } from '../data/editions.js';
 import { useEdition } from '../lib/edition.js';
-import { AQ_LINK } from '../shared/AQNav.jsx';
 import { FONT } from '../styles/fonts.js';
 
 // The web header's "Edition 01 · Sep 2026 [LATEST] ▾" button: opens a list of every edition (newest first; drafts
 // aren't listed) and a link to /editions. Shows the edition of the page you're on. Esc / outside click closes.
 const MONO = { fontFamily: FONT.mono, fontWeight: "700", letterSpacing: "1.2px", textTransform: "uppercase" };
 
-// compact: in the header's AQ bar, styled like its links (just "Sep 2026 ▾", round hover)
-export default function WebEditionPicker({ compact }) {
+export default function WebEditionPicker() {
   const [open, setOpen] = useState(false);
   const cur = useEdition(), here = cur.number;
   const box = useRef(null);
@@ -24,14 +22,14 @@ export default function WebEditionPicker({ compact }) {
   }, [open]);
   return (
     <div ref={box} style={{ position: "relative" }}>
-      <button onClick={() => setOpen(!open)} aria-expanded={open ? 'true' : 'false'} aria-haspopup="true" aria-label={`${editionName(cur.number)}, ${cur.month}${cur.number === LATEST ? ', latest' : ''}. Choose an edition`}
-        className={compact ? 'edition-btn aq-link' : 'edition-btn'} style={compact ? { ...AQ_LINK, gap: "8px", border: "0", background: open ? "var(--page)" : "transparent", cursor: "pointer" } : { ...MONO, fontSize: "11px", minHeight: "40px", display: "flex", alignItems: "center", gap: "8px", padding: "0 12px", cursor: "pointer", background: "var(--card)", color: "var(--ink)", border: "2px solid var(--ink)", boxShadow: "3px 3px 0 var(--ink)" }}>
-        <span>{compact ? cur.month.replace(/^(\w{3})\w*/, '$1') : `${editionName(cur.number)} · ${cur.month.replace(/^(\w{3})\w*/, '$1')}`}</span>
+      <button className="edition-btn" onClick={() => setOpen(!open)} aria-expanded={open ? 'true' : 'false'} aria-haspopup="true" aria-label={`${editionName(cur.number)}, ${cur.month}${cur.number === LATEST ? ', latest' : ''}. Choose an edition`}
+        style={{ ...MONO, fontSize: "11px", minHeight: "40px", display: "flex", alignItems: "center", gap: "8px", padding: "0 12px", background: "var(--card)", color: "var(--ink)", border: "2px solid var(--ink)", boxShadow: "3px 3px 0 var(--ink)", cursor: "pointer" }}>
+        <span>{`${editionName(cur.number)} · ${cur.month.replace(/^(\w{3})\w*/, '$1')}`}</span>
         {cur.number === LATEST && <LatestTag />}
         <svg width="10" height="7" viewBox="0 0 10 7" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true" style={{ transform: open ? "rotate(180deg)" : "none", transition: "transform .15s" }}><path d="M1 1 L5 5 L9 1" /></svg>
       </button>
       {open && (
-        <div className="card-drop" role="menu" style={{ position: "absolute", ...(compact ? { right: "0" } : { left: "0" }), top: "calc(100% + 10px)", zIndex: "60", width: "280px", boxSizing: "border-box", background: "var(--card)", border: "2px solid var(--ink)", boxShadow: "6px 6px 0 var(--ink)", padding: "8px" }}>
+        <div className="card-drop" role="menu" style={{ position: "absolute", left: "0", top: "calc(100% + 10px)", zIndex: "60", width: "280px", boxSizing: "border-box", background: "var(--card)", border: "2px solid var(--ink)", boxShadow: "6px 6px 0 var(--ink)", padding: "8px" }}>
           <div style={{ ...MONO, fontSize: "9.5px", color: "var(--muted)", padding: "6px 8px" }}>Editions</div>
           {[...PUBLISHED].reverse().map((e) => (
             <Link key={e.number} role="menuitem" to={editionLink(e.number)} onClick={() => setOpen(false)} aria-current={e.number === here ? 'true' : undefined}

@@ -1,5 +1,6 @@
 import { useEffect, useLayoutEffect, useRef } from 'react';
 import WebHeader from './WebHeader.jsx';
+import { BackToMagazine } from '../shared/InsideAQ.jsx';
 import ArticleCard, { TagPill } from '../shared/ArticleCard.jsx';
 import ArticleBody, { AuthorBox, FieldLog } from '../shared/ArticleBody.jsx';
 import ImageSlot from '../shared/ImageSlot.jsx';
@@ -29,6 +30,7 @@ export default function WebArticle({ article: a, next }) {
     <div className="web">
       <div style={{ position: "relative", width: "1440px", margin: "0 auto", overflow: "clip", background: "var(--page)", fontFamily: FONT.body, color: "var(--ink)" }}>
         <WebHeader wire />
+        <BackToMagazine web />
         <div style={{ position: "absolute", left: "0", top: "78px", width: "1440px", height: "2px", background: "var(--string)" }} />
         <div ref={hero} className="hero-drop" style={{ position: "absolute", left: "80px", top: "118px", width: a.cover ? "fit-content" : "620px", transformOrigin: "50% -38px" }}>
           <div className="hero-sway" style={{ transformOrigin: "50% -38px", transform: "rotate(-1deg)" }}>
