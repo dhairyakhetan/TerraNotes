@@ -11,7 +11,7 @@ import { HOST } from '../host.js';
 // Events: Read depth { article, depth } · Game opened { game } · Shared { article, method } · Follow { channel }
 //         · Words game done { score, of }
 export function startAnalytics() {
-  if (HOST.embedded) return;
+  if (HOST.embedded || /^(localhost|127\.0\.0\.1)$/.test(location.hostname)) return; // its script is only served on Vercel
   try { inject({ mode: import.meta.env.PROD ? 'production' : 'development', debug: false }); } catch { /* blocked: fine */ }
 }
 

@@ -1,5 +1,5 @@
 import { createContext, useContext } from 'react';
-import { LATEST, editionName } from '../data/editions.js';
+import { LATEST, editionName, homeHeadline } from '../data/editions.js';
 import { editionData } from '../editions/index.js';
 import { HOST } from '../host.js';
 import { tnHost } from './dom.js';
@@ -27,4 +27,4 @@ export function applyLook({ id, look }, el = tnHost() || document.documentElemen
 
 
 // A home page's tab title: the latest edition's is plain "Aquaterra" (inside AQ's website: "Terra Notes | AquaTerra")
-export const homeTitle = (e) => (e.number !== LATEST ? `Aquaterra — ${editionName(e.number)} · ${e.month}` : HOST.embedded ? 'Terra Notes | AquaTerra' : 'Aquaterra');
+export const homeTitle = (e) => (e.number !== LATEST ? `Aquaterra — ${editionName(e.number)} · ${e.month}` : HOST.embedded ? 'Terra Notes | AquaTerra' : homeHeadline());

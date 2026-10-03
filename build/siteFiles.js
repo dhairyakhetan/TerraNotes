@@ -83,6 +83,8 @@ export default function siteFiles(host) {
           const p = homeLink(e.number, section), title = [name, old].filter(Boolean).join(' · ');
           let html = title ? setMeta(setTitle(base, `Aquaterra — ${title}`), 'property', 'og:title', `${title} · TerraNotes`) : base;
           html = setMeta(html, 'property', 'og:url', url(p));
+          const about = `${editionData(e.number).intro} ${editionName(e.number)} · ${e.month} · TerraNotes by Aquaterra.`;
+          if (e.number !== LATEST) html = setMeta(setMeta(html, 'name', 'description', about), 'property', 'og:description', about); // the latest's: index.html's own
           // the main page shows the magazine; an edition's other pages show that edition
           const pic = p === '/' ? null : og(ogImage.edition(e.number));
           html = pic ? withImage(html, pic, `TerraNotes ${editionName(e.number)} · ${e.month}`) : withHome(html);
@@ -122,6 +124,24 @@ export default function siteFiles(host) {
         '', '## Optional', '', `- [Full text of every article](${url('/llms-full.txt')})`, `- [Sitemap](${url('/sitemap.xml')})`, ''].join('\n'));
       const text = (b) => (typeof b === 'string' ? [b, ''] : b.h2 ? [`### ${b.h2}`, ''] : b.projects ? [...b.projects.map((x) => `- ${x.name}: ${x.what} (${x.meta})`), ''] : []);
       out('llms-full.txt', [...intro, ...ARTICLES.map((a) => [`## ${a.title}`, '', `${url(articleLink(a))} · ${a.tag} · ${line(a)}`, '', ...a.body.flatMap(text)].join('\n'))].join('\n'));
+      checkCsp(dir);
     },
   };
+}
+
+// The Content-Security-Policy (vercel.json) lets a page run only the site's own script files and the inline scripts it
+// lists by hash. An inline script that changes (index.html's, a demo's) would then be blocked on the live site, so the
+// build stops instead and says which hash to put in vercel.json's script-src.
+function checkCsp(dir) {
+  const csp = JSON.parse(fs.readFileSync('vercel.json', 'utf8')).headers.flatMap((h) => h.headers).find((h) => h.key === 'Content-Security-Policy')?.value || '';
+  const walk = (d) => fs.readdirSync(d, { withFileTypes: true }).flatMap((e) => (e.isDirectory() ? walk(path.join(d, e.name)) : e.name.endsWith('.html') ? [path.join(d, e.name)] : []));
+  const missing = new Map();
+  for (const f of walk(dir)) {
+    // browsers hash a script's text with its line ends made \n (a demo's files may have \r\n)
+    for (const m of fs.readFileSync(f, 'utf8').replace(/\r\n?/g, '\n').matchAll(/<script(?![^>]*\bsrc=)(?![^>]*type="application\/ld\+json")[^>]*>([\s\S]*?)<\/script>/g)) {
+      const hash = `'sha256-${crypto.createHash('sha256').update(m[1]).digest('base64')}'`;
+      if (!csp.includes(hash)) missing.set(hash, path.relative(dir, f));
+    }
+  }
+  if (missing.size) throw new Error(`vercel.json Content-Security-Policy: add these inline-script hashes to script-src (an inline script changed):\n${[...missing].map(([h, f]) => `  ${h}  (${f})`).join('\n')}`);
 }

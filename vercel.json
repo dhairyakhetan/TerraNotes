@@ -14,7 +14,8 @@
         { "key": "X-Content-Type-Options", "value": "nosniff" },
         { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
         { "key": "X-Frame-Options", "value": "SAMEORIGIN" },
-        { "key": "Permissions-Policy", "value": "camera=(), microphone=(), geolocation=()" }
+        { "key": "Permissions-Policy", "value": "camera=(), microphone=(), geolocation=()" },
+        { "key": "Content-Security-Policy", "value": "default-src 'self'; script-src 'self' 'sha256-EPr1qt+SAx6/pM18YmMJhGj+dwo5MeWuIx8qmHkMk9o=' 'sha256-mAcW1V9xskRu5pabXOL2uTnv2LcetrLITvcxekWbCbQ=' 'sha256-um5v6ha8KzLD7y6AviY9uEAd55uu7C9khG5nXFro640='; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; media-src 'self'; connect-src 'self'; frame-src 'self'; frame-ancestors 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests" }
       ]
     }
   ]
