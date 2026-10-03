@@ -37,7 +37,7 @@ export default function WebHome() {
         <EditionDecor web />
         <HomeIntroCard web />
         <div data-ruled="1" style={{ position: "absolute", left: "720px", top: "132px", fontFamily: FONT.mono, fontSize: "12px", letterSpacing: "1.8px" }}>TERRANOTES · WRITE-UPS, PHOTOS &amp; WORDS</div>
-        <div data-ruled="2" data-rid="hero" style={{ position: "absolute", left: "716px", top: "160px", fontFamily: FONT.head, fontSize: "96px", lineHeight: "0.9", letterSpacing: "-2px", textTransform: "uppercase", color: "var(--ink)" }}>
+        <div data-ruled="3" data-rid="hero" style={{ position: "absolute", left: "716px", top: "160px", fontFamily: FONT.head, fontSize: "96px", lineHeight: "0.9", letterSpacing: "-2px", textTransform: "uppercase", color: "var(--ink)" }}>
           <div>Land{DOT}</div>
           <div style={{ paddingLeft: "70px" }}>Water{DOT}</div>
           <div style={{ paddingLeft: "20px" }}>City{DOT}</div>

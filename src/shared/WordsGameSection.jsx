@@ -44,8 +44,8 @@ export default function WordsGameSection({ web }) {
   const w = useWordsGame(ref, useEdition().words);
   return (
     <section id="words" ref={ref} style={{ position: "absolute", left: "0", ...L.section }}>
-      <h2 data-ruled={web ? '2' : '1'} data-rid="words-title" style={{ position: "absolute", margin: "0", fontFamily: FONT.serif, fontStyle: "italic", fontWeight: "400", color: "var(--ink)", ...L.title }}>Words we should bring back.</h2>
-      <div data-ruled={web ? '1' : undefined} data-rid="words-score" style={{ position: "absolute", fontFamily: FONT.mono, color: "var(--ink)", ...L.score }}>{web ? `MINI GAME · SCORE ${w.score} / ${w.total}` : <>MINI GAME<br />SCORE {w.score} / {w.total}</>}</div>
+      <h2 data-ruled="2" data-rid="words-title" style={{ position: "absolute", margin: "0", fontFamily: FONT.serif, fontStyle: "italic", fontWeight: "400", color: "var(--ink)", ...L.title }}>Words we should bring back.</h2>
+      <div data-ruled="1" data-rid="words-score" style={{ position: "absolute", fontFamily: FONT.mono, color: "var(--ink)", ...L.score }}>{web ? `MINI GAME · SCORE ${w.score} / ${w.total}` : <>MINI GAME<br />SCORE {w.score} / {w.total}</>}</div>
       {/* the word, on a cloud */}
       <div style={{ position: "absolute", left: `${C.left}px`, top: `${C.top}px`, width: `${C.w}px`, height: `${C.h}px` }}>
         <svg width={C.w} height={C.h} viewBox="0 0 200 110" preserveAspectRatio="none" style={{ position: "absolute", left: "0", top: "0", overflow: "visible" }} aria-hidden="true">
