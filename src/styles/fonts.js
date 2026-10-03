@@ -7,4 +7,5 @@ export const FONT = {
   serif: 'var(--font-serif)', // "Photo wall", "TerraNotes", the intro headline
   body: 'var(--font-body)', // UI body text
   read: 'var(--font-read)', // article paragraphs
+  script: 'var(--font-script)', // a neat copperplate script (September's diary under "Meet the team")
 };

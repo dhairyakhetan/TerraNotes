@@ -12,6 +12,7 @@ import { useDialogA11y } from '../lib/useDialogA11y.js';
 import { faceSpots, profileTop, teamLinks, useFaceColors } from '../lib/teamLayout.js';
 import { FONT } from '../styles/fonts.js';
 import { useReveal } from '../lib/reveal.js';
+import { TEAM_NOTE } from '../editions/pages.js';
 
 // "Meet the team" (id="members"), both layouts: the edition's team (src/editions/<id>/team.js), their faces floating in
 // a honeycomb, dotted lines joining each team, a legend that highlights one team, and a profile card that opens level
@@ -25,7 +26,7 @@ const PHONE = {
   count: { right: "20px", top: "30px", fontSize: "9px", letterSpacing: "1.6px", lineHeight: "1.6" },
   blurb: { left: "20px", top: "136px", width: "340px", fontSize: "15px", lineHeight: "1.5" },
   note: { left: "22px", top: "270px", width: "250px", fontSize: "21px" },
-  legend: { left: "16px", top: "340px", width: "142px", gap: "4px" }, chip: { minHeight: "32px", padding: "0 10px 0 6px", gap: "8px", fontSize: "9.5px", letterSpacing: "1.2px" }, dot: "12px",
+  legend: { left: "16px", top: "340px", width: "142px", gap: "4px" }, extra: { left: 172, top: 350, width: 200, size: 23, under: false }, chip: { minHeight: "32px", padding: "0 10px 0 6px", gap: "8px", fontSize: "9.5px", letterSpacing: "1.2px" }, dot: "12px",
   face: { half: 58, gap: "8px", shadow: "6px 5px 0", icon: 20, font: "11px", name: "12px", role: "8.5px", roleSpacing: "1px", roleGap: "3px", pad: "2px 6px", bump: "transform .12s ease" },
   dim: "rgba(17,17,17,.55)",
   card: { width: 334, shadow: "8px 8px 0", padding: "18px", clip: [34, 10, "-7px"], close: { right: "10px", top: "10px" }, photo: "96px", name: "30px", role: "20px", bio: "14px", credit: "13px" },
@@ -38,7 +39,7 @@ const WEB = {
   count: { left: "1080px", top: "30px", width: "280px", fontSize: "11px", letterSpacing: "1.8px" },
   blurb: { left: "80px", top: "200px", width: "440px", fontSize: "17px", lineHeight: "1.55" },
   note: { left: "82px", top: "360px", width: "400px", fontSize: "27px" },
-  legend: { left: "78px", top: "440px", width: "220px", gap: "6px" }, chip: { minHeight: "40px", padding: "0 14px 0 8px", gap: "10px", fontSize: "11px", letterSpacing: "1.4px" }, dot: "14px",
+  legend: { left: "78px", top: "440px", width: "220px", gap: "6px" }, extra: { left: 84, top: 440, width: 470, size: 34, under: true }, chip: { minHeight: "40px", padding: "0 14px 0 8px", gap: "10px", fontSize: "11px", letterSpacing: "1.4px" }, dot: "14px",
   face: { half: 66, gap: "10px", shadow: "8px 6px 0", icon: 22, font: "13px", name: "15px", role: "10px", roleSpacing: "1.2px", roleGap: "4px", pad: "2px 8px", bump: "transform 180ms cubic-bezier(0.32, 0.72, 0, 1)" },
   dim: "rgba(17,17,17,.35)",
   card: { width: 360, shadow: "9px 9px 0", padding: "22px", clip: [36, 11, "-8px"], close: { right: "12px", top: "12px" }, photo: "108px", name: "34px", role: "23px", bio: "15px", credit: "14px" },
@@ -82,7 +83,7 @@ const preloadBadges = (members) => members.filter((m) => m.badge && !badges.has(
 
 export default function TeamSection({ web }) {
   const edition = useEdition(), { members: MEMBERS, teams: TEAMS } = edition;
-  const L = layoutFor(edition)[web ? 'web' : 'phone'], S = L.spots, H = L.height;
+  const L = layoutFor(edition)[web ? 'web' : 'phone'], S = L.spots, H = L.height, Note = TEAM_NOTE[edition.id];
   useEffect(() => preloadBadges(MEMBERS), [MEMBERS]);
   const self = useRef(null);
   useReveal(self);
@@ -122,6 +123,8 @@ export default function TeamSection({ web }) {
       <svg width={L.width} height={H} viewBox={`0 0 ${L.width} ${H}`} style={{ position: "absolute", left: "0", top: "0", pointerEvents: "none" }} aria-hidden="true" fill="none" strokeWidth={L.line[0]} strokeDasharray={L.line[1]} strokeLinecap="round">
         {L.links.map((l) => <path key={l.team} d={l.d} stroke={TEAMS[l.team].color} opacity={team == null ? 0.55 : team === l.team ? 0.95 : 0.12} style={{ transition: "opacity .25s" }} />)}
       </svg>
+      {/* the edition's own note, if it has one (src/editions/pages.js TEAM_NOTE): web under the legend, phone beside it */}
+      {Note && <Note size={L.extra.size} style={{ left: `${L.extra.left}px`, top: `${L.extra.under ? L.extra.top + Object.keys(TEAMS).length * 46 + 34 : L.extra.top}px`, width: `${L.extra.width}px` }} />}
       {/* legend: pick a team to fade everyone else */}
       <div style={{ position: "absolute", display: "flex", flexDirection: "column", ...L.legend }}>
         {Object.entries(TEAMS).map(([key, t]) => {

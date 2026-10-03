@@ -61,6 +61,7 @@ export const LOOK = {
     serif: "'Instrument Serif', Georgia, serif", // "Photo wall", "TerraNotes", the intro headline
     body: "'Figtree', system-ui, sans-serif", // UI body text
     read: "'Newsreader', Georgia, serif", // article paragraphs
+    script: "'Pinyon Script', 'Snell Roundhand', cursive", // a neat copperplate script (not used this month)
   },
   // a stylesheet for fonts index.html doesn't load already (e.g. a Google Fonts link), or ''
   fontsCss: 'https://fonts.googleapis.com/css2?family=Rozha+One&display=swap',

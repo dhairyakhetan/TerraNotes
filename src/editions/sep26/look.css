@@ -29,3 +29,12 @@ html[data-edition="sep26"] .web .page-sheet,:host([data-edition="sep26"]) .web .
 @keyframes sep-sticky{from{rotate:0deg}to{rotate:-2.5deg}}
 .sep-float{animation:sep-float 10s ease-in-out infinite}
 @keyframes sep-float{0%{translate:0 0;rotate:-6deg;opacity:0}12%{opacity:.55}40%{opacity:.45}55%,100%{translate:8px -60px;rotate:8deg;opacity:0}}
+
+/* the diary under "Meet the team" (Diary.jsx): each letter inks in after the one before, then the line sinks into the
+   page. One-shots, opacity / translate only. */
+.diary-line{display:block}
+.diary-ch{opacity:0;animation:diary-ink .45s ease-out forwards}
+@keyframes diary-ink{from{opacity:0}60%{opacity:1}to{opacity:.88}}
+.diary-sink{animation:diary-sink 1.6s ease-in forwards}
+@keyframes diary-sink{to{opacity:0;translate:0 5px}}
+@media (prefers-reduced-motion: reduce){.diary-ch{animation:none;opacity:.88}.diary-sink{animation:none;opacity:0}}

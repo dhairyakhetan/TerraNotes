@@ -45,21 +45,22 @@ function Snake({ W, small }) {
   const [top, setTop] = useState(() => best('aq-snake-best'));
   useEffect(() => {
     const N = 15, C = W / N, g = setup(cv.current, W, W);
-    let snake, dir, queue, food, state = 'ready', acc = 0, last = performance.now(), raf = 0, pts = 0;
+    let snake, dir, next, food, state = 'ready', acc = 0, last = performance.now(), raf = 0, pts = 0;
     const free = () => { let f; do f = [Math.floor(Math.random() * N), Math.floor(Math.random() * N)]; while (snake.some(([x, y]) => x === f[0] && y === f[1])); return f; };
-    const reset = () => { snake = [[7, 7], [6, 7], [5, 7]]; dir = [1, 0]; queue = []; food = free(); pts = 0; setScore(0); };
+    const reset = () => { snake = [[7, 7], [6, 7], [5, 7]]; dir = [1, 0]; next = null; food = free(); pts = 0; setScore(0); };
     reset();
     const steer = (d) => {
       if (state === 'over') return; // only the Play again button restarts, so the score stays up
       if (state === 'ready') state = 'playing';
-      const prev = queue.length ? queue[queue.length - 1] : dir;
-      if (d[0] === -prev[0] && d[1] === -prev[1]) return; // no turning back on yourself
-      if (d[0] !== prev[0] || d[1] !== prev[1]) queue.push(d);
+      // one turn per step, no queue: a later press before the next step replaces the earlier one, so a burst of
+      // presses never plays itself out over the following steps
+      if (d[0] === -dir[0] && d[1] === -dir[1]) return; // no turning back on yourself
+      next = d[0] === dir[0] && d[1] === dir[1] ? null : d;
     };
     turn.current = steer;
     again.current = () => { reset(); state = 'ready'; setOver(false); };
     const tick = () => {
-      if (queue.length) dir = queue.shift();
+      if (next) { dir = next; next = null; }
       const head = [snake[0][0] + dir[0], snake[0][1] + dir[1]];
       const hit = head[0] < 0 || head[1] < 0 || head[0] >= N || head[1] >= N || snake.some(([x, y], i) => i < snake.length - 1 && x === head[0] && y === head[1]);
       if (hit) { state = 'over'; setOver(true); if (pts > best('aq-snake-best')) { keep('aq-snake-best', pts); setTop(pts); } return; }

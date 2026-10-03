@@ -164,11 +164,12 @@ The site is "notes pegged on a line": paper cards hanging from strings, with ink
 
 Each edition has a theme, a vibe for the whole page, not just colours: September 2026 is **"exam season"**, a school
 notebook (`src/editions/sep26/`: `look.js` colours, `look.css` ruled paper with a red margin and punch holes on the pages
-with `class="page-sheet"`, `Decor.jsx` doodles on the home pages: sticky note, coffee ring, star, paper plane). October
+with `class="page-sheet"`, `Decor.jsx` doodles on the home pages: sticky note, coffee ring, star, paper plane, moving a little; `Diary.jsx`, a
+Tom Riddle-style diary under "Meet the team" that writes random lines in a script font after you stay a while). October
 2026 (the latest edition) is **"Pujo"**, Durga Puja: laal-paar saree cream and alta red, maroon ink, sindoor handwriting,
 marigold strings, a pandal-night photo wall, Rozha One headings; `look.css` the saree border and an alpana dot pattern;
 `Decor.jsx` a marigold toran, alpana, dhak, conch and a "Subho Sharodiya!" tag; Pujo words; two sample articles. A new edition starts from a copy of the newest look and changes the values; its own CSS and
-doodles are registered in `src/editions/pages.js` (`EDITION_CSS`, `DECOR`).
+doodles are registered in `src/editions/pages.js` (`EDITION_CSS`, `DECOR`, `TEAM_NOTE` for something in the team section).
 Use the variables, nothing else (the look lists a few more, for the photo wall, dark panels and details).
 
 **Palette:**
@@ -196,6 +197,7 @@ Tag colours are in the edition's `TAGS` (`articles.js`) and team colours in its 
 | `serif` | Instrument Serif | "Photo wall", "TerraNotes", the intro headline |
 | `body` | Figtree | UI text |
 | `read` | Newsreader | article paragraphs |
+| `script` | Pinyon Script (`fontsCss`) | September's diary only |
 
 **Shapes:**
 - **Borders:** always `2px solid var(--ink)`; 1.5px on small bits.
