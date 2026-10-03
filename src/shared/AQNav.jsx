@@ -44,13 +44,23 @@ export function AqAction({ action, children, ...rest }) {
 
 export const AqGlobe = ({ size }) => <img src={withBase('/brand/aquaterra-globe.webp')} alt="" width={size} height={size} style={{ display: "block", width: `${size}px`, height: `${size}px` }} />;
 
-// AQ's look for its pills: white, ink edge, fully round
-export const PILL = { background: "var(--card)", border: "2px solid var(--ink)", borderRadius: "999px", boxShadow: "4px 4px 0 var(--ink)" };
-export const AQ_LABEL = { fontFamily: FONT.mono, fontWeight: "700", fontSize: "12px", letterSpacing: "1.2px", textTransform: "uppercase", color: "var(--ink)", textDecoration: "none" };
+// AQ's look (its v6.css "flat white pill"): white, 2px ink edge, no shadow; links in heavy caps, a round hover, the
+// page's link lit in AQ's light green with ink text
+export const PILL = { background: "var(--card)", border: "2px solid var(--ink)", borderRadius: "999px" };
+export const AQ_LABEL = { fontFamily: FONT.body, fontWeight: "800", fontSize: "12.5px", lineHeight: "1", letterSpacing: "0.02em", textTransform: "uppercase", color: "var(--ink)", textDecoration: "none" };
+export const AQ_LINK = { ...AQ_LABEL, display: "inline-flex", alignItems: "center", gap: "6px", minHeight: "44px", padding: "0 14px", borderRadius: "999px", whiteSpace: "nowrap", boxSizing: "border-box" };
+export const AQ_ON = { background: "var(--mint)", color: "var(--ink)" }; // the lit link (AQ: --welfare)
+// AQ's link icons are tinted: home green, projects blue, teams teal, terra notes purple
+export const AQ_TINT = { home: "var(--green)", projects: "var(--blue)", teams: "var(--mint)", notes: "var(--purple)" };
 
 // line icons for AQ's bars (outline, like AQ's heroicons), in currentColor
-const line = (size, d) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" aria-hidden="true" style={{ stroke: "currentColor", strokeWidth: "1.8", strokeLinecap: "round", strokeLinejoin: "round" }}>{d}</svg>;
+const line = (size, d, w = 1.8) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" aria-hidden="true" style={{ stroke: "currentColor", strokeWidth: w, strokeLinecap: "round", strokeLinejoin: "round" }}>{d}</svg>;
 export const AQ_ICONS = {
+  wave: (s = 14) => line(s, <><path d="M2 12c2 0 2-3 5-3s3 3 5 3 3-3 5-3 3 3 5 3" /><path d="M2 17c2 0 2-3 5-3s3 3 5 3 3-3 5-3 3 3 5 3" /></>),
+  bolt: (s = 14) => line(s, <path d="M13 2 L3 14 H12 L11 22 L21 10 H12 Z" />),
+  flag: (s = 14) => line(s, <><path d="M4 15 C4 15 5 14 8 14 C11 14 13 16 16 16 C19 16 20 15 20 15 V3 C20 3 19 4 16 4 C13 4 11 2 8 2 C5 2 4 3 4 3 Z" /><path d="M4 22 V15" /></>),
+  open: (s = 14) => line(s, <><path d="M4 4.5 A2.5 2.5 0 0 1 6.5 2 H20 V19 H6.5 A2.5 2.5 0 0 0 4 21.5 Z" /><path d="M4 21.5 A2.5 2.5 0 0 1 6.5 19 H20 V22 H6.5 A2.5 2.5 0 0 1 4 21.5 Z" /></>),
+  chevron: (s = 14) => line(s, <path d="M9 5 L16 12 L9 19" />, 2.4),
   search: (s = 18) => line(s, <><circle cx="11" cy="11" r="7" /><path d="M21 21 L16.6 16.6" /></>),
   dots: (s = 18) => line(s, <><circle cx="5" cy="12" r="1.2" /><circle cx="12" cy="12" r="1.2" /><circle cx="19" cy="12" r="1.2" /></>),
   home: (s = 20) => line(s, <><path d="M3 11 L12 3.5 L21 11" /><path d="M5.5 9.5 V20 H18.5 V9.5" /><path d="M10 20 V14 H14 V20" /></>),

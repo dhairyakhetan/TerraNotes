@@ -8,9 +8,9 @@
 // The signed-in variants (AQ's AUTH_ITEMS: feed / explore / alerts / teams, the HoD desk) are not here yet: see the
 // 'aq-nav' event in shared/AQNav.jsx for how AQ's own code can take over those parts.
 export const AQ_TOP = [ // laptop pill, before the magazine's own item
-  { path: '/', label: 'home' },
-  { path: '/projects', label: 'projects' },
-  { path: '/teams', label: 'teams' },
+  { path: '/', label: 'home', icon: 'wave' },
+  { path: '/projects', label: 'projects', icon: 'bolt' },
+  { path: '/teams', label: 'teams', icon: 'flag' },
 ];
 
 export const AQ_DOCK = [ // phone dock, in order; 'notes' is the magazine itself (it opens the magazine's menu)

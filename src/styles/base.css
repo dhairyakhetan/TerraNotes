@@ -40,3 +40,8 @@ html,a,button{touch-action:manipulation} /* no double-tap zoom, so no tap delay 
 
 /* the wordmark on the black phone menu: a thin cream edge so its dark blue letters still read */
 .wordmark-img.on-dark{filter:drop-shadow(1px 0 0 var(--page)) drop-shadow(-1px 0 0 var(--page)) drop-shadow(0 1px 0 var(--page)) drop-shadow(0 -1px 0 var(--page))}
+
+/* AQ's nav (shared/AQNav.jsx): links get a round hover and settle when pressed, as on AQ's site */
+.aq-link{transition:background-color .16s ease,translate .16s ease}
+.aq-link:hover{background-color:var(--page)}
+.aq-link:active{translate:0 1px}

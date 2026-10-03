@@ -2,13 +2,12 @@ import { useState } from 'react';
 import { createPortal } from 'react-dom';
 import BackHome from '../shared/BackHome.jsx';
 import PhoneMenu from './PhoneMenu.jsx';
-import { AqLink, AqAction, AqGlobe, PILL, AQ_LABEL, AQ_ICONS } from '../shared/AQNav.jsx';
+import { AqLink, AqAction, AqGlobe, PILL, AQ_LINK, AQ_ICONS } from '../shared/AQNav.jsx';
 import { AQ_DOCK } from '../data/aqNav.js';
 import { portalRoot } from '../lib/dom.js';
-import { FONT } from '../styles/fonts.js';
 
 // The phone's two bars, AQ's nav with the magazine inside it (data/aqNav.js, shared/AQNav.jsx), as on AQ's site:
-// - top: a sticky 64px strip with AQ's floating pill: AQ's globe; on pages other than home, "← Terra Notes" (back to
+// - top: a sticky 64px strip with AQ's floating pill: AQ's globe, "Terra Notes" (on other pages "← Terra Notes", back to
 //   the magazine's home, a real Back when you came from there); then search, log in and ⋯ (placeholders AQ's code
 //   takes over).
 // - bottom: AQ's dock (home, projects, teams, blog, notes, about). "notes" is the magazine: it's always the lit tab
@@ -22,19 +21,16 @@ export default function PhoneHeader({ current, edge }) {
   return (
     <>
       <header className="site-header" style={{ position: "sticky", top: "0", zIndex: "50", width: "390px", height: "64px", boxSizing: "border-box", padding: "6px 10px 0", pointerEvents: "none" }}>
-        <nav aria-label="Main" style={{ ...PILL, boxShadow: "3px 3px 0 var(--ink)", pointerEvents: "auto", height: "52px", boxSizing: "border-box", padding: "0 4px 0 4px", display: "flex", alignItems: "center", gap: "2px" }}>
+        <nav aria-label="Main" style={{ ...PILL, pointerEvents: "auto", height: "52px", boxSizing: "border-box", padding: "0 4px 0 4px", display: "flex", alignItems: "center", gap: "2px" }}>
           <AqLink path="/" aria-label="Aquaterra home" style={{ ...ICON_BTN }}><AqGlobe size={30} /></AqLink>
-          {home && <span style={{ fontFamily: FONT.serif, fontStyle: "italic", fontSize: "19px", color: "var(--ink)", padding: "0 4px", whiteSpace: "nowrap" }}>Terra Notes</span>}
-          {!home && (
-            <BackHome aria-label="Back to Terra Notes" style={{ display: "flex", alignItems: "center", gap: "4px", minHeight: "44px", padding: "0 6px", textDecoration: "none", color: "var(--ink)", whiteSpace: "nowrap" }}>
-              <span aria-hidden="true" style={{ fontFamily: FONT.mono, fontSize: "14px" }}>←</span>
-              <span style={{ fontFamily: FONT.serif, fontStyle: "italic", fontSize: "19px" }}>Terra Notes</span>
-            </BackHome>
-          )}
+          {/* the magazine: AQ's lit "notes", which is also the way back to its home */}
+          {home
+            ? <span style={{ ...AQ_LINK, fontSize: "11.5px", padding: "0 10px" }}>Terra Notes</span>
+            : <BackHome aria-label="Back to Terra Notes" style={{ ...AQ_LINK, fontSize: "11.5px", padding: "0 10px", gap: "4px" }}><span aria-hidden="true">←</span>Terra Notes</BackHome>}
           <span style={{ flexGrow: "1" }} />
           {/* AQ's own controls: placeholders until AQ's code answers them (shared/AQNav.jsx) */}
           <AqAction action="search" className="press" style={ICON_BTN}>{AQ_ICONS.search()}</AqAction>
-          <AqAction action="account" className="press" style={{ ...AQ_LABEL, fontSize: "11px", flexShrink: "0", minHeight: "40px", padding: "0 14px", borderRadius: "999px", border: "2px solid var(--ink)", background: "var(--ink)", color: "var(--card)", '--c': 'var(--ink)' }}>Log in →</AqAction>
+          <AqAction action="account" className="press" style={{ ...AQ_LINK, fontSize: "11.5px", flexShrink: "0", minHeight: "38px", padding: "0 12px", border: "2px solid var(--ink)", background: "var(--mint)", boxShadow: "2px 2px 0 var(--ink)", '--c': 'var(--ink)' }}>Log in →</AqAction>
           <AqAction action="menu" className="press" style={ICON_BTN}>{AQ_ICONS.dots(20)}</AqAction>
         </nav>
       </header>
@@ -43,7 +39,7 @@ export default function PhoneHeader({ current, edge }) {
         {AQ_DOCK.map((t) => (t.notes
           ? (
             <button key="notes" type="button" className="press" onClick={() => setMenuOpen(true)} aria-current="page" aria-label="Terra Notes: open the magazine's menu" aria-expanded={menuOpen ? 'true' : 'false'}
-              style={{ display: "flex", alignItems: "center", gap: "6px", height: "44px", padding: "0 14px", border: "2px solid var(--ink)", borderRadius: "999px", background: "var(--green)", color: "var(--card)", ...AQ_LABEL, fontSize: "11px", '--c': 'var(--ink)' }}>
+              style={{ ...AQ_LINK, fontSize: "11.5px", gap: "6px", padding: "0 14px", border: "0", background: "var(--ink)", color: "var(--card)", '--c': 'var(--ink)' }}>
               {AQ_ICONS[t.icon](18)}{t.label}
             </button>
           )
