@@ -5,5 +5,5 @@ export { PHOTOS } from './photos.js';
 export { WORDS } from './words.js';
 export { TEAMS, MEMBERS } from './team.js';
 
-// 2–3 lines under "Notes from where the land meets the water." on its home page (the phone card fits 3, no more)
-export const INTRO = 'Our Pujo issue: pandals, dhak beats, bhog queues and a city that forgets to sleep for five days.';
+// 2 lines under "Notes from where the land meets the water." on its home page (the phone card has room for 2 once the headline takes 3 lines)
+export const INTRO = 'Pandals, dhak beats, bhog queues, sleepless nights.';

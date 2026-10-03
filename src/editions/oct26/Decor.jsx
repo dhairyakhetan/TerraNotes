@@ -1,12 +1,12 @@
 // October 2026's decorations on the home pages (src/editions/pages.js DECOR; the page draws them first, so its cards
-// sit on top), for the Pujo issue: a toran of marigolds and mango leaves across the top, an alpana rosette half under
+// sit on top), for the Pujo issue: bright colours throughout, a toran of marigolds and mango leaves across the top, an alpana rosette half under
 // the intro card, a dhak with its kash plume, a conch shell, and a marigold tag saying "Subho Sharodiya!" (happy
 // autumn festival). Positions are on the home artboard (web 1440, phone 390), in the empty spots between sections and
 // clear of Buddy's corner (top right: his call button, the ghost and "tap him", shared/buddy/Buddy.jsx).
 // Decoration only: hidden from screen readers. Colours: the look's (var(--yellow) marigold, var(--red) alta…).
 // They move a little, in the background (class "dz" + their own, loops in look.css): the toran's leaves sway, the
 // alpana turns slowly, the dhak beats twice and rests, the tag swings on its hole, the conch drifts, and marigold
-// petals fall from the toran.
+// petals fall from the toran, and little four-point sparkles in the empty spots twinkle (class oct-twinkle).
 import { FONT } from '../../styles/fonts.js';
 
 const line = { stroke: "var(--ink)", strokeWidth: "2.2", fill: "none", strokeLinecap: "round", strokeLinejoin: "round" };
@@ -64,6 +64,13 @@ const Petal = ({ left, top, delay, red }) => (
   </svg>
 );
 
+// a four-point sparkle that twinkles (scale / rotate / opacity only), in one of the look's bright colours
+const Sparkle = ({ left, top, s, c, delay }) => (
+  <svg className="dz oct-twinkle" width={s} height={s} viewBox="0 0 100 100" style={{ position: "absolute", left: `${left}px`, top: `${top}px`, animationDelay: `${delay}s` }}>
+    <path d="M50 4 C55 36 64 45 96 50 C64 55 55 64 50 96 C45 64 36 55 4 50 C36 45 45 36 50 4 Z" style={{ fill: `var(--${c})`, stroke: "var(--ink)", strokeWidth: "4", strokeLinejoin: "round" }} />
+  </svg>
+);
+
 export default function Oct26Decor({ web }) {
   return (
     <div aria-hidden="true" style={{ position: "absolute", left: "0", top: "0", width: "0", height: "0", pointerEvents: "none" }}>
@@ -74,6 +81,7 @@ export default function Oct26Decor({ web }) {
           <Tag left={1262} top={452} w={128} size={20} deg={5} />
           <Dhak left={1000} top={340} s={64} />
           <Conch left={1170} top={950} s={120} />
+          {[[1215, 205, 24, "mint", 0], [880, 470, 20, "pink", 0.9], [1090, 620, 28, "yellow", 1.7], [1300, 770, 22, "mint", 0.4], [1010, 880, 18, "pink", 1.3]].map(([x, y, s, c, dl]) => <Sparkle key={x} left={x} top={y} s={s} c={c} delay={dl} />)}
           {[[640, 0], [690, 4.8, 1], [1160, 1.6, 1], [1250, 6.4], [1350, 3.2], [1120, 8]].map(([x, d, r]) => <Petal key={x} left={x} top={120} delay={d} red={r} />)}
         </>
       ) : (
@@ -81,6 +89,7 @@ export default function Oct26Decor({ web }) {
           <Toran width={390} top={64} swags={2} sag={14} />
           <Alpana left={-40} top={270} d={120} />
           <Tag left={292} top={266} w={86} size={15} deg={6} />
+          {[[300, 620, 22, "mint", 0], [262, 705, 16, "pink", 0.9], [338, 745, 20, "yellow", 1.7]].map(([x, y, s, c, dl]) => <Sparkle key={x} left={x} top={y} s={s} c={c} delay={dl} />)}
           {[[40, 0], [200, 3.6, 1], [356, 7.2]].map(([x, d, r]) => <Petal key={x} left={x} top={96} delay={d} red={r} />)}
         </>
       )}

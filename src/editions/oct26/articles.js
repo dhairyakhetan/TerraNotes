@@ -3,16 +3,16 @@
 // top of src/data/articles.js. Writers' text is verbatim, typos included. Covers and photos go in
 // public/editions/oct26/articles/<slug>/.
 
-// Pujo colours: alta red, marigold, banana leaf, lotus, peacock
+// Pujo colours, bright: hibiscus red, marigold, green, lotus pink, royal blue, violet
 export const TAGS = {
-  'Field notes': { color: '#C8102E', ink: '#FFFDF7' },
-  Reportage: { color: '#1F6F8B', ink: '#FFFDF7' },
-  Logbook: { color: '#3E7D2C', ink: '#FFFDF7' },
-  'Object study': { color: '#7A2E8E', ink: '#FFFDF7' },
-  Dispatch: { color: '#F4B400', ink: '#3A0B0E' },
-  Essay: { color: '#E35D8C', ink: '#3A0B0E' },
-  Prose: { color: '#3E7D2C', ink: '#FFFDF7' },
-  'Under Aquaterra': { color: '#F4B400', ink: '#3A0B0E' },
+  'Field notes': { color: '#F0214A', ink: '#FFFFFF' },
+  Reportage: { color: '#2F6BFF', ink: '#FFFFFF' },
+  Logbook: { color: '#12B76A', ink: '#26268F' },
+  'Object study': { color: '#9B5CFF', ink: '#FFFFFF' },
+  Dispatch: { color: '#FFC914', ink: '#26268F' },
+  Essay: { color: '#FF5FA2', ink: '#26268F' },
+  Prose: { color: '#12B76A', ink: '#26268F' },
+  'Under Aquaterra': { color: '#FFC914', ink: '#26268F' },
 };
 
 // Two sample pieces, written to show off the Pujo look (from Aquaterra itself: no writer). Swap them for the

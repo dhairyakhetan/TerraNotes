@@ -4,9 +4,9 @@
 // Leave caption '' and the design's placeholder shows instead; with no place, the viewer just says "Highlight 01".
 
 export const PHOTOS = [
-  { photo: '', caption: '', place: '', tint: '#8C1F1F' },
-  { photo: '/editions/oct26/photos/durga.webp', caption: 'Maa Durga, drawn for the Pujo issue', place: '', tint: '#B8860B' },
-  { photo: '', caption: '', place: '', tint: '#5A1A2A' },
-  { photo: '', caption: '', place: '', tint: '#9C3D1E' },
-  { photo: '', caption: '', place: '', tint: '#3E2A5A' },
+  { photo: '', caption: '', place: '', tint: '#FF4F8B' },
+  { photo: '/editions/oct26/photos/durga.webp', caption: 'Maa Durga, drawn for the Pujo issue', place: '', tint: '#FFB400' },
+  { photo: '', caption: '', place: '', tint: '#18C7B8' },
+  { photo: '', caption: '', place: '', tint: '#FF7A2F' },
+  { photo: '', caption: '', place: '', tint: '#B6E04B' },
 ];

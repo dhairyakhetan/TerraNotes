@@ -15,10 +15,10 @@
 
 // label: the legend and profile tag. made: what the team made; credit: the same as a sentence, shown on its members' profiles (writers also get "their articles").
 export const TEAMS = {
-  heads: { label: 'Heads', color: '#3E7D2C', made: 'keep everyone on track', credit: 'Keeps everyone on track' },
-  design: { label: 'Design team', color: '#1F6F8B', made: 'made the layout and style of this website, along with its other design elements', credit: 'Made the layout and style of this website, along with its other design elements' },
-  writing: { label: 'Writing team', color: '#C8102E', made: 'wrote the articles on this website', credit: 'Wrote the articles on this website' },
-  tech: { label: 'Tech team', color: '#7A2E8E', made: 'made this website', credit: 'Made this website' },
+  heads: { label: 'Heads', color: '#12B76A', made: 'keep everyone on track', credit: 'Keeps everyone on track' },
+  design: { label: 'Design team', color: '#2F6BFF', made: 'made the layout and style of this website, along with its other design elements', credit: 'Made the layout and style of this website, along with its other design elements' },
+  writing: { label: 'Writing team', color: '#F0214A', made: 'wrote the articles on this website', credit: 'Wrote the articles on this website' },
+  tech: { label: 'Tech team', color: '#9B5CFF', made: 'made this website', credit: 'Made this website' },
 };
 
 // Mixed on purpose: the order sets where each face sits, so teams end up spread around the section.
