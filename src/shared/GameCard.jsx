@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { openGames } from '../lib/buddyState.js';
 import { calm, LITE } from '../lib/motion.js';
 import { FONT } from '../styles/fonts.js';
+import { useReveal } from '../lib/reveal.js';
 
 // The mini games card at the end of the home pages (shared/EndCards.jsx places it): Buddy's two games, one tap away
 // without calling him first. It turns between Snake and Float every few seconds (not with reduced motion or LITE, while
@@ -51,6 +52,7 @@ const Screen = ({ id, width }) => (
 export default function GameCard({ web, style }) {
   const [at, setAt] = useState(0), [moved, setMoved] = useState(false); // moved: the game has changed once (so it animates)
   const box = useRef(null), held = useRef(false), seen = useRef(false);
+  useReveal(box);
   useEffect(() => {
     if (calm() || LITE) return undefined;
     const io = new IntersectionObserver(([e]) => { seen.current = e.isIntersecting; });

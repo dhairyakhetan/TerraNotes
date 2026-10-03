@@ -229,6 +229,7 @@ Popups are white cards with a hard shadow and a clip:
   - Animate **only `transform` / `opacity`**, never layout or paint properties.
   - Add every new loop class to the reduced-motion rule, the `.tn-lite` rule and the `html[data-tn-nav]` pause rule there.
   - Wrap a section in `usePauseOffscreen(ref)` so its loops stop when it's scrolled away.
+- **Blocks below the fold rise in** the first time they scroll into view: `useReveal(ref, delay)` (`lib/reveal.js`, `.reveal` in `styles/motion.css`; a `.stagger` child's items follow one by one, `--i`). The home sections and the end cards use it.
 - **One-shot animations** go in `styles/motion.css`. Entrances animate the `translate` / `rotate` / `scale` properties (not `transform`) so elements keep their tilt.
 - **JS animation** must check `calm()` (reduced motion) from `lib/motion.js`. For per-frame work, run `requestAnimationFrame` only while something moves. `web/WebArticleLine.jsx` is the model.
 - **`LITE`** (low-end devices: ≤2 GB memory, ≤2 cores, Data Saver, or `?lite`) stops every loop.

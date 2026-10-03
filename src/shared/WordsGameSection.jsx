@@ -2,6 +2,7 @@ import { useRef } from 'react';
 import { fitWord, useWordsGame } from '../lib/useWordsGame.js';
 import { useEdition } from '../lib/edition.js';
 import { FONT } from '../styles/fonts.js';
+import { useReveal } from '../lib/reveal.js';
 
 // "Words we should bring back." (id="words"), both layouts: an old word on a cloud (with how to say it), three meanings
 // to pick from, the verdict + real definition, a "psst." hint after a while, and a score card after 5 words. Game
@@ -39,6 +40,7 @@ const DARK_BTN = { background: "var(--ink)", color: "var(--card)", border: "2px 
 export default function WordsGameSection({ web }) {
   const L = web ? WEB : PHONE, C = L.cloud;
   const ref = useRef(null);
+  useReveal(ref);
   const w = useWordsGame(ref, useEdition().words);
   return (
     <section id="words" ref={ref} style={{ position: "absolute", left: "0", ...L.section }}>

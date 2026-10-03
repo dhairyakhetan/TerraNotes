@@ -11,6 +11,7 @@ import { usePresence } from '../lib/usePresence.js';
 import { useDialogA11y } from '../lib/useDialogA11y.js';
 import { faceSpots, profileTop, teamLinks, useFaceColors } from '../lib/teamLayout.js';
 import { FONT } from '../styles/fonts.js';
+import { useReveal } from '../lib/reveal.js';
 
 // "Meet the team" (id="members"), both layouts: the edition's team (src/editions/<id>/team.js), their faces floating in
 // a honeycomb, dotted lines joining each team, a legend that highlights one team, and a profile card that opens level
@@ -84,6 +85,7 @@ export default function TeamSection({ web }) {
   const L = layoutFor(edition)[web ? 'web' : 'phone'], S = L.spots, H = L.height;
   useEffect(() => preloadBadges(MEMBERS), [MEMBERS]);
   const self = useRef(null);
+  useReveal(self);
   usePauseOffscreen(self);
   const [team, setTeam] = useState(null); // legend filter; null = everyone
   const { colorFor, fade } = useFaceColors(team, TEAMS);

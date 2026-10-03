@@ -3,6 +3,7 @@ import { useEdition } from '../lib/edition.js';
 import { usePauseOffscreen } from '../lib/pauseOffscreen.js';
 import { fitFrame, usePhotoShapes } from '../lib/photoShapes.js';
 import { FONT } from '../styles/fonts.js';
+import { useReveal } from '../lib/reveal.js';
 
 // "Photo wall" (id="photos"), both layouts: a dark rounded panel with two strings of fairy lights and the edition's 5
 // PHOTOS (src/editions/<id>/photos.js) pegged up as polaroids, each framed at its photo's own shape. Tap / click one →
@@ -53,6 +54,7 @@ export default function PhotoWallSection({ web, onOpen }) {
   const { photos: PHOTOS } = useEdition();
   const shapes = usePhotoShapes(0.2, 5, PHOTOS);
   const self = useRef(null);
+  useReveal(self);
   usePauseOffscreen(self);
   return (
     <section ref={self} id="photos" style={{ position: "absolute", background: "var(--wall)", overflow: "hidden", ...L.section }}>

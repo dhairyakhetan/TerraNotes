@@ -331,6 +331,32 @@ html.tn-lite .labs :is(.cq .spin,.cq .onode,.print),:host(.tn-lite) .labs :is(.c
 .labs-phone .tab.on{height:40px;background:var(--c);color:var(--tc)}
 @supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){.labs .lb-tabs{background:rgba(243,238,228,.94)}}
 
+/* ===== opening: the gallery arrives (one-shot, on the page's first draw; no motion with reduced motion) =====
+   The polaroids fade in, then the badge, title, line, button and "or pull a book" rise one after another, the books
+   pop up onto the shelf from left to right, and the chapter tabs drop in from above. Animates translate / scale /
+   opacity (not transform), so the elements keep their own tilts and hover moves. */
+@media (prefers-reduced-motion: no-preference){
+.labs .lb-intro > :first-child{animation:lbPrintsIn 1s cubic-bezier(.2,.9,.25,1) both}
+.labs .lb-intro > :not(:first-child){animation:lbUp .7s cubic-bezier(.2,.9,.25,1) both}
+.labs .lb-intro > :nth-child(2){animation-delay:.12s}
+.labs .lb-intro > :nth-child(3){animation-delay:.2s}
+.labs .lb-intro > :nth-child(4){animation-delay:.3s}
+.labs .lb-intro > :nth-child(5){animation-delay:.38s}
+.labs .lb-intro > :nth-child(6){animation-delay:.46s}
+.labs .lb-intro > :nth-child(7){animation-delay:.5s}
+.labs .lb-intro > :nth-child(8){animation-delay:.9s}
+.labs .brow .bslot{animation:lbBookUp .55s cubic-bezier(.3,1.4,.5,1) both}
+.labs .brow .bslot:nth-of-type(1){animation-delay:.6s}.labs .brow .bslot:nth-of-type(2){animation-delay:.66s}
+.labs .brow .bslot:nth-of-type(3){animation-delay:.72s}.labs .brow .bslot:nth-of-type(4){animation-delay:.78s}
+.labs .brow .bslot:nth-of-type(5){animation-delay:.84s}.labs .brow .bslot:nth-of-type(6){animation-delay:.9s}
+.labs .brow .bslot:nth-of-type(7){animation-delay:.96s}.labs .brow .bslot:nth-of-type(8){animation-delay:1.02s}
+.labs .lb-tabs{animation:lbTabsIn .6s cubic-bezier(.2,.9,.25,1) .15s both}
+}
+@keyframes lbPrintsIn{from{opacity:0;scale:1.06}}
+@keyframes lbUp{from{opacity:0;translate:0 22px}}
+@keyframes lbBookUp{from{opacity:0;translate:0 40px}}
+@keyframes lbTabsIn{from{opacity:0;translate:0 -18px}}
+
 /* ===== AQ's look ([data-tn-aq]: inside AQ's website, and the own site's preview of it; src/host.js AQ_LOOK) =====
    AQ's own nav floats over the top of the page, so the gallery runs full width, its header slot is gone and the pill
    sits under AQ's nav. The intro keeps its 134px offset so the polaroids sit where they were designed to. */

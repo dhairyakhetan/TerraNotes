@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { useReveal } from '../lib/reveal.js';
 import { Link } from '../router.jsx';
 import BackHome from './BackHome.jsx';
 import { cardCover } from './ArticleCard.jsx';
@@ -17,7 +18,7 @@ import { FONT } from '../styles/fonts.js';
 const MONO = { fontFamily: FONT.mono, fontWeight: "700", letterSpacing: "1.4px", textTransform: "uppercase" };
 const short = (month) => month.replace(/^(\w{3})\w*/, '$1');
 
-function Tile({ e, here, web }) {
+function Tile({ e, i, here, web }) {
   const W = web ? 168 : 132, H = web ? 120 : 94;
   const d = editionData(e.number), cover = (d.articles.find((a) => a.featured) || d.articles[0])?.cover;
   const coming = e.draft && e.number !== here, current = e.number === here;
@@ -36,21 +37,23 @@ function Tile({ e, here, web }) {
       <span style={{ ...MONO, fontSize: web ? "10.5px" : "9.5px", marginTop: "2px", color: coming ? "var(--muted)" : "var(--ink)" }}>{coming ? 'coming soon' : current ? 'reading now' : 'open →'}</span>
     </>
   );
-  const box = { display: "flex", flexDirection: "column", flexShrink: "0", width: `${W}px`, textDecoration: "none", color: "var(--ink)", minHeight: "44px" };
+  const box = { display: "flex", flexDirection: "column", flexShrink: "0", width: `${W}px`, textDecoration: "none", color: "var(--ink)", minHeight: "44px", '--i': i };
   return coming ? <div style={box}>{inner}</div> : <Link to={editionLink(e.number)} className="lift-link" aria-current={current ? 'page' : undefined} aria-label={`${editionName(e.number)}, ${e.month}${e.number === LATEST ? ', latest' : ''}`} style={box}>{inner}</Link>;
 }
 
 export function EditionsCard({ web }) {
   const { number } = useEdition();
+  const box = useRef(null);
+  useReveal(box, 140); // rises in just after the games card beside it, its covers one by one
   if (!AQ_LOOK) return null;
   return (
-    <nav aria-label="Editions" style={{ position: "relative", boxSizing: "border-box", width: web ? "600px" : "342px", padding: web ? "22px 26px" : "16px", background: "var(--card)", border: "2px solid var(--ink)", boxShadow: `${web ? 8 : 5}px ${web ? 8 : 5}px 0 var(--yellow)`, transform: "rotate(0.8deg)", color: "var(--ink)", display: "flex", flexDirection: "column" }}>
+    <nav ref={box} aria-label="Editions" style={{ position: "relative", boxSizing: "border-box", width: web ? "600px" : "342px", padding: web ? "22px 26px" : "16px", background: "var(--card)", border: "2px solid var(--ink)", boxShadow: `${web ? 8 : 5}px ${web ? 8 : 5}px 0 var(--yellow)`, transform: "rotate(0.8deg)", color: "var(--ink)", display: "flex", flexDirection: "column" }}>
       <div style={{ display: "flex", alignItems: "baseline", gap: "10px" }}>
         <span style={{ fontFamily: FONT.head, fontSize: web ? "26px" : "20px", textTransform: "uppercase" }}>The editions</span>
         <span style={{ fontFamily: FONT.hand, fontSize: web ? "22px" : "18px", color: "var(--hand)" }}>a new one every month</span>
       </div>
-      <div style={{ display: "flex", gap: web ? "20px" : "14px", marginTop: web ? "16px" : "12px", paddingBottom: "8px", overflowX: "auto", overscrollBehaviorX: "contain" }}>
-        {[...EDITIONS].reverse().map((e) => <Tile key={e.number} e={e} here={number} web={web} />)}
+      <div className="stagger" style={{ display: "flex", gap: web ? "20px" : "14px", marginTop: web ? "16px" : "12px", paddingBottom: "8px", overflowX: "auto", overscrollBehaviorX: "contain" }}>
+        {[...EDITIONS].reverse().map((e, i) => <Tile key={e.number} e={e} i={i} here={number} web={web} />)}
       </div>
       <span style={{ flexGrow: "1" }} />
       <Link to="/editions" style={{ ...MONO, fontSize: web ? "11px" : "10.5px", alignSelf: "flex-end", display: "flex", alignItems: "center", minHeight: "44px", textDecoration: "none", color: "var(--ink)" }}>all editions →</Link>
