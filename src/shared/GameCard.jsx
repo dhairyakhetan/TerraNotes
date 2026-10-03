@@ -5,13 +5,14 @@ import { FONT } from '../styles/fonts.js';
 import { useReveal } from '../lib/reveal.js';
 
 // The mini games card at the end of the home pages (shared/EndCards.jsx places it): Buddy's two games, one tap away
-// without calling him first. It turns between Snake and Float every few seconds (not with reduced motion or LITE, while
+// without calling him first. It turns between Snake, Float and Fling every few seconds (not with reduced motion or LITE, while
 // it's off screen, or while the pointer or focus is on it), and its button opens the one showing, in the same popup
-// Buddy uses (shared/buddy/BuddyGames.jsx, event 'aq-games'). The two pills underneath pick one by hand.
+// Buddy uses (shared/buddy/BuddyGames.jsx, event 'aq-games'). The pills underneath pick one by hand.
 // web = the 1440 artboard (600 × 300), else the 390 one (342 wide).
 const GAMES = [
   { id: 'snake', name: 'Snake', title: 'Snake, but spooky', line: 'eat the stars. don’t eat yourself.', shadow: 'var(--purple)' },
   { id: 'float', name: 'Float', title: 'Float, little ghost', line: 'tap to rise. mind the posts.', shadow: 'var(--blue)' },
+  { id: 'fling', name: 'Fling', title: 'Fling, little ghost', line: 'pull back. let go. knock ’em down.', shadow: 'var(--green)' },
 ];
 const EVERY = 4200; // ms each game shows for
 const MONO = { fontFamily: FONT.mono, fontWeight: "700", letterSpacing: "1.4px", textTransform: "uppercase" };
@@ -43,9 +44,26 @@ function FloatArt() {
     </>
   );
 }
+function FlingArt() {
+  return (
+    <>
+      <rect x="0" y="80" width="150" height="13" style={{ fill: "var(--text)" }} />
+      <path d="M22 80 L24 58 L18 50 M24 58 L30 50" style={{ fill: "none", stroke: "var(--peg)", strokeWidth: "4", strokeLinecap: "round" }} />
+      {[[96, 52, 6, 28], [124, 52, 6, 28], [92, 46, 40, 6]].map(([x, y, w, h]) => <rect key={x + y} x={x} y={y} width={w} height={h} style={{ fill: "var(--peg)", stroke: "var(--ink)", strokeWidth: "1.2" }} />)}
+      <circle cx="112" cy="72" r="7" style={{ fill: "var(--green)", stroke: "var(--ink)", strokeWidth: "1.2" }} />
+      <circle cx="112" cy="39" r="6" style={{ fill: "var(--green)", stroke: "var(--ink)", strokeWidth: "1.2" }} />
+      {[[40, 44], [52, 34], [64, 28], [76, 26]].map(([x, y]) => <circle key={x} cx={x} cy={y} r="1.6" style={{ fill: "var(--card)", opacity: ".6" }} />)}
+      <g transform="translate(78 12) scale(0.36)">
+        <path d="M6 30 C6 14 17 4 30 4 C43 4 54 14 54 30 V60 a8 8 0 0 1 -16 0 a8 8 0 0 1 -16 0 a8 8 0 0 1 -16 0 Z" style={{ fill: "var(--green)" }} />
+        <circle cx="21" cy="27" r="6.5" style={{ fill: "var(--card)" }} /><circle cx="39" cy="27" r="6.5" style={{ fill: "var(--card)" }} />
+        <circle cx="23" cy="25" r="3.4" style={{ fill: "var(--ink)" }} /><circle cx="41" cy="25" r="3.4" style={{ fill: "var(--ink)" }} />
+      </g>
+    </>
+  );
+}
 const Screen = ({ id, width }) => (
   <svg width={width} height={width * 0.62} viewBox="0 0 150 93" aria-hidden="true" style={{ display: "block", flexShrink: "0", borderRadius: "8px", border: "2px solid var(--ink)", boxShadow: "4px 4px 0 var(--ink)", background: "var(--text)" }}>
-    {id === 'snake' ? <SnakeArt /> : <FloatArt />}
+    {id === 'snake' ? <SnakeArt /> : id === 'float' ? <FloatArt /> : <FlingArt />}
   </svg>
 );
 
@@ -74,15 +92,15 @@ export default function GameCard({ web, style }) {
           <span style={{ fontFamily: FONT.hand, fontSize: web ? "23px" : "18px", lineHeight: "1.05", color: "var(--hand)" }}>{g.line}</span>
         </div>
       </div>
-      <div style={{ display: "flex", alignItems: "center", gap: "8px", marginTop: web ? "22px" : "14px" }}>
-        <button type="button" className="press btn" onClick={() => openGames(g.id)}
-          style={{ ...MONO, fontSize: web ? "12px" : "11px", "--c": "var(--yellow)", minHeight: "44px", padding: "0 18px", background: "var(--ink)", color: "var(--card)", border: "2px solid var(--ink)", boxShadow: "4px 4px 0 var(--yellow)", cursor: "pointer" }}>
-          Play {g.name} →
+      <div style={{ display: "flex", alignItems: "center", gap: web ? "8px" : "5px", marginTop: web ? "22px" : "14px" }}>
+        <button type="button" className="press btn" onClick={() => openGames(g.id)} aria-label={`Play ${g.name}`}
+          style={{ ...MONO, fontSize: web ? "12px" : "11px", "--c": "var(--yellow)", minHeight: "44px", padding: web ? "0 18px" : "0 14px", whiteSpace: "nowrap", background: "var(--ink)", color: "var(--card)", border: "2px solid var(--ink)", boxShadow: "4px 4px 0 var(--yellow)", cursor: "pointer" }}>
+          {web ? `Play ${g.name} →` : 'Play →'}
         </button>
         <span style={{ flexGrow: "1" }} />
         {GAMES.map((x, i) => (
           <button key={x.id} type="button" onClick={() => pick(i)} aria-pressed={i === at ? 'true' : 'false'} aria-label={`Show ${x.name}`}
-            style={{ ...MONO, fontSize: "10px", minHeight: "44px", padding: "0 12px", borderRadius: "999px", border: "2px solid var(--ink)", background: i === at ? "var(--ink)" : "var(--card)", color: i === at ? "var(--card)" : "var(--ink)", cursor: "pointer", backgroundClip: "padding-box", boxShadow: "none" }}>
+            style={{ ...MONO, fontSize: "10px", minHeight: "44px", padding: web ? "0 12px" : "0 10px", borderRadius: "999px", border: "2px solid var(--ink)", background: i === at ? "var(--ink)" : "var(--card)", color: i === at ? "var(--card)" : "var(--ink)", cursor: "pointer", backgroundClip: "padding-box", boxShadow: "none" }}>
             {x.name}
           </button>
         ))}

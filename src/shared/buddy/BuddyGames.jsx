@@ -7,12 +7,15 @@ import { lockScroll, unlockScroll } from '../../lib/scrollLock.js';
 import { drawGhost } from './Ghost.jsx';
 import { lastTap } from '../../lib/buddyState.js';
 import { calm } from '../../lib/motion.js';
+import Fling from './Fling.jsx';
 
 // Buddy's games popup (mounted once in App.jsx; opened by openGames() in lib/buddyState.js, event 'aq-games').
 // Two tabs, each a <canvas> game drawn every frame with requestAnimationFrame (only while the popup is open):
 //   Snake: Buddy's head + a tail of wisps eating stars; arrows / WASD / swipe / the on-screen pad (keys light up while
 //          held, big screens); it speeds up a little per star; only the Play again button restarts.
 //   Float: flappy style; tap / click / space floats him up between the posts.
+//   Fling: Angry Birds style; drag Buddy back in a slingshot and knock down towers of planks onto gremlins (Fling.jsx,
+//          real physics, fetched the first time the tab opens).
 // Best scores in localStorage. Esc, ✕ or a click outside closes it.
 const MONO = { fontFamily: FONT.mono, fontWeight: "700", letterSpacing: "1.2px", textTransform: "uppercase" };
 const best = (k) => { try { return Number(localStorage.getItem(k)) || 0; } catch { return 0; } };
@@ -269,13 +272,13 @@ export default function BuddyGames({ first = null }) {
     <div className={leaving ? 'fade-out' : 'fade-in'} onClick={(e) => { if (e.target === e.currentTarget) setGame(null); }} style={{ position: "fixed", inset: "0", zIndex: "900", display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(17,17,17,.55)", padding: "12px" }}>
       <div ref={card} role="dialog" aria-label="Buddy's games" style={{ position: "relative", boxSizing: "border-box", background: "var(--cream)", border: "2px solid var(--ink)", boxShadow: "8px 8px 0 var(--purple)", padding: small ? "14px" : "20px", transform: "rotate(-0.6deg)", maxHeight: "calc(100dvh - 24px)", overflowY: "auto" }}>
         <div className="no-cascade" style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "12px" }}>
-          {tab('snake', 'Snake')}{tab('float', 'Float')}
-          <span style={{ flexGrow: "1", fontFamily: FONT.hand, fontSize: "20px", color: "var(--hand)", textAlign: "right", paddingRight: "8px" }}>{shown === 'snake' ? 'eat the stars' : 'mind the posts'}</span>
+          {tab('snake', 'Snake')}{tab('float', 'Float')}{tab('fling', 'Fling')}
+          <span style={{ flexGrow: "1", fontFamily: FONT.hand, fontSize: "20px", color: "var(--hand)", textAlign: "right", paddingRight: "8px" }}>{shown === 'snake' ? 'eat the stars' : shown === 'float' ? 'mind the posts' : small ? '' : 'knock ’em down'}</span>
           <button className="press" onClick={() => setGame(null)} aria-label="Close the games" style={{ "--c": "var(--ink)", width: "40px", height: "40px", flexShrink: "0", padding: "0", background: "var(--card)", border: "2px solid var(--ink)", boxShadow: "3px 3px 0 var(--ink)", display: "flex", alignItems: "center", justifyContent: "center" }}>
             <CloseIcon size={14} weight={2.8} />
           </button>
         </div>
-        <div className="no-cascade" key={shown}>{shown === 'snake' ? <Snake W={W} small={small} /> : <Float W={W} H={H} />}</div>
+        <div className="no-cascade" key={shown}>{shown === 'snake' ? <Snake W={W} small={small} /> : shown === 'float' ? <Float W={W} H={H} /> : <Fling W={small ? 330 : 600} H={small ? 250 : 340} />}</div>
       </div>
     </div>
   );

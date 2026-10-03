@@ -304,10 +304,11 @@ src/shared/             used by both layouts:
   Reading               the article pages' progress bar + the web "in this piece" rail (lib/readProgress.js)
   TeamSection           "Meet the team" + profile card        PhotoWallSection, PhotoViewer, WordsGameSection
   HomeIntroCard         the home intro card                   AqNavSlot     placeholder for AQ's nav (AQ's look, own site)
-  EndCards              the home pages' end: GameCard (Snake ↔ Float) + EditionsCard (InsideAQ, with AQ's look)
+  EndCards              the home pages' end: GameCard (Snake → Float → Fling) + EditionsCard (InsideAQ, with AQ's look)
   IntroNotebook         the opening animation (the address's edition: its cover, number, month)              ErrorBoundary crash card
   Tapes                 Clip, ByTape, FeaturedTape, LatestTag, DraftTape    Icons   Globe, Instagram, Close, Chevron, Photo, Menu
-  ImageSlot  Logo  BackHome                                    buddy/        Buddy (easter-egg ghost), Ghost, BuddyGames
+  ImageSlot  Logo  BackHome                                    buddy/        Buddy (easter-egg ghost), Ghost, BuddyGames (Snake, Float,
+                        Fling: Angry Birds style, matter-js physics loaded with its tab)
 src/lib/                logic only, no JSX:
   base (BASE, withBase)   dom (byId, $, portalRoot, flag)   useDialogA11y
   edition (useEdition, applyLook)   layoutMode   routes   scrollMemory   animatedHistory   cardFlight   motion (calm, LITE)   fitTitle
