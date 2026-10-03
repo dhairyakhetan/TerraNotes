@@ -12,12 +12,16 @@ import { useDialogA11y } from '../lib/useDialogA11y.js';
 import { faceSpots, profileTop, teamLinks, useFaceColors } from '../lib/teamLayout.js';
 import { FONT } from '../styles/fonts.js';
 import { useReveal } from '../lib/reveal.js';
-import { TEAM_NOTE } from '../editions/pages.js';
+import { TEAM_NOTE, RULED, TEAM_FIT } from '../editions/pages.js';
+import { useRuleSnap } from '../lib/ruled.js';
+import { hangExtra } from '../phone/PhoneHangingArticles.jsx';
 
 // "Meet the team" (id="members"), both layouts: the edition's team (src/editions/<id>/team.js), their faces floating in
 // a honeycomb, dotted lines joining each team, a legend that highlights one team, and a profile card that opens level
 // with a tapped face (bio, what their team made, their articles, Instagram, optional badge / crown).
 // PHONE and WEB hold each layout's positions and sizes; the section's height grows with the number of members.
+// An edition on ruled paper (September's notebook) overrides some of them (src/editions/pages.js TEAM_FIT) so its text
+// starts clear of the margin, and gets each text block's first baseline put on a ruled line (lib/ruled.js).
 const PHONE = {
   faces: { rows: [[72, 196, 318], [134, 256]], sizes: [92, 80, 98, 84, 88, 96, 82, 90], nudgeX: [-6, 5, -3, 8, -8, 4, 2, -5, 7], nudgeY: [0, 16, -10, 8, 20, -6, 12, -14, 4, 18, -4], top: 510, rowH: 176 },
   width: 390, top: 2470, bend: 18, line: [1.2, '3 5'], header: 64,
@@ -44,15 +48,26 @@ const WEB = {
   dim: "rgba(17,17,17,.35)",
   card: { width: 360, shadow: "9px 9px 0", padding: "22px", clip: [36, 11, "-8px"], close: { right: "12px", top: "12px" }, photo: "108px", name: "34px", role: "23px", bio: "15px", credit: "14px" },
 };
-const layoutOf = (L, { members, teams }) => {
+const layoutOf = (L, { members, teams }, web) => {
   const spots = faceSpots(L.faces, members.length), bottom = Math.max(...spots.map((s) => s.cy + s.size / 2));
-  const height = L === PHONE ? bottom + 64 : Math.max(900, bottom + 110);
+  const height = web ? Math.max(900, bottom + 110) : bottom + 64;
   return { ...L, spots, links: teamLinks(spots, L.bend, members, teams), height };
+};
+// an edition's own values for a layout's table (src/editions/pages.js TEAM_FIT: September's text on its ruled lines),
+// merged one level deep: a key it names changes only the values it lists
+const fitted = (L, over) => {
+  if (!over) return L;
+  const m = { ...L };
+  for (const k of Object.keys(over)) m[k] = m[k] && typeof m[k] === 'object' && !Array.isArray(m[k]) ? { ...m[k], ...over[k] } : over[k];
+  return m;
 };
 // an edition's team laid out on both layouts (worked out once per edition)
 const LAYOUTS = new WeakMap();
 const layoutFor = (edition) => {
-  if (!LAYOUTS.has(edition.members)) LAYOUTS.set(edition.members, { phone: layoutOf(PHONE, edition), web: layoutOf(WEB, edition) });
+  if (!LAYOUTS.has(edition.members)) {
+    const fit = TEAM_FIT[edition.id];
+    LAYOUTS.set(edition.members, { phone: layoutOf(fitted(PHONE, fit?.phone), edition, false), web: layoutOf(fitted(WEB, fit?.web), edition, true) });
+  }
   return LAYOUTS.get(edition.members);
 };
 // the section's height for an edition's team ('phone' / 'web'): the home pages grow with it
@@ -88,6 +103,14 @@ export default function TeamSection({ web }) {
   const self = useRef(null);
   useReveal(self);
   usePauseOffscreen(self);
+  // an edition on ruled paper (September's notebook): each text block's first baseline is put on a ruled line, as the
+  // diary does (lib/ruled.js); `probe` marks where a block's baseline is, `snap` is the shift it gets
+  const rule = RULED[edition.id]?.[web ? 'web' : 'phone'];
+  const probes = useRef({});
+  const tops = { title: parseFloat(L.title.top), count: parseFloat(L.count.top), blurb: parseFloat(L.blurb.top), note: parseFloat(L.note.top), legend: parseFloat(L.legend.top) };
+  const shifts = useRuleSnap(rule, L.top + (web ? 0 : hangExtra(edition.articles)), tops, probes, web);
+  const probe = (name) => rule && <span ref={(el) => { probes.current[name] = el; }} aria-hidden="true" style={{ display: "inline-block", width: "0", height: "0" }} />;
+  const snap = (name) => (rule ? { translate: `0 ${shifts[name] || 0}px` } : null);
   const [team, setTeam] = useState(null); // legend filter; null = everyone
   const { colorFor, fade } = useFaceColors(team, TEAMS);
   const [open, setOpen] = useState(null); // index of the member whose profile is open
@@ -116,23 +139,23 @@ export default function TeamSection({ web }) {
   return (
     <section ref={self} id="members" style={{ position: "absolute", left: "0", top: `${L.top}px`, width: `${L.width}px`, height: `${H}px` }}>
       <div style={{ position: "absolute", top: "0", height: "2px", background: "var(--ink)", ...L.rule }} />
-      <h2 style={{ position: "absolute", margin: "0", fontFamily: FONT.head, fontWeight: "400", textTransform: "uppercase", color: "var(--ink)", ...L.title }}>Meet<br />the team</h2>
-      <div style={{ position: "absolute", textAlign: "right", fontFamily: FONT.mono, color: "var(--ink)", ...L.count }}>{web ? `${count.toUpperCase()} OF US · CLICK A FACE` : <>{count.toUpperCase()} OF US<br />TAP A FACE</>}</div>
-      <p style={{ position: "absolute", margin: "0", color: "var(--text)", ...L.blurb }}>one magazine, a meeting every Friday, {count} people who are all doing something else the rest of the week. writing writes the articles, design made this site's look and layout, tech built it, and the heads keep everyone on track.</p>
-      <div style={{ position: "absolute", fontFamily: FONT.hand, lineHeight: "1.1", color: "var(--hand)", transform: "rotate(-2deg)", ...L.note }}>nobody here is a professional. that is the point.</div>
+      <h2 style={{ position: "absolute", margin: "0", fontFamily: FONT.head, fontWeight: "400", textTransform: "uppercase", color: "var(--ink)", ...L.title, ...snap('title') }}>{probe('title')}Meet<br />the team</h2>
+      <div style={{ position: "absolute", textAlign: "right", fontFamily: FONT.mono, color: "var(--ink)", ...L.count, ...snap('count') }}>{web && probe('count')}{web ? `${count.toUpperCase()} OF US · CLICK A FACE` : <>{count.toUpperCase()} OF US<br />TAP A FACE</>}</div>
+      <p style={{ position: "absolute", margin: "0", color: "var(--text)", ...L.blurb, ...snap('blurb') }}>{probe('blurb')}one magazine, a meeting every Friday, {count} people who are all doing something else the rest of the week. writing writes the articles, design made this site's look and layout, tech built it, and the heads keep everyone on track.</p>
+      <div style={{ position: "absolute", fontFamily: FONT.hand, lineHeight: "1.1", color: "var(--hand)", transform: "rotate(-2deg)", ...L.note, ...snap('note') }}>{probe('note')}nobody here is a professional. that is the point.</div>
       <svg width={L.width} height={H} viewBox={`0 0 ${L.width} ${H}`} style={{ position: "absolute", left: "0", top: "0", pointerEvents: "none" }} aria-hidden="true" fill="none" strokeWidth={L.line[0]} strokeDasharray={L.line[1]} strokeLinecap="round">
         {L.links.map((l) => <path key={l.team} d={l.d} stroke={TEAMS[l.team].color} opacity={team == null ? 0.55 : team === l.team ? 0.95 : 0.12} style={{ transition: "opacity .25s" }} />)}
       </svg>
       {/* the edition's own note, if it has one (src/editions/pages.js TEAM_NOTE): web under the legend, phone beside it */}
       {Note && <Note web={web} size={L.extra.size} style={{ left: `${L.extra.left}px`, top: `${L.extra.under ? L.extra.top + Object.keys(TEAMS).length * 46 + 34 : L.extra.top}px`, width: `${L.extra.width}px` }} />}
       {/* legend: pick a team to fade everyone else */}
-      <div style={{ position: "absolute", display: "flex", flexDirection: "column", ...L.legend }}>
-        {Object.entries(TEAMS).map(([key, t]) => {
+      <div style={{ position: "absolute", display: "flex", flexDirection: "column", ...L.legend, ...snap('legend') }}>
+        {Object.entries(TEAMS).map(([key, t], row) => {
           const on = team === key;
           return (
             <button key={key} className="legend-chip" onClick={() => setTeam(on ? null : key)} aria-pressed={on ? 'true' : 'false'} style={{ width: "100%", display: "flex", alignItems: "center", background: on ? 'var(--ink)' : 'transparent', color: on ? 'var(--card)' : 'var(--ink)', border: `1.5px solid ${on ? 'var(--ink)' : 'transparent'}`, borderRadius: "999px", fontFamily: FONT.mono, fontWeight: "700", textTransform: "uppercase", textAlign: "left", ...L.chip }}>
               <span style={{ width: L.dot, height: L.dot, flexShrink: "0", borderRadius: "50%", background: t.color, border: "1.5px solid var(--ink)", boxSizing: "border-box" }} />
-              <span style={{ flexGrow: "1" }}>{t.label}</span>
+              <span style={{ flexGrow: "1" }}>{row === 0 && probe('legend')}{t.label}</span>
               <span>{MEMBERS.filter((m) => teamsOf(m).includes(key)).length}</span>
             </button>
           );

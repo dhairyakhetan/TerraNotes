@@ -37,17 +37,12 @@ You usually have no push access here. The owner runs you in a chat, and gets you
    ```
    Later changes in the same conversation go on top as new commits; hand over a new patch with all of them, and say
    it **replaces** the earlier one (apply only the newest).
-5. **Give the owner the `.patch` file**, a few lines on what changed and what you tested, and these instructions
-   (copy them as they are, with the file name filled in):
+5. **Give the owner the `.patch` file**, a few lines on what changed and what you tested, a one-line commit message
+   for it, and this (as it is, with the file name filled in). The owner applies it with `git apply` and commits it
+   themselves:
 
-   > **To apply `terranotes-<what-it-does>.patch`**
-   > - **Easiest:** open Claude Code on `dhairyakhetan/TerraNotes` (claude.ai/code), attach the file and say:
-   >   *"Apply this patch with `git am --3way`, run `npm run build`, check the changed pages at 390px and 1440px, then
-   >   push to main."*
-   > - **On your own computer**, in the TerraNotes folder: `git pull`, then `git am --3way terranotes-<…>.patch`, then
-   >   `npm install && npm run build && npm run preview` and open http://localhost:4173 (phone width too). If it looks
-   >   right, `git push`.
-   > - **If it won't apply:** `git am --abort`, and send me the error; I'll make a new patch from a fresh copy.
+   > **To apply:** in the TerraNotes folder, `git pull`, then `git apply terranotes-<what-it-does>.patch`.
+   > If it says the patch doesn't apply, send me the error and I'll make a new one from a fresh copy.
 
    Patch files are hand-over only: never commit them to the repo.
 
@@ -191,7 +186,9 @@ The site is "notes pegged on a line": paper cards hanging from strings, with ink
 
 Each edition has a theme, a vibe for the whole page, not just colours: September 2026 is **"exam season"**, a school
 notebook (`src/editions/sep26/`: `look.js` colours, `look.css` ruled paper with a red margin and punch holes on the pages
-with `class="page-sheet"`, `Decor.jsx` doodles on the home pages: sticky note, coffee ring, star, paper plane, moving a little; `Diary.jsx`, a
+with `class="page-sheet"`; its home pages write on those lines: text straight on the paper carries `data-ruled` ("1"/"2": rules per
+line) and `lib/ruled.js` `useRuledPage` sets each block's first baseline on a rule, clear of the margin, "Meet the team" via
+`TEAM_FIT` in `sep26/ruled.js`, the ruling's numbers in `RULED` (`pages.js`); `Decor.jsx` doodles on the home pages: sticky note, coffee ring, star, paper plane, moving a little; `Diary.jsx`, a
 Tom Riddle-style diary under "Meet the team" that writes random lines in a script font after you stay a while). October
 2026 (the latest edition) is **"Pujo"**, Durga Puja: laal-paar saree cream and alta red, maroon ink, sindoor handwriting,
 marigold strings, a pandal-night photo wall, Rozha One headings; `look.css` the saree border and an alpana dot pattern;

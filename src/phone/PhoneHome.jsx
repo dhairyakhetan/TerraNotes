@@ -13,6 +13,7 @@ import { homeTitle, useEdition } from '../lib/edition.js';
 import { usePauseOffscreen } from '../lib/pauseOffscreen.js';
 import { usePresence } from '../lib/usePresence.js';
 import { FONT } from '../styles/fonts.js';
+import { useRuledPage } from '../lib/ruled.js';
 
 // The phone home page of an edition (the latest's at /, also at /articles, /photos, /words, /members, scrolled to that
 // section; an older one's at /sep26…): a 390px page where everything under the sticky header is absolutely placed.
@@ -23,6 +24,8 @@ export default function PhoneHome() {
   const [photo, setPhoto] = useState(null); // index open in the photo viewer
   const [shownPhoto, photoLeaving] = usePresence(photo, 180);
   const edition = useEdition(), extra = hangExtra(edition.articles);
+  const sheet = useRef(null);
+  useRuledPage(sheet, edition, false, edition.articles.length); // a ruled-paper edition writes its text on the lines
   const snake = endCardsSpace(false); // the games (+ editions) cards under the team
   useEffect(() => { document.title = homeTitle(edition); }, [edition]);
   const hangers = useRef(null);
@@ -30,7 +33,7 @@ export default function PhoneHome() {
 
   return (
     <>
-      <div id="top" className="page-home page-sheet" style={{ position: "relative", width: "390px", height: `${2480 + teamHeight(edition, 'phone') + extra + snake}px`, margin: "0 auto", overflow: "clip", background: "var(--page)", fontFamily: FONT.body, color: "var(--text)" }}>
+      <div id="top" ref={sheet} className="page-home page-sheet" style={{ position: "relative", width: "390px", height: `${2480 + teamHeight(edition, 'phone') + extra + snake}px`, margin: "0 auto", overflow: "clip", background: "var(--page)", fontFamily: FONT.body, color: "var(--text)" }}>
         <PhoneHeader current="home" />
         <EditionDecor />
         <PhoneBuddy />
