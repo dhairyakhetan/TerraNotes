@@ -55,7 +55,7 @@ npm run build    # → dist/ (also writes per-article HTML, sitemap, robots, 404
 npm run preview  # serve dist/ on :4173
 npm run check    # tools/check-embed.mjs: the mistakes that only break inside AQ's website (the build runs it first)
 node tools/make-card-covers.mjs    # after adding an article / changing a cover: the small card copies (cover-card.webp)
-node tools/make-link-previews.mjs   # after adding an article / changing a cover (needs `npm i -D playwright`)
+node tools/make-link-previews.mjs   # after adding an article / changing a cover / a new edition: every link preview, in public/og/ (needs `npm i -D playwright`)
 ```
 
 There are no automated tests. Verify changes in a real browser at **both** widths: 390px (phone layout, emulate
@@ -161,7 +161,7 @@ Two separate layouts, chosen by window width (`lib/layoutMode.js`, `useIsWeb()`)
 - **Addresses follow the editions** (`data/editions.js`; each edition's id comes from its month, `sep26`):
   - latest edition: `/` and `/articles/<slug>`; older ones and drafts: `/<id>` (that edition's whole home page, in its own look) and `/<id>/articles/<slug>`.
   - Build links with `articleLink(a)` / `editionLink(n)` / `homeLink(n, section)`, never by hand. A new edition moves the old links by itself; either address of an article redirects to its current one (`App.jsx`).
-- **Files follow the editions too:** `public/editions/<id>/` holds that edition's files, latest or not. Each article has a folder, `public/editions/<id>/articles/<slug>/`: `cover.jpg`, `preview.jpg` (link preview, made by the tool) and any photos of its own (`articleFolder(a)`). The photo wall's pictures are in `public/editions/<id>/photos/`.
+- **Files follow the editions too:** `public/editions/<id>/` holds that edition's files, latest or not. Each article has a folder, `public/editions/<id>/articles/<slug>/`: `cover.jpg`, `cover-card.webp` (the cards' copy, made by the tool) and any photos of its own (`articleFolder(a)`). Every link preview lives together in `public/og/` (`ogImage` in `data/editions.js`): `home.jpg` (the main page, `/` and `/editions`), `<id>.jpg` (an edition's home and section pages), `<id>-<slug>.jpg` (an article). The photo wall's pictures are in `public/editions/<id>/photos/`.
 - **An article can have its own page** instead of the usual layout: `page: 'labs'` in its data and an entry in `PAGES` (`App.jsx`). It lives in `src/articles/<name>/`.
   - Its `body` is still what crawlers and AIs read.
   - It gets no card flight (no cover to land on; `flight()` in `lib/cardFlight.js`), just the crossfade.
@@ -277,7 +277,7 @@ vite.config.js          plugins: React, %SITE_URL% + the latest edition's look, 
 build/siteFiles.js      at build: an .html per article at its address (own title + preview image), each edition's home and section
                         pages, 404, sitemap, robots, llms.txt (drafts left out)
 build/staticCopy.js     each page's text as plain HTML inside #root, for crawlers without JavaScript
-tools/make-link-previews.mjs   preview.jpg in each article's folder (1200×630 link preview)
+tools/make-link-previews.mjs   every link preview (1200×630) into public/og/: the main page, each edition, each article, on the edition's paper
 tools/check-embed.mjs   the guard for AQ's website (see "Inside AQ's website")   tools/export-aq.mjs   writes the magazine into it
 embed/aq/               AQ-only: README (for AQ's side), scripts/ (prerender.mjs), public/fonts/
 src/host.js             where this copy runs (own site / AQ's website)
@@ -318,7 +318,7 @@ src/styles/             fonts.js (FONT: the look's font variables) · base.css (
                         motion.css (one-shot) · phone.css · web.css · intro.css · buddy.css
 public/                 editions/<id>/ (articles/<slug>/: cover, preview, own photos · photos/: the photo wall)
                         brand/ (globe, wordmark) · team/ (faces, 400px WebP) · badges/ · fonts/ (AQ Labs' own fonts)
-                        og/home.jpg (home link preview, made by hand) · icons + site.webmanifest
+                        og/ (every link preview, made by tools/make-link-previews.mjs) · icons + site.webmanifest
 ```
 
 ## Common jobs

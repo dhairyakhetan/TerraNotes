@@ -25,9 +25,16 @@ export const editionLink = (n) => (n === LATEST ? '/' : `/${editionId(n)}`);
 // an edition's home page opened at a section ('articles', 'photos', 'words', 'members'): /photos, /sep26/photos
 export const homeLink = (n, section) => (n === LATEST ? `/${section || ''}` : `/${editionId(n)}${section ? `/${section}` : ''}`);
 export const articleLink = (a) => `${a.edition === LATEST ? '' : `/${editionId(a.edition)}`}/articles/${a.slug}`;
-// an article's folder of files (cover.jpg, preview.jpg, its photos): public/editions/<id>/articles/<slug>/, as a URL
+// an article's folder of files (cover.jpg, cover-card.webp, its photos): public/editions/<id>/articles/<slug>/, as a URL
 // (inside AQ's website under its /terranotes: lib/base.js)
 export const articleFolder = (a) => withBase(`/editions/${editionId(a.edition)}/articles/${a.slug}`);
+// the link-preview pictures (1200×630, made by tools/make-link-previews.mjs), all kept together in public/og/: the main
+// page's (home.jpg), each edition's (sep26.jpg) and each article's (sep26-labs.jpg), as URLs (inside AQ: under /terranotes)
+export const ogImage = {
+  home: () => withBase('/og/home.jpg'),
+  edition: (n) => withBase(`/og/${editionId(n)}.jpg`),
+  article: (a) => withBase(`/og/${editionId(a.edition)}-${a.slug}.jpg`),
+};
 // the month a new edition is due, for the empty "previous editions" shelf
 export const nextMonth = () => {
   const [m, y] = editionOf(LATEST).month.split(' ');

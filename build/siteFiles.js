@@ -2,9 +2,11 @@
 // src/editions (drafts are left out: their pages only exist in the app, at their own address):
 // - an .html per article at its address (articles/<slug>.html, older editions <id>/articles/<slug>.html; also one per
 //   chapter and demo of an own-page article, <article>/<chapter>.html and <article>/<chapter>/demo.html; served
-//   without .html via cleanUrls in vercel.json): its own title, description, link-preview tags (image: preview.jpg in
-//   the article's folder, public/editions/<id>/articles/<slug>/, copied to a content-hashed name so chat apps don't
-//   keep showing an old picture) and its text (build/staticCopy.js) for crawlers that don't run JavaScript;
+//   without .html via cleanUrls in vercel.json): its own title, description, link-preview tags and its text
+//   (build/staticCopy.js) for crawlers that don't run JavaScript;
+// - every page's link-preview picture from public/og/ (src/data/editions.js ogImage: the main page's on / and
+//   /editions, an edition's on its home page and sections, an article's on the article), copied to a content-hashed
+//   name so chat apps don't keep showing an old picture;
 // - index.html, articles.html, photos.html, words.html, members.html (the latest edition's home page and its sections),
 //   the same for each older edition under its id (sep26.html, sep26/photos.html…), and editions.html, with their own
 //   titles and text;
@@ -13,7 +15,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
 import { ALL_ARTICLES } from '../src/data/articles.js';
-import { LATEST, PUBLISHED, articleFolder, articleLink, editionName, homeLink, isDraft } from '../src/data/editions.js';
+import { LATEST, PUBLISHED, articleLink, editionName, homeLink, isDraft, ogImage } from '../src/data/editions.js';
 import { SITE } from '../src/data/site.js';
 import { editionData } from '../src/editions/index.js';
 import { articleHtml, editionsHtml, homeHtml, withContent } from './staticCopy.js';
@@ -32,6 +34,22 @@ export default function siteFiles(host) {
       const out = (name, text) => { fs.mkdirSync(path.dirname(path.join(dir, name)), { recursive: true }); fs.writeFileSync(path.join(dir, name), text); };
       const base = fs.readFileSync(path.join(dir, 'index.html'), 'utf8');
       const url = (p) => `${host}${p}`;
+      // a link-preview picture (a URL under public/) copied to a content-hashed name; null when it hasn't been made
+      const hashed = new Map();
+      const og = (p) => {
+        if (!hashed.has(p)) {
+          const file = `public${p}`;
+          if (!fs.existsSync(file)) hashed.set(p, null);
+          else { const buf = fs.readFileSync(file), name = p.replace(/\.jpg$/, `-${crypto.createHash('md5').update(buf).digest('hex').slice(0, 8)}.jpg`); out(name.slice(1), buf); hashed.set(p, name); }
+        }
+        return hashed.get(p);
+      };
+      const withImage = (html, p, alt) => {
+        let h = html;
+        for (const [attr, name] of [['property', 'og:image'], ['property', 'og:image:secure_url'], ['name', 'twitter:image']]) h = setMeta(h, attr, name, url(p));
+        return alt ? h.replace('<meta property="og:image:type"', `<meta property="og:image:alt" content="${esc(alt)}" />\n    <meta property="og:image:type"`) : h;
+      };
+      const home = og(ogImage.home()), withHome = (html) => (home ? withImage(html, home, 'TerraNotes by Aquaterra') : html);
 
       for (const a of ARTICLES) {
         const desc = `${a.dek}${a.author ? ` — by ${a.author}` : ''}`;
@@ -41,17 +59,10 @@ export default function siteFiles(host) {
         html = setMeta(html, 'property', 'og:title', a.title);
         html = setMeta(html, 'property', 'og:description', desc);
         html = setMeta(html, 'property', 'og:url', url(articleLink(a)));
-        let og = a.cover; // no preview picture made yet: the cover itself
-        const made = `public${articleFolder(a)}/preview.jpg`;
-        if (fs.existsSync(made)) {
-          const buf = fs.readFileSync(made);
-          og = `${articleFolder(a)}/preview-${crypto.createHash('md5').update(buf).digest('hex').slice(0, 8)}.jpg`;
-          out(og.slice(1), buf);
-        }
-        if (og) {
-          for (const [attr, name] of [['property', 'og:image'], ['property', 'og:image:secure_url'], ['name', 'twitter:image']]) html = setMeta(html, attr, name, url(og));
-          if (og === a.cover) html = html.replace(/\s*<meta property="og:image:(width|height)"[^>]*>/g, ''); // a cover isn't 1200×630
-          html = html.replace('<meta property="og:image:type"', `<meta property="og:image:alt" content="${esc(a.alt || a.title)}" />\n    <meta property="og:image:type"`);
+        const pic = og(ogImage.article(a)) || a.cover; // no preview picture made yet: the cover itself
+        if (pic) {
+          html = withImage(html, pic, a.alt || a.title);
+          if (pic === a.cover) html = html.replace(/\s*<meta property="og:image:(width|height)"[^>]*>/g, ''); // a cover isn't 1200×630
         }
         html = html.replace('</title>', `</title>\n    <link rel="canonical" href="${esc(url(articleLink(a)))}" />`);
         out(`${articleLink(a).slice(1)}.html`, withContent(html, articleHtml(a)));
@@ -72,13 +83,16 @@ export default function siteFiles(host) {
           const p = homeLink(e.number, section), title = [name, old].filter(Boolean).join(' · ');
           let html = title ? setMeta(setTitle(base, `Aquaterra — ${title}`), 'property', 'og:title', `${title} · TerraNotes`) : base;
           html = setMeta(html, 'property', 'og:url', url(p));
+          // the main page shows the magazine; an edition's other pages show that edition
+          const pic = p === '/' ? null : og(ogImage.edition(e.number));
+          html = pic ? withImage(html, pic, `TerraNotes ${editionName(e.number)} · ${e.month}`) : withHome(html);
           out(p === '/' ? 'index.html' : `${p.slice(1)}.html`, withContent(html, homeHtml[section](editionData(e.number))));
           if (e.number === LATEST || !section) pages.push(p); // the sitemap: the latest's sections, an older edition's home
         }
       }
-      out('editions.html', withContent(setMeta(setMeta(setTitle(base, 'Aquaterra — Editions'), 'property', 'og:title', 'Editions · TerraNotes'), 'property', 'og:url', url('/editions')), editionsHtml()));
+      out('editions.html', withContent(withHome(setMeta(setMeta(setTitle(base, 'Aquaterra — Editions'), 'property', 'og:title', 'Editions · TerraNotes'), 'property', 'og:url', url('/editions'))), editionsHtml()));
 
-      out('404.html', setTitle(base, 'Aquaterra — not found').replace('</title>', '</title>\n    <meta name="robots" content="noindex" />'));
+      out('404.html', setTitle(withHome(base), 'Aquaterra — not found').replace('</title>', '</title>\n    <meta name="robots" content="noindex" />'));
       const paths = [...pages, '/editions', ...ARTICLES.map(articleLink)];
       out('sitemap.xml', `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${paths.map((p) => `  <url><loc>${url(p)}</loc></url>`).join('\n')}\n</urlset>\n`);
       out('robots.txt', ['# TerraNotes by Aquaterra: every page is open to crawlers.', '# A plain-text guide to the site and its articles, for AI assistants: /llms.txt (full text: /llms-full.txt)', 'User-agent: *', 'Allow: /', '', `Sitemap: ${url('/sitemap.xml')}`, ''].join('\n'));

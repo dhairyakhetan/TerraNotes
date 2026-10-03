@@ -33,7 +33,7 @@ import { ALL_ARTICLES, editionData } from '../editions/index.js';
 //   demos:    optional: { <chapter>: '<folder>' }: a web app kept in the article's folder, opened full-window at
 //             <article>/<chapter>/demo (pages/DemoPage.jsx), e.g. { 'wisdom-woods': 'wisdom-woods/demo' }
 // Blocks render in shared/ArticleBody.jsx. Leave a field '' and the design's placeholder shows instead.
-// After adding or changing an article's cover, run tools/make-link-previews.mjs for its link-preview image.
+// After adding or changing an article's cover, run tools/make-link-previews.mjs for its link-preview image (public/og/).
 // Each article also gets `edition` (its edition's number, data/editions.js) from the folder it's in.
 
 export { ALL_ARTICLES };

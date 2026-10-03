@@ -20,7 +20,7 @@ import path from 'node:path';
 import crypto from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import { ALL_ARTICLES } from '../../src/terranotes/data/articles.js';
-import { LATEST, PUBLISHED, articleFolder, articleLink, editionName, homeLink, isDraft } from '../../src/terranotes/data/editions.js';
+import { LATEST, PUBLISHED, articleFolder, articleLink, editionName, homeLink, isDraft, ogImage } from '../../src/terranotes/data/editions.js';
 import { SITE } from '../../src/terranotes/data/site.js';
 import { editionData } from '../../src/terranotes/editions/index.js';
 import { BASE } from '../../src/terranotes/lib/base.js';
@@ -36,29 +36,32 @@ const SECTIONS = { '': '', articles: 'All articles', photos: 'Photo wall', words
 const ARTICLES = ALL_ARTICLES.filter((a) => !isDraft(a.edition));
 const HOME_DESC = 'Terra Notes by AquaTerra: notes from where the land meets the water. Stories, research, fashion, photos and art, written by students in Kolkata.';
 
-// the preview picture (1200×630, made by scripts/terranotes/tools/make-link-previews.mjs) under a content-hashed name, so
-// chat apps, which cache previews for a long time, fetch a new picture whenever it changes
-function previewFor(a) {
-  const made = path.join(PUBLIC, articleFolder(a), 'preview.jpg');
-  if (!fs.existsSync(made)) return { image: a.cover || '', copy: null, wide: false };
+// a link-preview picture (1200×630, made by scripts/terranotes/tools/make-link-previews.mjs, all in
+// public/terranotes/og/: data/editions.js ogImage) under a content-hashed name, so chat apps, which cache previews for a
+// long time, fetch a new picture whenever it changes; `fallback` when it hasn't been made
+function preview(url, fallback = '') {
+  const made = path.join(PUBLIC, url);
+  if (!fs.existsSync(made)) return { image: fallback, copy: null, wide: false };
   const buf = fs.readFileSync(made);
-  const name = `${articleFolder(a)}/preview-${crypto.createHash('md5').update(buf).digest('hex').slice(0, 8)}.jpg`;
+  const name = url.replace(/\.jpg$/, `-${crypto.createHash('md5').update(buf).digest('hex').slice(0, 8)}.jpg`);
   return { image: name, copy: { to: name.slice(1), buf }, wide: true };
 }
+const previewFor = (a) => preview(ogImage.article(a), a.cover || '');
 
 export function terraNotesPages(origin = SITE.website) {
   const pages = [];
-  const site = (path, title, body) => pages.push({
+  // a page with the main page's picture, or (an edition's other pages) that edition's
+  const site = (path, title, body, n) => { const pv = n ? preview(ogImage.edition(n)) : preview(ogImage.home()); pages.push({
     path, file: `${path.slice(1)}.html`,
     title: title ? `Aquaterra — ${title}` : 'Terra Notes | AquaTerra’s Monthly Digital Magazine',
     description: title ? `${title} · Terra Notes by AquaTerra.` : HOME_DESC,
-    type: 'website', image: `${origin}${at('/og/home.jpg')}`, imageAlt: 'Terra Notes by AquaTerra', wide: true,
-    label: title || 'Terra Notes', body,
-  });
+    type: 'website', image: pv.image ? `${origin}${pv.image}` : '', imageAlt: n ? `Terra Notes ${editionName(n)}` : 'Terra Notes by AquaTerra', wide: pv.wide,
+    label: title || 'Terra Notes', body, copy: pv.copy,
+  }); };
   // each edition's home page and its sections, newest first (an older edition's: under its id, its edition in the title)
   for (const e of [...PUBLISHED].reverse()) {
     const old = e.number !== LATEST && `${editionName(e.number)} · ${e.month}`;
-    for (const [section, name] of Object.entries(SECTIONS)) site(at(homeLink(e.number, section)), [name, old].filter(Boolean).join(' · '), homeHtml[section](editionData(e.number)));
+    for (const [section, name] of Object.entries(SECTIONS)) site(at(homeLink(e.number, section)), [name, old].filter(Boolean).join(' · '), homeHtml[section](editionData(e.number)), homeLink(e.number, section) === '/' ? 0 : e.number);
   }
   site(at('/editions'), 'Editions', editionsHtml());
   for (const a of ARTICLES) {
