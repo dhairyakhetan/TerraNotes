@@ -36,4 +36,5 @@ createRoot(document.getElementById('root')).render( // the own site's page: embe
   </React.StrictMode>
 );
 // fetch AQ Labs' page code once the first page is up, so opening it from a card doesn't wait on it
-setTimeout(() => loadLabs().catch(() => {}), 2000);
+// once the page has finished loading and the browser is idle, so it never competes with what's on screen
+addEventListener('load', () => (window.requestIdleCallback || setTimeout)(() => loadLabs().catch(() => {}), { timeout: 4000 }), { once: true });

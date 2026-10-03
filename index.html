@@ -16,7 +16,12 @@
     <!-- Each page's text is also written into the HTML for chatbots and search engines (build/staticCopy.js).
          Browsers that run the app never show it: this hides it before anything is drawn, and the app replaces it. -->
     <script>document.documentElement.classList.add('tn-js')</script>
-    <style>.tn-js .tn-static{display:none}</style>
+    <style>.tn-js .tn-static{display:none}
+      /* until the app draws (it replaces #root's contents), a quiet "TerraNotes" on the edition's paper, not a blank page */
+      .tn-js #root:has(> .tn-static)::before,.tn-js #root:empty::before{content:"TerraNotes";position:fixed;inset:0;display:grid;place-items:center;
+        background:var(--page,#F5F2E9);color:var(--ink,#18213A);font:italic 400 40px/1 'Instrument Serif',Georgia,serif;animation:tn-boot 1.4s ease-in-out infinite alternate}
+      @keyframes tn-boot{from{opacity:.35}to{opacity:.9}}
+      @media (prefers-reduced-motion: reduce){.tn-js #root::before{animation:none}}</style>
     <!-- the latest edition's colours and fonts as CSS variables, filled in from its look.js (vite.config.js) -->
     <style>%LOOK%</style>
     <meta name="theme-color" content="%THEME_COLOR%" />

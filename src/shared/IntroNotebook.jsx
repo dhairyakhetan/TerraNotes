@@ -11,7 +11,7 @@ import { calm } from '../lib/motion.js';
 // The opening animation (when: lib/introNotebook.js), over the site while it loads underneath: a notebook slides in
 // spinning, opens on the Aquaterra logo, "TerraNotes" is written in, a CERTIFIED stamp thumps down, and it lifts away
 // after 4.3 s (1.8 s with reduced motion). Skip button, Enter or Space ends it early. Meanwhile the covers and photos
-// start downloading. It's the edition of the page it opens on (an older one's address shows that one): its number and
+// start downloading (the covers on screen first; the rest waits for its turn). It's the edition of the page it opens on (an older one's address shows that one): its number and
 // month on the cover's label and the stamp, and its cover picture pasted on the front. All timings: styles/intro.css.
 const PLAY = 4300, REDUCED = 1800, LEAVE = 450;
 const WORDS = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve'];
@@ -31,7 +31,7 @@ export default function IntroNotebook() {
     window.aqIntro = true; // (AQ's site reads this too)
     dispatchEvent(new Event('aq-intro'));
     // fetch what the pages will need while the notebook plays
-    for (const src of [withBase('/brand/aquaterra-globe.webp'), withBase('/brand/aquaterra-wordmark.webp'), ...data.articles.map((a) => cardCover(a.cover)), ...data.photos.map((p) => p.photo)].filter(Boolean)) {
+    for (const src of [withBase('/brand/aquaterra-globe.webp'), withBase('/brand/aquaterra-wordmark.webp'), ...data.articles.slice(0, 6).map((a) => cardCover(a.cover))].filter(Boolean)) {
       const img = new Image();
       img.src = src;
     }

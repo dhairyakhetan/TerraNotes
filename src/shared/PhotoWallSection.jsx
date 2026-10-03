@@ -77,7 +77,7 @@ export default function PhotoWallSection({ web, onOpen }) {
             <div style={{ position: "absolute", left: "50%", background: "var(--peg)", ...L.peg }} />
             <div style={{ background: "var(--card)", border: "2px solid var(--ink)", ...L.print }}>
               <div style={{ position: "relative", overflow: "hidden", height: p.photo ? `${f.h}px` : `${s.empty}px`, background: p.tint, display: "flex", alignItems: "center", justifyContent: "center", fontSize: L.emptyFont, color: s.ink }}>
-                {p.photo ? <img src={p.photo} alt={p.caption} style={{ position: "absolute", inset: "0", width: "100%", height: "100%", objectFit: "cover" }} /> : '[photo]'}
+                {p.photo ? <img src={p.photo} alt={p.caption} loading="lazy" decoding="async" style={{ background: "var(--blank)", position: "absolute", inset: "0", width: "100%", height: "100%", objectFit: "cover" }} /> : '[photo]'}
                 <div className="glint" style={{ animationDuration: `${s.dur}s`, animationDelay: `${s.delay}s` }} />
               </div>
               <figcaption style={{ fontFamily: FONT.hand, textAlign: "center", ...L.caption }}>{p.caption || '[caption]'}</figcaption>

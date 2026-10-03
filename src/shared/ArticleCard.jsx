@@ -54,7 +54,7 @@ export default function ArticleCard({ article: a, look = 'phone', mark, classNam
       {a.featured && <FeaturedTape />}
       <Clip color={tagOf(a).color} w={cw} h={ch} top={ctop} />
       <article style={{ width: "100%", height: "100%", boxSizing: "border-box", background: "var(--card)", border: "2px solid var(--ink)", boxShadow: `${L.shadow}px ${L.shadow}px 0 ${a.featured ? "var(--yellow)" : "var(--ink)"}`, padding: `${L.pad}px`, display: "flex", flexDirection: "column", gap: `${L.gap}px`, overflow: "hidden" }}>
-        <ImageSlot src={cardCover(a.cover)} fallback={a.cover} alt={a.alt} box={{ height: `${img}px`, minHeight: coverFloor(img) }} icon={L.icon} font={L.iconFont} />
+        <ImageSlot src={cardCover(a.cover)} fallback={a.cover} alt={a.alt} first={placeOf(a).i < 6} box={{ height: `${img}px`, minHeight: coverFloor(img) }} icon={L.icon} font={L.iconFont} />
         <TagRow a={a} look={look} />
         <h3 ref={title} style={{ flexShrink: "0", margin: "0", fontFamily: FONT.head, fontWeight: "400", fontSize: `${titlePx}px`, lineHeight: "0.95", letterSpacing: "-0.3px", textTransform: "uppercase", color: "var(--ink)" }}>{a.title}</h3>
         <p style={{ flexShrink: "0", margin: "0", fontFamily: FONT.hand, fontSize: `${dekPx}px`, lineHeight: "1.1", color: "var(--dek)" }}>{a.dek}</p>
