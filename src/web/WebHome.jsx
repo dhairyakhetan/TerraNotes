@@ -8,7 +8,6 @@ import WordsGameSection from '../shared/WordsGameSection.jsx';
 import TeamSection, { teamHeight } from '../shared/TeamSection.jsx';
 import { WebBuddy } from '../shared/buddy/Buddy.jsx';
 import SnakeCard, { SNAKE_CARD_SPACE } from '../shared/SnakeCard.jsx';
-import { HOST } from '../host.js';
 import { homeTitle, useEdition } from '../lib/edition.js';
 import { usePauseEach } from '../lib/pauseOffscreen.js';
 import { usePresence } from '../lib/usePresence.js';
@@ -26,7 +25,7 @@ export default function WebHome() {
   useEffect(() => { document.title = homeTitle(edition); }, [edition]);
   const page = useRef(null);
   usePauseEach(page, '.hero-sway,.fl1,.fl2,.fl3,.fl4,.fl5,.fl6,.fk1,.fk2,.fk3,.fk4,.spark,.bulb,.orbit-bubble,.buddy-bob'); // loops hold still once scrolled away
-  const snake = HOST.embedded ? SNAKE_CARD_SPACE.web : 0; // inside AQ: the Snake card, under the team
+  const snake = SNAKE_CARD_SPACE.web; // the Snake card, under the team
 
   return (
     <div className="web">
@@ -45,7 +44,7 @@ export default function WebHome() {
         <PhotoWallSection web onOpen={setPhoto} />
         <WordsGameSection web />
         <TeamSection web />
-        {HOST.embedded && <SnakeCard web top={2610 + teamHeight(edition, 'web') + 40} />}
+        <SnakeCard web top={2610 + teamHeight(edition, 'web') + 40} />
       </div>
       {shownPhoto != null && <PhotoViewer web start={shownPhoto} closing={photoLeaving} onClose={() => setPhoto(null)} />}
     </div>

@@ -1,8 +1,7 @@
 import { openGames } from '../lib/buddyState.js';
 import { FONT } from '../styles/fonts.js';
 
-// Inside AQ's website only (HOST.embedded; its phone menu, Buddy's way in, isn't drawn there): the last thing on the
-// home pages, Snake one tap away, without having to call Buddy first. It opens the same games popup Buddy does
+// The last thing on the home pages: Snake one tap away, without having to call Buddy first. It opens the same games popup Buddy does
 // (shared/buddy/BuddyGames.jsx, event 'aq-games'). The whole card is the button (one 44px+ target).
 // `web` is the 1440 artboard, otherwise the 390 phone one; `top` is where it sits on that artboard.
 export const SNAKE_CARD_SPACE = { web: 360, phone: 330 }; // how much taller the home page gets to make room for it

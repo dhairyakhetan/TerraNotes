@@ -50,9 +50,8 @@ The same code runs as the magazine's own site and here; `src/terranotes/host.js`
    Its `useTransitions={false}` toggle in `AppRouter` is needed for the flights: don't remove it.
 5. **AQ's nav, dock and footer wrap it; the magazine's own header is hidden** (`:host header.site-header{visibility:hidden}`
    in `styles/base.css`), its box kept as the spacer under AQ's fixed nav. So, here only: no own footer or skip link,
-   a Snake card at the end of the home pages and a visible "call Buddy" button on phones (`shared/SnakeCard.jsx`,
-   `shared/buddy/Buddy.jsx`), cards load `cover-card.webp`, and AQ Labs runs full width with its chapter tabs as a
-   floating pill (no find bar). The viewport tag is pinned to `width=390` on phones only while the magazine shows.
+   a visible "call Buddy" button on phones (`shared/buddy/Buddy.jsx`), cards load `cover-card.webp`, and AQ Labs runs
+   full width with its chapter pill under AQ's nav. The viewport tag is pinned to `width=390` on phones only while the magazine shows.
 6. **Editions.** Every month is its own folder, `editions/<id>/` (look, articles, photo wall, words, team), kept for
    good: the latest edition is `/terranotes`, an older one `/terranotes/sep26`, a draft (`draft: true` in
    `data/editions.js`) only at its own address with a "Draft" tape, and nowhere in the prerender or sitemap.

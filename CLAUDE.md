@@ -65,7 +65,7 @@ The magazine also runs inside AQ's main website (the `dhairyakhetan/fah` repo), 
   `public/terranotes/`, `scripts/terranotes/`), then commit in fah. Without a path it writes `out/aq/` and
   `out/terranotes-for-aq.zip` to hand over. Never edit those folders in fah: the next export replaces them.
 - **`src/host.js` is what differs:** AQ's copy says `{ base: '/terranotes', embedded: true }`. AQ-only behaviour checks
-  `HOST.embedded` (the Snake card, the phone "call Buddy" button, no own footer or skip link, AQ Labs' floating tabs,
+  `HOST.embedded` (the phone "call Buddy" button, no own footer or skip link, AQ Labs running full width,
   card covers from `cover-card.webp`); AQ-only styles are rules that start with `:host`.
 - **It draws inside a shadow root** (`src/TerraNotesRoot.jsx`), under AQ's own nav, dock and footer. AQ hides the
   magazine's header (`:host header.site-header{visibility:hidden}` in `styles/base.css`). So, in all code:
@@ -111,7 +111,7 @@ Two separate layouts, chosen by window width (`lib/layoutMode.js`, `useIsWeb()`)
   - `chapters`: its sections get addresses, `<article>/<id>` (element ids).
   - `demos`: `{ chapter: folder }`, a web app kept in its folder, opened in a new tab at `<article>/<chapter>/demo`. `pages/DemoPage.jsx` shows it full-window in a same-origin frame, with no footer, Buddy or opening animation. Its files stay as the team made them.
   - **AQ Labs** (`src/articles/labs/`, the "labs" article; teams and chapter ids in `data/labs.js`) is the AQ Labs team's own gallery site, ported. Its Wisdom Woods chapter opens the team's demo at `/articles/labs/wisdom-woods/demo` (files: `public/editions/sep26/articles/labs/wisdom-woods/demo/`). It keeps their look on purpose: their fonts (`public/fonts/`, JetBrains Mono from Google Fonts), their palette and rounded pills. Don't restyle it into the magazine's design.
-    - Built from the AQ Labs design. Web: one long scroll (intro with a 3D bookshelf, then every chapter), sticky chapter tabs with a ⌕ find bar (inside AQ's website: floating pill tabs, no find bar). Phone: one chapter at a time (the shelf is the start; `/articles/labs/<id>` opens a chapter as its own page, so Back returns to the shelf); search lives in the "view all projects" sheet.
+    - Built from the AQ Labs design. Web: one long scroll (intro with a 3D bookshelf, then every chapter), sticky chapter tabs as a floating glass pill (as on AQ's website). Phone: one chapter at a time (the shelf is the start; `/articles/labs/<id>` opens a chapter as its own page, so Back returns to the shelf); search lives in the "view all projects" sheet.
     - Books sit in fixed hover slots (`.bslot`), so the pulled-out book never flickers. Karyaarth's stills open in the site's `PhotoViewer` (it takes `photos`, `title`, `label`, `count`).
   - Its CSS (`labs.css`) is scoped to `.labs`. Its class names must not match any in `src/styles/` (it had to rename `.intro` and `.orbit`). Its loops keep the motion rules below, inside `labs.css`: transform / opacity only, stopped by reduced motion, `.tn-lite`, `.off-screen` and `html[data-tn-nav]` (with their `:host` twins). It brings its own stylesheet (`labs.css?inline`, a `<style>` beside the page), so it loads with the gallery.
 - **Shared components** (`src/shared/`) take a `web` prop (or `look`) and keep a `PHONE` / `WEB` table of positions and sizes. Change a value in the right table; don't fork the component.

@@ -142,59 +142,17 @@ function Book({ t, i, size: [w, h, fs], web, href, onClick, pressed, ox }) {
   );
 }
 
-// The chapter tabs (and, on web, the search; not inside AQ, whose tabs are a floating pill). active = the chapter lit;
-// hits = chapters with search matches
-function Tabs({ web, active, hits, base, onTab, search }) {
+// The chapter tabs, a floating pill (as on AQ's website). active = the chapter lit
+function Tabs({ web, active, base, onTab }) {
   return (
     <nav className="lb-tabs" aria-label="Chapters">
       {TEAMS.map((t, i) => (
-        <a key={t.id} className={`tab${active === t.id ? ' on' : ''}${hits?.has(t.id) ? ' hit' : ''}`} data-spy={t.id} href={withBase(`${base}/${t.id}`)} onClick={(e) => onTab(e, t.id)}
+        <a key={t.id} className={`tab${active === t.id ? ' on' : ''}`} data-spy={t.id} href={withBase(`${base}/${t.id}`)} onClick={(e) => onTab(e, t.id)}
           aria-label={web ? undefined : `${pad2(i + 1)} ${t.name}`} aria-current={active === t.id ? (web ? 'true' : 'page') : undefined} style={{ '--c': t.c, '--tc': t.tc }}>
           <span className="n">{pad2(i + 1)}</span><span className="t">{t.label.replace('|', ' ')}</span>
         </a>
       ))}
-      {search}
     </nav>
-  );
-}
-
-// web: the ⌕ button at the end of the tab strip and the find bar under it
-function WebFind({ main, onHits }) {
-  const [open, setOpen] = useState(false);
-  const [query, setQuery] = useState('');
-  const [hits, setHits] = useState({ ranges: [], cur: 0 });
-  const input = useRef(null), btn = useRef(null);
-  useEffect(() => { // new query: find everything, mark it, go to the first match
-    if (!open) return;
-    const ranges = findAll(main.current, query);
-    onHits(new Set(ranges.map((r) => r.startContainer.parentElement.closest('section[data-ch]')?.id).filter(Boolean)));
-    setHits({ ranges, cur: 0 });
-    mark(ranges);
-  }, [query, open]);
-  useEffect(() => { if (hits.ranges.length) showMatch(hits.ranges[hits.cur]); else if (HL) CSS.highlights.delete('labs-find-now'); }, [hits]);
-  useEffect(() => { if (open) input.current.focus(); }, [open]);
-  useEffect(() => unmark, []);
-  const step = (d) => setHits((h) => (h.ranges.length ? { ...h, cur: (h.cur + d + h.ranges.length) % h.ranges.length } : h));
-  const close = () => { setOpen(false); setQuery(''); setHits({ ranges: [], cur: 0 }); onHits(new Set()); unmark(); btn.current.focus(); };
-  const n = hits.ranges.length;
-  return (
-    <>
-      <div className="lb-tools">
-        <button ref={btn} type="button" className="iconbtn" aria-label="Search this article" aria-expanded={open ? 'true' : 'false'} onClick={() => (open ? close() : setOpen(true))} style={open ? { background: "#111111", color: "#F3EEE4" } : undefined}>
-          <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" aria-hidden="true"><circle cx="7.5" cy="7.5" r="5.5" /><path d="M11.8 11.8 L16 16" /></svg>
-        </button>
-      </div>
-      {open && (
-        <div className="lb-find" role="search">
-          <input ref={input} type="search" value={query} onChange={(e) => setQuery(e.target.value)} placeholder="search the gallery…" aria-label="Search the gallery" enterKeyHint="search"
-            onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); step(e.shiftKey ? -1 : 1); } else if (e.key === 'Escape') close(); }} />
-          <span className="count" aria-live="polite">{query.trim() ? (n ? `${hits.cur + 1} / ${n}` : 'none') : ''}</span>
-          <button type="button" onClick={() => step(-1)} disabled={!n} aria-label="Previous match">↑</button>
-          <button type="button" onClick={() => step(1)} disabled={!n} aria-label="Next match">↓</button>
-          <button type="button" onClick={close} aria-label="Close search">✕</button>
-        </div>
-      )}
-    </>
   );
 }
 
@@ -278,7 +236,6 @@ export default function LabsPage({ article: a, web, chapter }) {
   const navigate = useNavigate(), nav = useRef(navigate);
   nav.current = navigate;
   const [active, setActive] = useState(null); // web: the chapter across the middle of the window
-  const [hits, setHits] = useState(() => new Set()); // web: chapters with search matches
   const [card, setCard] = useState(0); // The Human Manual: the suit pulled up (tap)
   const [sheet, setSheet] = useState(false); // phone: "all projects" open
   const [shownSheet, sheetLeaving] = usePresence(sheet || null, 180);
@@ -727,7 +684,7 @@ export default function LabsPage({ article: a, web, chapter }) {
   const page = (
     <div className={`labs ${web ? 'labs-web' : 'labs-phone'}`} style={HOST.embedded ? undefined : { width: web ? "1440px" : "390px" }}>
       {web ? <WebHeader /> : <PhoneHeader current="article" edge={tagOf(a).color} />}
-      <Tabs web={web} active={web ? active : ch} hits={web ? hits : null} base={base} onTab={onTab} search={web && !HOST.embedded ? <WebFind main={main} onHits={setHits} /> : null} />
+      <Tabs web={web} active={web ? active : ch} base={base} onTab={onTab} />
       {/* inside AQ, whose page has its own <main>: a region, so there is one main landmark */}
       <Main ref={main} {...(HOST.embedded && { role: 'region', 'aria-label': 'AQ Labs' })} style={{ display: "flex", flexDirection: "column" }}>
         {(web || !ch) && intro}

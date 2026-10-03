@@ -8,7 +8,6 @@ import WordsGameSection from '../shared/WordsGameSection.jsx';
 import TeamSection, { teamHeight } from '../shared/TeamSection.jsx';
 import { PhoneBuddy } from '../shared/buddy/Buddy.jsx';
 import SnakeCard, { SNAKE_CARD_SPACE } from '../shared/SnakeCard.jsx';
-import { HOST } from '../host.js';
 import { homeTitle, useEdition } from '../lib/edition.js';
 import { usePauseOffscreen } from '../lib/pauseOffscreen.js';
 import { usePresence } from '../lib/usePresence.js';
@@ -23,7 +22,7 @@ export default function PhoneHome() {
   const [photo, setPhoto] = useState(null); // index open in the photo viewer
   const [shownPhoto, photoLeaving] = usePresence(photo, 180);
   const edition = useEdition(), extra = hangExtra(edition.articles);
-  const snake = HOST.embedded ? SNAKE_CARD_SPACE.phone : 0; // inside AQ: the Snake card, under the team
+  const snake = SNAKE_CARD_SPACE.phone; // the Snake card, under the team
   useEffect(() => { document.title = homeTitle(edition); }, [edition]);
   const hangers = useRef(null);
   usePauseOffscreen(hangers); // the swinging cards hold still once scrolled away
@@ -43,7 +42,7 @@ export default function PhoneHome() {
           <WordsGameSection />
           <TeamSection />
         </div>
-        {HOST.embedded && <SnakeCard top={2480 + teamHeight(edition, 'phone') + extra + 40} />}
+        <SnakeCard top={2480 + teamHeight(edition, 'phone') + extra + 40} />
       </div>
       {shownPhoto != null && <PhotoViewer start={shownPhoto} closing={photoLeaving} onClose={() => setPhoto(null)} />}
     </>

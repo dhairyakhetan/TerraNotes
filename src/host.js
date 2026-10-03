@@ -5,5 +5,5 @@
 // as AQ has it, react-router-dom, in router.jsx and lib/animatedHistory.js).
 //   base:     the path the magazine lives under ('' = the site's root; AQ: '/terranotes'): lib/base.js
 //   embedded: drawn inside another site's page (AQ, with its own nav, footer and skip link): no skip link, footer or
-//             console hello of its own, and the AQ-only touches (styles with :host, SnakeCard, the phone call button)
+//             console hello of its own, and the AQ-only touches (styles with :host, the phone call button)
 export const HOST = { base: '', embedded: false };

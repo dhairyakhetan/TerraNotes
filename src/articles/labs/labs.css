@@ -13,12 +13,12 @@
 .labs{position:relative;margin:0 auto;overflow:clip;background:#111111;color:#111111}
 /* the gallery's resets, under the site header only (:where keeps them as weak as web.css's `.web a`, which they beat
    by coming later: main.jsx imports this file last) */
-.labs :where(main,.lb-tabs,.lb-find,.psheet){font-family:'Eina',system-ui,sans-serif;font-weight:400;line-height:normal}
-.labs :where(main,.lb-tabs,.lb-find,.psheet) :where(*,*::before,*::after){box-sizing:border-box}
+.labs :where(main,.lb-tabs,.psheet){font-family:'Eina',system-ui,sans-serif;font-weight:400;line-height:normal}
+.labs :where(main,.lb-tabs,.psheet) :where(*,*::before,*::after){box-sizing:border-box}
 .labs :where(main,.psheet) img{display:block}
 .labs :where(main,.psheet) :is(p,h1,h2,h3,figure){margin:0}
 .labs :where(main,.lb-tabs,.psheet) a{color:inherit;text-decoration:none}
-.labs :where(main,.lb-find,.psheet) button{font:inherit;color:inherit}
+.labs :where(main,.psheet) button{font:inherit;color:inherit}
 .labs .m{font-family:'JetBrains Mono',ui-monospace,monospace;font-weight:700;text-transform:uppercase;letter-spacing:.14em}
 .labs .d{font-family:'Neutral Face',system-ui,sans-serif;font-weight:900;text-transform:uppercase;letter-spacing:-.04em;line-height:.86}
 .labs .s{font-family:'Instrument Serif',Georgia,serif;font-style:italic;font-weight:400}
@@ -55,18 +55,11 @@
 .labs-phone .tab.on{flex-grow:4.2;height:44px;padding:0 8px;gap:3px;background:var(--c);color:var(--tc);box-shadow:none}
 .labs-phone .tab.on .n{margin-top:0;font-size:9px;letter-spacing:.14em;opacity:.75}
 .labs-phone .tab.on .t{max-height:16px;opacity:1;transition:opacity .18s ease .1s,max-height .22s ease}
-/* a tab whose chapter has search matches */
-.labs .tab.hit::after{content:"";position:absolute;right:5px;top:5px;width:8px;height:8px;border-radius:50%;background:#FF4D2E;border:1.5px solid #111111}
-.labs .lb-tools{margin-left:auto;align-self:center;padding:0 20px 0 12px}
 
-/* in-page search: web, a find bar under the tab strip; phone, inside the "all projects" sheet. Matches are
+/* in-page search (phone, inside the "all projects" sheet). Matches are
    highlighted in place (CSS Custom Highlight API) */
-.labs .lb-find{position:absolute;left:0;right:0;top:100%;display:flex;align-items:center;gap:8px;padding:10px 20px;background:#F3EEE4;border-bottom:2px solid #111111}
-.labs .lb-find input,.labs .psheet input{flex:1;min-width:0;height:44px;padding:0 16px;border:2px solid #111111;border-radius:999px;background:#FFFFFF;font-family:'JetBrains Mono',monospace;font-weight:500;font-size:14px;color:#111111;outline:none}
-.labs :is(.lb-find,.psheet) input:focus-visible{box-shadow:0 0 0 3px #3DA9FC}
-.labs .lb-find .count{flex:none;min-width:64px;text-align:center;font-family:'JetBrains Mono',monospace;font-weight:700;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:#5A5A55}
-.labs .lb-find button{flex:none;width:44px;height:44px;border-radius:999px;border:2px solid #111111;background:#FFFFFF;cursor:pointer;font-size:16px;line-height:1;padding:0;display:flex;align-items:center;justify-content:center}
-.labs .lb-find button[disabled]{opacity:.35;cursor:default}
+.labs .psheet input{flex:1;min-width:0;height:44px;padding:0 16px;border:2px solid #111111;border-radius:999px;background:#FFFFFF;font-family:'JetBrains Mono',monospace;font-weight:500;font-size:14px;color:#111111;outline:none}
+.labs .psheet input:focus-visible{box-shadow:0 0 0 3px #3DA9FC}
 ::highlight(labs-find){background-color:#FFC700;color:#111111}
 ::highlight(labs-find-now){background-color:#FF4D2E;color:#FFFFFF}
 .labs .flash{outline:3px solid #FF4D2E;outline-offset:4px}
@@ -324,22 +317,25 @@ html.tn-lite .labs :is(.cq .spin,.cq .onode,.print),:host(.tn-lite) .labs :is(.c
   .labs-phone .chap > section > *,.labs-phone .chap > .lb-more,.labs .psheet,.labs .psheet.out,.labs .sheet-bg,.labs .sheet-bg.out,.labs .psheet .pick{animation:none}
 }
 
+/* ===== the chapter tabs: a floating glass pill (as on AQ's website) ===== */
+.labs .lb-tabs{box-sizing:border-box;border-bottom:0;align-items:center;gap:2px;background:rgba(243,238,228,.74);border:1px solid rgba(255,255,255,.6);border-radius:999px;-webkit-backdrop-filter:blur(18px) saturate(1.5);backdrop-filter:blur(18px) saturate(1.5);box-shadow:0 10px 30px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.6);overflow-x:auto;scrollbar-width:none}
+.labs .lb-tabs::-webkit-scrollbar{display:none}
+.labs-web .lb-tabs{position:sticky;top:88px;z-index:40;width:max-content;max-width:calc(100% - 32px);height:52px;padding:5px;margin:14px auto}
+.labs-web .chap{scroll-margin-top:0;padding-top:150px}
+.labs-phone .lb-tabs{position:relative;height:48px;padding:4px;margin:8px;gap:2px}
+.labs .tab{border:0;box-shadow:none}
+.labs-web .tab{height:40px;padding:0 14px;margin:0;border-radius:999px;background:transparent}
+.labs-web .tab:hover{background:rgba(255,255,255,.5)}
+.labs-web .tab.on{height:40px;background:var(--c);color:var(--tc);box-shadow:0 4px 14px -4px var(--c)}
+.labs-phone .tab{height:40px;border-radius:999px;background:transparent;box-shadow:none}
+.labs-phone .tab.on{height:40px;background:var(--c);color:var(--tc)}
+@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){.labs .lb-tabs{background:rgba(243,238,228,.94)}}
+
 /* ===== inside AQ's website only (:host = drawn in its shadow root, embed/aq/) =====
-   AQ's own nav floats over the top of the page, so the gallery runs full width, edge to edge, its header slot is gone
-   (the dark hero runs up under AQ's nav), and the chapter tabs are a floating glass pill under that nav (no find bar).
-   The intro keeps its 134px offset so the polaroids sit where they were designed to (pill 52 + its 78px offset). */
+   AQ's own nav floats over the top of the page, so the gallery runs full width, its header slot is gone and the pill
+   sits under AQ's nav. The intro keeps its 134px offset so the polaroids sit where they were designed to. */
 :host .labs > header.site-header{display:none !important}
 :host .labs-web .lb-intro{margin-top:134px}
-:host .labs-web .chap{scroll-margin-top:0;padding-top:150px}
-:host .labs .lb-tabs{box-sizing:border-box;border-bottom:0;align-items:center;gap:2px;background:rgba(243,238,228,.74);border:1px solid rgba(255,255,255,.6);border-radius:999px;-webkit-backdrop-filter:blur(18px) saturate(1.5);backdrop-filter:blur(18px) saturate(1.5);box-shadow:0 10px 30px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.6);overflow-x:auto;scrollbar-width:none}
-:host .labs .lb-tabs::-webkit-scrollbar{display:none}
-:host .labs-web .lb-tabs{position:sticky;top:78px;z-index:40;width:max-content;max-width:calc(100% - 32px);height:52px;padding:5px;margin:0 auto -52px}
+:host .labs-web .lb-tabs{top:78px;margin:0 auto -52px}
 :host .labs-phone{padding-top:72px}
-:host .labs-phone .lb-tabs{position:relative;height:48px;padding:4px;margin:0 8px 8px;gap:2px}
-:host .labs .tab{border:0;box-shadow:none}
-:host .labs-web .tab{height:40px;padding:0 14px;margin:0;border-radius:999px;background:transparent}
-:host .labs-web .tab:hover{background:rgba(255,255,255,.5)}
-:host .labs-web .tab.on{height:40px;background:var(--c);color:var(--tc);box-shadow:0 4px 14px -4px var(--c)}
-:host .labs-phone .tab{height:40px;border-radius:999px;background:transparent;box-shadow:none}
-:host .labs-phone .tab.on{height:40px;background:var(--c);color:var(--tc)}
-@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){:host .labs .lb-tabs{background:rgba(243,238,228,.94)}}
+:host .labs-phone .lb-tabs{margin:0 8px 8px}
