@@ -63,7 +63,9 @@ npm run test:visual:update    # after a change you meant: save new screenshots (
 
 The one automated test is visual (`playwright.config.js`, `tests/visual/`, run on every push by `.github/workflows/visual.yml`):
 the home page, an article and `/sep26` (+ one of its articles) at both widths, compared with saved screenshots; a
-change you meant needs new ones (`npm run test:visual:update`, or the workflow run by hand with "update"). Still verify changes in a real browser at **both** widths: 390px (phone layout, emulate
+change you meant needs new ones: run the workflow by hand with "update" (it commits them). The saved screenshots are
+CI's: another Chromium lays text out a few pixels differently, so a local `npm run test:visual` against them can fail
+for that alone (save local ones with `test:visual:update` to compare before / after your own change, but don't commit them). Still verify changes in a real browser at **both** widths: 390px (phone layout, emulate
 touch) and 1440px (web layout), and resize across 900px. Also check reduced motion, `?lite` (low-end mode) and `?intro` (forces the opening
 animation). Automated browsers never get the intro.
 
