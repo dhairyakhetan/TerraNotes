@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { Link } from '../router.jsx';
 import BackHome from './BackHome.jsx';
 import { cardCover } from './ArticleCard.jsx';
@@ -59,10 +60,18 @@ export function EditionsCard({ web }) {
 
 // floats just under AQ's fixed nav (AQ sets --nav-h on its page; the custom property reaches into the shadow root),
 // left, so it never moves the page's own layout. The page is zoomed, so the offset is divided back.
+// It slips away while you scroll down (it would sit on the text) and comes back when you scroll up.
 export function BackToMagazine({ web }) {
+  const [away, setAway] = useState(false);
+  useEffect(() => {
+    let last = scrollY;
+    const on = () => { const y = scrollY; if (Math.abs(y - last) > 6) { setAway(y > last && y > 160); last = y; } };
+    addEventListener('scroll', on, { passive: true });
+    return () => removeEventListener('scroll', on);
+  }, []);
   if (!AQ_LOOK) return null;
   const z = web ? 'var(--web-zoom, 1)' : 'var(--phone-zoom, 1)';
   return (
-    <BackHome className={web ? 'btn' : 'press'} style={{ position: "fixed", zIndex: "40", top: `calc(var(--nav-h, 70px) / ${z} + 10px)`, left: web ? "24px" : "12px", display: "inline-flex", alignItems: "center", minHeight: "44px", padding: "0 16px", boxSizing: "border-box", borderRadius: "999px", background: "var(--card)", border: "2px solid var(--ink)", boxShadow: "3px 3px 0 var(--ink)", "--c": "var(--ink)", ...MONO, fontSize: web ? "12px" : "11px", color: "var(--ink)", textDecoration: "none" }}>← Back to home</BackHome>
+    <BackHome className={web ? 'btn' : 'press'} aria-hidden={away ? 'true' : undefined} tabIndex={away ? -1 : undefined} style={{ transition: "transform .25s ease, opacity .25s ease, translate 160ms ease", transform: away ? "translateY(-24px)" : "none", opacity: away ? "0" : "1", pointerEvents: away ? "none" : "auto", position: "fixed", zIndex: "40", top: `calc(var(--nav-h, 70px) / ${z} + 16px)`, left: web ? "24px" : "12px", display: "inline-flex", alignItems: "center", minHeight: "44px", padding: "0 16px", boxSizing: "border-box", borderRadius: "999px", background: "var(--card)", border: "2px solid var(--ink)", boxShadow: "3px 3px 0 var(--ink)", "--c": "var(--ink)", ...MONO, fontSize: web ? "12px" : "11px", color: "var(--ink)", textDecoration: "none" }}>← Back to home</BackHome>
   );
 }

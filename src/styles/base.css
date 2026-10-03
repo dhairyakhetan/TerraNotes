@@ -17,7 +17,7 @@ html,a,button{touch-action:manipulation} /* no double-tap zoom, so no tap delay 
 /* Inside AQ, AQ's own nav floats over the top of the page, so the magazine's header is not drawn: its box stays as the
    spacer under that nav (every artboard is positioned against its 64px / 80px), visibility so nothing that measures
    it breaks. */
-:host([data-tn-aq]) header.site-header,html[data-tn-aq] header.site-header{visibility:hidden}
+:host([data-tn-aq]) header.site-header > *,html[data-tn-aq] header.site-header > *{visibility:hidden} /* the band stays: text doesn't show through under AQ's nav */
 
 /* press feedback: links and buttons dim while pressed, except the ones with their own press style */
 :where(a,button):active{opacity:.6}

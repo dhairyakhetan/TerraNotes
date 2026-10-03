@@ -2,8 +2,11 @@ import { useEffect, useLayoutEffect, useRef } from 'react';
 import WebHeader from './WebHeader.jsx';
 import { BackToMagazine } from '../shared/InsideAQ.jsx';
 import ArticleCard, { TagPill } from '../shared/ArticleCard.jsx';
-import ArticleBody, { AuthorBox, FieldLog } from '../shared/ArticleBody.jsx';
+import ArticleBody, { AuthorBox, EndMark, FieldLog } from '../shared/ArticleBody.jsx';
+import { ReadingBar, ReadingRail } from '../shared/Reading.jsx';
+import { useReadProgress } from '../lib/readProgress.js';
 import ImageSlot from '../shared/ImageSlot.jsx';
+import BackHome from '../shared/BackHome.jsx';
 import { Clip, FeaturedTape } from '../shared/Tapes.jsx';
 import { placeOf, tagOf } from '../data/articles.js';
 import { pad2 } from '../lib/format.js';
@@ -13,13 +16,14 @@ import { FONT } from '../styles/fonts.js';
 
 // One article, web layout (data: data/articles.js; `next` = the following article in its edition). The cover hangs
 // on a wire at the left (drops in, or flies out of the clicked card, then sways); tag, title, dek and byline on the
-// right; then a 700px reading column (shared/ArticleBody.jsx) with the field log pinned in its right margin, the
-// "words by" box, and the next article hanging on its own wire. Title block and body are in normal flow, so a long
+// right; then a 700px reading column (shared/ArticleBody.jsx) with "in this piece" sticky in its right margin
+// (shared/Reading.jsx: the sections, how much is read) and a progress bar under the header, the "words by" box, and the next article hanging on its own wire. Title block and body are in normal flow, so a long
 // title pushes the text down.
 const MONO = { fontFamily: FONT.mono, letterSpacing: "1px", textTransform: "uppercase" };
 
 export default function WebArticle({ article: a, next }) {
-  const hero = useRef(null);
+  const hero = useRef(null), text = useRef(null);
+  const read = useReadProgress(text);
   useLayoutEffect(() => { flyInFromCard(hero.current); }, []);
   useEffect(() => { document.title = `Aquaterra — ${a.title}`; }, [a.title]);
   const tag = tagOf(a), { i, n } = placeOf(a);
@@ -30,6 +34,7 @@ export default function WebArticle({ article: a, next }) {
     <div className="web">
       <div style={{ position: "relative", width: "1440px", margin: "0 auto", overflow: "clip", background: "var(--page)", fontFamily: FONT.body, color: "var(--ink)" }}>
         <WebHeader wire />
+        <ReadingBar web p={read.p} color={tag.color} />
         <BackToMagazine web />
         <div style={{ position: "absolute", left: "0", top: "78px", width: "1440px", height: "2px", background: "var(--string)" }} />
         <div ref={hero} className="hero-drop" style={{ position: "absolute", left: "80px", top: "118px", width: a.cover ? "fit-content" : "620px", transformOrigin: "50% -38px" }}>
@@ -56,9 +61,15 @@ export default function WebArticle({ article: a, next }) {
           </div>
         </div>
         <div className="rise-in" style={{ position: "relative", margin: "40px 0 0 370px", width: "700px", display: "flex", flexDirection: "column", gap: "28px" }}>
-          {log && <FieldLog log={log} web />}
-          <ArticleBody a={a} tag={tag} web />
-          <div style={{ width: "18px", height: "18px", background: "var(--ink)" }} />
+          <div style={{ position: "relative" }}>
+            <div ref={text} style={{ display: "flex", flexDirection: "column", gap: "28px" }}>
+              {log && <FieldLog log={log} web />}
+              <ArticleBody a={a} tag={tag} web />
+              <EndMark web />
+            </div>
+            {/* the right margin: "in this piece", sticky while the text scrolls by */}
+            <div style={{ position: "absolute", left: "790px", top: "0", bottom: "0" }}><ReadingRail a={a} tag={tag} p={read.p} at={read.at} /></div>
+          </div>
           <AuthorBox a={a} web />
           {/* next on the line */}
           <div style={{ position: "relative", margin: "30px -370px 0", width: "1440px", height: "620px" }}>
@@ -70,6 +81,7 @@ export default function WebArticle({ article: a, next }) {
                 <ArticleCard article={next} look="webNext" />
               </div>
             </div>
+            <BackHome className="lift-link" style={{ position: "absolute", left: "80px", top: "560px", minHeight: "44px", display: "flex", alignItems: "center", fontFamily: FONT.hand, fontSize: "26px", color: "var(--ink)", textDecoration: "none" }}>← back to home</BackHome>
           </div>
         </div>
       </div>

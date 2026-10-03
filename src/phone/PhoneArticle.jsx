@@ -2,7 +2,9 @@ import { useEffect, useLayoutEffect, useRef } from 'react';
 import PhoneHeader from './PhoneHeader.jsx';
 import { BackToMagazine } from '../shared/InsideAQ.jsx';
 import ArticleCard, { TagPill } from '../shared/ArticleCard.jsx';
-import ArticleBody, { AuthorBox } from '../shared/ArticleBody.jsx';
+import ArticleBody, { AuthorBox, EndMark } from '../shared/ArticleBody.jsx';
+import { ReadingBar } from '../shared/Reading.jsx';
+import { useReadProgress } from '../lib/readProgress.js';
 import BackHome from '../shared/BackHome.jsx';
 import ImageSlot from '../shared/ImageSlot.jsx';
 import { Clip, FeaturedTape } from '../shared/Tapes.jsx';
@@ -17,7 +19,8 @@ import { FONT } from '../styles/fonts.js';
 // loops.css). Then the byline strip, the body (shared/ArticleBody.jsx), the "words by" box, the next article on its
 // own wire, and "back to home". Hero, byline and body are in normal flow: a taller cover pushes the rest down.
 export default function PhoneArticle({ article: a, next }) {
-  const hero = useRef(null);
+  const hero = useRef(null), text = useRef(null);
+  const read = useReadProgress(text);
   useLayoutEffect(() => { flyInFromCard(hero.current, true); }, []);
   useEffect(() => { document.title = `Aquaterra — ${a.title}`; }, [a.title]);
   const tag = tagOf(a), { i, n } = placeOf(a);
@@ -26,6 +29,7 @@ export default function PhoneArticle({ article: a, next }) {
   return (
     <div className="page-article" style={{ position: "relative", width: "390px", margin: "0 auto", overflow: "clip", background: "var(--page)", fontFamily: FONT.body, color: "var(--ink)" }}>
       <PhoneHeader current="article" edge={tag.color} />
+      <ReadingBar p={read.p} color={tag.color} />
       <BackToMagazine />
       <div style={{ position: "absolute", left: "0", top: "100px", width: "390px", height: "2px", background: "var(--string)" }} />
       <div ref={hero} className="hero-drop" style={{ position: "relative", margin: "70px 0 0 16px", width: "358px", minHeight: "484px", transformOrigin: "50% -32px" }}>
@@ -50,8 +54,10 @@ export default function PhoneArticle({ article: a, next }) {
         <div style={{ padding: "10px", background: tag.color, color: tag.ink }}>{`${a.readTime || '[x]'} min`}</div>
       </div>
       <div className="rise-in" style={{ position: "relative", margin: "39px 0 0 24px", width: "342px", minHeight: "2606px", display: "flex", flexDirection: "column", gap: "22px" }}>
-        <ArticleBody a={a} tag={tag} />
-        <div style={{ width: "16px", height: "16px", background: "var(--ink)" }} />
+        <div ref={text} style={{ display: "flex", flexDirection: "column", gap: "22px" }}>
+          <ArticleBody a={a} tag={tag} />
+          <EndMark />
+        </div>
         <AuthorBox a={a} />
         {/* next on the line */}
         <div style={{ position: "relative", margin: "10px -24px 0", width: "390px", height: "470px" }}>

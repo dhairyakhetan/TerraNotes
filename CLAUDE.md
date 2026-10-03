@@ -266,7 +266,8 @@ src/pages/              EditionsPage (/editions), NotFoundPage (404): both layou
                         DemoPage (an article's demo app, full-window)
 src/articles/labs/      LabsPage.jsx + labs.css: the AQ Labs gallery (the "labs" article's own page, both layouts)
 src/shared/             used by both layouts:
-  ArticleCard           the card (+ TagPill, TagRow)          ArticleBody   body blocks, FieldLog, AuthorBox
+  ArticleCard           the card (+ TagPill, TagRow)          ArticleBody   body blocks (numbered sections), FieldLog, EndMark, AuthorBox
+  Reading               the article pages' progress bar + the web "in this piece" rail (lib/readProgress.js)
   TeamSection           "Meet the team" + profile card        PhotoWallSection, PhotoViewer, WordsGameSection
   HomeIntroCard         the home intro card                   AqNavSlot     placeholder for AQ's nav (AQ's look, own site)
   EndCards              the home pages' end: GameCard (Snake ↔ Float) + EditionsCard (InsideAQ, with AQ's look)

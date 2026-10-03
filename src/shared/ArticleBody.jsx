@@ -2,6 +2,7 @@ import ImageSlot from './ImageSlot.jsx';
 import { Clip } from './Tapes.jsx';
 import { PhotoIcon } from './Icons.jsx';
 import { editionData } from '../editions/index.js';
+import { partId } from '../lib/readProgress.js';
 import { FONT } from '../styles/fonts.js';
 
 // An article's body, rendered from its `body` list (block formats: top of data/articles.js), on either layout.
@@ -12,7 +13,7 @@ const MONO = { fontFamily: FONT.mono, letterSpacing: "1px", textTransform: "uppe
 const HEAD = { fontFamily: FONT.head, textTransform: "uppercase", lineHeight: "1" };
 const cap = (t) => t.match(/^[“‘"'(]*./u)[0]; // the drop cap: first letter, with any opening quote mark before it
 
-function Block({ b, first, a, tag, web }) {
+function Block({ b, first, part, a, tag, web }) {
   const para = { fontFamily: FONT.read, color: "var(--text)", margin: "0", ...P[web ? 'web' : 'phone'] };
   if (typeof b === 'string') {
     if (!first) return <p style={para}>{b}</p>;
@@ -20,8 +21,13 @@ function Block({ b, first, a, tag, web }) {
     return <p style={para}><span style={{ float: "left", fontFamily: FONT.head, fontSize: web ? "78px" : "62px", lineHeight: "0.8", margin: web ? "8px 14px 0 0" : "6px 10px 0 0", padding: web ? "8px 10px" : "6px 8px", background: tag.color, color: tag.ink, border: "2px solid var(--ink)" }}>{draft ? a.title[0] : cap(b)}</span>{draft ? b : b.slice(cap(b).length)}</p>;
   }
   if (b.h2 != null) {
-    const sq = web ? "18px" : "14px";
-    return <h2 style={{ margin: web ? "12px 0 0" : "10px 0 0", fontFamily: FONT.head, fontWeight: "400", fontSize: web ? "32px" : "24px", lineHeight: "1", textTransform: "uppercase", display: "flex", alignItems: "center", gap: web ? "14px" : "10px" }}><span style={{ width: sq, height: sq, background: tag.color, border: "2px solid var(--ink)", flexShrink: "0" }} />{b.h2}</h2>;
+    // numbered: a little tag-coloured tab with the section's number, then the heading (id part-N: the web rail's links)
+    return (
+      <h2 id={partId(part)} data-part="" style={{ margin: web ? "24px 0 0" : "16px 0 0", scrollMarginTop: web ? "36px" : "20px", fontFamily: FONT.head, fontWeight: "400", fontSize: web ? "34px" : "25px", lineHeight: "1.02", textTransform: "uppercase", display: "flex", alignItems: "flex-start", gap: web ? "16px" : "12px" }}>
+        <span aria-hidden="true" style={{ ...MONO, flexShrink: "0", marginTop: web ? "2px" : "1px", fontSize: web ? "13px" : "11px", fontWeight: "700", lineHeight: "1", padding: web ? "7px 8px" : "6px 6px", background: tag.color, color: tag.ink, border: "2px solid var(--ink)", boxShadow: "3px 3px 0 var(--ink)", transform: "rotate(-3deg)" }}>{String(part + 1).padStart(2, '0')}</span>
+        <span>{b.h2}</span>
+      </h2>
+    );
   }
   if (b.quote != null) {
     return (
@@ -163,7 +169,19 @@ function Extra({ b, tag, web }) {
 // Every block of the article, in order (the first paragraph gets the drop cap).
 export default function ArticleBody({ a, tag, web }) {
   const first = a.body.findIndex((b) => typeof b === 'string');
-  return a.body.map((b, i) => <Block key={i} b={b} first={i === first} a={a} tag={tag} web={web} />);
+  let part = -1; // section headings are numbered in order
+  return a.body.map((b, i) => <Block key={i} b={b} first={i === first} part={b?.h2 != null ? ++part : part} a={a} tag={tag} web={web} />);
+}
+
+// The end of the text: a small ink square, "end of the piece", and a rule
+export function EndMark({ web }) {
+  return (
+    <div aria-hidden="true" style={{ display: "flex", alignItems: "center", gap: web ? "14px" : "10px", marginTop: web ? "8px" : "4px" }}>
+      <span style={{ width: web ? "18px" : "14px", height: web ? "18px" : "14px", background: "var(--ink)", flexShrink: "0" }} />
+      <span style={{ ...MONO, fontSize: web ? "12px" : "10.5px", fontWeight: "700", whiteSpace: "nowrap" }}>end of the piece</span>
+      <span style={{ flexGrow: "1", height: "2px", background: "var(--ink)" }} />
+    </div>
+  );
 }
 
 // The "words by" box under the text (not for articles from Aquaterra itself: author null).
