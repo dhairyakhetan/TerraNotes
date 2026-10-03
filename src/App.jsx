@@ -30,7 +30,7 @@ import AqNavSlot from './shared/AqNavSlot.jsx';
 import { ALL_ARTICLES } from './data/articles.js';
 import { LATEST, articleFolder, articleLink, editionById, editionLink, editionOf, homeLink, isDraft } from './data/editions.js';
 import { editionData } from './editions/index.js';
-import { OWN_PAGES } from './editions/pages.js';
+import { OWN_PAGES, EDITION_CSS } from './editions/pages.js';
 import { EditionContext, applyLook } from './lib/edition.js';
 import { useIsWeb } from './lib/layoutMode.js';
 import { SECTIONS, editionAt, isDemoPath } from './lib/routes.js';
@@ -103,7 +103,8 @@ function ArticleRoute({ web }) {
 // layout effects (they measure text drawn in the look's fonts).
 function Look({ edition }) {
   useLayoutEffect(() => applyLook(edition), [edition]);
-  return null;
+  const css = EDITION_CSS[edition.id]; // its look.css (src/editions/pages.js)
+  return css ? <style>{css}</style> : null;
 }
 
 // "Skip to main content": hidden until focused with the keyboard; moves focus past the page's header.

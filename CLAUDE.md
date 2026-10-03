@@ -162,21 +162,25 @@ Two separate layouts, chosen by window width (`lib/layoutMode.js`, `useIsWeb()`)
 
 The site is "notes pegged on a line": paper cards hanging from strings, with ink borders, hard shadows, tape and handwriting.
 
-This is September 2026's look (`src/editions/sep26/look.js`); a new edition starts from a copy and changes the values.
+Each edition has a theme, a vibe for the whole page, not just colours: September 2026 is **"exam season"**, a school
+notebook (`src/editions/sep26/`: `look.js` colours, `look.css` ruled paper with a red margin and punch holes on the pages
+with `class="page-sheet"`, `Decor.jsx` doodles on the home pages: sticky note, coffee ring, star, paper plane). October
+is planned as Durga Puja. A new edition starts from a copy of the newest look and changes the values; its own CSS and
+doodles are registered in `src/editions/pages.js` (`EDITION_CSS`, `DECOR`).
 Use the variables, nothing else (the look lists a few more, for the photo wall, dark panels and details).
 
 **Palette:**
 
 | Role | Variable | Sep 2026 |
 |---|---|---|
-| page | `--page` (outside the artboard: `--outside`) | `#F3EEE4` (`#E6E0D3`) |
+| page | `--page` (outside the artboard: `--outside`) | `#F5F2E9` (`#E4E0D5`) |
 | cards | `--card` (soft cream `--cream`) | `#FFFFFF` (`#FBF8F1`) |
-| ink / borders | `--ink` | `#111111` |
-| body text | `--text` | `#1E2723` |
-| handwriting | `--hand` (deks `--dek`) | `#5B3A1E` (`#5B4630`) |
-| string / wire | `--string` / `--wire` | `#5B3A1E` / `#8E7A5E` |
-| accents | `--yellow`, `--red`, `--blue`, `--green`, `--purple`, `--pink`, `--mint` | `#F7C21A`, `#F0442B`, `#3DA5F4`, `#1E7A4C`, `#7B5CE6`, `#EE4E8A`, `#7FC49B` |
-| photo wall | panel `--wall`, amber shadow `--amber` | `#1C2622`, `#E9A23B` |
+| ink / borders | `--ink` | `#18213A` (navy-black ballpoint) |
+| body text | `--text` | `#253048` |
+| handwriting | `--hand` (deks `--dek`) | `#2349B8` blue ballpoint (`#344262`) |
+| string / wire | `--string` / `--wire` | `#6E747D` / `#9AA0A9` (pencil) |
+| accents | `--yellow`, `--red`, `--blue`, `--green`, `--purple`, `--pink`, `--mint` | highlighters and pens: `#FFD43B`, `#E5484D`, `#3D7BFD`, `#2E9E5B`, `#7B5CE6`, `#FF6FAE`, `#7FE0A6` |
+| photo wall | panel `--wall`, amber shadow `--amber` | `#1C2740` (blackboard), `#FFD43B` |
 
 Tag colours are in the edition's `TAGS` (`articles.js`) and team colours in its `TEAMS` (`team.js`).
 
@@ -255,7 +259,7 @@ src/App.jsx             routes (phone vs web page per route, articles with their
                         edition (its look + useEdition()), skip link, scroll memory, error card, games popup (loaded on first use), draft tape
 src/editions/           one folder per edition (see "Editions"): <id>/look.js, articles.js, photos.js, words.js, team.js, index.js
   index.js              the folders by id, ALL_ARTICLES, editionData(n), the build's checks
-  pages.js              editions' own home / article pages (OWN_PAGES)
+  pages.js              editions' own pages (OWN_PAGES), CSS (EDITION_CSS) and home doodles (DECOR)
 src/data/               site-wide content (each file documents its fields at the top)
   site.js               site URL, Aquaterra website + Instagram, a line about Aquaterra
   articles.js           article fields + body block formats (top), ALL_ARTICLES, ARTICLES (latest edition), placeOf(), tagOf()

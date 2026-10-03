@@ -27,7 +27,7 @@ export default function PhoneArticle({ article: a, next }) {
   const title = useFitTitle(a.title, 42, 30, 4); // at most four lines
 
   return (
-    <div className="page-article" style={{ position: "relative", width: "390px", margin: "0 auto", overflow: "clip", background: "var(--page)", fontFamily: FONT.body, color: "var(--ink)" }}>
+    <div className="page-article page-sheet" style={{ position: "relative", width: "390px", margin: "0 auto", overflow: "clip", background: "var(--page)", fontFamily: FONT.body, color: "var(--ink)" }}>
       <PhoneHeader current="article" edge={tag.color} />
       <ReadingBar p={read.p} color={tag.color} />
       <BackToMagazine />

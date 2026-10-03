@@ -5,14 +5,15 @@ import { LABS_TEAMS } from '../../data/labs.js';
 // src/data/articles.js. Writers' text is verbatim, typos included.
 
 export const TAGS = {
-  'Field notes': { color: '#F0442B', ink: '#FFFFFF' },
-  Reportage: { color: '#3DA5F4', ink: '#111111' },
-  Logbook: { color: '#1E7A4C', ink: '#FFFFFF' },
+  // highlighter and pen colours (the exam-season notebook look)
+  'Field notes': { color: '#E5484D', ink: '#FFFFFF' },
+  Reportage: { color: '#3D7BFD', ink: '#FFFFFF' },
+  Logbook: { color: '#2E9E5B', ink: '#FFFFFF' },
   'Object study': { color: '#7B5CE6', ink: '#FFFFFF' },
-  Dispatch: { color: '#F7C21A', ink: '#111111' },
-  Essay: { color: '#EE4E8A', ink: '#111111' },
-  Prose: { color: '#1E7A4C', ink: '#FFFFFF' },
-  'Under Aquaterra': { color: '#F7C21A', ink: '#111111' },
+  Dispatch: { color: '#FFD43B', ink: '#18213A' },
+  Essay: { color: '#FF6FAE', ink: '#18213A' },
+  Prose: { color: '#7FE0A6', ink: '#18213A' },
+  'Under Aquaterra': { color: '#FFD43B', ink: '#18213A' },
 };
 
 export const ARTICLES = [

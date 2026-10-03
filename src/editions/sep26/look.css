@@ -1,0 +1,20 @@
+/* September 2026's look, "exam season" (src/editions/sep26/look.js): the pages are sheets of a school notebook.
+   Only this edition's pages get it (html / the shadow host carry data-edition="sep26": lib/edition.js); loaded through
+   src/editions/pages.js EDITION_CSS. Pages opt in with class="page-sheet" on their root (the home and article pages).
+   The pages set their background inline (background: var(--page)), so these use !important to lay the ruling on top. */
+
+/* ruled paper: faint blue lines every 40px under the header, a red margin line */
+html[data-edition="sep26"] .page-sheet,:host([data-edition="sep26"]) .page-sheet{
+  --margin-x:14px;
+  background-image:linear-gradient(to right,transparent 0 var(--margin-x),rgba(229,72,77,.45) var(--margin-x) calc(var(--margin-x) + 1.5px),transparent calc(var(--margin-x) + 1.5px)),repeating-linear-gradient(to bottom,transparent 0 39px,rgba(61,123,253,.14) 39px 40px) !important;
+  background-position:0 0,0 104px !important;
+  background-repeat:no-repeat,repeat !important;
+}
+/* web: a wider margin, and punch holes down the left edge */
+html[data-edition="sep26"] .web .page-sheet,:host([data-edition="sep26"]) .web .page-sheet{
+  --margin-x:104px;
+  background-image:radial-gradient(circle at 46px 50%,var(--outside) 0 12px,rgba(24,33,58,.28) 12.5px 14px,transparent 14.5px),linear-gradient(to right,transparent 0 var(--margin-x),rgba(229,72,77,.45) var(--margin-x) calc(var(--margin-x) + 2px),transparent calc(var(--margin-x) + 2px)),repeating-linear-gradient(to bottom,transparent 0 47px,rgba(61,123,253,.14) 47px 48px) !important;
+  background-size:92px 260px,auto,auto !important;
+  background-position:0 140px,0 0,0 128px !important;
+  background-repeat:repeat-y,no-repeat,repeat !important;
+}

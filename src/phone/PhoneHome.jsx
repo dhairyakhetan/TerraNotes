@@ -7,6 +7,7 @@ import PhotoViewer from '../shared/PhotoViewer.jsx';
 import WordsGameSection from '../shared/WordsGameSection.jsx';
 import TeamSection, { teamHeight } from '../shared/TeamSection.jsx';
 import { PhoneBuddy } from '../shared/buddy/Buddy.jsx';
+import EditionDecor from '../shared/EditionDecor.jsx';
 import EndCards, { endCardsSpace } from '../shared/EndCards.jsx';
 import { homeTitle, useEdition } from '../lib/edition.js';
 import { usePauseOffscreen } from '../lib/pauseOffscreen.js';
@@ -29,8 +30,9 @@ export default function PhoneHome() {
 
   return (
     <>
-      <div id="top" className="page-home" style={{ position: "relative", width: "390px", height: `${2480 + teamHeight(edition, 'phone') + extra + snake}px`, margin: "0 auto", overflow: "clip", background: "var(--page)", fontFamily: FONT.body, color: "var(--text)" }}>
+      <div id="top" className="page-home page-sheet" style={{ position: "relative", width: "390px", height: `${2480 + teamHeight(edition, 'phone') + extra + snake}px`, margin: "0 auto", overflow: "clip", background: "var(--page)", fontFamily: FONT.body, color: "var(--text)" }}>
         <PhoneHeader current="home" />
+        <EditionDecor />
         <PhoneBuddy />
         <HomeIntroCard />
         <div id="articles" aria-hidden="true" style={{ position: "absolute", left: "0", top: "236px", width: "1px", height: "1px" }} />

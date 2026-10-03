@@ -15,9 +15,9 @@
 
 // label: the legend and profile tag. made: what the team made; credit: the same as a sentence, shown on its members' profiles (writers also get "their articles").
 export const TEAMS = {
-  heads: { label: 'Heads', color: '#1E7A4C', made: 'keep everyone on track', credit: 'Keeps everyone on track' },
-  design: { label: 'Design team', color: '#3DA5F4', made: 'made the layout and style of this website, along with its other design elements', credit: 'Made the layout and style of this website, along with its other design elements' },
-  writing: { label: 'Writing team', color: '#F0442B', made: 'wrote the articles on this website', credit: 'Wrote the articles on this website' },
+  heads: { label: 'Heads', color: '#2E9E5B', made: 'keep everyone on track', credit: 'Keeps everyone on track' },
+  design: { label: 'Design team', color: '#3D7BFD', made: 'made the layout and style of this website, along with its other design elements', credit: 'Made the layout and style of this website, along with its other design elements' },
+  writing: { label: 'Writing team', color: '#E5484D', made: 'wrote the articles on this website', credit: 'Wrote the articles on this website' },
   tech: { label: 'Tech team', color: '#7B5CE6', made: 'made this website', credit: 'Made this website' },
 };
 

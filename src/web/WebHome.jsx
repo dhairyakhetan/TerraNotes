@@ -7,6 +7,7 @@ import PhotoViewer from '../shared/PhotoViewer.jsx';
 import WordsGameSection from '../shared/WordsGameSection.jsx';
 import TeamSection, { teamHeight } from '../shared/TeamSection.jsx';
 import { WebBuddy } from '../shared/buddy/Buddy.jsx';
+import EditionDecor from '../shared/EditionDecor.jsx';
 import EndCards, { endCardsSpace } from '../shared/EndCards.jsx';
 import { homeTitle, useEdition } from '../lib/edition.js';
 import { usePauseEach } from '../lib/pauseOffscreen.js';
@@ -29,8 +30,9 @@ export default function WebHome() {
 
   return (
     <div className="web">
-      <div id="top" ref={page} style={{ position: "relative", width: "1440px", height: `${2610 + teamHeight(edition, 'web') + snake}px`, margin: "0 auto", overflow: "clip", background: "var(--page)", fontFamily: FONT.body, color: "var(--ink)" }}>
+      <div id="top" ref={page} className="page-sheet" style={{ position: "relative", width: "1440px", height: `${2610 + teamHeight(edition, 'web') + snake}px`, margin: "0 auto", overflow: "clip", background: "var(--page)", fontFamily: FONT.body, color: "var(--ink)" }}>
         <WebHeader />
+        <EditionDecor web />
         <HomeIntroCard web />
         <div style={{ position: "absolute", left: "720px", top: "132px", fontFamily: FONT.mono, fontSize: "12px", letterSpacing: "1.8px" }}>TERRANOTES · WRITE-UPS, PHOTOS &amp; WORDS</div>
         <div style={{ position: "absolute", left: "716px", top: "160px", fontFamily: FONT.head, fontSize: "96px", lineHeight: "0.9", letterSpacing: "-2px", textTransform: "uppercase", color: "var(--ink)" }}>

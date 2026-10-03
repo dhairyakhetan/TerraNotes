@@ -32,7 +32,7 @@ export default function WebArticle({ article: a, next }) {
 
   return (
     <div className="web">
-      <div style={{ position: "relative", width: "1440px", margin: "0 auto", overflow: "clip", background: "var(--page)", fontFamily: FONT.body, color: "var(--ink)" }}>
+      <div className="page-sheet" style={{ position: "relative", width: "1440px", margin: "0 auto", overflow: "clip", background: "var(--page)", fontFamily: FONT.body, color: "var(--ink)" }}>
         <WebHeader wire />
         <ReadingBar web p={read.p} color={tag.color} />
         <BackToMagazine web />
