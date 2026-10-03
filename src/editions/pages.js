@@ -21,8 +21,8 @@ export const OWN_PAGES = {};
 // - DECOR: a component drawn on its home pages' artboard ({ web }: which layout), for doodles and the like
 export const EDITION_CSS = { sep26: sep26Css, oct26: oct26Css };
 export const DECOR = { sep26: Sep26Decor, oct26: Oct26Decor };
-// - TEAM_NOTE: a component drawn in its "Meet the team" section, under the legend ({ style, size, web }: where and how
-//   big, from shared/TeamSection.jsx), e.g. September's diary, October's horn
+// - TEAM_NOTE: a component drawn in its "Meet the team" section, web under the legend, phone beside it ({ style, size,
+//   web }: where and how big, from shared/TeamSection.jsx), e.g. September's diary, October's horn
 export const TEAM_NOTE = { sep26: Sep26Diary, oct26: Oct26Horn };
 // - RULED / TEAM_FIT: for an edition whose pages are ruled paper: its ruling ({ web, phone }: { start, gap, margin }),
 //   which the home pages write on (lib/ruled.js useRuledPage: every [data-ruled] element), and its "Meet the team"

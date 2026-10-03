@@ -30,7 +30,7 @@ const PHONE = {
   count: { right: "20px", top: "30px", fontSize: "9px", letterSpacing: "1.6px", lineHeight: "1.6" },
   blurb: { left: "20px", top: "136px", width: "340px", fontSize: "15px", lineHeight: "1.5" },
   note: { left: "22px", top: "270px", width: "250px", fontSize: "21px" },
-  legend: { left: "20px", top: "340px", width: "350px", display: "grid", gridTemplateColumns: "1fr 1fr", gridAutoRows: "48px", alignItems: "center", columnGap: "12px" }, extra: { left: 28, top: 448, width: 334, size: 23 }, chip: { minHeight: "44px", padding: "0 10px 0 6px", gap: "8px", fontSize: "9.5px", letterSpacing: "1.2px" }, dot: "12px",
+  legend: { left: "20px", top: "340px", width: "170px", display: "grid", gridTemplateColumns: "1fr", gridAutoRows: "48px", alignItems: "center" }, extra: { left: 204, top: 352, width: 170, size: 23 }, chip: { minHeight: "44px", padding: "0 10px 0 6px", gap: "8px", fontSize: "9.5px", letterSpacing: "1.2px" }, dot: "12px",
   face: { half: 58, gap: "8px", shadow: "6px 5px 0", icon: 20, font: "11px", name: "12px", role: "8.5px", roleSpacing: "1px", roleGap: "3px", pad: "2px 6px", bump: "transform .12s ease" },
   dim: "rgba(17,17,17,.55)",
   card: { width: 334, shadow: "8px 8px 0", padding: "18px", clip: [34, 10, "-7px"], close: { right: "10px", top: "10px" }, photo: "96px", name: "30px", role: "20px", bio: "14px", credit: "13px" },
@@ -146,9 +146,9 @@ export default function TeamSection({ web }) {
       <svg width={L.width} height={H} viewBox={`0 0 ${L.width} ${H}`} style={{ position: "absolute", left: "0", top: "0", pointerEvents: "none" }} aria-hidden="true" fill="none" strokeWidth={L.line[0]} strokeDasharray={L.line[1]} strokeLinecap="round">
         {L.links.map((l) => <path key={l.team} d={l.d} stroke={TEAMS[l.team].color} opacity={team == null ? 0.55 : team === l.team ? 0.95 : 0.12} style={{ transition: "opacity .25s" }} />)}
       </svg>
-      {/* the edition's own note, if it has one (src/editions/pages.js TEAM_NOTE): under the legend */}
+      {/* the edition's own note, if it has one (src/editions/pages.js TEAM_NOTE): web under the legend, phone beside it */}
       {Note && <Note web={web} size={L.extra.size} style={{ left: `${L.extra.left}px`, top: `${L.extra.top}px`, width: `${L.extra.width}px` }} />}
-      {/* legend: pick a team to fade everyone else; two by two, every chip the same size */}
+      {/* legend: pick a team to fade everyone else; every chip the same size (web two by two, phone one column) */}
       <div style={{ position: "absolute", ...L.legend, ...snap('legend') }}>
         {Object.entries(TEAMS).map(([key, t], row) => {
           const on = team === key;

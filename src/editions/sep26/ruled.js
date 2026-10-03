@@ -8,7 +8,7 @@ export const RULE = { web: { start: 128, gap: 32, margin: 104 }, phone: { start:
 // the ruling's (or a whole number of rules), and shared/TeamSection.jsx drops each block's first baseline on a ruled
 // line (lib/ruled.js, as the diary does), so the rest of its lines follow. Tops are where a block starts roughly: the
 // fit moves it by less than half a rule. No ink divider over the section: the page's own lines do that job. The legend
-// (two by two, as in every edition) puts a team every two rules (tap targets stay 44px). Only September reads this.
+// (as in every edition: web two by two, phone one column) puts a team every two rules (tap targets stay 44px). Only September reads this.
 export const TEAM_FIT = {
   web: {
     rule: { display: 'none' },
@@ -25,7 +25,7 @@ export const TEAM_FIT = {
     blurb: { left: '28px', top: '146px', width: '334px', lineHeight: '28px' },
     note: { left: '28px', top: '324px', width: '330px', lineHeight: '28px', transform: 'none' },
     legend: { left: '20px', top: '394px', gridAutoRows: '56px' },
-    extra: { left: 28, top: 522, width: 334, size: 21 },
-    faces: { top: 660 },
+    extra: { left: 204, top: 400, width: 170, size: 21 },
+    faces: { top: 700 },
   },
 };
