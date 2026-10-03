@@ -28,4 +28,11 @@ export const TEAM_NOTE = { sep26: Sep26Diary, oct26: Oct26Horn };
 //   which the home pages write on (lib/ruled.js useRuledPage: every [data-ruled] element), and its "Meet the team"
 //   text laid out on it (overrides for shared/TeamSection.jsx's tables; the section sets its own blocks' baselines)
 export const RULED = { sep26: Sep26Rule };
+// - LAYOUT: newer layouts of the shared home sections, switched on per edition so an older edition keeps the one it
+//   came out with. A new edition copies the newest one's entry.
+//     leadCard: the web article line hangs its first piece as the big 340×460 card, runs the wire to the page's edge
+//               and ends in a "more soon" slot (web/WebArticleLine.jsx)
+//     wordsRow: the web words game puts the cloud and its answers side by side, centred on each other
+//               (shared/WordsGameSection.jsx)
+export const LAYOUT = { oct26: { leadCard: true, wordsRow: true } };
 export const TEAM_FIT = { sep26: Sep26TeamFit };

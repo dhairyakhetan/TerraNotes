@@ -14,7 +14,7 @@ export const LOOK = {
     cream: '#FFF4CF', // soft cream cards
     ink: '#26268F', // borders, text, hard shadows, dark fills: royal indigo
     text: '#33368F', // body text
-    hand: '#E8115F', // handwriting: hibiscus pink
+    hand: '#D10F55', // handwriting: hibiscus pink (a notch deep enough for small text on the cream: 5:1)
     string: '#FF9F1C', // the strings things hang from: saffron
     dek: '#5256D6', // deks (the line under a title)
     wire: '#FFB84D', // the menu's wire; quiet handwritten notes
@@ -37,7 +37,7 @@ export const LOOK = {
     labelDark: '#E4E2FF', // labels on dark
     ruleDark: '#7C73F5', // lines on dark
     // quieter details
-    muted: '#6F76B5', // quiet grey text
+    muted: '#5A62A8', // quiet grey text (5:1 on the page)
     grey: '#4E55A0', // secondary text (the words game's "/ say it /")
     bioText: '#33368F', // a member's bio on their profile card
     introLabel: '#E8115F', // "Introduction" on the home intro card

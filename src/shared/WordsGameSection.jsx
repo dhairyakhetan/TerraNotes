@@ -3,11 +3,13 @@ import { fitWord, useWordsGame } from '../lib/useWordsGame.js';
 import { useEdition } from '../lib/edition.js';
 import { FONT } from '../styles/fonts.js';
 import { useReveal } from '../lib/reveal.js';
+import { LAYOUT } from '../editions/pages.js';
 
 // "Words we should bring back." (id="words"), both layouts: an old word on a cloud (with how to say it), three meanings
 // to pick from, the verdict + real definition, a "psst." hint after a while, and a score card after 5 words. Game
 // state: lib/useWordsGame.js; words: the edition's (src/editions/<id>/words.js). Phone: cloud on top, options under it;
-// web: cloud left, options right.
+// web: cloud left, options right; with the edition's LAYOUT wordsRow (src/editions/pages.js), the heading on one line
+// above, and the cloud and its options side by side, centred on each other (WEB_ROW), the verdict under the options.
 const CLOUD = 'M26 104 H176 A24 24 0 0 0 178 56 A36 36 0 0 0 110 30 A30 30 0 0 0 56 42 A30 30 0 0 0 26 104 Z';
 const PHONE = {
   section: { top: "1830px", width: "390px", height: "650px" }, btn: 'press',
@@ -35,13 +37,24 @@ const WEB = {
   done: { left: "780px", top: "120px", width: "520px", boxShadow: "9px 9px 0 var(--ink)", padding: "28px" }, doneLabel: { fontSize: "12px", letterSpacing: "1.8px" }, doneScore: "96px", doneMsg: { marginTop: "8px", fontSize: "30px" },
   again: { marginTop: "18px", minHeight: "48px", padding: "0 20px", fontSize: "12px" },
 };
+const WEB_ROW = {
+  ...WEB,
+  title: { left: "80px", top: "24px", width: "900px", fontSize: "68px", lineHeight: "0.95" },
+  score: { right: "80px", top: "54px", textAlign: "right", fontSize: "12px", letterSpacing: "1.8px" },
+  cloud: { ...WEB.cloud, left: 70, top: 130 },
+  options: { left: "760px", top: "170px", width: "600px", gap: "18px" }, // 3 × 68 + 2 × 18 = 240, centred on the 320 cloud
+  hint: { ...WEB.hint, top: "452px" },
+  reveal: { left: "760px", top: "450px", width: "600px", gap: "20px" },
+  done: { ...WEB.done, top: "150px" },
+};
 const DARK_BTN = { background: "var(--ink)", color: "var(--card)", border: "2px solid var(--ink)", fontFamily: FONT.mono, fontWeight: "700", letterSpacing: "1px", textTransform: "uppercase" };
 
 export default function WordsGameSection({ web }) {
-  const L = web ? WEB : PHONE, C = L.cloud;
+  const edition = useEdition();
+  const L = web ? (LAYOUT[edition.id]?.wordsRow ? WEB_ROW : WEB) : PHONE, C = L.cloud;
   const ref = useRef(null);
   useReveal(ref);
-  const w = useWordsGame(ref, useEdition().words);
+  const w = useWordsGame(ref, edition.words);
   return (
     <section id="words" ref={ref} style={{ position: "absolute", left: "0", ...L.section }}>
       <h2 data-ruled="2" data-rid="words-title" style={{ position: "absolute", margin: "0", fontFamily: FONT.serif, fontStyle: "italic", fontWeight: "400", color: "var(--ink)", ...L.title }}>Words we should bring back.</h2>

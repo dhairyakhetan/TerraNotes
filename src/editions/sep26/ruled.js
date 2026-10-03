@@ -18,6 +18,7 @@ export const TEAM_FIT = {
     note: { left: '128px', top: '382px', lineHeight: '32px', transform: 'none' },
     legend: { left: '118px', top: '520px', gridAutoRows: '64px' },
     extra: { left: 128, top: 680, width: 430, size: 28 },
+    face: { role: '10px', roleSpacing: '1.2px' }, // the type sizes September came out with (the shared ones grew later)
   },
   phone: {
     rule: { display: 'none' },
@@ -26,6 +27,7 @@ export const TEAM_FIT = {
     note: { left: '28px', top: '324px', width: '330px', lineHeight: '28px', transform: 'none' },
     legend: { left: '20px', top: '394px', gridAutoRows: '56px' },
     extra: { left: 204, top: 400, width: 170, size: 21 },
-    faces: { top: 700 },
+    faces: { top: 700, rows: [[72, 196, 318], [134, 256]] },
+    count: { fontSize: '9px', letterSpacing: '1.6px' }, chip: { fontSize: '9.5px', letterSpacing: '1.2px' }, face: { role: '8.5px', roleSpacing: '1px' }, // as September came out
   },
 };

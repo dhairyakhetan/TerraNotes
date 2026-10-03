@@ -195,7 +195,7 @@ Tom Riddle-style diary under "Meet the team" that writes random lines in a scrip
 marigold strings, a pandal-night photo wall, Rozha One headings; `look.css` the saree border and an alpana dot pattern;
 `Decor.jsx` a marigold toran, alpana, dhak, conch and a "Subho Sharodiya!" tag; `Horn.jsx`, an engraving-style S-horn that now and then slides in upright from
 the page edge by the team legend (left on web, right on phones), is blown and slides back out; Pujo words; two sample articles. A new edition starts from a copy of the newest look and changes the values; its own CSS and
-doodles are registered in `src/editions/pages.js` (`EDITION_CSS`, `DECOR`, `TEAM_NOTE` for a secret by the team legend: under it on web, beside it on phones).
+doodles are registered in `src/editions/pages.js` (`EDITION_CSS`, `DECOR`, `TEAM_NOTE` for a secret by the team legend: under it on web, beside it on phones; `LAYOUT` switches on newer layouts of the shared home sections per edition, so older ones keep theirs: copy the newest edition's entry).
 Use the variables, nothing else (the look lists a few more, for the photo wall, dark panels and details).
 
 **Palette:**

@@ -23,15 +23,15 @@ import { hangExtra } from '../phone/PhoneHangingArticles.jsx';
 // An edition on ruled paper (September's notebook) overrides some of them (src/editions/pages.js TEAM_FIT) so its text
 // starts clear of the margin, and gets each text block's first baseline put on a ruled line (lib/ruled.js).
 const PHONE = {
-  faces: { rows: [[72, 196, 318], [134, 256]], sizes: [92, 80, 98, 84, 88, 96, 82, 90], nudgeX: [-6, 5, -3, 8, -8, 4, 2, -5, 7], nudgeY: [0, 16, -10, 8, 20, -6, 12, -14, 4, 18, -4], top: 610, rowH: 176 },
+  faces: { rows: [[80, 196, 310], [134, 256]], sizes: [92, 80, 98, 84, 88, 96, 82, 90], nudgeX: [-6, 5, -3, 8, -8, 4, 2, -5, 7], nudgeY: [0, 16, -10, 8, 20, -6, 12, -14, 4, 18, -4], top: 580, rowH: 176 },
   width: 390, top: 2470, bend: 18, line: [1.2, '3 5'], header: 64,
   rule: { left: "20px", width: "350px" },
   title: { left: "18px", top: "22px", fontSize: "46px", lineHeight: "0.92", letterSpacing: "-1px" },
-  count: { right: "20px", top: "30px", fontSize: "9px", letterSpacing: "1.6px", lineHeight: "1.6" },
+  count: { right: "20px", top: "30px", fontSize: "10.5px", letterSpacing: "1.4px", lineHeight: "1.6" },
   blurb: { left: "20px", top: "136px", width: "340px", fontSize: "15px", lineHeight: "1.5" },
   note: { left: "22px", top: "270px", width: "250px", fontSize: "21px" },
-  legend: { left: "20px", top: "340px", width: "170px", display: "grid", gridTemplateColumns: "1fr", gridAutoRows: "48px", alignItems: "center" }, extra: { left: 204, top: 352, width: 170, size: 23 }, chip: { minHeight: "44px", padding: "0 10px 0 6px", gap: "8px", fontSize: "9.5px", letterSpacing: "1.2px" }, dot: "12px",
-  face: { half: 58, gap: "8px", shadow: "6px 5px 0", icon: 20, font: "11px", name: "12px", role: "8.5px", roleSpacing: "1px", roleGap: "3px", pad: "2px 6px", bump: "transform .12s ease" },
+  legend: { left: "20px", top: "340px", width: "170px", display: "grid", gridTemplateColumns: "1fr", gridAutoRows: "48px", alignItems: "center" }, extra: { left: 204, top: 352, width: 170, size: 23 }, chip: { minHeight: "44px", padding: "0 10px 0 6px", gap: "8px", fontSize: "11px", letterSpacing: "1px" }, dot: "12px",
+  face: { half: 58, gap: "8px", shadow: "6px 5px 0", icon: 20, font: "11px", name: "12px", role: "10px", roleSpacing: "0.6px", roleGap: "3px", pad: "2px 6px", bump: "transform .12s ease" },
   dim: "rgba(17,17,17,.55)",
   card: { width: 334, shadow: "8px 8px 0", padding: "18px", clip: [34, 10, "-7px"], close: { right: "10px", top: "10px" }, photo: "96px", name: "30px", role: "20px", bio: "14px", credit: "13px" },
 };
@@ -44,7 +44,7 @@ const WEB = {
   blurb: { left: "80px", top: "200px", width: "440px", fontSize: "17px", lineHeight: "1.55" },
   note: { left: "82px", top: "360px", width: "400px", fontSize: "27px" },
   legend: { left: "78px", top: "440px", width: "440px", display: "grid", gridTemplateColumns: "1fr 1fr", gridAutoRows: "52px", alignItems: "center", columnGap: "24px" }, extra: { left: 84, top: 560, width: 470, size: 34 }, chip: { minHeight: "44px", padding: "0 14px 0 8px", gap: "10px", fontSize: "11px", letterSpacing: "1.4px" }, dot: "14px",
-  face: { half: 66, gap: "10px", shadow: "8px 6px 0", icon: 22, font: "13px", name: "15px", role: "10px", roleSpacing: "1.2px", roleGap: "4px", pad: "2px 8px", bump: "transform 180ms cubic-bezier(0.32, 0.72, 0, 1)" },
+  face: { half: 66, gap: "10px", shadow: "8px 6px 0", icon: 22, font: "13px", name: "15px", role: "11px", roleSpacing: "1px", roleGap: "4px", pad: "2px 8px", bump: "transform 180ms cubic-bezier(0.32, 0.72, 0, 1)" },
   dim: "rgba(17,17,17,.35)",
   card: { width: 360, shadow: "9px 9px 0", padding: "22px", clip: [36, 11, "-8px"], close: { right: "12px", top: "12px" }, photo: "108px", name: "34px", role: "23px", bio: "15px", credit: "14px" },
 };
