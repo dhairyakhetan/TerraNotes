@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useEdition } from '../../lib/edition.js';
 import { drawGhost } from './Ghost.jsx';
 import { FONT } from '../../styles/fonts.js';
+import { LEVELS } from './flingLevels.js';
 
 // Fling, the slingshot game in Buddy's games (BuddyGames.jsx), played like Angry Birds: drag Buddy back in the
 // slingshot (the further, the harder), let go, and knock down towers of planks to pop the grumpy gremlins hiding in
@@ -9,44 +10,27 @@ import { FONT } from '../../styles/fonts.js';
 // a retry. Real physics (matter-js, fetched only when this tab opens): planks topple, slide and break when hit hard
 // enough; a gremlin pops on a hard enough knock, from Buddy, a plank or a fall. Points: gremlin 5000, stone 800, wood
 // 500, glass 300, unused Buddy 10000. No sleeping bodies: a plank left unheld falls. The world is 1200 × 540, drawn scaled into the canvas; the canvas only draws while
-// the popup is open. Best score in localStorage ('aq-fling-best').
+// the popup is open. Best score in localStorage ('aq-fling-best'), the furthest level reached too ('aq-fling-level'):
+// the game starts there, and the level picker under the canvas lists every level up to it. The 50 levels: flingLevels.js.
 // What tells you what to do: a banner at each level's start (how many gremlins to pop), a pulsing ring and "drag me"
 // on Buddy while he waits, and, while you pull, the reach of the band, a dotted line of where he'll fly and a power
 // meter; Buddies and gremlins left in the corner; a line after each turn ("missed: pull further", "2 gremlins left");
 // buttons drawn on the cleared / out-of-Buddies cards; the cursor changes over Buddy; Restart level under the canvas.
 const WW = 1200, WH = 540, GROUND = 490, BASE = GROUND - 30, SLING = { x: 160, y: BASE - 92 }, PULL = 100, POWER = 0.25, BR = 17;
 // the slingshot stands on a mound at the left (BASE is its top), the gremlins' forts far out at the right, like Angry Birds
-// levels: [kind, x, y (centre), w, h] for blocks ('wood' / 'glass' / 'stone'), [ 'gremlin', x, y, r ]
-const LEVELS = [
-  [ // a hut with a gremlin inside and one on the roof, and a glass stand with a third
-    ['wood', 860, 440, 20, 100], ['wood', 960, 440, 20, 100], ['wood', 910, 380, 140, 20], ['gremlin', 910, 472, 18],
-    ['glass', 910, 355, 30, 30], ['gremlin', 910, 325, 15],
-    ['glass', 1050, 450, 20, 80], ['glass', 1090, 450, 20, 80], ['wood', 1070, 402, 70, 16], ['gremlin', 1070, 379, 15],
-  ],
-  [ // a two-floor fort with a stone block on top
-    ['wood', 820, 445, 20, 90], ['wood', 920, 445, 20, 90], ['wood', 1020, 445, 20, 90], ['wood', 920, 391, 230, 18],
-    ['gremlin', 870, 474, 16], ['gremlin', 970, 474, 16],
-    ['glass', 840, 347, 20, 70], ['glass', 1000, 347, 20, 70], ['wood', 920, 303, 190, 18], ['gremlin', 920, 365, 17],
-    ['stone', 920, 274, 40, 40], ['gremlin', 920, 240, 14],
-  ],
-  [ // a castle: stone towers either side, a two-floor keep in the middle
-    ['stone', 800, 435, 24, 110], ['stone', 800, 372, 60, 16], ['gremlin', 800, 349, 15],
-    ['stone', 1100, 435, 24, 110], ['stone', 1100, 372, 60, 16], ['gremlin', 1100, 349, 15],
-    ['wood', 880, 440, 20, 100], ['glass', 950, 440, 20, 100], ['wood', 1020, 440, 20, 100], ['wood', 950, 381, 170, 18],
-    ['gremlin', 915, 474, 16], ['gremlin', 985, 474, 16],
-    ['wood', 895, 332, 20, 80], ['wood', 1005, 332, 20, 80], ['wood', 950, 283, 140, 18], ['gremlin', 950, 355, 17],
-    ['glass', 950, 249, 20, 50], ['gremlin', 950, 210, 14],
-  ],
-];
 const HP = { gremlin: 1, glass: 3, wood: 8, stone: 16 }, PTS = { gremlin: 5000, glass: 300, wood: 500, stone: 800 };
 const best = () => { try { return Number(localStorage.getItem('aq-fling-best')) || 0; } catch { return 0; } };
 const keep = (v) => { try { localStorage.setItem('aq-fling-best', String(v)); } catch { /* private mode */ } };
+// how far you've got: the furthest level open to play (the picker lists them)
+const reached = () => { try { return Math.min(LEVELS.length - 1, Number(localStorage.getItem('aq-fling-level')) || 0); } catch { return 0; } };
+const reach = (v) => { try { localStorage.setItem('aq-fling-level', String(v)); } catch { /* private mode */ } };
 
 export default function Fling({ W, H }) {
   const { colors: K, fonts: F } = useEdition().look; // a canvas can't read CSS variables: the values themselves
   const cv = useRef(null);
   const [score, setScore] = useState(0), [top, setTop] = useState(best), [failed, setFailed] = useState(false);
-  const restart = useRef(null);
+  const restart = useRef(null), jump = useRef(null);
+  const [lv, setLv] = useState(reached), [open, setOpen] = useState(reached);
   useEffect(() => {
     let raf = 0, gone = false, cleanup = () => {};
     import('matter-js').then(({ default: M }) => {
@@ -79,9 +63,9 @@ export default function Fling({ W, H }) {
         });
         M.Composite.add(engine.world, things);
         s = { lv, birds: 3, broke: 0, state: 'aim', ghost: null, pull: null, trail: [], since: 0, calm: 0.8, pops: [], bits: [], t: 0, banner: 2.2, note: null, hit: 0, grabbed: s?.grabbed || false, start: total.pts };
-        setFailed(false);
+        setFailed(false); setLv(lv);
       };
-      build(0);
+      build(reached());
 
       // knocks: a hard enough hit breaks a plank or pops a gremlin (not while a fresh level settles)
       M.Events.on(engine, 'collisionStart', (ev) => {
@@ -125,6 +109,7 @@ export default function Fling({ W, H }) {
           if (!gremlins().length) { // cleared: unused Buddies count
             for (let i = 0; i < s.birds; i++) add(10000, SLING.x + i * 30, SLING.y - 60);
             s.state = 'clear';
+            if (s.lv + 1 < LEVELS.length && s.lv + 1 > reached()) { reach(s.lv + 1); setOpen(s.lv + 1); }
             if (total.pts > best()) { keep(total.pts); setTop(total.pts); }
           } else if (s.birds > 0) {
             const n = gremlins().length;
@@ -152,7 +137,7 @@ export default function Fling({ W, H }) {
         const v = b.vertices;
         g.beginPath(); g.moveTo(v[0].x, v[0].y); for (let i = 1; i < v.length; i++) g.lineTo(v[i].x, v[i].y); g.closePath();
         if (b.kind === 'glass') { g.fillStyle = K.cream; g.globalAlpha = 0.85; g.fill(); g.globalAlpha = 1; g.strokeStyle = K.blue; g.lineWidth = 2.5; g.stroke(); }
-        else if (b.kind === 'stone') { g.fillStyle = K.wire; g.fill(); ink(); g.stroke(); }
+        else if (b.kind === 'stone') { g.fillStyle = K.muted; g.fill(); ink(); g.stroke(); }
         else { g.fillStyle = K.peg; g.fill(); ink(); g.stroke(); }
         if (b.hp < HP[b.kind]) { // cracked
           const { x, y } = b.position; g.save(); g.translate(x, y); g.rotate(b.angle); ink(1.4); g.beginPath(); g.moveTo(-6, -8); g.lineTo(2, 0); g.lineTo(-3, 8); g.stroke(); g.restore();
@@ -246,7 +231,7 @@ export default function Fling({ W, H }) {
         // Buddies still waiting
         for (let i = 0; i < Math.max(0, s.birds - (s.state === 'aim' ? 1 : 0)); i++) drawGhost(g, SLING.x - 50 - i * 34, BASE - 13, 12, K, { t: s.t + i, look: [1, 0] });
         // bits and points
-        s.bits.forEach((p) => { g.globalAlpha = Math.max(0, p.life); g.fillStyle = p.kind === 'gremlin' ? K.green : p.kind === 'glass' ? K.blue : p.kind === 'stone' ? K.wire : K.peg; g.fillRect(p.x - 3, p.y - 3, 6, 6); });
+        s.bits.forEach((p) => { g.globalAlpha = Math.max(0, p.life); g.fillStyle = p.kind === 'gremlin' ? K.green : p.kind === 'glass' ? K.blue : p.kind === 'stone' ? K.muted : K.peg; g.fillRect(p.x - 3, p.y - 3, 6, 6); });
         g.globalAlpha = 1;
         g.textAlign = 'center';
         s.pops.forEach((p) => { g.globalAlpha = Math.max(0, p.life); g.fillStyle = K.ink; g.font = `700 ${u(22)}px ${F.mono}`; g.fillText(p.text, p.x, p.y - (1 - p.life) * 40); });
@@ -306,6 +291,7 @@ export default function Fling({ W, H }) {
         c.style.cursor = s.state === 'clear' || s.state === 'failed' ? 'pointer' : s.state === 'aim' && Math.hypot(p.x - SLING.x, p.y - SLING.y) < grab ? 'grab' : 'default';
       };
       const up = () => { if (!dragging) return; dragging = false; launch(); };
+      jump.current = (n) => { total.pts = 0; setScore(0); build(n); };
       restart.current = () => { total.pts = s.start; setScore(total.pts); build(s.lv); };
       c.addEventListener('pointerdown', down); c.addEventListener('pointermove', move); c.addEventListener('pointerup', up); c.addEventListener('pointercancel', up);
       cleanup = () => { c.removeEventListener('pointerdown', down); c.removeEventListener('pointermove', move); c.removeEventListener('pointerup', up); c.removeEventListener('pointercancel', up); M.Engine.clear(engine); };
@@ -320,7 +306,10 @@ export default function Fling({ W, H }) {
       <canvas ref={cv} role="img" aria-label={failed ? 'Fling: out of Buddies, tap to retry' : 'Fling: drag Buddy back in the slingshot and let go to knock the towers down'} style={{ display: "block", width: `${W}px`, height: `${H}px`, border: "2px solid var(--ink)", touchAction: "none", cursor: "default", background: "var(--page)" }} />
       <div style={{ display: "flex", alignItems: "center", gap: "12px", marginTop: "10px" }}>
         <span style={{ flexGrow: "1", fontFamily: FONT.hand, fontSize: W < 400 ? "18px" : "20px", lineHeight: "1.1", color: "var(--hand)" }}>{W < 400 ? 'pull back · follow the dots · let go' : 'pull Buddy back · the dots show where he’ll fly · let go'}</span>
-        <button type="button" className="press btn" onClick={() => restart.current?.()} style={{ "--c": "var(--ink)", flexShrink: "0", fontFamily: FONT.mono, fontWeight: "700", letterSpacing: "1px", textTransform: "uppercase", fontSize: "11px", minHeight: "44px", padding: "0 14px", background: "var(--card)", color: "var(--ink)", border: "2px solid var(--ink)", boxShadow: "3px 3px 0 var(--ink)", cursor: "pointer" }}>↺ Restart level</button>
+        <select aria-label="Pick a level" value={lv} onChange={(e) => jump.current?.(Number(e.target.value))} style={{ flexShrink: "0", fontFamily: FONT.mono, fontWeight: "700", letterSpacing: "1px", textTransform: "uppercase", fontSize: "11px", minHeight: "44px", padding: "0 8px", background: "var(--card)", color: "var(--ink)", border: "2px solid var(--ink)", borderRadius: "0", boxShadow: "3px 3px 0 var(--ink)", cursor: "pointer" }}>
+          {LEVELS.slice(0, open + 1).map((_, i) => <option key={i} value={i}>{`Level ${i + 1}`}</option>)}
+        </select>
+        <button type="button" className="press btn" onClick={() => restart.current?.()} style={{ "--c": "var(--ink)", flexShrink: "0", fontFamily: FONT.mono, fontWeight: "700", letterSpacing: "1px", textTransform: "uppercase", fontSize: "11px", minHeight: "44px", padding: "0 14px", background: "var(--card)", color: "var(--ink)", border: "2px solid var(--ink)", boxShadow: "3px 3px 0 var(--ink)", cursor: "pointer" }}>{W < 400 ? '↺ Restart' : '↺ Restart level'}</button>
       </div>
     </>
   );

@@ -56,6 +56,7 @@ npm run preview  # serve dist/ on :4173
 npm run check    # tools/check-embed.mjs: the mistakes that only break inside AQ's website (the build runs it first)
 node tools/make-card-covers.mjs    # after adding an article / changing a cover: the small card copies (cover-card.webp)
 node tools/make-link-previews.mjs   # after adding an article / changing a cover / a new edition: every link preview, in public/og/ (needs `npm i -D playwright`)
+node tools/check-fling-levels.mjs   # after adding / changing a Fling level (shared/buddy/flingLevels.js): plays each, checks it stands and can be cleared
 ```
 
 There are no automated tests. Verify changes in a real browser at **both** widths: 390px (phone layout, emulate
