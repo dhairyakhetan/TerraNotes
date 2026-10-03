@@ -48,7 +48,7 @@ export default function Sep26Decor({ web }) {
       {web ? (
         <>
           <Coffee left={330} top={360} d={150} />
-          <Sticky left={1236} top={112} w={150} size={24} deg={5} />
+          <Sticky left={1244} top={446} w={136} size={22} deg={5} />
           <Star left={1000} top={352} s={46} />
           <Plane left={1150} top={950} w={190} />
           <Scribble left={1080} top={420} size={34} delay={0}>+</Scribble>
