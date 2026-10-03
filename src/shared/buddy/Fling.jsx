@@ -18,20 +18,20 @@ const WW = 900, WH = 500, GROUND = 460, SLING = { x: 150, y: 368 }, PULL = 92, P
 // levels: [kind, x, y (centre), w, h] for planks ('wood' / 'glass'), [ 'gremlin', x, y, r ]
 const LEVELS = [
   [ // a hut: two posts, a roof, a gremlin inside and one on top
-    ['wood', 600, 400, 20, 120], ['wood', 720, 400, 20, 120], ['wood', 660, 330, 170, 20], ['gremlin', 660, 440, 18],
-    ['glass', 660, 290, 20, 60], ['gremlin', 660, 240, 16],
+    ['wood', 650, 400, 20, 120], ['wood', 770, 400, 20, 120], ['wood', 710, 330, 170, 20], ['gremlin', 710, 440, 18],
+    ['glass', 710, 290, 20, 60], ['gremlin', 710, 240, 16],
   ],
   [ // two towers and a bridge
-    ['wood', 560, 410, 20, 100], ['wood', 620, 410, 20, 100], ['wood', 590, 350, 90, 20], ['gremlin', 590, 440, 16],
-    ['wood', 720, 400, 20, 120], ['wood', 790, 400, 20, 120], ['wood', 755, 330, 100, 20], ['gremlin', 755, 440, 16],
-    ['glass', 670, 320, 220, 16], ['glass', 600, 290, 20, 44], ['glass', 740, 290, 20, 44], ['gremlin', 670, 290, 18],
+    ['wood', 610, 410, 20, 100], ['wood', 670, 410, 20, 100], ['wood', 640, 350, 90, 20], ['gremlin', 640, 440, 16],
+    ['wood', 770, 400, 20, 120], ['wood', 840, 400, 20, 120], ['wood', 805, 330, 100, 20], ['gremlin', 805, 440, 16],
+    ['glass', 720, 320, 220, 16], ['glass', 650, 290, 20, 44], ['glass', 790, 290, 20, 44], ['gremlin', 720, 290, 18],
   ],
   [ // a castle: glass below, wood above, three gremlins
-    ['glass', 560, 420, 20, 80], ['glass', 640, 420, 20, 80], ['glass', 720, 420, 20, 80], ['glass', 800, 420, 20, 80],
-    ['wood', 600, 370, 100, 20], ['wood', 760, 370, 100, 20], ['wood', 680, 370, 60, 20],
-    ['gremlin', 600, 442, 15], ['gremlin', 760, 442, 15],
-    ['wood', 620, 320, 20, 80], ['wood', 740, 320, 20, 80], ['wood', 680, 270, 160, 20], ['gremlin', 680, 345, 17],
-    ['glass', 680, 230, 20, 60],
+    ['glass', 610, 420, 20, 80], ['glass', 690, 420, 20, 80], ['glass', 770, 420, 20, 80], ['glass', 850, 420, 20, 80],
+    ['wood', 650, 370, 100, 20], ['wood', 810, 370, 100, 20], ['wood', 730, 370, 60, 20],
+    ['gremlin', 650, 442, 15], ['gremlin', 810, 442, 15],
+    ['wood', 670, 320, 20, 80], ['wood', 790, 320, 20, 80], ['wood', 730, 270, 160, 20], ['gremlin', 730, 345, 17],
+    ['glass', 730, 230, 20, 60],
   ],
 ];
 const best = () => { try { return Number(localStorage.getItem('aq-fling-best')) || 0; } catch { return 0; } };
@@ -53,7 +53,7 @@ export default function Fling({ W, H }) {
       const u = (px) => Math.round(px * Math.min(1.8, Math.max(1, 0.62 / k))); // the drawn text and guides: bigger on a small canvas, so they stay readable
       g.setTransform(dpr * k, 0, 0, dpr * k, 0, (H / k - WH) * dpr * k); // the world's floor sits at the canvas's bottom
       const engine = M.Engine.create({ positionIterations: 10, velocityIterations: 8, enableSleeping: true });
-      engine.gravity.y = 1;
+      engine.gravity.y = 2; // twice matter's default: Buddy arcs and drops, not flies flat
       let s; // the game's state
       const total = { pts: 0 };
       const add = (n, x, y) => { total.pts += n; setScore(total.pts); s.pops.push({ x, y, text: String(n), life: 1 }); };
@@ -157,13 +157,13 @@ export default function Fling({ W, H }) {
         if (hold) { g.strokeStyle = K.ink; g.lineWidth = 5; g.beginPath(); g.moveTo(front ? bx - 10 : bx + 16, by); g.lineTo(hold.x, hold.y); g.stroke(); }
         if (front) { g.fillStyle = K.peg; ink(); g.beginPath(); g.moveTo(bx - 2, by + 44); g.lineTo(bx - 16, by); g.lineTo(bx - 8, by - 4); g.lineTo(bx + 4, by + 38); g.closePath(); g.fill(); g.stroke(); }
       };
-      // where Buddy will fly from a pull: the same steps as the physics (gravity 1 × 0.001 a ms², 60 steps a second,
+      // where Buddy will fly from a pull: the same steps as the physics (gravity 2 × 0.001 a ms², 60 steps a second,
       // air friction 0.004), dotted until it lands or leaves the world
       const flight = (p) => {
         let x = p.x, y = p.y, vx = (SLING.x - p.x) * POWER, vy = (SLING.y - p.y) * POWER;
         const dots = [];
         for (let i = 1; i < 150; i++) {
-          vx *= 0.996; vy = vy * 0.996 + 0.2778; x += vx; y += vy;
+          vx *= 0.996; vy = vy * 0.996 + 0.5556; x += vx; y += vy;
           if (i % 4 === 0) dots.push([x, y]);
           if (y > GROUND - 4 || x > WW + 20) break;
         }
