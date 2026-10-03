@@ -32,7 +32,7 @@ The same code runs as the magazine's own site and here; `src/terranotes/host.js`
    - The stylesheets in `styles/` are imported with `?inline` and injected into the shadow root; AQ Labs injects its own
      (`articles/labs/labs.css`). Rules that start with `:host` apply only here.
    - What a shadow root can't hold (`@font-face`, rules for `<html>`, the `::view-transition-*` tree) is in
-     `styles/document.css`, keyed on `html.tn-on`. The Google fonts are self-hosted: `public/terranotes/fonts/g-*.woff2`.
+     `styles/document.css`, keyed on `html.tn-on`. The Google fonts are self-hosted: `public/terranotes/fonts/g-*.woff2` (from this repo's `public/fonts/`, which the own site uses too).
    - The magazine finds what it drew with `lib/dom.js` (`byId`, `$`), never `document.getElementById/querySelector`;
      pop-ups portal into `portalRoot()`; outside-click checks use `e.composedPath()`.
    - Each edition's look (its colours and fonts as CSS variables: `--ink`, `--card`, `--font-head`…) goes on the shadow

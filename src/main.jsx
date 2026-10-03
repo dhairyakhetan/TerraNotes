@@ -10,6 +10,7 @@ import { sayHello } from './lib/consoleHello.js';
 import { startAnalytics } from './lib/analytics.js';
 import { LITE } from './lib/motion.js';
 import { AQ_LOOK } from './host.js';
+import './styles/fontfaces.css';
 import './styles/base.css';
 import './styles/loops.css';
 import './styles/motion.css';

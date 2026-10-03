@@ -3,8 +3,8 @@
 //   <frontend>/src/terranotes/      this repo's src/ (all but main.jsx, the own site's entry), with src/host.js saying
 //                                   "under /terranotes, embedded" and the router package named as AQ has it
 //                                   (react-router-dom), + embed/aq/README.md
-//   <frontend>/public/terranotes/   this repo's public/ (all but the own site's icons and manifest), + embed/aq/public/
-//                                   (the self-hosted fonts); a demo's index.html gets the <base> tag AQ needs
+//   <frontend>/public/terranotes/   this repo's public/ (all but the own site's icons and manifest; the self-hosted fonts
+//                                   are in public/fonts), + embed/aq/public/ (AQ-only files, if any); a demo's index.html gets the <base> tag AQ needs
 //   <frontend>/scripts/terranotes/  build/staticCopy.js (as staticCopy.mjs), embed/aq/scripts/ and
 //                                   tools/make-link-previews.mjs, their imports pointed at src/terranotes/
 // src/terranotes and scripts/terranotes are generated: replaced whole. public/terranotes only gains and updates files
@@ -55,6 +55,7 @@ for (const f of files(path.join(ROOT, 'src'))) {
 }
 want.set('src/terranotes/README.md', fs.readFileSync(path.join(ROOT, 'embed/aq/README.md')));
 for (const [dir, skip] of [[path.join(ROOT, 'public'), PUBLIC_SKIP], [path.join(ROOT, 'embed/aq/public'), () => false]]) {
+  if (!fs.existsSync(dir)) continue; // embed/aq/public: AQ-only files, if any (the fonts are in public/fonts now, shared with the own site)
   for (const f of files(dir)) {
     if (skip(f)) continue;
     let data = fs.readFileSync(path.join(dir, f));

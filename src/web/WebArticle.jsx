@@ -1,7 +1,7 @@
 import { useEffect, useLayoutEffect, useRef } from 'react';
 import WebHeader from './WebHeader.jsx';
 import { BackToMagazine } from '../shared/InsideAQ.jsx';
-import ArticleCard, { TagPill } from '../shared/ArticleCard.jsx';
+import ArticleCard, { TagPill, coverSet } from '../shared/ArticleCard.jsx';
 import ArticleBody, { AuthorBox, EndMark, FieldLog } from '../shared/ArticleBody.jsx';
 import PassItOn from '../shared/PassItOn.jsx';
 import { ReadingBar, ReadingRail } from '../shared/Reading.jsx';
@@ -46,7 +46,7 @@ export default function WebArticle({ article: a, next }) {
             <Clip color={tag.color} w={40} h={10} top="-8px" />
             {a.featured && <FeaturedTape style={{ left: "-10px", top: "-12px", fontSize: "12px" }} />}
             <div style={{ background: "var(--card)", border: "2px solid var(--ink)", boxShadow: `12px 12px 0 ${a.featured ? "var(--yellow)" : "var(--ink)"}`, padding: "14px" }}>
-              <ImageSlot src={a.cover} alt={a.alt} label={`${a.alt} — lead photo`} box={a.cover ? { height: "560px", width: "auto", maxWidth: "620px" } : { height: "420px" }} icon={22} font="12px" />
+              <ImageSlot src={a.cover} srcSet={coverSet(a.cover)} sizes="420px" first alt={a.alt} label={`${a.alt} — lead photo`} box={a.cover ? { height: "560px", width: "auto", maxWidth: "620px" } : { height: "420px" }} icon={22} font="12px" />
             </div>
           </div>
         </div>

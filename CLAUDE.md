@@ -54,7 +54,7 @@ npm run dev      # http://localhost:5173
 npm run build    # → dist/ (also writes per-article HTML, sitemap, robots, 404, llms.txt: build/siteFiles.js)
 npm run preview  # serve dist/ on :4173
 npm run check    # tools/check-embed.mjs: the mistakes that only break inside AQ's website (the build runs it first)
-node tools/make-card-covers.mjs    # after adding an article / changing a cover: the small card copies (cover-card.webp)
+node tools/make-card-covers.mjs    # after adding an article / changing a cover: its WebP copies (cover-card.webp for cards, cover-page.webp for the article page)
 node tools/make-link-previews.mjs   # after adding an article / changing a cover / a new edition: every link preview, in public/og/ (needs `npm i -D playwright`)
 node tools/check-fling-levels.mjs   # after adding / changing a Fling level (shared/buddy/flingLevels.js): plays each, checks it stands and can be cleared
 ```
@@ -78,7 +78,7 @@ TerraNotes comes out monthly, and each edition has its own look and content, kep
 look after October is out.
 
 - **One folder per edition**, `src/editions/<id>/` (the id comes from its month: `sep26`, `oct26`):
-  - `look.js`: its colours and fonts, by role (`LOOK.colors`, `LOOK.fonts`, `fontsCss` for fonts `index.html` doesn't load).
+  - `look.js`: its colours and fonts, by role (`LOOK.colors`, `LOOK.fonts`). Fonts are self-hosted: a new one goes in `public/fonts/` with an `@font-face` in `styles/fontfaces.css` and its twin in `styles/document.css` (`fontsCss` is for a stylesheet the site doesn't serve itself, normally `''`).
   - `articles.js`: its `ARTICLES`, in order, and the `TAGS` they use. Their fields are explained at the top of `data/articles.js`.
   - `photos.js`, `words.js`, `team.js`: its photo wall, words game and team (`TEAMS`, `MEMBERS`).
   - `index.js`: gathers them, plus `INTRO` (the home intro card's lines).
@@ -134,7 +134,7 @@ every change working there too, by the rules below.
   `isTnPath`, `lib/animatedHistory.js` `createAnimatedHistory()` with `onShown()`, and `embed/aq/scripts/prerender.mjs`
   (`terraNotesPages()`, `terraNotesLlms()`, `terraNotesSitemapPaths()`; it builds on `build/staticCopy.js`).
 - **AQ-only files:** `src/TerraNotesRoot.jsx`, `src/styles/document.css`, the `.d.ts` stubs, and `embed/aq/` (the
-  README for AQ's side, the prerender, the card-cover tool, the self-hosted fonts).
+  README for AQ's side, the prerender, the card-cover tool). The self-hosted fonts are shared: `public/fonts/`.
 
 ## Layout model
 
@@ -162,7 +162,7 @@ Two separate layouts, chosen by window width (`lib/layoutMode.js`, `useIsWeb()`)
 - **Addresses follow the editions** (`data/editions.js`; each edition's id comes from its month, `sep26`):
   - latest edition: `/` and `/articles/<slug>`; older ones and drafts: `/<id>` (that edition's whole home page, in its own look) and `/<id>/articles/<slug>`.
   - Build links with `articleLink(a)` / `editionLink(n)` / `homeLink(n, section)`, never by hand. A new edition moves the old links by itself; either address of an article redirects to its current one (`App.jsx`).
-- **Files follow the editions too:** `public/editions/<id>/` holds that edition's files, latest or not. Each article has a folder, `public/editions/<id>/articles/<slug>/`: `cover.jpg`, `cover-card.webp` (the cards' copy, made by the tool) and any photos of its own (`articleFolder(a)`). Every link preview lives together in `public/og/` (`ogImage` in `data/editions.js`): `home.jpg` (the main page, `/` and `/editions`), `<id>.jpg` (an edition's home and section pages), `<id>-<slug>.jpg` (an article). The photo wall's pictures are in `public/editions/<id>/photos/`.
+- **Files follow the editions too:** `public/editions/<id>/` holds that edition's files, latest or not. Each article has a folder, `public/editions/<id>/articles/<slug>/`: `cover.jpg`, `cover-card.webp` and `cover-page.webp` (the WebP copies the cards and the article page use, made by the tool; link previews keep the JPEG) and any photos of its own (`articleFolder(a)`). Every link preview lives together in `public/og/` (`ogImage` in `data/editions.js`): `home.jpg` (the main page, `/` and `/editions`), `<id>.jpg` (an edition's home and section pages), `<id>-<slug>.jpg` (an article). The photo wall's pictures are in `public/editions/<id>/photos/`.
 - **An article can have its own page** instead of the usual layout: `page: 'labs'` in its data and an entry in `PAGES` (`App.jsx`). It lives in `src/articles/<name>/`.
   - Its `body` is still what crawlers and AIs read.
   - It gets no card flight (no cover to land on; `flight()` in `lib/cardFlight.js`), just the crossfade.
@@ -223,7 +223,7 @@ Tag colours are in the edition's `TAGS` (`articles.js`) and team colours in its 
 | `serif` | Instrument Serif | "Photo wall", "TerraNotes", the intro headline |
 | `body` | Figtree | UI text |
 | `read` | Newsreader | article paragraphs |
-| `script` | Pinyon Script (`fontsCss`) | September's diary only |
+| `script` | Pinyon Script | September's diary only |
 
 **Shapes:**
 - **Borders:** always `2px solid var(--ink)`; 1.5px on small bits.
@@ -280,7 +280,7 @@ build/siteFiles.js      at build: an .html per article at its address (own title
 build/staticCopy.js     each page's text as plain HTML inside #root, for crawlers without JavaScript
 tools/make-link-previews.mjs   every link preview (1200×630) into public/og/: the main page, each edition, each article, on the edition's paper
 tools/check-embed.mjs   the guard for AQ's website (see "Inside AQ's website")   tools/export-aq.mjs   writes the magazine into it
-embed/aq/               AQ-only: README (for AQ's side), scripts/ (prerender.mjs), public/fonts/
+embed/aq/               AQ-only: README (for AQ's side), scripts/ (prerender.mjs)
 src/host.js             where this copy runs (own site / AQ's website)
 src/main.jsx            the own site's entry: router with the animated history, intro, lite class, console hello, CSS imports
 src/TerraNotesRoot.jsx  AQ's entry: the shadow-root mount (+ styles/document.css, the .d.ts stubs)
@@ -316,10 +316,10 @@ src/lib/                logic only, no JSX:
   byWriter (?by=)   teamLayout   photoShapes   useGallery   useWordsGame   usePresence   pauseOffscreen
   scrollLock   buddyState   introNotebook   consoleHello   format (pad2, firstName, instagramUrl, teamsOf)
   freshCode (a page from before a deploy reloads once when its lazy code is gone: wrap new React.lazy loaders in freshLoad)
-src/styles/             fonts.js (FONT: the look's font variables) · base.css (resets, press / focus states) · loops.css (endless animations)
+src/styles/             fonts.js (FONT: the look's font variables) · fontfaces.css (the self-hosted fonts) · base.css (resets, press / focus states) · loops.css (endless animations)
                         motion.css (one-shot) · phone.css · web.css · intro.css · buddy.css
 public/                 editions/<id>/ (articles/<slug>/: cover, preview, own photos · photos/: the photo wall)
-                        brand/ (globe, wordmark) · team/ (faces, 400px WebP) · badges/ · fonts/ (AQ Labs' own fonts)
+                        brand/ (globe, wordmark) · team/ (faces, 400px WebP) · badges/ · fonts/ (every font, self-hosted: styles/fontfaces.css)
                         og/ (every link preview, made by tools/make-link-previews.mjs) · icons + site.webmanifest
 ```
 

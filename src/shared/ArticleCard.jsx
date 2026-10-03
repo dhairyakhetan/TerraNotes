@@ -11,6 +11,8 @@ import { FONT } from '../styles/fonts.js';
 // Cards load the 480px cover-card.webp beside cover.jpg (tools/make-card-covers.mjs), not the 900px+ original; the
 // original if that copy is missing.
 export const cardCover = (src) => (typeof src === 'string' && src.endsWith('/cover.jpg') ? src.replace(/cover\.jpg$/, 'cover-card.webp') : src);
+// the article page's cover: the WebP copies (tools/make-card-covers.mjs) as a srcset, the browser picking by screen
+export const coverSet = (src) => (typeof src === 'string' && src.endsWith('/cover.jpg') ? `${cardCover(src)} 480w, ${src.replace(/cover\.jpg$/, 'cover-page.webp')} 900w` : undefined);
 
 // The article card: clip on top, cover, tag pill + "01 / 08", title, dek. White, 2px ink border, hard shadow
 // (yellow + "★ featured" tape when featured). Links to the article; the click is remembered so the cover can fly

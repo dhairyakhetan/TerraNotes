@@ -2,7 +2,7 @@ import { useEffect, useLayoutEffect, useRef } from 'react';
 import PhoneHeader from './PhoneHeader.jsx';
 import { BackToMagazine } from '../shared/InsideAQ.jsx';
 import { AQ_LOOK } from '../host.js';
-import ArticleCard, { TagPill } from '../shared/ArticleCard.jsx';
+import ArticleCard, { TagPill, coverSet } from '../shared/ArticleCard.jsx';
 import ArticleBody, { AuthorBox, EndMark } from '../shared/ArticleBody.jsx';
 import PassItOn from '../shared/PassItOn.jsx';
 import { ReadingBar } from '../shared/Reading.jsx';
@@ -44,7 +44,7 @@ export default function PhoneArticle({ article: a, next }) {
           <Clip color={tag.color} w={34} h={9} top="-7px" />
           {a.featured && <FeaturedTape style={{ left: "-6px", top: "-10px" }} />}
           <article style={{ boxSizing: "border-box", background: "var(--card)", border: "2px solid var(--ink)", boxShadow: `8px 8px 0 ${a.featured ? "var(--yellow)" : "var(--ink)"}`, padding: "10px", display: "flex", flexDirection: "column", gap: "12px" }}>
-            <ImageSlot src={a.cover} alt={a.alt} label={`${a.alt} — lead photo`} box={a.cover ? { height: "auto" } : { height: "240px" }} />
+            <ImageSlot src={a.cover} srcSet={coverSet(a.cover)} sizes="340px" first alt={a.alt} label={`${a.alt} — lead photo`} box={a.cover ? { height: "auto" } : { height: "240px" }} />
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
               <TagPill a={a} size="10px" pad="3px 8px" lh="1.2" />
               <span style={{ fontFamily: FONT.mono, fontSize: "11px", letterSpacing: "1px", color: "var(--ink)" }}>{`${pad2(i + 1)} / ${pad2(n)}`}</span>

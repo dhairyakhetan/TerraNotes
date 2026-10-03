@@ -64,6 +64,6 @@ export const LOOK = {
     read: "'Newsreader', Georgia, serif", // article paragraphs
     script: "'Pinyon Script', 'Snell Roundhand', cursive", // a neat copperplate script (not used this month)
   },
-  // a stylesheet for fonts index.html doesn't load already (e.g. a Google Fonts link), or ''
-  fontsCss: 'https://fonts.googleapis.com/css2?family=Rozha+One&display=swap',
+  // a stylesheet for fonts the site doesn't serve itself, or '' (its fonts are self-hosted: src/styles/fontfaces.css)
+  fontsCss: '',
 };
