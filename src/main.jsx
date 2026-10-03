@@ -1,4 +1,5 @@
 import React from 'react';
+import { watchStaleCode } from './lib/freshCode.js';
 import { createRoot } from 'react-dom/client';
 import { unstable_HistoryRouter as HistoryRouter } from 'react-router';
 import App, { loadLabs } from './App.jsx';
@@ -21,6 +22,7 @@ import './styles/buddy.css';
 // opening notebook when it's due, marks low-end devices (<html class="tn-lite">, lib/motion.js), and prints the
 // console hello.
 sayHello();
+watchStaleCode(); // after a deploy, a stale page reloads once instead of half-working (lib/freshCode.js)
 if (LITE) document.documentElement.classList.add('tn-lite');
 if (AQ_LOOK) document.documentElement.dataset.tnAq = ''; // AQ's look (src/host.js): the CSS keys on html[data-tn-aq]
 const intro = introWanted(); // decided before anything draws (and before the router reads the address)

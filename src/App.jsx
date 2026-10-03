@@ -1,4 +1,5 @@
 import { lazy, Suspense, useEffect, useLayoutEffect, useState } from 'react';
+import { freshLoad } from './lib/freshCode.js';
 import { Navigate, Route, Routes, useLocation, useParams } from './router.jsx';
 import PhoneHome from './phone/PhoneHome.jsx';
 import PhoneArticle from './phone/PhoneArticle.jsx';
@@ -8,10 +9,10 @@ import { EditionsPage } from './pages/EditionsPage.jsx';
 import DemoPage from './pages/DemoPage.jsx';
 // the AQ Labs gallery is about a third of the code: its own chunk (the embed warms it once the home page has settled)
 export const loadLabs = () => import('./articles/labs/LabsPage.jsx');
-const LabsPage = lazy(loadLabs);
+const LabsPage = lazy(freshLoad(loadLabs)); // freshLoad: a page from before a deploy reloads instead of crashing
 // Buddy's games (canvas games) load the first time someone opens them ('aq-games', lib/buddyState.js)
 const loadGames = () => import('./shared/buddy/BuddyGames.jsx');
-const BuddyGames = lazy(loadGames);
+const BuddyGames = lazy(freshLoad(loadGames));
 function Games() {
   const [first, setFirst] = useState(null);
   useEffect(() => {

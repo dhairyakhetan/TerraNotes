@@ -313,6 +313,7 @@ src/lib/                logic only, no JSX:
   edition (useEdition, applyLook)   layoutMode   routes   scrollMemory   animatedHistory   cardFlight   motion (calm, LITE)   fitTitle
   byWriter (?by=)   teamLayout   photoShapes   useGallery   useWordsGame   usePresence   pauseOffscreen
   scrollLock   buddyState   introNotebook   consoleHello   format (pad2, firstName, instagramUrl, teamsOf)
+  freshCode (a page from before a deploy reloads once when its lazy code is gone: wrap new React.lazy loaders in freshLoad)
 src/styles/             fonts.js (FONT: the look's font variables) · base.css (resets, press / focus states) · loops.css (endless animations)
                         motion.css (one-shot) · phone.css · web.css · intro.css · buddy.css
 public/                 editions/<id>/ (articles/<slug>/: cover, preview, own photos · photos/: the photo wall)
