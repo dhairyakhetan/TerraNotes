@@ -35,10 +35,13 @@ html[data-edition="oct26"] .web .page-sheet,:host([data-edition="oct26"]) .web .
 .oct-twinkle{animation:oct-twinkle 2.6s ease-in-out infinite alternate}
 @keyframes oct-twinkle{from{scale:.65;rotate:-12deg;opacity:.7}to{scale:1.1;rotate:12deg;opacity:1}}
 
-/* the horn under "Meet the team" (Horn.jsx): each blow lifts it to the lips and three sound rings roll out of the bell.
-   One-shots on transform / opacity, started from Horn.jsx (not at all with reduced motion or LITE). */
-.horn-lift{animation:horn-lift 1.9s ease-in-out}
+/* the horn at the team legend (Horn.jsx): it slides in from the page's edge (--out: where it rests, off the edge), is
+   blown (lifts, three sound rings roll out of the bell) and slides back out. One-shots on translate / transform /
+   opacity, started from Horn.jsx (never with reduced motion or LITE, where it rests in view instead). */
+.horn-pop{animation:horn-pop 3.6s cubic-bezier(.3,.7,.3,1)}
+@keyframes horn-pop{0%{translate:var(--out)}20%,78%{translate:0}100%{translate:var(--out)}}
+.horn-lift{animation:horn-lift 1.6s ease-in-out .8s}
 @keyframes horn-lift{0%,100%{transform:none}18%{transform:rotate(-7deg)}30%,62%{transform:rotate(-7deg) scale(1.03)}40%,52%{transform:rotate(-6deg) scale(1.05)}}
 .horn-ring{opacity:0;animation:horn-ring 1.1s ease-out forwards}
 @keyframes horn-ring{0%{opacity:0;transform:translateX(-6px)}25%{opacity:1}100%{opacity:0;transform:translateX(14px)}}
-@media (prefers-reduced-motion: reduce){.horn-lift,.horn-ring{animation:none}.horn-ring{opacity:0}}
+@media (prefers-reduced-motion: reduce){.horn-pop,.horn-lift,.horn-ring{animation:none}.horn-ring{opacity:0}}

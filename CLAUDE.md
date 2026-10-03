@@ -192,8 +192,8 @@ line) and `lib/ruled.js` `useRuledPage` sets each block's first baseline on a ru
 Tom Riddle-style diary under "Meet the team" that writes random lines in a script font after you stay a while). October
 2026 (the latest edition) is **"Pujo"**, Durga Puja: laal-paar saree cream and alta red, maroon ink, sindoor handwriting,
 marigold strings, a pandal-night photo wall, Rozha One headings; `look.css` the saree border and an alpana dot pattern;
-`Decor.jsx` a marigold toran, alpana, dhak, conch and a "Subho Sharodiya!" tag; `Horn.jsx`, an engraving-style S-horn under "Meet the team" that
-someone blows now and then; Pujo words; two sample articles. A new edition starts from a copy of the newest look and changes the values; its own CSS and
+`Decor.jsx` a marigold toran, alpana, dhak, conch and a "Subho Sharodiya!" tag; `Horn.jsx`, an engraving-style S-horn that now and then slides in from
+the page edge by the team legend (left on web, right on phones), is blown and slides back out; Pujo words; two sample articles. A new edition starts from a copy of the newest look and changes the values; its own CSS and
 doodles are registered in `src/editions/pages.js` (`EDITION_CSS`, `DECOR`, `TEAM_NOTE` for something under the team legend).
 Use the variables, nothing else (the look lists a few more, for the photo wall, dark panels and details).
 
