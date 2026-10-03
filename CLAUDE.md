@@ -13,7 +13,7 @@ npm run build    # → dist/ (also writes per-article HTML, sitemap, robots, 404
 npm run preview  # serve dist/ on :4173
 npm run check    # tools/check-embed.mjs: the mistakes that only break inside AQ's website (the build runs it first)
 node tools/make-card-covers.mjs    # after adding an article / changing a cover: the small card copies (cover-card.webp)
-node tools/export-aq.mjs …         # ONLY when integrating into AQ's website (see "Integrating into AQ's website")
+node tools/export-aq.mjs …         # ONLY when integrating into AQ's website (see "Integrating into AQ's website"; --patch: a file to hand over)
 node tools/make-link-previews.mjs   # after adding an article / changing a cover (needs `npm i -D playwright`)
 ```
 
@@ -110,6 +110,17 @@ editions, fixes, design) happens in this repo and never touches AQ's.
    the way AQ's owner wants.
 5. AQ's own code doesn't change for an export. What it must keep doing is listed in `shared/AqNavSlot.jsx` (its nav,
    `--nav-h`, no nav padding on `/terranotes`) and in "What AQ's code uses from here" above.
+
+**As a patch file** (the usual way when fah can't be pushed from this session, or the owner asks for one):
+1. A clean checkout of fah's latest `main` next to this repo (a `git worktree` of `origin/main` is enough; link its
+   `frontend/node_modules` from an installed copy for the checks).
+2. `node tools/export-aq.mjs <that checkout>/frontend --verify --patch`: the checks above, then
+   `out/terranotes-for-aq.patch` (one commit with only the three folders, made without touching that checkout's
+   index or HEAD) and `out/terranotes-for-aq.md`: what the owner does with it, and the prompt to paste to Claude in fah
+   (template: `embed/aq/HANDOFF.md`; the same steps are in `embed/aq/README.md` for Claude there).
+3. Test it before handing it over: in another clean checkout, `git am --3way` the patch, `git show --stat HEAD`, then
+   `npm run build` in `frontend/`.
+4. Send the owner both files (and say the patch is for AQ's repo, not this one).
 
 Without a path, the tool writes `out/aq/` and `out/terranotes-for-aq.zip` instead, to hand over by hand.
 

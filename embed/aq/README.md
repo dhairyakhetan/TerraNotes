@@ -16,6 +16,11 @@ The next export **replaces `src/terranotes/` and `scripts/terranotes/` whole**, 
 - **Change how AQ hosts it** (the shadow root, AQ's nav around it, the prerender) in the TerraNotes repo too. Those
   parts live there as `src/TerraNotesRoot.jsx`, `src/styles/document.css` and `embed/aq/` (this README, `prerender.mjs`,
   the fonts). What AQ's own code has to keep doing for it is at the top of `shared/AqNavSlot.jsx`.
+- **An update can come as a patch file** (`terranotes-for-aq.patch`, from the export's `--patch`), with a prompt from
+  the owner. Apply it as that prompt says: a new branch from an up-to-date main, `git am --3way <patch>` (on a conflict
+  in these three folders take the patch's side; if it won't apply, `git am --abort` and report, never hand-edit),
+  `git show --stat HEAD` touches only the three folders, then `npx tsc -b`, `node scripts/verify-routing.mjs`,
+  `npm run build`, a look in `npm run dev` (below), and a PR. A failure is fixed in the TerraNotes repo, not here.
 - `public/terranotes/` is only added to by an export, never cleared; the export lists files there it doesn't know.
   The card covers (`cover-card.webp`) and link previews come from the TerraNotes repo now.
 
