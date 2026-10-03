@@ -39,7 +39,7 @@ const WEB = {
   count: { left: "1080px", top: "30px", width: "280px", fontSize: "11px", letterSpacing: "1.8px" },
   blurb: { left: "80px", top: "200px", width: "440px", fontSize: "17px", lineHeight: "1.55" },
   note: { left: "82px", top: "360px", width: "400px", fontSize: "27px" },
-  legend: { left: "78px", top: "440px", width: "220px", gap: "6px" }, extra: { left: 84, top: 440, width: 470, size: 34, under: true }, chip: { minHeight: "40px", padding: "0 14px 0 8px", gap: "10px", fontSize: "11px", letterSpacing: "1.4px" }, dot: "14px",
+  legend: { left: "78px", top: "440px", width: "220px", gap: "6px" }, extra: { left: 128, top: 440, width: 430, size: 34, under: true }, chip: { minHeight: "40px", padding: "0 14px 0 8px", gap: "10px", fontSize: "11px", letterSpacing: "1.4px" }, dot: "14px",
   face: { half: 66, gap: "10px", shadow: "8px 6px 0", icon: 22, font: "13px", name: "15px", role: "10px", roleSpacing: "1.2px", roleGap: "4px", pad: "2px 8px", bump: "transform 180ms cubic-bezier(0.32, 0.72, 0, 1)" },
   dim: "rgba(17,17,17,.35)",
   card: { width: 360, shadow: "9px 9px 0", padding: "22px", clip: [36, 11, "-8px"], close: { right: "12px", top: "12px" }, photo: "108px", name: "34px", role: "23px", bio: "15px", credit: "14px" },
@@ -124,7 +124,7 @@ export default function TeamSection({ web }) {
         {L.links.map((l) => <path key={l.team} d={l.d} stroke={TEAMS[l.team].color} opacity={team == null ? 0.55 : team === l.team ? 0.95 : 0.12} style={{ transition: "opacity .25s" }} />)}
       </svg>
       {/* the edition's own note, if it has one (src/editions/pages.js TEAM_NOTE): web under the legend, phone beside it */}
-      {Note && <Note size={L.extra.size} style={{ left: `${L.extra.left}px`, top: `${L.extra.under ? L.extra.top + Object.keys(TEAMS).length * 46 + 34 : L.extra.top}px`, width: `${L.extra.width}px` }} />}
+      {Note && <Note web={web} size={L.extra.size} style={{ left: `${L.extra.left}px`, top: `${L.extra.under ? L.extra.top + Object.keys(TEAMS).length * 46 + 34 : L.extra.top}px`, width: `${L.extra.width}px` }} />}
       {/* legend: pick a team to fade everyone else */}
       <div style={{ position: "absolute", display: "flex", flexDirection: "column", ...L.legend }}>
         {Object.entries(TEAMS).map(([key, t]) => {
