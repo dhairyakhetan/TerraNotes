@@ -69,6 +69,10 @@ The magazine also runs inside AQ's main website (the `dhairyakhetan/fah` repo), 
   card covers from `cover-card.webp`, and `shared/InsideAQ.jsx`: the other editions on a card at the end of the home
   pages and a "← Terra Notes" pill under AQ's nav, standing in for the hidden header); AQ-only styles are rules that
   start with `:host`.
+- **AQ's look on the own site too.** The own site is AQ's testing ground, so by default it shows the magazine as it
+  sits inside AQ (`AQ_LOOK` in `src/host.js`): header hidden, a stand-in for AQ's nav on top (`shared/AqNavStandIn.jsx`),
+  the `shared/InsideAQ.jsx` pieces and the phone call button. `?aq=0` in the address shows the plain version (`?aq=1`
+  back; remembered for the tab). AQ-look CSS keys on `html[data-tn-aq]` with a `:host([data-tn-aq])` twin.
 - **It draws inside a shadow root** (`src/TerraNotesRoot.jsx`), under AQ's own nav, dock and footer. AQ hides the
   magazine's header (`:host header.site-header{visibility:hidden}` in `styles/base.css`). So, in all code:
   - Router pieces come from `src/router.jsx` (it adds and strips the `/terranotes` prefix), never from `react-router`.

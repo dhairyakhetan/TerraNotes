@@ -7,6 +7,7 @@ import { createAnimatedHistory } from './lib/animatedHistory.js';
 import { introWanted } from './lib/introNotebook.js';
 import { sayHello } from './lib/consoleHello.js';
 import { LITE } from './lib/motion.js';
+import { AQ_LOOK } from './host.js';
 import './styles/base.css';
 import './styles/loops.css';
 import './styles/motion.css';
@@ -22,6 +23,7 @@ import './styles/buddy.css';
 // console hello.
 sayHello();
 if (LITE) document.documentElement.classList.add('tn-lite');
+if (AQ_LOOK) document.documentElement.dataset.tnAq = ''; // AQ's look (src/host.js): the CSS keys on html[data-tn-aq]
 const intro = introWanted(); // decided before anything draws (and before the router reads the address)
 
 createRoot(document.getElementById('root')).render( // the own site's page: embed-ok

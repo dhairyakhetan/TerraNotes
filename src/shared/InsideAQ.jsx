@@ -3,24 +3,24 @@ import BackHome from './BackHome.jsx';
 import { LatestTag } from './Tapes.jsx';
 import { LATEST, PUBLISHED, editionLink, editionName } from '../data/editions.js';
 import { useEdition } from '../lib/edition.js';
-import { HOST } from '../host.js';
+import { AQ_LOOK } from '../host.js';
 import { FONT } from '../styles/fonts.js';
 
-// Inside AQ's website only (HOST.embedded). There AQ's own nav stays as it is and the magazine's header is hidden
+// Inside AQ's website, and on the magazine's own site while it shows AQ's look (AQ_LOOK, src/host.js). There AQ's own nav stays as it is and the magazine's header is hidden
 // (styles/base.css), so the two things only that header gave are drawn in the page instead:
 // - PastEditionsCard: the way to the other editions (the header's edition picker), at the end of the home pages, under
-//   the Snake card. Only when there is another edition to go to.
+//   the Snake card (with just one edition yet, it says so).
 // - BackToMagazine: a small "← Terra Notes" pill under AQ's nav on the other pages (the header's back link).
 const MONO = { fontFamily: FONT.mono, fontWeight: "700", letterSpacing: "1.4px", textTransform: "uppercase" };
 
 const otherEditions = (here) => [...PUBLISHED].reverse().filter((e) => e.number !== here);
 // how much taller the home page gets for the card (0 when it isn't drawn)
-export const pastEditionsSpace = (here, web) => (HOST.embedded && otherEditions(here).length ? (web ? 240 : 230) + 64 * (otherEditions(here).length - 1) : 0);
+export const pastEditionsSpace = (here, web) => (AQ_LOOK ? (web ? 240 : 230) + 64 * Math.max(0, otherEditions(here).length - 1) : 0);
 
 export function PastEditionsCard({ web, top }) {
   const { number } = useEdition();
   const list = otherEditions(number);
-  if (!HOST.embedded || !list.length) return null;
+  if (!AQ_LOOK) return null;
   const W = web ? 620 : 342;
   return (
     <nav aria-label="Other editions" style={{ position: "absolute", left: `${(web ? 1440 : 390) / 2 - W / 2}px`, top: `${top}px`, width: `${W}px`, boxSizing: "border-box", padding: web ? "22px 28px" : "16px", background: "var(--card)", border: "2px solid var(--ink)", boxShadow: `${web ? 8 : 5}px ${web ? 8 : 5}px 0 var(--yellow)`, transform: "rotate(0.8deg)", color: "var(--ink)" }}>
@@ -33,6 +33,7 @@ export function PastEditionsCard({ web, top }) {
           <span aria-hidden="true" style={{ ...MONO, fontSize: "14px" }}>→</span>
         </Link>
       ))}
+      {!list.length && <div style={{ padding: "8px 0 6px", fontFamily: FONT.hand, fontSize: web ? "24px" : "20px", lineHeight: "1.1", color: "var(--wire)", borderBottom: "1.5px solid var(--rule)" }}>this is the first edition: older ones will show up here.</div>}
       <Link to="/editions" style={{ ...MONO, fontSize: web ? "12px" : "11px", display: "flex", alignItems: "center", minHeight: "44px", marginTop: "4px", textDecoration: "none", color: "var(--ink)" }}>all editions →</Link>
     </nav>
   );
@@ -41,7 +42,7 @@ export function PastEditionsCard({ web, top }) {
 // floats just under AQ's fixed nav (AQ sets --nav-h on its page; the custom property reaches into the shadow root),
 // left, so it never moves the page's own layout. The page is zoomed, so the offset is divided back.
 export function BackToMagazine({ web }) {
-  if (!HOST.embedded) return null;
+  if (!AQ_LOOK) return null;
   const z = web ? 'var(--web-zoom, 1)' : 'var(--phone-zoom, 1)';
   return (
     <BackHome className={web ? 'btn' : 'press'} style={{ position: "fixed", zIndex: "40", top: `calc(var(--nav-h, 70px) / ${z} + 10px)`, left: web ? "24px" : "12px", display: "inline-flex", alignItems: "center", minHeight: "44px", padding: "0 16px", boxSizing: "border-box", borderRadius: "999px", background: "var(--card)", border: "2px solid var(--ink)", boxShadow: "3px 3px 0 var(--ink)", "--c": "var(--ink)", ...MONO, fontSize: web ? "12px" : "11px", color: "var(--ink)", textDecoration: "none" }}>← Terra Notes</BackHome>

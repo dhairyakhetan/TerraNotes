@@ -14,7 +14,8 @@ import ErrorBoundary from './shared/ErrorBoundary.jsx';
 import SiteFooter from './shared/SiteFooter.jsx';
 import BuddyGames from './shared/buddy/BuddyGames.jsx';
 import { DraftTape } from './shared/Tapes.jsx';
-import { HOST } from './host.js';
+import { HOST, AQ_LOOK } from './host.js';
+import AqNavStandIn from './shared/AqNavStandIn.jsx';
 import { ALL_ARTICLES } from './data/articles.js';
 import { LATEST, articleFolder, articleLink, editionById, editionLink, editionOf, homeLink, isDraft } from './data/editions.js';
 import { editionData } from './editions/index.js';
@@ -122,6 +123,7 @@ export default function App() {
     <EditionContext.Provider value={edition}>
       <Look edition={edition} />
       {!bare && !HOST.embedded && <SkipLink />}
+      {!bare && AQ_LOOK && !HOST.embedded && <AqNavStandIn web={web} />}
       <ScrollMemory />
       <ErrorBoundary resetKey={pathname}>
         {toWriter ? <Navigate to={{ pathname: writers, search }} replace /> : (

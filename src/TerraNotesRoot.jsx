@@ -63,6 +63,7 @@ export default function TerraNotesRoot() {
     }
     shadowRef.current = shadow;
     setRoot(shadow, el, portals);
+    el.dataset.tnAq = ''; // AQ's look (src/host.js AQ_LOOK): the CSS keys on :host([data-tn-aq])
     applyLook(editionData(LATEST), el); // at once, so nothing draws before the look is there (the app then sets the page's own)
     setParts({ app, portals });
   }, []);

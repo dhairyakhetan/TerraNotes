@@ -13,7 +13,7 @@ import { FONT } from '../../styles/fonts.js';
 import { usePresence } from '../../lib/usePresence.js';
 import { withBase } from '../../lib/base.js';
 import { byId, flag } from '../../lib/dom.js';
-import { HOST } from '../../host.js';
+import { HOST, AQ_LOOK } from '../../host.js';
 import labsCss from './labs.css?inline'; // with this page's chunk; a <style> beside the page (the return), so it lands in AQ's shadow root too
 
 // The "labs" article's own page (data/articles.js: page: 'labs'): the AQ Labs gallery, built from the AQ Labs design
@@ -683,7 +683,7 @@ export default function LabsPage({ article: a, web, chapter }) {
   </>);
 
   const page = (
-    <div className={`labs ${web ? 'labs-web' : 'labs-phone'}`} style={HOST.embedded ? undefined : { width: web ? "1440px" : "390px" }}>
+    <div className={`labs ${web ? 'labs-web' : 'labs-phone'}`} style={AQ_LOOK ? undefined : { width: web ? "1440px" : "390px" }}>
       {web ? <WebHeader /> : <PhoneHeader current="article" edge={tagOf(a).color} />}
       {web && <BackToMagazine web />} {/* inside AQ (phone: AQ Labs' own tabs sit there) */}
       <Tabs web={web} active={web ? active : ch} base={base} onTab={onTab} />

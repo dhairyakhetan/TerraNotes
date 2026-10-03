@@ -4,7 +4,7 @@ import Ghost from './Ghost.jsx';
 import { editionLink } from '../../data/editions.js';
 import { callBuddy, openGames, useBuddy } from '../../lib/buddyState.js';
 import { useEdition } from '../../lib/edition.js';
-import { HOST } from '../../host.js';
+import { AQ_LOOK } from '../../host.js';
 import { FONT } from '../../styles/fonts.js';
 
 // Buddy, a little green ghost (an easter egg). Called from a hidden button in the web home page's top-right corner
@@ -115,7 +115,7 @@ export function PhoneBuddy() {
   // The phone menu's "click me" (MenuCall) calls him; inside AQ's website that menu isn't drawn, so a small visible
   // ghost button stands where he floats and calls him instead (44px: a touch target).
   if (!here) {
-    return HOST.embedded ? (
+    return AQ_LOOK ? (
       <div style={{ position: "absolute", left: "312px", top: "176px", width: "44px", height: "44px", zIndex: "5" }}>
         <button className="buddy-call buddy-near" onClick={callBuddy} aria-label="Call buddy the ghost" style={{ width: "44px", height: "44px" }}>
           <Ghost size={24} />
