@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { cardCover } from '../shared/ArticleCard.jsx';
 import { Link } from '../router.jsx';
 import PhoneHeader from '../phone/PhoneHeader.jsx';
 import WebHeader from '../web/WebHeader.jsx';
@@ -51,7 +52,7 @@ function EditionCard({ e, web }) {
       <div style={{ ...MONO, marginTop: "4px", fontSize: web ? "12px" : "10px" }}>{`${pad2(list.length)} pieces`}</div>
       <div style={{ display: "flex", gap: web ? "12px" : "6px", marginTop: web ? "18px" : "14px" }}>
         {list.filter((a) => a.cover).slice(0, 6).map((a) => (
-          <Link key={a.slug} to={articleLink(a)} aria-label={a.title} style={{ flex: "1", minWidth: "0", aspectRatio: "3 / 4", border: "1.5px solid var(--ink)", background: `var(--outside) url(${a.cover}) 50% 12% / cover no-repeat` }} />
+          <Link key={a.slug} to={articleLink(a)} aria-label={a.title} style={{ flex: "1", minWidth: "0", aspectRatio: "3 / 4", border: "1.5px solid var(--ink)", background: `var(--outside) url(${cardCover(a.cover)}) 50% 12% / cover no-repeat` }} />
         ))}
       </div>
       <ol style={{ margin: web ? "18px 0 0" : "14px 0 0", padding: "0 0 0 22px", fontSize: web ? "16px" : "14px", lineHeight: "1.5" }}>

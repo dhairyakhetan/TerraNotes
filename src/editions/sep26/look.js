@@ -33,9 +33,6 @@ export const LOOK = {
     // dark panels (photo viewer, phone menu)
     labelDark: '#BDB6A6', // labels on dark
     ruleDark: '#3A3A36', // lines on dark
-    // the footer band
-    footer: '#0A0A0A',
-    footerInk: '#F4EFE0',
     // quieter details
     muted: '#6B665C', // quiet grey text
     grey: '#4A4A45', // secondary text (the words game's "/ say it /")

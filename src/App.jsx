@@ -1,4 +1,4 @@
-import { lazy, Suspense, useLayoutEffect } from 'react';
+import { lazy, Suspense, useEffect, useLayoutEffect, useState } from 'react';
 import { Navigate, Route, Routes, useLocation, useParams } from './router.jsx';
 import PhoneHome from './phone/PhoneHome.jsx';
 import PhoneArticle from './phone/PhoneArticle.jsx';
@@ -9,13 +9,24 @@ import DemoPage from './pages/DemoPage.jsx';
 // the AQ Labs gallery is about a third of the code: its own chunk (the embed warms it once the home page has settled)
 export const loadLabs = () => import('./articles/labs/LabsPage.jsx');
 const LabsPage = lazy(loadLabs);
+// Buddy's games (canvas games) load the first time someone opens them ('aq-games', lib/buddyState.js)
+const BuddyGames = lazy(() => import('./shared/buddy/BuddyGames.jsx'));
+function Games() {
+  const [first, setFirst] = useState(null);
+  useEffect(() => {
+    const on = (e) => setFirst((f) => f || e.detail || 'snake');
+    addEventListener('aq-games', on);
+    return () => removeEventListener('aq-games', on);
+  }, []);
+  return first && <Suspense fallback={null}><BuddyGames first={first} /></Suspense>;
+}
+// while an article's own page loads (its code comes separately): a page-sized dark space, so nothing jumps or flashes
+const Loading = () => <div aria-busy="true" style={{ minHeight: "100vh", background: "var(--ink)" }} />;
 import NotFoundPage from './pages/NotFoundPage.jsx';
 import ErrorBoundary from './shared/ErrorBoundary.jsx';
-import SiteFooter from './shared/SiteFooter.jsx';
-import BuddyGames from './shared/buddy/BuddyGames.jsx';
 import { DraftTape } from './shared/Tapes.jsx';
 import { HOST, AQ_LOOK } from './host.js';
-import AqNavStandIn from './shared/AqNavStandIn.jsx';
+import AqNavSlot from './shared/AqNavSlot.jsx';
 import { ALL_ARTICLES } from './data/articles.js';
 import { LATEST, articleFolder, articleLink, editionById, editionLink, editionOf, homeLink, isDraft } from './data/editions.js';
 import { editionData } from './editions/index.js';
@@ -42,9 +53,9 @@ import { ScrollMemory } from './lib/scrollMemory.js';
 // lib/byWriter.js).
 // Every page belongs to an edition (lib/routes.js editionAt: /sep26… is September's, the rest the latest's): its look
 // goes on the page and its content reaches the components through useEdition() (lib/edition.js).
-// Around them: the skip link, the crash card, the footer and Buddy's games popup (these last two outlive navigation).
-// Inside AQ's website (src/host.js embedded; embed/aq/TerraNotesRoot.jsx mounts this) AQ draws the skip link and the
-// footer, so these don't.
+// Around them: the skip link, the crash card and Buddy's games popup (it outlives navigation). There is no footer.
+// Inside AQ's website (src/host.js embedded; src/TerraNotesRoot.jsx mounts this) AQ draws the skip link, so this
+// doesn't; on the own site, AQ's look puts a placeholder where AQ's nav will be (shared/AqNavSlot.jsx).
 
 // Articles with their own page instead of the usual layout (an article's `page` in data/articles.js)
 const PAGES = { labs: LabsPage };
@@ -82,7 +93,7 @@ function ArticleRoute({ web }) {
   if (pathname !== here) return <Navigate to={here + search + hash} replace />;
   if (demo) return <DemoPage src={`${articleFolder(a)}/${a.demos[chapter]}/`} name={chapter.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())} />;
   const key = articleLink(a); // remount per article so its entrance replays
-  if (a.page) { const Own = PAGES[a.page]; return <Suspense fallback={null}><Own key={key} article={a} web={web} chapter={chapter || null} /></Suspense>; }
+  if (a.page) { const Own = PAGES[a.page]; return <Suspense fallback={<Loading />}><Own key={key} article={a} web={web} chapter={chapter || null} /></Suspense>; }
   const Page = pageFor(a.edition, 'article', web);
   const same = ALL_ARTICLES.filter((x) => x.edition === a.edition);
   return <Page key={key} article={a} next={same[(same.indexOf(a) + 1) % same.length]} />;
@@ -123,7 +134,7 @@ export default function App() {
     <EditionContext.Provider value={edition}>
       <Look edition={edition} />
       {!bare && !HOST.embedded && <SkipLink />}
-      {!bare && AQ_LOOK && !HOST.embedded && <AqNavStandIn web={web} />}
+      {!bare && AQ_LOOK && !HOST.embedded && <AqNavSlot />}
       <ScrollMemory />
       <ErrorBoundary resetKey={pathname}>
         {toWriter ? <Navigate to={{ pathname: writers, search }} replace /> : (
@@ -137,8 +148,7 @@ export default function App() {
           </Routes></Zoom>
         )}
       </ErrorBoundary>
-      {!bare && !HOST.embedded && <SiteFooter />}
-      {!bare && <BuddyGames />}
+      {!bare && <Games />}
       {edition.draft && !bare && <DraftTape />}
     </EditionContext.Provider>
   );

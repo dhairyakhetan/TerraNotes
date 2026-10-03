@@ -1,5 +1,5 @@
 import { Link } from '../router.jsx';
-import ArticleCard, { TagRow } from '../shared/ArticleCard.jsx';
+import ArticleCard, { TagRow, cardCover } from '../shared/ArticleCard.jsx';
 import ImageSlot from '../shared/ImageSlot.jsx';
 import { ByTape, Clip, FeaturedTape } from '../shared/Tapes.jsx';
 import { tagOf } from '../data/articles.js';
@@ -62,7 +62,7 @@ export default function PhoneHangingArticles() {
             <Clip color={tagOf(a6).color} w={24} h={9} top="-6px" left={110} />
             <Clip color={tagOf(a6).color} w={24} h={9} top="-6px" left={250} />
             <article style={{ width: "100%", height: "100%", boxSizing: "border-box", background: "var(--card)", border: "2px solid var(--ink)", boxShadow: `7px 7px 0 ${a6.featured ? "var(--yellow)" : "var(--ink)"}`, padding: "8px", display: "flex", gap: "12px" }}>
-              <ImageSlot src={a6.cover} alt={a6.alt} box={{ width: "122px", flexShrink: "0", height: "176px" }} />
+              <ImageSlot src={cardCover(a6.cover)} fallback={a6.cover} alt={a6.alt} box={{ width: "122px", flexShrink: "0", height: "176px" }} />
               <div style={{ display: "flex", flexDirection: "column", gap: "8px", paddingTop: "4px", flexGrow: "1" }}>
                 <TagRow a={a6} />
                 <h3 ref={fitWide} style={{ flexShrink: "0", margin: "0", fontFamily: FONT.head, fontWeight: "400", fontSize: "22px", lineHeight: "0.95", letterSpacing: "-0.3px", textTransform: "uppercase", color: "var(--ink)" }}>{a6.title}</h3>

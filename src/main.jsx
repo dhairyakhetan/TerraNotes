@@ -1,7 +1,7 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { unstable_HistoryRouter as HistoryRouter } from 'react-router';
-import App from './App.jsx';
+import App, { loadLabs } from './App.jsx';
 import IntroNotebook from './shared/IntroNotebook.jsx';
 import { createAnimatedHistory } from './lib/animatedHistory.js';
 import { introWanted } from './lib/introNotebook.js';
@@ -13,7 +13,6 @@ import './styles/loops.css';
 import './styles/motion.css';
 import './styles/phone.css';
 import './styles/web.css';
-import './styles/footer.css';
 import './styles/intro.css';
 import './styles/buddy.css';
 
@@ -34,3 +33,5 @@ createRoot(document.getElementById('root')).render( // the own site's page: embe
     </HistoryRouter>
   </React.StrictMode>
 );
+// fetch AQ Labs' page code once the first page is up, so opening it from a card doesn't wait on it
+setTimeout(() => loadLabs().catch(() => {}), 2000);

@@ -7,11 +7,10 @@ import { pad2 } from '../lib/format.js';
 import { flight } from '../lib/cardFlight.js';
 import { coverFloor, useFitTitle } from '../lib/fitTitle.js';
 import { FONT } from '../styles/fonts.js';
-import { HOST } from '../host.js';
 
-// Inside AQ's website cards load the 480px cover-card.webp beside cover.jpg (made by its make-card-covers tool,
-// embed/aq/scripts/tools/), not the 900px+ original; the original if that copy is missing.
-const cardCover = (src) => (HOST.embedded && typeof src === 'string' && src.endsWith('/cover.jpg') ? src.replace(/cover\.jpg$/, 'cover-card.webp') : src);
+// Cards load the 480px cover-card.webp beside cover.jpg (tools/make-card-covers.mjs), not the 900px+ original; the
+// original if that copy is missing.
+export const cardCover = (src) => (typeof src === 'string' && src.endsWith('/cover.jpg') ? src.replace(/cover\.jpg$/, 'cover-card.webp') : src);
 
 // The article card: clip on top, cover, tag pill + "01 / 08", title, dek. White, 2px ink border, hard shadow
 // (yellow + "★ featured" tape when featured). Links to the article; the click is remembered so the cover can fly

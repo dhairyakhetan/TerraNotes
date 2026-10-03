@@ -224,8 +224,9 @@ function Scores({ score, top, unit }) {
 }
 
 // The popup. Esc, the ✕ or a click outside closes it (it lifts away).
-export default function BuddyGames() {
-  const [game, setGame] = useState(null);
+// first: the game asked for when this was loaded (App.jsx loads it on the first 'aq-games')
+export default function BuddyGames({ first = null }) {
+  const [game, setGame] = useState(first);
   const [shown, leaving] = usePresence(game, 200);
   useEffect(() => {
     const on = (e) => setGame(e.detail || 'snake');

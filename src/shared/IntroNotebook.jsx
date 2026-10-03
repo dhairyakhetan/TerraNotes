@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { cardCover } from './ArticleCard.jsx';
 import { ARTICLES } from '../data/articles.js';
 import { LATEST } from '../data/editions.js';
 import { editionData } from '../editions/index.js';
@@ -8,8 +9,8 @@ import { calm } from '../lib/motion.js';
 
 // The opening animation (when: lib/introNotebook.js), over the site while it loads underneath: a notebook slides in
 // spinning, opens on the Aquaterra logo, "TerraNotes" is written in, a CERTIFIED stamp thumps down, and it lifts away
-// after 4.3 s (1.8 s with reduced motion). Skip button, Enter or Space ends it early. Meanwhile the covers, photos and
-// the footer video start downloading. All timings: styles/intro.css.
+// after 4.3 s (1.8 s with reduced motion). Skip button, Enter or Space ends it early. Meanwhile the covers and photos
+// start downloading. All timings: styles/intro.css.
 const PLAY = 4300, REDUCED = 1800, LEAVE = 450;
 
 export default function IntroNotebook() {
@@ -21,10 +22,10 @@ export default function IntroNotebook() {
 
   useEffect(() => {
     introSeen();
-    window.aqIntro = true; // the footer video starts downloading now too (SiteFooter)
+    window.aqIntro = true; // (AQ's site reads this too)
     dispatchEvent(new Event('aq-intro'));
     // fetch what the pages will need while the notebook plays
-    for (const src of [withBase('/brand/aquaterra-globe.webp'), withBase('/brand/aquaterra-wordmark.webp'), ...ARTICLES.map((a) => a.cover), ...editionData(LATEST).photos.map((p) => p.photo)].filter(Boolean)) {
+    for (const src of [withBase('/brand/aquaterra-globe.webp'), withBase('/brand/aquaterra-wordmark.webp'), ...ARTICLES.map((a) => cardCover(a.cover)), ...editionData(LATEST).photos.map((p) => p.photo)].filter(Boolean)) {
       const img = new Image();
       img.src = src;
     }

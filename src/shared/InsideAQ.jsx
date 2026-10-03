@@ -1,5 +1,6 @@
 import { Link } from '../router.jsx';
 import BackHome from './BackHome.jsx';
+import { cardCover } from './ArticleCard.jsx';
 import { EDITIONS, LATEST, editionLink, editionName } from '../data/editions.js';
 import { editionData } from '../editions/index.js';
 import { useEdition } from '../lib/edition.js';
@@ -11,7 +12,7 @@ import { FONT } from '../styles/fonts.js';
 // - EditionsCard: every edition as a little cover to open (the header's edition picker), at the end of the home pages
 //   beside the games card (shared/EndCards.jsx). The page's own edition says "you're here"; one still being made
 //   (draft: true in data/editions.js) shows as "coming", with no link and nothing of its content.
-// - BackToMagazine: a small "← Terra Notes" pill under AQ's nav on the other pages (the header's back link).
+// - BackToMagazine: a small "← Back to home" pill under AQ's nav on the other pages (the header's back link).
 const MONO = { fontFamily: FONT.mono, fontWeight: "700", letterSpacing: "1.4px", textTransform: "uppercase" };
 const short = (month) => month.replace(/^(\w{3})\w*/, '$1');
 
@@ -24,7 +25,7 @@ function Tile({ e, here, web }) {
       <span style={{ position: "relative", display: "block", width: `${W}px`, height: `${H}px`, boxSizing: "border-box", border: coming ? "2px dashed var(--slotLine)" : "2px solid var(--ink)", background: coming ? "var(--cream)" : "var(--blank)", overflow: "hidden" }}>
         {coming
           ? <span style={{ position: "absolute", inset: "0", display: "flex", alignItems: "center", justifyContent: "center", textAlign: "center", fontFamily: FONT.hand, fontSize: web ? "22px" : "19px", lineHeight: "1", color: "var(--wire)", padding: "8px" }}>out end of {e.month.split(' ')[0]}</span>
-          : cover && <img src={cover} alt="" loading="lazy" decoding="async" style={{ display: "block", width: "100%", height: "100%", objectFit: "cover" }} />}
+          : cover && <img src={cardCover(cover)} onError={(ev) => { if (ev.currentTarget.src !== cover) ev.currentTarget.src = cover; }} alt="" loading="lazy" decoding="async" style={{ display: "block", width: "100%", height: "100%", objectFit: "cover" }} />}
         {current && <span style={{ position: "absolute", left: "6px", top: "6px", ...MONO, fontSize: "9px", padding: "3px 6px", background: "var(--yellow)", border: "1.5px solid var(--ink)", color: "var(--ink)" }}>you’re here</span>}
       </span>
       <span style={{ display: "flex", alignItems: "baseline", gap: "6px", marginTop: "8px" }}>
@@ -62,6 +63,6 @@ export function BackToMagazine({ web }) {
   if (!AQ_LOOK) return null;
   const z = web ? 'var(--web-zoom, 1)' : 'var(--phone-zoom, 1)';
   return (
-    <BackHome className={web ? 'btn' : 'press'} style={{ position: "fixed", zIndex: "40", top: `calc(var(--nav-h, 70px) / ${z} + 10px)`, left: web ? "24px" : "12px", display: "inline-flex", alignItems: "center", minHeight: "44px", padding: "0 16px", boxSizing: "border-box", borderRadius: "999px", background: "var(--card)", border: "2px solid var(--ink)", boxShadow: "3px 3px 0 var(--ink)", "--c": "var(--ink)", ...MONO, fontSize: web ? "12px" : "11px", color: "var(--ink)", textDecoration: "none" }}>← Terra Notes</BackHome>
+    <BackHome className={web ? 'btn' : 'press'} style={{ position: "fixed", zIndex: "40", top: `calc(var(--nav-h, 70px) / ${z} + 10px)`, left: web ? "24px" : "12px", display: "inline-flex", alignItems: "center", minHeight: "44px", padding: "0 16px", boxSizing: "border-box", borderRadius: "999px", background: "var(--card)", border: "2px solid var(--ink)", boxShadow: "3px 3px 0 var(--ink)", "--c": "var(--ink)", ...MONO, fontSize: web ? "12px" : "11px", color: "var(--ink)", textDecoration: "none" }}>← Back to home</BackHome>
   );
 }

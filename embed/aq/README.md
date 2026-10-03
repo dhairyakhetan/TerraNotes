@@ -11,13 +11,13 @@ The next export **replaces `src/terranotes/` and `scripts/terranotes/` whole**, 
 
 - **Change the magazine** (articles, a new edition, a fix, a restyle) in the TerraNotes repo, following its
   `CLAUDE.md`. Then export into this repo and commit:
-  `node tools/export-aq.mjs <path to this repo>/frontend` (run it from the TerraNotes repo).
+  `node tools/export-aq.mjs <path to this repo>/frontend --verify` (run it from the TerraNotes repo; its CLAUDE.md,
+  "Integrating into AQ's website", has the steps).
 - **Change how AQ hosts it** (the shadow root, AQ's nav around it, the prerender) in the TerraNotes repo too. Those
   parts live there as `src/TerraNotesRoot.jsx`, `src/styles/document.css` and `embed/aq/` (this README, `prerender.mjs`,
-  `tools/make-card-covers.mjs`, the fonts).
-- `public/terranotes/` is only added to by an export, never cleared, because AQ makes some files there itself
-  (`cover-card.webp`). After adding or changing a cover, run `node scripts/terranotes/tools/make-card-covers.mjs`
-  and `node scripts/terranotes/tools/make-link-previews.mjs` from `frontend/`, and commit what they write.
+  the fonts). What AQ's own code has to keep doing for it is at the top of `shared/AqNavSlot.jsx`.
+- `public/terranotes/` is only added to by an export, never cleared; the export lists files there it doesn't know.
+  The card covers (`cover-card.webp`) and link previews come from the TerraNotes repo now.
 
 ## How it sits inside AQ
 
@@ -48,12 +48,12 @@ The same code runs as the magazine's own site and here; `src/terranotes/host.js`
 4. **Page-change animation** (card flights, crossfades) is `lib/animatedHistory.js`, which is AQ's router history
    (`App.tsx` `AppRouter`). It only animates changes that stay inside `/terranotes`; everything else passes through.
    Its `useTransitions={false}` toggle in `AppRouter` is needed for the flights: don't remove it.
-5. **AQ's nav, dock and footer wrap it; the magazine's own header is hidden** (`:host header.site-header{visibility:hidden}`
-   in `styles/base.css`), its box kept as the spacer under AQ's fixed nav. So, here only: no own footer or skip link,
+5. **AQ's nav, dock and footer wrap it (the magazine has no footer); the magazine's own header is hidden** (`:host header.site-header{visibility:hidden}`
+   in `styles/base.css`), its box kept as the spacer under AQ's fixed nav. So, here only: no skip link,
    a visible "call Buddy" button on phones (`shared/buddy/Buddy.jsx`), cards load `cover-card.webp`, AQ Labs runs
    full width with its chapter pill under AQ's nav, and what the hidden header gave is drawn in the page
    (`shared/InsideAQ.jsx`): a card with the other editions at the end of the home pages (once there is more than one)
-   and a "← Terra Notes" pill under AQ's nav (it reads AQ's `--nav-h`). The viewport tag is pinned to `width=390` on phones only while the magazine shows.
+   and a "← Back to home" pill under AQ's nav (it reads AQ's `--nav-h`). The viewport tag is pinned to `width=390` on phones only while the magazine shows.
 6. **Editions.** Every month is its own folder, `editions/<id>/` (look, articles, photo wall, words, team), kept for
    good: the latest edition is `/terranotes`, an older one `/terranotes/sep26`, a draft (`draft: true` in
    `data/editions.js`) only at its own address with a "Draft" tape, and nowhere in the prerender or sitemap.

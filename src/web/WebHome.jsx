@@ -24,7 +24,7 @@ export default function WebHome() {
   const edition = useEdition();
   useEffect(() => { document.title = homeTitle(edition); }, [edition]);
   const page = useRef(null);
-  usePauseEach(page, '.hero-sway,.fl1,.fl2,.fl3,.fl4,.fl5,.fl6,.fk1,.fk2,.fk3,.fk4,.spark,.bulb,.orbit-bubble,.buddy-bob'); // loops hold still once scrolled away
+  usePauseEach(page, '.hero-sway,.fl1,.fl2,.fl3,.fl4,.fl5,.fl6,.fk1,.fk2,.fk3,.fk4,.spark,.bulb,.buddy-bob'); // loops hold still once scrolled away
   const snake = endCardsSpace(true); // the games (+ editions) cards under the team
 
   return (

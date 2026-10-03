@@ -54,10 +54,10 @@
 /* stopping them */
 .off-screen,.off-screen *{animation-play-state:paused !important}
 /* while pages swap the incoming page mustn't be redrawn every frame (that made going back stutter on phones) */
-html[data-tn-nav] :is(.sway,.flutter,.hero-sway,.fl1,.fl2,.fl3,.fl4,.fl5,.fl6,.fk1,.fk2,.fk3,.fk4,.glint,.spark,.twist,.orbit-bubble,.buddy-bob),
-:host([data-tn-nav]) :is(.sway,.flutter,.hero-sway,.fl1,.fl2,.fl3,.fl4,.fl5,.fl6,.fk1,.fk2,.fk3,.fk4,.glint,.spark,.twist,.orbit-bubble,.buddy-bob){animation-play-state:paused}
-html.tn-lite :is(.sway,.flutter,.hero-sway,.twist,.glint,.bulb,.spark,.fl1,.fl2,.fl3,.fl4,.fl5,.fl6,.orbit-bubble,.buddy-bob,.buddy-menu-call svg),
-:host(.tn-lite) :is(.sway,.flutter,.hero-sway,.twist,.glint,.bulb,.spark,.fl1,.fl2,.fl3,.fl4,.fl5,.fl6,.orbit-bubble,.buddy-bob,.buddy-menu-call svg){animation:none}
+html[data-tn-nav] :is(.sway,.flutter,.hero-sway,.fl1,.fl2,.fl3,.fl4,.fl5,.fl6,.fk1,.fk2,.fk3,.fk4,.glint,.spark,.twist,.buddy-bob),
+:host([data-tn-nav]) :is(.sway,.flutter,.hero-sway,.fl1,.fl2,.fl3,.fl4,.fl5,.fl6,.fk1,.fk2,.fk3,.fk4,.glint,.spark,.twist,.buddy-bob){animation-play-state:paused}
+html.tn-lite :is(.sway,.flutter,.hero-sway,.twist,.glint,.bulb,.spark,.fl1,.fl2,.fl3,.fl4,.fl5,.fl6,.buddy-bob,.buddy-menu-call svg),
+:host(.tn-lite) :is(.sway,.flutter,.hero-sway,.twist,.glint,.bulb,.spark,.fl1,.fl2,.fl3,.fl4,.fl5,.fl6,.buddy-bob,.buddy-menu-call svg){animation:none}
 @media (prefers-reduced-motion: reduce){
   :is(.sway,.flutter,.hero-sway,.twist,.glint,.bulb,.spark,.fl1,.fl2,.fl3,.fl4,.fl5,.fl6){animation:none}
 }
