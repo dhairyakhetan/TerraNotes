@@ -26,12 +26,17 @@
   display:flex;flex-direction:column;align-items:center;justify-content:center;gap:calc(var(--pw) * .08)}
 @keyframes nbFront{0%{opacity:1}50%,100%{opacity:0}}
 .nb-front::before{content:"";position:absolute;left:calc(var(--pw) * .06);top:6%;bottom:6%;border-left:1.5px dashed rgba(243,238,228,.35)}
-.nb-front-logo{width:calc(var(--pw) * .34);height:auto}
-/* the edition's cover, pasted on the front (IntroNotebook.jsx) */
-.nb-front-cover{width:calc(var(--pw) * .6);aspect-ratio:4/5;object-fit:cover;border:2px solid var(--ink);box-shadow:4px 4px 0 var(--yellow);transform:rotate(2deg)}
-.nb-label{background:var(--page);border:2px solid var(--ink);box-shadow:3px 3px 0 var(--red);padding:calc(var(--pw) * .025) calc(var(--pw) * .06);text-align:center;
-  font:400 calc(var(--pw) * .085)/1 var(--font-head);text-transform:uppercase;color:var(--ink);transform:rotate(-2deg)}
-.nb-label span{display:block;margin-top:calc(var(--pw) * .02);font:400 calc(var(--pw) * .042)/1 var(--font-mono);letter-spacing:.15em}
+/* the front's imprint (IntroNotebook.jsx): blind-stamped into the cover (a shade darker, lit from above: a dark edge on
+   top, a light one under), with "Top secret" in worn foil */
+.nb-imprint{position:relative;display:flex;flex-direction:column;align-items:center;gap:calc(var(--pw) * .03);padding:calc(var(--pw) * .07) calc(var(--pw) * .08);
+  border:2px solid rgba(0,0,0,.32);box-shadow:0 1px 0 rgba(255,255,255,.14),inset 0 1px 0 rgba(255,255,255,.1),inset 0 -1px 0 rgba(0,0,0,.25);text-align:center}
+.nb-imp-small,.nb-imp-name{color:rgba(0,0,0,.42);text-shadow:0 1px 0 rgba(255,255,255,.16),0 -1px 0 rgba(0,0,0,.35)}
+.nb-imp-small{font:400 calc(var(--pw) * .036)/1.2 var(--font-mono);letter-spacing:.18em;text-transform:uppercase}
+.nb-imp-name{font:italic 400 calc(var(--pw) * .11)/1 var(--font-serif)}
+.nb-imp-rule{width:60%;height:0;border-top:2px solid rgba(0,0,0,.32);box-shadow:0 1px 0 rgba(255,255,255,.14)}
+.nb-imp-secret{margin:calc(var(--pw) * .02) 0;font:400 calc(var(--pw) * .15)/.9 var(--font-head);text-transform:uppercase;letter-spacing:.02em;color:var(--yellow);
+  opacity:.82;text-shadow:0 -1px 0 rgba(0,0,0,.45),0 1px 0 rgba(255,255,255,.2);transform:rotate(-4deg);
+  -webkit-mask-image:repeating-linear-gradient(115deg,black 0 7px,rgba(0,0,0,.72) 7px 9px);mask-image:repeating-linear-gradient(115deg,black 0 7px,rgba(0,0,0,.72) 7px 9px)}
 .nb-back{transform:scaleX(-1);animation:nbBack 900ms 1300ms step-end both;background:var(--page);border:2px solid var(--ink);
   box-shadow:inset -8px 0 14px -8px rgba(0,0,0,.25);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:calc(var(--pw) * .06)}
 @keyframes nbBack{0%{opacity:0}50%,100%{opacity:1}}

@@ -11,8 +11,8 @@ import { calm } from '../lib/motion.js';
 // The opening animation (when: lib/introNotebook.js), over the site while it loads underneath: a notebook slides in
 // spinning, opens on the Aquaterra logo, "TerraNotes" is written in, a CERTIFIED stamp thumps down, and it lifts away
 // after 4.3 s (1.8 s with reduced motion). Skip button, Enter or Space ends it early. Meanwhile the covers and photos
-// start downloading (the covers on screen first; the rest waits for its turn). It's the edition of the page it opens on (an older one's address shows that one): its number and
-// month on the cover's label and the stamp, and its cover picture pasted on the front. All timings: styles/intro.css.
+// start downloading (the covers on screen first; the rest waits for its turn). It's the edition of the page it opens on
+// (an older one's address shows that one): its number and month pressed into the cover and on the stamp. All timings: styles/intro.css.
 const PLAY = 4300, REDUCED = 1800, LEAVE = 450;
 const WORDS = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve'];
 
@@ -21,7 +21,6 @@ export default function IntroNotebook() {
   const [gone, setGone] = useState(false);
   const skip = useRef(null);
   const n = editionAt(useLocation().pathname), { month } = editionOf(n), data = editionData(n);
-  const cover = (data.articles.find((a) => a.featured) || data.articles[0])?.cover;
   const issue = String(n).padStart(2, '0');
 
   const leave = () => setLeaving(true);
@@ -82,10 +81,15 @@ export default function IntroNotebook() {
               {/* the cover: its outside, then (once it swings past halfway) its inside with the logo */}
               <div className="nb-cover">
                 <div className="nb-face nb-front">
-                  {cover
-                    ? <img src={cardCover(cover)} onError={(ev) => { if (ev.currentTarget.src !== cover) ev.currentTarget.src = cover; }} alt="" className="nb-front-cover" />
-                    : <img src={withBase('/brand/aquaterra-globe.webp')} alt="" className="nb-front-logo" />}
-                  <div className="nb-label">TerraNotes<span>issue {issue} · {month.toLowerCase()}</span></div>
+                  {/* pressed into the cover, not stuck on: a blind-stamped frame, the issue, and a worn foil "Top secret" */}
+                  <div className="nb-imprint">
+                    <div className="nb-imp-small">Aquaterra · field notes</div>
+                    <div className="nb-imp-secret">Top<br />secret</div>
+                    <div className="nb-imp-small">do not open before the bell</div>
+                    <div className="nb-imp-rule" />
+                    <div className="nb-imp-name">TerraNotes</div>
+                    <div className="nb-imp-small">issue {issue} · {month.toLowerCase()}</div>
+                  </div>
                 </div>
                 <div className="nb-face nb-back">
                   <img src={withBase('/brand/aquaterra-globe.webp')} alt="" className="nb-logo" />
