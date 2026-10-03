@@ -11,6 +11,8 @@ npm install
 npm run dev      # http://localhost:5173
 npm run build    # → dist/ (also writes per-article HTML, sitemap, robots, 404, llms.txt: build/siteFiles.js)
 npm run preview  # serve dist/ on :4173
+npm run check    # tools/check-embed.mjs: the mistakes that only break inside AQ's website (the build runs it first)
+node tools/export-aq.mjs [path]   # write the magazine into AQ's website (see "Inside AQ's website")
 node tools/make-link-previews.mjs   # after adding an article / changing a cover (needs `npm i -D playwright`)
 ```
 
@@ -44,7 +46,7 @@ look after October is out.
 - **A page's edition comes from its address** (`editionAt` in `lib/routes.js`): `/sep26…` is September's, everything else the latest's.
   - `App.jsx` puts that edition's look on the page and hands its content down. Components read it with `useEdition()` (`lib/edition.js`): `{ number, id, month, draft, look, tags, articles, photos, words, teams, members, intro }`.
   - Never import an edition's own files (`src/editions/<id>/…`) in a component. Another edition's data (an article's own edition, say): `editionData(n)` from `src/editions/index.js`.
-- **Looks are CSS variables.** `lib/edition.js` sets every colour as `--<name>` and every font as `--font-<name>` on `<html>` (plus `data-edition="<id>"`). So:
+- **Looks are CSS variables.** `lib/edition.js` sets every colour as `--<name>` and every font as `--font-<name>` on `<html>` (inside AQ's website: on the shadow host), plus `data-edition="<id>"`. So:
   - Shared components and CSS use `var(--ink)`, `var(--card)`…, never a hex colour. Fonts come from `FONT` (`var(--font-head)`…).
   - SVG colours go in `style` (`style={{ stroke: "var(--ink)" }}`), not in attributes: Safari may not read a variable there.
   - A canvas can't read CSS variables: it takes the values from `useEdition().look` (see `shared/buddy/BuddyGames.jsx`).
@@ -55,13 +57,44 @@ look after October is out.
   - Its own CSS goes in its folder too, scoped with `[data-edition="<id>"]` or its own class, with class names no other file uses.
 - **Never change how a live or older edition looks** while making the next one. Check it: screenshot its pages at 390px and 1440px before and after your change; they must match.
 
+## Inside AQ's website
+
+The magazine also runs inside AQ's main website (the `dhairyakhetan/fah` repo), at `/terranotes`, from this same code.
+
+- **Updating it there:** `node tools/export-aq.mjs <fah checkout>/frontend` writes its three folders (`src/terranotes/`,
+  `public/terranotes/`, `scripts/terranotes/`), then commit in fah. Without a path it writes `out/aq/` and
+  `out/terranotes-for-aq.zip` to hand over. Never edit those folders in fah: the next export replaces them.
+- **`src/host.js` is what differs:** AQ's copy says `{ base: '/terranotes', embedded: true }`. AQ-only behaviour checks
+  `HOST.embedded` (the Snake card, the phone "call Buddy" button, no own footer or skip link, AQ Labs' floating tabs,
+  card covers from `cover-card.webp`); AQ-only styles are rules that start with `:host`.
+- **It draws inside a shadow root** (`src/TerraNotesRoot.jsx`), under AQ's own nav, dock and footer. AQ hides the
+  magazine's header (`:host header.site-header{visibility:hidden}` in `styles/base.css`). So, in all code:
+  - Router pieces come from `src/router.jsx` (it adds and strips the `/terranotes` prefix), never from `react-router`.
+  - Elements the magazine drew are found with `byId` / `$` (`lib/dom.js`), never `document.getElementById` /
+    `querySelector`. Pop-ups portal into `portalRoot()`. Outside-click checks use `e.composedPath().includes(el)`.
+    Flags on `<html>` go through `flag()` (it sets them on the shadow host too).
+  - File URLs written in code go through `withBase()` (`lib/base.js`). Paths in `src/editions/` and `src/data/` stay
+    as they are: `src/editions/index.js` and `articleFolder()` turn them into real URLs.
+  - CSS that styles the page from `<html>` needs a `:host(…)` twin (`html[data-tn-nav] .x, :host([data-tn-nav]) .x`),
+    and `:root` variables are `:root,:host`.
+  - What a shadow root can't hold (`@font-face`, `<html>` rules, `::view-transition-*`) also goes in
+    `src/styles/document.css` (loaded only there).
+  - The edition's look goes on the shadow host, never `<html>`: AQ's own CSS uses `--ink`, `--card` and `--pink` too.
+  - `npm run build` runs `tools/check-embed.mjs` first and fails on any of these. A line that genuinely needs one (a
+    document-level element) ends with the comment `embed-ok`.
+- **What AQ's code uses from here** (keep these working): `TerraNotesRoot.jsx` (default export), `lib/base.js`
+  `isTnPath`, `lib/animatedHistory.js` `createAnimatedHistory()` with `onShown()`, and `embed/aq/scripts/prerender.mjs`
+  (`terraNotesPages()`, `terraNotesLlms()`, `terraNotesSitemapPaths()`; it builds on `build/staticCopy.js`).
+- **AQ-only files:** `src/TerraNotesRoot.jsx`, `src/styles/document.css`, the `.d.ts` stubs, and `embed/aq/` (the
+  README Claude reads in fah, the prerender, the card-cover tool, the self-hosted fonts).
+
 ## Layout model
 
 Two separate layouts, chosen by window width (`lib/layoutMode.js`, `useIsWeb()`):
 
 | | Phone (`src/phone/`) | Web (`src/web/`) |
 |---|---|---|
-| Width | fixed **390px**. Phones and upright tablets are pinned to it by the viewport tag in `index.html` | fixed **1440px**, drawn with CSS `zoom: var(--web-zoom)` to fit narrower windows (900px and up) |
+| Width | fixed **390px**. Phones and upright tablets are pinned to it by the viewport tag in `index.html` (inside AQ's website: `TerraNotesRoot.jsx`, while the magazine shows) | fixed **1440px**, drawn with CSS `zoom: var(--web-zoom)` to fit narrower windows (900px and up) |
 | Header | `PhoneHeader` (64px, sticky; the logo glides when the back link comes or goes) + slide-in `PhoneMenu` | `WebHeader` (80px, sticky; inner pages: "← back to home" left, logo + edition picker centred, gliding over when that changes) |
 
 - **Home pages are artboards.** Everything under the header is `position: absolute` at design coordinates (px).
@@ -78,9 +111,9 @@ Two separate layouts, chosen by window width (`lib/layoutMode.js`, `useIsWeb()`)
   - `chapters`: its sections get addresses, `<article>/<id>` (element ids).
   - `demos`: `{ chapter: folder }`, a web app kept in its folder, opened in a new tab at `<article>/<chapter>/demo`. `pages/DemoPage.jsx` shows it full-window in a same-origin frame, with no footer, Buddy or opening animation. Its files stay as the team made them.
   - **AQ Labs** (`src/articles/labs/`, the "labs" article; teams and chapter ids in `data/labs.js`) is the AQ Labs team's own gallery site, ported. Its Wisdom Woods chapter opens the team's demo at `/articles/labs/wisdom-woods/demo` (files: `public/editions/sep26/articles/labs/wisdom-woods/demo/`). It keeps their look on purpose: their fonts (`public/fonts/`, JetBrains Mono from Google Fonts), their palette and rounded pills. Don't restyle it into the magazine's design.
-    - Built from the AQ Labs design. Web: one long scroll (intro with a 3D bookshelf, then every chapter), sticky chapter tabs with a ⌕ find bar. Phone: one chapter at a time (the shelf is the start; `/articles/labs/<id>` opens a chapter as its own page, so Back returns to the shelf); search lives in the "view all projects" sheet.
+    - Built from the AQ Labs design. Web: one long scroll (intro with a 3D bookshelf, then every chapter), sticky chapter tabs with a ⌕ find bar (inside AQ's website: floating pill tabs, no find bar). Phone: one chapter at a time (the shelf is the start; `/articles/labs/<id>` opens a chapter as its own page, so Back returns to the shelf); search lives in the "view all projects" sheet.
     - Books sit in fixed hover slots (`.bslot`), so the pulled-out book never flickers. Karyaarth's stills open in the site's `PhotoViewer` (it takes `photos`, `title`, `label`, `count`).
-  - Its CSS (`labs.css`) is scoped to `.labs`. Its class names must not match any in `src/styles/` (it had to rename `.intro` and `.orbit`). Its loops keep the motion rules below, inside `labs.css`: transform / opacity only, stopped by reduced motion, `.lite`, `.off-screen` and `html[data-nav]`.
+  - Its CSS (`labs.css`) is scoped to `.labs`. Its class names must not match any in `src/styles/` (it had to rename `.intro` and `.orbit`). Its loops keep the motion rules below, inside `labs.css`: transform / opacity only, stopped by reduced motion, `.tn-lite`, `.off-screen` and `html[data-tn-nav]` (with their `:host` twins). It brings its own stylesheet (`labs.css?inline`, a `<style>` beside the page), so it loads with the gallery.
 - **Shared components** (`src/shared/`) take a `web` prop (or `look`) and keep a `PHONE` / `WEB` table of positions and sizes. Change a value in the right table; don't fork the component.
 - **The home page also answers at `/articles`, `/photos`, `/words` and `/members`** (an older edition's at `/sep26/photos`…) and scrolls to that section: element ids `articles`, `photos`, `words`, `members`. See `lib/routes.js` and `lib/scrollMemory.js`.
 - **Section addresses drop off by themselves.** Once you scroll a screen away from the section an address names (`/photos`, `/sep26/words`, `/articles/labs/photon`), `lib/scrollMemory.js` replaces it with the plain page (`/`, `/sep26`, `/articles/labs`) in place, with state `{ quiet: true }`, so nothing scrolls or remounts. `?by=` addresses stay.
@@ -159,7 +192,7 @@ Popups are white cards with a hard shadow and a clip:
 **Motion** (it must run on low-end phones):
 - **Endless loops** go in `styles/loops.css`:
   - Animate **only `transform` / `opacity`**, never layout or paint properties.
-  - Add every new loop class to the reduced-motion rule, the `.lite` rule and the `html[data-nav]` pause rule there.
+  - Add every new loop class to the reduced-motion rule, the `.tn-lite` rule and the `html[data-tn-nav]` pause rule there.
   - Wrap a section in `usePauseOffscreen(ref)` so its loops stop when it's scrolled away.
 - **One-shot animations** go in `styles/motion.css`. Entrances animate the `translate` / `rotate` / `scale` properties (not `transform`) so elements keep their tilt.
 - **JS animation** must check `calm()` (reduced motion) from `lib/motion.js`. For per-frame work, run `requestAnimationFrame` only while something moves. `web/WebArticleLine.jsx` is the model.
@@ -176,7 +209,12 @@ build/siteFiles.js      at build: an .html per article at its address (own title
                         pages, 404, sitemap, robots, llms.txt (drafts left out)
 build/staticCopy.js     each page's text as plain HTML inside #root, for crawlers without JavaScript
 tools/make-link-previews.mjs   preview.jpg in each article's folder (1200×630 link preview)
-src/main.jsx            entry: router with the animated history, intro, lite class, console hello, all CSS imports (labs.css last)
+tools/check-embed.mjs   the guard for AQ's website (see "Inside AQ's website")   tools/export-aq.mjs   writes the magazine into it
+embed/aq/               AQ-only: README (for Claude in fah), scripts/ (prerender.mjs, tools/make-card-covers.mjs), public/fonts/
+src/host.js             where this copy runs (own site / AQ's website)
+src/main.jsx            the own site's entry: router with the animated history, intro, lite class, console hello, CSS imports
+src/TerraNotesRoot.jsx  AQ's entry: the shadow-root mount (+ styles/document.css, the .d.ts stubs)
+src/router.jsx          every router piece the code uses (adds / strips AQ's /terranotes)
 src/App.jsx             routes (phone vs web page per route, articles with their own page: PAGES, address redirects), the page's
                         edition (its look + useEdition()), skip link, scroll memory, error card, footer, games popup, draft tape
 src/editions/           one folder per edition (see "Editions"): <id>/look.js, articles.js, photos.js, words.js, team.js, index.js
@@ -200,6 +238,7 @@ src/shared/             used by both layouts:
   Tapes                 Clip, ByTape, FeaturedTape, LatestTag, DraftTape    Icons   Globe, Instagram, Close, Chevron, Photo, Menu
   ImageSlot  Logo  BackHome                                    buddy/        Buddy (easter-egg ghost), Ghost, BuddyGames
 src/lib/                logic only, no JSX:
+  base (BASE, withBase)   dom (byId, $, portalRoot, flag)   useDialogA11y
   edition (useEdition, applyLook)   layoutMode   routes   scrollMemory   animatedHistory   cardFlight   motion (calm, LITE)   fitTitle
   byWriter (?by=)   teamLayout   photoShapes   useGallery   useWordsGame   usePresence   pauseOffscreen
   scrollLock   buddyState   introNotebook   consoleHello   format (pad2, firstName, instagramUrl, teamsOf)

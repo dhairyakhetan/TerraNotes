@@ -6,6 +6,7 @@ import { lockScroll, unlockScroll } from '../lib/scrollLock.js';
 import { useGallery } from '../lib/useGallery.js';
 import { usePhotoShapes } from '../lib/photoShapes.js';
 import { useEdition } from '../lib/edition.js';
+import { useDialogA11y } from '../lib/useDialogA11y.js';
 import { FONT } from '../styles/fonts.js';
 
 // The full-screen photo viewer opened from the photo wall (and AQ Labs' Karyaarth stills), both layouts: one polaroid
@@ -42,6 +43,8 @@ export default function PhotoViewer({ web, photos: own, title = 'Photo wall', la
   const { cur, go, dx, dragging, prog, nb, handlers } = useGallery(n, start, { width: L.W, ...L.drag });
   useEffect(() => { lockScroll(); return unlockScroll; }, []);
   const strip = useRef(null), first = useRef(true);
+  const dialog = useRef(null);
+  useDialogA11y(!closing, dialog, onClose, 'button[aria-label="Close photos"]'); // focus in, Esc, Tab kept inside, focus back on the photo that opened it
   useEffect(() => { // the thumbnails follow along, keeping the current one in the middle (when they don't all fit)
     const el = strip.current, t = el?.children[cur];
     if (!t) return;
@@ -96,10 +99,10 @@ export default function PhotoViewer({ web, photos: own, title = 'Photo wall', la
   );
 
   return (
-    <div className={`${L.cls} ${closing ? 'viewer-out' : 'viewer-in'}`} role="dialog" aria-label={`${title}: photos`} style={{ position: "fixed", left: "0", right: "0", top: "0", margin: "0 auto", width: `${L.W}px`, zIndex: "90", background: "var(--ink)", color: "var(--page)" }}>
+    <div ref={dialog} className={`${L.cls} ${closing ? 'viewer-out' : 'viewer-in'}`} role="dialog" aria-modal="true" aria-label={`${title}: photos`} style={{ position: "fixed", left: "0", right: "0", top: "0", margin: "0 auto", width: `${L.W}px`, zIndex: "90", background: "var(--ink)", color: "var(--page)" }}>
       <div style={{ position: "absolute", fontFamily: FONT.serif, lineHeight: "1", ...L.title }}>{title}</div>
       <div style={{ position: "absolute", fontFamily: FONT.mono, color: "var(--labelDark)", textTransform: "uppercase", ...L.count }}>{count} ·{" "}<span style={{ color: "var(--yellow)" }}>{pad2(cur + 1)}</span>{" "}{`/ ${pad2(n)}`}</div>
-      <button className={L.press} onClick={onClose} aria-label="Close photos" autoFocus={web} style={{ "--c": "var(--amber)", position: "absolute", ...button, ...L.close }}>
+      <button className={L.press} onClick={onClose} aria-label="Close photos" style={{ "--c": "var(--amber)", position: "absolute", ...button, ...L.close }}>
         <CloseIcon size={L.closeIcon} />
       </button>
       {web ? (

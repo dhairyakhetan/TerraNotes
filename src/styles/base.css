@@ -1,14 +1,23 @@
 /* Base styles, both layouts. Nearly all styling is inline in the components; CSS is only for what inline styles
    can't do: resets, :active / :hover / :focus states, keyframes, and classes several components share.
-   Phone taps use :active (no :hover); web hover states live in web.css. */
+   Phone taps use :active (no :hover); web hover states live in web.css.
+   Inside AQ's website these files are injected into a shadow root (embed/aq/): rules on html / body do nothing there
+   (.tn-body is its stand-in for <body>), and rules that start with :host apply only there. */
 html,body{margin:0;background:var(--outside)}
-body{font-family:var(--font-body);color:var(--text)}
+body,.tn-body{font-family:var(--font-body);color:var(--text)}
+/* inside AQ: no darker band around the artboards, AQ's page is the magazine's cream */
+.tn-body{margin:0;background:var(--page)}
 /* drawn to exact sizes: iPhones mustn't enlarge the text on their own; #section jumps clear the sticky header;
    no sideways jump when a popup locks scrolling */
 html{-webkit-text-size-adjust:100%;text-size-adjust:100%;scroll-padding-top:64px;scrollbar-gutter:stable}
 a,button{-webkit-tap-highlight-color:transparent}
 html,a,button{touch-action:manipulation} /* no double-tap zoom, so no tap delay */
 #top{box-shadow:0 0 0 1px var(--edge)} /* the home pages' edge against the darker background */
+:host #top{box-shadow:none}
+/* Inside AQ, AQ's own nav floats over the top of the page, so the magazine's header is not drawn: its box stays as the
+   spacer under that nav (every artboard is positioned against its 64px / 80px), visibility so nothing that measures
+   it breaks. */
+:host header.site-header{visibility:hidden}
 
 /* press feedback: links and buttons dim while pressed, except the ones with their own press style */
 :where(a,button):active{opacity:.6}

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { FOOTER_VIDEO, ROSTER_COLORS, SITE } from '../data/site.js';
 import { LITE, calm } from '../lib/motion.js';
+import { withBase } from '../lib/base.js';
 
 // The footer on every page (mounted once in App.jsx, outside the routes, so its video survives navigation). It links
 // nowhere, by design. Styles: styles/footer.css.
@@ -131,7 +132,7 @@ function OrbitBanner() {
           ))}
         </div>
         {/* inside the stage, so it's on screen exactly when the bubbles are */}
-        {!reduced && <video ref={video} className="orbit-video" src={FOOTER_VIDEO.src} preload="none" muted loop playsInline aria-hidden="true" tabIndex={-1} />}
+        {!reduced && <video ref={video} className="orbit-video" src={withBase(FOOTER_VIDEO.src)} preload="none" muted loop playsInline aria-hidden="true" tabIndex={-1} />}
       </div>
     </section>
   );

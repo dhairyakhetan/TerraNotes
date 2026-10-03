@@ -1,4 +1,4 @@
-import { Link, useLocation, useNavigate } from 'react-router';
+import { Link, useLocation, useNavigate } from '../router.jsx';
 import { editionLink } from '../data/editions.js';
 import { useEdition } from '../lib/edition.js';
 import { openedFromHome } from '../lib/routes.js';

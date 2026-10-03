@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Link } from 'react-router';
+import { Link } from '../router.jsx';
 import { LatestTag } from '../shared/Tapes.jsx';
 import { LATEST, PUBLISHED, editionLink, editionName } from '../data/editions.js';
 import { useEdition } from '../lib/edition.js';
@@ -15,7 +15,7 @@ export default function WebEditionPicker() {
   const box = useRef(null);
   useEffect(() => {
     if (!open) return undefined;
-    const out = (e) => { if (!box.current?.contains(e.target)) setOpen(false); };
+    const out = (e) => { if (!e.composedPath().includes(box.current)) setOpen(false); }; // composedPath: inside AQ's shadow root, e.target is the host
     const esc = (e) => { if (e.key === 'Escape') setOpen(false); };
     addEventListener('pointerdown', out); addEventListener('keydown', esc);
     return () => { removeEventListener('pointerdown', out); removeEventListener('keydown', esc); };

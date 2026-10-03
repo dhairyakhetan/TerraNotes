@@ -1,11 +1,12 @@
 import { useLayoutEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { Link } from 'react-router';
+import { Link } from '../router.jsx';
 import BackHome from '../shared/BackHome.jsx';
 import Logo from '../shared/Logo.jsx';
 import { MenuIcon } from '../shared/Icons.jsx';
 import PhoneMenu from './PhoneMenu.jsx';
 import { calm } from '../lib/motion.js';
+import { portalRoot } from '../lib/dom.js';
 import { FONT } from '../styles/fonts.js';
 
 // The phone's sticky 64px header, plus the slide-in menu it opens. Home: logo left, menu button right. Every other
@@ -15,6 +16,7 @@ import { FONT } from '../styles/fonts.js';
 // (FLIP, transform only) and the back link slides in, like the web header.
 const EASE = 'cubic-bezier(0.32, 0.72, 0, 1)';
 let last = null; // the previous page's header: { home, box: the logo's place }
+export const forgetPhoneHeader = () => { last = null; }; // leaving the magazine (inside AQ): the next visit's first page doesn't glide
 
 export default function PhoneHeader({ current, edge }) {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -46,8 +48,8 @@ export default function PhoneHeader({ current, edge }) {
           <MenuIcon />
         </button>
       </header>
-      {/* in <body>, outside the page: page styles (.page-home a …) must not reach it */}
-      {createPortal(<PhoneMenu open={menuOpen} onClose={() => setMenuOpen(false)} current={current} edge={edge} />, document.body)}
+      {/* outside the page (in <body>; inside AQ, the shadow root's pop-up layer): page styles (.page-home a …) must not reach it */}
+      {createPortal(<PhoneMenu open={menuOpen} onClose={() => setMenuOpen(false)} current={current} edge={edge} />, portalRoot())}
     </>
   );
 }

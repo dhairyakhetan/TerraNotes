@@ -3,8 +3,10 @@
 // Leave a text field '' and the design's placeholder shows instead.
 export const SITE = {
   instagram: 'ngo.aquaterra', // Aquaterra's handle, without the @ (web header, phone menu; the footer links nowhere)
-  url: 'https://terranotes-aq.vercel.app', // this site's address: link previews, sitemap, llms.txt (env SITE_URL overrides it at build)
-  website: 'https://ngoaquaterra.com', // Aquaterra's main site (llms.txt)
+  // the magazine's own site: its link previews, sitemap and llms.txt are built from this address (env SITE_URL overrides
+  // it at build). Inside AQ's website, AQ's build decides the address (embed/aq/scripts/prerender.mjs).
+  url: 'https://terranotes-aq.vercel.app',
+  website: 'https://www.ngoaquaterra.com', // Aquaterra's main site (llms.txt; the magazine also lives there, at /terranotes)
   footerNote: 'Kolkata · est. 2021 · 1,300+ members', // second footer line (also llms.txt)
 };
 

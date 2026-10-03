@@ -1,7 +1,7 @@
 /* One-off motion, site-wide: how things arrive, open, close and change (the endless loops are in loops.css).
    Entrances animate `translate` / `rotate` / `scale` (not `transform`), so each element keeps its own tilt, and use
    fill-mode backwards, so press / hover nudges work again as soon as the entrance ends. All off under reduced motion. */
-:root{--settle:cubic-bezier(0.32,0.72,0,1);--spring:cubic-bezier(0.34,1.56,0.64,1)}
+:root,:host{--settle:cubic-bezier(0.32,0.72,0,1);--spring:cubic-bezier(0.34,1.56,0.64,1)}
 
 @keyframes fadeIn{from{opacity:0}}
 @keyframes fadeOut{to{opacity:0}}
@@ -90,15 +90,17 @@
 .legend-chip{transition:none}
 }
 
-/* Page to page (lib/animatedHistory.js sets html[data-nav] to into / next / prev / back / page during the swap).
+/* Page to page (lib/animatedHistory.js sets html[data-tn-nav] to into / next / prev / back / page during the swap).
+   Inside AQ's website these ::view-transition rules can't work from the shadow root: embed/aq/styles/document.css
+   carries a copy (keep the two in step).
    The header is its own layer, so it holds still while the pages move under it. */
 header.site-header{view-transition-name:site-header}
 ::view-transition-group(site-header){animation-duration:320ms}
 ::view-transition-old(root),::view-transition-new(root){animation-duration:420ms;animation-fill-mode:both}
 /* The swap itself is only a crossfade: each page brings its own motion (the article's cover drops in or flies out of
    its card and the text rises; home's card flies back), so moving the whole page as well played everything twice. */
-html[data-nav]::view-transition-old(root){animation:vtOut 220ms ease-out both}
-html[data-nav]::view-transition-new(root){animation:vtIn 260ms ease-out both}
+html[data-tn-nav]::view-transition-old(root){animation:vtOut 220ms ease-out both}
+html[data-tn-nav]::view-transition-new(root){animation:vtIn 260ms ease-out both}
 @keyframes vtOut{to{opacity:0}}
 @keyframes vtIn{from{opacity:0}}
 /* the header isn't crossfaded; the new one simply takes over (and glides its logo over when the back link comes or

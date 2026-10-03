@@ -1,6 +1,8 @@
 import { useEffect, useLayoutEffect, useRef } from 'react';
-import { useLocation, useNavigate, useNavigationType } from 'react-router';
+import { useLocation, useNavigate, useNavigationType } from '../router.jsx';
 import { calm } from './motion.js';
+import { $, byId } from './dom.js';
+import { HOST } from '../host.js';
 import { keepFrom, noteFrom, sameHome, sectionOf } from './routes.js';
 
 // Scroll handling for every navigation. <ScrollMemory /> renders nothing; App.jsx places it BEFORE the routes so its
@@ -17,10 +19,14 @@ import { keepFrom, noteFrom, sameHome, sectionOf } from './routes.js';
 const KEY = 'aq-scroll';
 const saved = (() => { try { return JSON.parse(sessionStorage.getItem(KEY)) || {}; } catch { return {}; } })();
 const persist = () => { try { sessionStorage.setItem(KEY, JSON.stringify(saved)); } catch { /* private mode */ } };
-if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
 let current = null; // the history entry whose scroll position is being recorded
 let lastPath = null, lastKey = null;
 let anchor = null; // the section the address names: { top: where it's shown, base, armed: false while still gliding there }
+// Inside AQ's website the visitor can leave the magazine and come back: "the previous page" mustn't survive that (a fresh
+// arrival would glide instead of starting at the top). Called when the magazine goes away.
+export const forgetScroll = () => { lastPath = null; lastKey = null; anchor = null; current = null; };
+// on its own site, from the very start (inside AQ, only while the magazine shows: the effect below)
+if (!HOST.embedded && 'scrollRestoration' in history) history.scrollRestoration = 'manual';
 
 export function ScrollMemory() {
   const { pathname, hash, key, search, state } = useLocation();
@@ -32,7 +38,7 @@ export function ScrollMemory() {
     persist();
     const spot = `${key}:${pathname}`; // a fresh load's key is always "default", so the path is part of it
     const sec = sectionOf(pathname) || (hash && { id: decodeURIComponent(hash.slice(1)), base: pathname });
-    const target = sec && document.getElementById(sec.id);
+    const target = sec && byId(sec.id);
     const quiet = type === 'REPLACE' && state?.quiet;
     let glide = quiet && !calm(); // a page's own section link (AQ Labs' tabs) glides there itself
     if (quiet) { keepFrom(lastKey, key); saved[spot] = Math.round(scrollY); } // same page, new address: still "opened from home", same spot
@@ -44,7 +50,7 @@ export function ScrollMemory() {
       else if (target) target.scrollIntoView({ behavior });
       else window.scrollTo({ top: 0, behavior });
       if (type === 'PUSH' && new URLSearchParams(search).get('by')) {
-        requestAnimationFrame(() => document.querySelector('.art-scroller')?.scrollTo({ left: 0, behavior }));
+        requestAnimationFrame(() => $('.art-scroller')?.scrollTo({ left: 0, behavior }));
       }
     }
     lastPath = pathname;
@@ -54,6 +60,11 @@ export function ScrollMemory() {
     anchor = target && !new URLSearchParams(search).has('by') ? { top: at, base: sec.base, armed: !glide, t: performance.now() } : null;
     current = spot;
   }, [pathname, hash, key]);
+  useEffect(() => { // the browser's own scroll restoration is off while the magazine shows (this file keeps the positions)
+    const was = 'scrollRestoration' in history ? history.scrollRestoration : null;
+    if (was) history.scrollRestoration = 'manual';
+    return () => { if (was) history.scrollRestoration = was; forgetScroll(); };
+  }, []);
   useEffect(() => {
     const remember = () => {
       if (current != null) saved[current] = Math.round(scrollY);

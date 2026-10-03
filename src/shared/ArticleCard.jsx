@@ -1,4 +1,4 @@
-import { Link } from 'react-router';
+import { Link } from '../router.jsx';
 import ImageSlot from './ImageSlot.jsx';
 import { ByTape, Clip, FeaturedTape } from './Tapes.jsx';
 import { placeOf, tagOf } from '../data/articles.js';
@@ -7,6 +7,11 @@ import { pad2 } from '../lib/format.js';
 import { flight } from '../lib/cardFlight.js';
 import { coverFloor, useFitTitle } from '../lib/fitTitle.js';
 import { FONT } from '../styles/fonts.js';
+import { HOST } from '../host.js';
+
+// Inside AQ's website cards load the 480px cover-card.webp beside cover.jpg (made by its make-card-covers tool,
+// embed/aq/scripts/tools/), not the 900px+ original; the original if that copy is missing.
+const cardCover = (src) => (HOST.embedded && typeof src === 'string' && src.endsWith('/cover.jpg') ? src.replace(/cover\.jpg$/, 'cover-card.webp') : src);
 
 // The article card: clip on top, cover, tag pill + "01 / 08", title, dek. White, 2px ink border, hard shadow
 // (yellow + "★ featured" tape when featured). Links to the article; the click is remembered so the cover can fly
@@ -50,7 +55,7 @@ export default function ArticleCard({ article: a, look = 'phone', mark, classNam
       {a.featured && <FeaturedTape />}
       <Clip color={tagOf(a).color} w={cw} h={ch} top={ctop} />
       <article style={{ width: "100%", height: "100%", boxSizing: "border-box", background: "var(--card)", border: "2px solid var(--ink)", boxShadow: `${L.shadow}px ${L.shadow}px 0 ${a.featured ? "var(--yellow)" : "var(--ink)"}`, padding: `${L.pad}px`, display: "flex", flexDirection: "column", gap: `${L.gap}px`, overflow: "hidden" }}>
-        <ImageSlot src={a.cover} alt={a.alt} box={{ height: `${img}px`, minHeight: coverFloor(img) }} icon={L.icon} font={L.iconFont} />
+        <ImageSlot src={cardCover(a.cover)} fallback={a.cover} alt={a.alt} box={{ height: `${img}px`, minHeight: coverFloor(img) }} icon={L.icon} font={L.iconFont} />
         <TagRow a={a} look={look} />
         <h3 ref={title} style={{ flexShrink: "0", margin: "0", fontFamily: FONT.head, fontWeight: "400", fontSize: `${titlePx}px`, lineHeight: "0.95", letterSpacing: "-0.3px", textTransform: "uppercase", color: "var(--ink)" }}>{a.title}</h3>
         <p style={{ flexShrink: "0", margin: "0", fontFamily: FONT.hand, fontSize: `${dekPx}px`, lineHeight: "1.1", color: "var(--dek)" }}>{a.dek}</p>

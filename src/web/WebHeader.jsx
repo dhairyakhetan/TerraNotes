@@ -1,5 +1,5 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
-import { Link, useLocation } from 'react-router';
+import { Link, useLocation } from '../router.jsx';
 import BackHome from '../shared/BackHome.jsx';
 import Logo from '../shared/Logo.jsx';
 import WebEditionPicker from './WebEditionPicker.jsx';
@@ -22,6 +22,7 @@ const EASE = 'cubic-bezier(0.32, 0.72, 0, 1)';
 const PAD = 48; // the header's side padding: where the back link (home: the logo) starts
 const BACK = { minHeight: "44px", display: "flex", alignItems: "center", fontFamily: FONT.hand, fontSize: "24px", color: "var(--ink)", textDecoration: "none", whiteSpace: "nowrap" };
 let hadBack = null; // did the previous page's header show the back link? (null: first page of the visit)
+export const forgetWebHeader = () => { hadBack = null; }; // leaving the magazine (inside AQ): the next visit's first page doesn't glide
 
 export default function WebHeader({ wire }) {
   const back = !isHomePath(useLocation().pathname), { number } = useEdition();

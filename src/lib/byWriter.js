@@ -1,4 +1,4 @@
-import { useSearchParams } from 'react-router';
+import { useSearchParams } from '../router.jsx';
 import { homeLink } from '../data/editions.js';
 import { firstName } from './format.js';
 import { useEdition } from './edition.js';

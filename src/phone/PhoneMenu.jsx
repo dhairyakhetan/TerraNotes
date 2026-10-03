@@ -1,5 +1,5 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
-import { Link } from 'react-router';
+import { Link } from '../router.jsx';
 import Logo from '../shared/Logo.jsx';
 import { CloseIcon } from '../shared/Icons.jsx';
 import { MenuCall } from '../shared/buddy/Buddy.jsx';
@@ -7,6 +7,7 @@ import { homeLink } from '../data/editions.js';
 import { useEdition } from '../lib/edition.js';
 import { pad2 } from '../lib/format.js';
 import { lockScroll, unlockScroll } from '../lib/scrollLock.js';
+import { byId } from '../lib/dom.js';
 import { FONT } from '../styles/fonts.js';
 
 // The phone's full-screen menu (opened from PhoneHeader): slides in from the right, swipe right (or ✕) to close.
@@ -27,7 +28,7 @@ const STOPS = [
 
 // On the home page: the section in the upper 40% of the screen right now.
 function homeSection() {
-  const line = innerHeight * 0.4, top = (id) => document.getElementById(id)?.getBoundingClientRect().top ?? Infinity;
+  const line = innerHeight * 0.4, top = (id) => byId(id)?.getBoundingClientRect().top ?? Infinity;
   if (top('members') <= line) return 'members';
   if (top('words') <= line) return 'words';
   if (top('photos') <= line) return 'photos';

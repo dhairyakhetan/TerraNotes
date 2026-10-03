@@ -1,5 +1,5 @@
 import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useNavigate } from 'react-router';
+import { useNavigate } from '../../router.jsx';
 import PhoneHeader from '../../phone/PhoneHeader.jsx';
 import WebHeader from '../../web/WebHeader.jsx';
 import PhotoViewer from '../../shared/PhotoViewer.jsx';
@@ -10,6 +10,10 @@ import { pad2 } from '../../lib/format.js';
 import { calm } from '../../lib/motion.js';
 import { FONT } from '../../styles/fonts.js';
 import { usePresence } from '../../lib/usePresence.js';
+import { withBase } from '../../lib/base.js';
+import { byId, flag } from '../../lib/dom.js';
+import { HOST } from '../../host.js';
+import labsCss from './labs.css?inline'; // with this page's chunk; a <style> beside the page (the return), so it lands in AQ's shadow root too
 
 // The "labs" article's own page (data/articles.js: page: 'labs'): the AQ Labs gallery, built from the AQ Labs design
 // (styles: ./labs.css; teams: data/labs.js; photos: this article's folder, public/editions/<id>/articles/labs/<team>/).
@@ -138,12 +142,13 @@ function Book({ t, i, size: [w, h, fs], web, href, onClick, pressed, ox }) {
   );
 }
 
-// The chapter tabs (and, on web, the search). active = the chapter lit; hits = chapters with search matches
+// The chapter tabs (and, on web, the search; not inside AQ, whose tabs are a floating pill). active = the chapter lit;
+// hits = chapters with search matches
 function Tabs({ web, active, hits, base, onTab, search }) {
   return (
     <nav className="lb-tabs" aria-label="Chapters">
       {TEAMS.map((t, i) => (
-        <a key={t.id} className={`tab${active === t.id ? ' on' : ''}${hits?.has(t.id) ? ' hit' : ''}`} data-spy={t.id} href={`${base}/${t.id}`} onClick={(e) => onTab(e, t.id)}
+        <a key={t.id} className={`tab${active === t.id ? ' on' : ''}${hits?.has(t.id) ? ' hit' : ''}`} data-spy={t.id} href={withBase(`${base}/${t.id}`)} onClick={(e) => onTab(e, t.id)}
           aria-label={web ? undefined : `${pad2(i + 1)} ${t.name}`} aria-current={active === t.id ? (web ? 'true' : 'page') : undefined} style={{ '--c': t.c, '--tc': t.tc }}>
           <span className="n">{pad2(i + 1)}</span><span className="t">{t.label.replace('|', ' ')}</span>
         </a>
@@ -266,6 +271,8 @@ function PhotonSheets({ items }) {
   );
 }
 
+const Main = HOST.embedded ? 'div' : 'main';
+
 export default function LabsPage({ article: a, web, chapter }) {
   const main = useRef(null), base = articleLink(a), dir = articleFolder(a);
   const navigate = useNavigate(), nav = useRef(navigate);
@@ -281,13 +288,14 @@ export default function LabsPage({ article: a, web, chapter }) {
   const [shownStill, stillLeaving] = usePresence(still, 180);
   const ch = web ? null : chapter; // phone: the chapter open (null = the shelf)
   useEffect(() => { document.title = `Aquaterra — ${a.title}`; }, [a.title]);
+  useEffect(() => { flag('tnLabs', ''); return () => flag('tnLabs', null); }, []); // inside AQ: its footer meets the gallery (embed/aq/styles/document.css)
   const img = (f, alt = '') => ({ src: `${dir}/${f}`, alt });
   const stills = useMemo(() => STILLS.map((caption, i) => ({ photo: `${dir}/karyaarth/still-${pad2(i + 1)}.webp`, caption, place: `KA ${pad2(i + 1)}` })), [dir]);
 
   // web: glide to a chapter and show its address (quiet: in place, lib/scrollMemory.js doesn't scroll again)
   const go = useCallback((e, id) => {
     e?.preventDefault();
-    document.getElementById(id)?.scrollIntoView({ behavior: behavior() });
+    byId(id)?.scrollIntoView({ behavior: behavior() });
     nav.current(`${base}/${id}`, { replace: true, state: { quiet: true } });
   }, [base]);
   // phone: open a chapter (null: the shelf), as a page of its own, from the top
@@ -339,7 +347,7 @@ export default function LabsPage({ article: a, web, chapter }) {
     return TEAMS.slice(from, to).map((t, k) => {
       const ox = row / 2 - left;
       left += sizes[k][0] + 6;
-      return <Book key={t.id} t={t} i={from + k} size={sizes[k]} web={web} href={`${base}/${t.id}`} onClick={onBook(t.id)} pressed={pressed === t.id} ox={ox} />;
+      return <Book key={t.id} t={t} i={from + k} size={sizes[k]} web={web} href={withBase(`${base}/${t.id}`)} onClick={onBook(t.id)} pressed={pressed === t.id} ox={ox} />;
     });
   };
   const prints = PRINTS[web ? 'web' : 'phone'].map(([f, label, { rotate, ...box }, h]) => (
@@ -355,7 +363,7 @@ export default function LabsPage({ article: a, web, chapter }) {
         <span className="d" style={{ fontSize: W("104px", "196px"), color: "#F3EEE4" }}>AQ</span><span className="s" style={{ fontSize: W("106px", "206px"), letterSpacing: "-.02em", color: "#22A26A" }}>Labs</span>
       </h1>
       <p style={{ position: "relative", marginTop: W("16px", "20px"), maxWidth: W("320px", "560px"), textAlign: "center", fontSize: W("18px", "22px"), lineHeight: "1.45", color: "#D8D2C4", textWrap: "balance" }}>eight teams. eight things that didn't exist six weeks ago, and now do.</p>
-      <a className="lbtn" href={`${base}/karyaarth`} onClick={onBook('karyaarth')} style={{ position: "relative", marginTop: W("24px", "28px"), width: W("100%", undefined), background: "#1B8A5A", color: "#F3EEE4" }}>walk the gallery <span aria-hidden="true" style={{ fontSize: "16px" }}>↓</span></a>
+      <a className="lbtn" href={withBase(`${base}/karyaarth`)} onClick={onBook('karyaarth')} style={{ position: "relative", marginTop: W("24px", "28px"), width: W("100%", undefined), background: "#1B8A5A", color: "#F3EEE4" }}>walk the gallery <span aria-hidden="true" style={{ fontSize: "16px" }}>↓</span></a>
       <div className="lb-or" style={{ marginTop: W("36px", "50px"), width: W("100%", "900px"), gap: W("12px", "16px") }}><i /><span className="m" style={{ fontSize: W("10px", "11px"), color: "#9D978A" }}>or pull a book</span><i /></div>
       <div className="shelf">
         {web ? (
@@ -540,7 +548,7 @@ export default function LabsPage({ article: a, web, chapter }) {
   </>);
 
   // 04 Wisdom Woods
-  const demo = `${base}/wisdom-woods/demo`;
+  const demo = withBase(`${base}/wisdom-woods/demo`);
   const playCard = (
     <a className="lift" href={demo} {...OUT} aria-label="Play the Wisdom Woods demo (opens in a new tab)" style={{ position: "relative", display: "block", marginTop: W("26px", undefined), border: "2px solid #111111", borderRadius: W("18px", "22px"), overflow: "hidden", background: "#111111", boxShadow: `${W(6, 10)}px ${W(6, 10)}px 0 #1B8A5A`, '--sh': '#1B8A5A' }}>
       <img src={`${dir}/wisdom-woods/poster.webp`} alt="the Wisdom Woods title screen: a tree emblem in a jungle" loading="lazy" decoding="async" style={{ width: "100%", height: W("200px", "316px"), objectFit: "cover", objectPosition: "50% 45%" }} />
@@ -717,16 +725,17 @@ export default function LabsPage({ article: a, web, chapter }) {
   </>);
 
   const page = (
-    <div className={`labs ${web ? 'labs-web' : 'labs-phone'}`} style={{ width: web ? "1440px" : "390px" }}>
+    <div className={`labs ${web ? 'labs-web' : 'labs-phone'}`} style={HOST.embedded ? undefined : { width: web ? "1440px" : "390px" }}>
       {web ? <WebHeader /> : <PhoneHeader current="article" edge={tagOf(a).color} />}
-      <Tabs web={web} active={web ? active : ch} hits={web ? hits : null} base={base} onTab={onTab} search={web ? <WebFind main={main} onHits={setHits} /> : null} />
-      <main ref={main} style={{ display: "flex", flexDirection: "column" }}>
+      <Tabs web={web} active={web ? active : ch} hits={web ? hits : null} base={base} onTab={onTab} search={web && !HOST.embedded ? <WebFind main={main} onHits={setHits} /> : null} />
+      {/* inside AQ, whose page has its own <main>: a region, so there is one main landmark */}
+      <Main ref={main} {...(HOST.embedded && { role: 'region', 'aria-label': 'AQ Labs' })} style={{ display: "flex", flexDirection: "column" }}>
         {(web || !ch) && intro}
         {karyaarth}{careerCompass}{quirk}{wisdomWoods}{cirqle}{hunar}{photon}{humanManual}
-      </main>
+      </Main>
       {!web && shownSheet && <ProjectSheet ch={ch} leaving={sheetLeaving} main={main} onPick={open} onClose={closeSheet} />}
       {shownStill != null && <PhotoViewer web={web} photos={stills} title="Karyaarth" label="Still" count="Stills" start={shownStill} closing={stillLeaving} onClose={() => setStill(null)} />}
     </div>
   );
-  return web ? <div className="web">{page}</div> : page;
+  return <><style>{labsCss}</style>{web ? <div className="web">{page}</div> : page}</>;
 }

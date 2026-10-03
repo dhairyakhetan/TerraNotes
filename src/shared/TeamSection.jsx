@@ -1,5 +1,5 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
-import { Link } from 'react-router';
+import { Link } from '../router.jsx';
 import { CloseIcon, PhotoIcon } from './Icons.jsx';
 import { Clip } from './Tapes.jsx';
 import { articlesBy, byLink } from '../lib/byWriter.js';
@@ -8,6 +8,7 @@ import { firstName, instagramUrl, teamsOf } from '../lib/format.js';
 import { webZoom } from '../lib/layoutMode.js';
 import { usePauseOffscreen } from '../lib/pauseOffscreen.js';
 import { usePresence } from '../lib/usePresence.js';
+import { useDialogA11y } from '../lib/useDialogA11y.js';
 import { faceSpots, profileTop, teamLinks, useFaceColors } from '../lib/teamLayout.js';
 import { FONT } from '../styles/fonts.js';
 
@@ -107,6 +108,7 @@ export default function TeamSection({ web }) {
   const at = cardAt || fallback, C = L.card, F = L.face;
   const close = () => setOpen(null);
   const btn = web ? 'btn' : undefined;
+  useDialogA11y(sel != null && !leaving, card, close, 'button[aria-label="Close profile"]');
 
   return (
     <section ref={self} id="members" style={{ position: "absolute", left: "0", top: `${L.top}px`, width: `${L.width}px`, height: `${H}px` }}>
@@ -151,7 +153,7 @@ export default function TeamSection({ web }) {
       {sel && (
         <>
           <button className={leaving ? 'fade-out' : 'fade-in'} onClick={close} aria-label="Close profile" style={{ position: "absolute", left: "0", top: "0", width: `${L.width}px`, height: `${H}px`, border: "0", padding: "0", background: L.dim, cursor: web ? "default" : undefined }} />
-          <div ref={card} className={leaving ? 'card-lift' : 'card-drop'} role="dialog" aria-label={`${sel.name} — profile`} style={{ position: "absolute", left: `${at.left}px`, top: `${at.top}px`, width: `${C.width}px`, boxSizing: "border-box", background: "var(--card)", border: "2px solid var(--ink)", boxShadow: `${C.shadow} ${color}`, padding: C.padding, display: "flex", flexDirection: "column", gap: "12px", transform: "rotate(-1deg)" }}>
+          <div ref={card} className={leaving ? 'card-lift' : 'card-drop'} role="dialog" aria-modal="true" aria-label={`${sel.name} — profile`} style={{ position: "absolute", left: `${at.left}px`, top: `${at.top}px`, width: `${C.width}px`, boxSizing: "border-box", background: "var(--card)", border: "2px solid var(--ink)", boxShadow: `${C.shadow} ${color}`, padding: C.padding, display: "flex", flexDirection: "column", gap: "12px", transform: "rotate(-1deg)" }}>
             {sel.badge && <Badge b={sel.badge} />}
             <Clip color={color} w={C.clip[0]} h={C.clip[1]} top={C.clip[2]} />
             <button className={web ? 'btn' : 'press'} onClick={close} aria-label="Close profile" style={{ "--c": "var(--ink)", position: "absolute", ...C.close, width: "44px", height: "44px", background: "var(--card)", border: "2px solid var(--ink)", boxShadow: "3px 3px 0 var(--ink)", padding: "0", display: "flex", alignItems: "center", justifyContent: "center" }}>

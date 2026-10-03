@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import WebHeader from './WebHeader.jsx';
 import WebArticleLine from './WebArticleLine.jsx';
 import HomeIntroCard from '../shared/HomeIntroCard.jsx';
@@ -7,7 +7,10 @@ import PhotoViewer from '../shared/PhotoViewer.jsx';
 import WordsGameSection from '../shared/WordsGameSection.jsx';
 import TeamSection, { teamHeight } from '../shared/TeamSection.jsx';
 import { WebBuddy } from '../shared/buddy/Buddy.jsx';
+import SnakeCard, { SNAKE_CARD_SPACE } from '../shared/SnakeCard.jsx';
+import { HOST } from '../host.js';
 import { homeTitle, useEdition } from '../lib/edition.js';
+import { usePauseEach } from '../lib/pauseOffscreen.js';
 import { usePresence } from '../lib/usePresence.js';
 import { FONT } from '../styles/fonts.js';
 
@@ -21,10 +24,13 @@ export default function WebHome() {
   const [shownPhoto, photoLeaving] = usePresence(photo, 180);
   const edition = useEdition();
   useEffect(() => { document.title = homeTitle(edition); }, [edition]);
+  const page = useRef(null);
+  usePauseEach(page, '.hero-sway,.fl1,.fl2,.fl3,.fl4,.fl5,.fl6,.fk1,.fk2,.fk3,.fk4,.spark,.bulb,.orbit-bubble,.buddy-bob'); // loops hold still once scrolled away
+  const snake = HOST.embedded ? SNAKE_CARD_SPACE.web : 0; // inside AQ: the Snake card, under the team
 
   return (
     <div className="web">
-      <div id="top" style={{ position: "relative", width: "1440px", height: `${2610 + teamHeight(edition, 'web')}px`, margin: "0 auto", overflow: "clip", background: "var(--page)", fontFamily: FONT.body, color: "var(--ink)" }}>
+      <div id="top" ref={page} style={{ position: "relative", width: "1440px", height: `${2610 + teamHeight(edition, 'web') + snake}px`, margin: "0 auto", overflow: "clip", background: "var(--page)", fontFamily: FONT.body, color: "var(--ink)" }}>
         <WebHeader />
         <HomeIntroCard web />
         <div style={{ position: "absolute", left: "720px", top: "132px", fontFamily: FONT.mono, fontSize: "12px", letterSpacing: "1.8px" }}>TERRANOTES · WRITE-UPS, PHOTOS &amp; WORDS</div>
@@ -39,6 +45,7 @@ export default function WebHome() {
         <PhotoWallSection web onOpen={setPhoto} />
         <WordsGameSection web />
         <TeamSection web />
+        {HOST.embedded && <SnakeCard web top={2610 + teamHeight(edition, 'web') + 40} />}
       </div>
       {shownPhoto != null && <PhotoViewer web start={shownPhoto} closing={photoLeaving} onClose={() => setPhoto(null)} />}
     </div>

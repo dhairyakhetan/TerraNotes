@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { Link } from 'react-router';
+import { Link } from '../router.jsx';
 import PhoneHeader from '../phone/PhoneHeader.jsx';
 import WebHeader from '../web/WebHeader.jsx';
 import { LatestTag } from '../shared/Tapes.jsx';

@@ -12,3 +12,7 @@
 .photo-viewer{--ph:clamp(170px, calc(var(--vh) - 514px), 330px)}
 
 @media (prefers-reduced-motion: reduce){.menu-sheet{transition:none !important}.gal-track,.gal-slide{transition:none !important}}
+
+/* team legend chips are 32px tall on phones; the touch target is the 44px the rest of the site uses (the pill you see stays 32px) */
+.legend-chip{position:relative}
+.legend-chip::before{content:"";position:absolute;left:0;right:0;top:-6px;bottom:-6px}

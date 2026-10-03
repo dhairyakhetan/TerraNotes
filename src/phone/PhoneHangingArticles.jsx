@@ -1,4 +1,4 @@
-import { Link } from 'react-router';
+import { Link } from '../router.jsx';
 import ArticleCard, { TagRow } from '../shared/ArticleCard.jsx';
 import ImageSlot from '../shared/ImageSlot.jsx';
 import { ByTape, Clip, FeaturedTape } from '../shared/Tapes.jsx';

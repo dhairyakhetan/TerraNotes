@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { Link } from 'react-router';
+import { Link } from '../router.jsx';
 import ArticleCard from '../shared/ArticleCard.jsx';
 import { ChevronIcon } from '../shared/Icons.jsx';
 import { Clip } from '../shared/Tapes.jsx';
@@ -210,7 +210,7 @@ export default function WebArticleLine() {
           <div ref={(n) => { refs.knot = n; }} style={{ position: "absolute", left: "166px", top: "32px", width: "12px", height: "12px", boxSizing: "border-box", borderRadius: "50%", background: "var(--ink)", border: "2px solid var(--page)", zIndex: "2" }} />
         </div>
       </div>
-      <div ref={(n) => { refs.el = n; }} className="art-scroller" onPointerDown={onPointerDown} onClickCapture={onClickCapture} onDragStart={(e) => e.preventDefault()} tabIndex={0} aria-label="All write-ups, scroll sideways" style={{ position: "absolute", left: "300px", top: "470px", width: "1140px", height: "530px", overflowX: "auto", overflowY: "hidden", userSelect: "none", WebkitUserSelect: "none" }}>
+      <div ref={(n) => { refs.el = n; }} role="region" className="art-scroller" onPointerDown={onPointerDown} onClickCapture={onClickCapture} onDragStart={(e) => e.preventDefault()} tabIndex={0} aria-label="All write-ups, scroll sideways" style={{ position: "absolute", left: "300px", top: "470px", width: "1140px", height: "530px", overflowX: "auto", overflowY: "hidden", userSelect: "none", WebkitUserSelect: "none" }}>
         <div style={{ position: "relative", width: `${width}px`, height: "520px" }}>
           <svg width={width} height="200" viewBox={`0 0 ${width} 200`} style={{ position: "absolute", left: "0", top: "0" }} aria-hidden="true">
             <path ref={(n) => { refs.wire = n; }} d={wireFrom(pegs, width, 0)} fill="none" strokeWidth="1.8" style={{ stroke: "var(--string)" }} />

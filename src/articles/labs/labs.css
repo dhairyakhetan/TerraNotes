@@ -4,7 +4,7 @@
    Everything is scoped to .labs; class names must not match any in src/styles/ (hence .lbtn, .lb-*).
    .labs-web = the 1440px artboard, .labs-phone = 390px.
    Motion: two endless loops (the Cirqle orbit, .spin: transform only; web's drifting prints: translate only), stopped
-   by reduced motion, .lite, .off-screen and html[data-nav] at the bottom; the rest are hover / one-off transitions. */
+   by reduced motion, .tn-lite, .off-screen and html[data-tn-nav] (and their :host twins) at the bottom; the rest are hover / one-off transitions. */
 @font-face{font-family:'Neutral Face';src:url('/fonts/neutral-face.woff2') format('woff2');font-weight:400;font-display:swap}
 @font-face{font-family:'Neutral Face';src:url('/fonts/neutral-face-bold.woff2') format('woff2');font-weight:700 900;font-display:swap}
 @font-face{font-family:'Eina';src:url('/fonts/eina-regular.woff2') format('woff2');font-weight:400 500;font-display:swap}
@@ -314,8 +314,8 @@
 .labs .pick[disabled]{opacity:.4;cursor:default}
 
 /* ===== stopping the motion ===== */
-html[data-nav] .labs :is(.cq .spin,.cq .onode,.print){animation-play-state:paused}
-.lite .labs :is(.cq .spin,.cq .onode,.print){animation:none}
+html[data-tn-nav] .labs :is(.cq .spin,.cq .onode,.print),:host([data-tn-nav]) .labs :is(.cq .spin,.cq .onode,.print){animation-play-state:paused}
+html.tn-lite .labs :is(.cq .spin,.cq .onode,.print),:host(.tn-lite) .labs :is(.cq .spin,.cq .onode,.print){animation:none}
 @media (prefers-reduced-motion: reduce){
   .labs :is(.cq .spin,.cq .onode,.print){animation:none}
   .labs :is(.tab,.tab .t,.book,.book .sp,.lbtn,.print,.browser,.sheet,.lift,.hcard,.zoom > img,.browser img,.sheet img){transition:none !important}
@@ -323,3 +323,23 @@ html[data-nav] .labs :is(.cq .spin,.cq .onode,.print){animation-play-state:pause
   .labs-phone .chap::before{display:none}
   .labs-phone .chap > section > *,.labs-phone .chap > .lb-more,.labs .psheet,.labs .psheet.out,.labs .sheet-bg,.labs .sheet-bg.out,.labs .psheet .pick{animation:none}
 }
+
+/* ===== inside AQ's website only (:host = drawn in its shadow root, embed/aq/) =====
+   AQ's own nav floats over the top of the page, so the gallery runs full width, edge to edge, its header slot is gone
+   (the dark hero runs up under AQ's nav), and the chapter tabs are a floating glass pill under that nav (no find bar).
+   The intro keeps its 134px offset so the polaroids sit where they were designed to (pill 52 + its 78px offset). */
+:host .labs > header.site-header{display:none !important}
+:host .labs-web .lb-intro{margin-top:134px}
+:host .labs-web .chap{scroll-margin-top:0;padding-top:150px}
+:host .labs .lb-tabs{box-sizing:border-box;border-bottom:0;align-items:center;gap:2px;background:rgba(243,238,228,.74);border:1px solid rgba(255,255,255,.6);border-radius:999px;-webkit-backdrop-filter:blur(18px) saturate(1.5);backdrop-filter:blur(18px) saturate(1.5);box-shadow:0 10px 30px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.6);overflow-x:auto;scrollbar-width:none}
+:host .labs .lb-tabs::-webkit-scrollbar{display:none}
+:host .labs-web .lb-tabs{position:sticky;top:78px;z-index:40;width:max-content;max-width:calc(100% - 32px);height:52px;padding:5px;margin:0 auto -52px}
+:host .labs-phone{padding-top:72px}
+:host .labs-phone .lb-tabs{position:relative;height:48px;padding:4px;margin:0 8px 8px;gap:2px}
+:host .labs .tab{border:0;box-shadow:none}
+:host .labs-web .tab{height:40px;padding:0 14px;margin:0;border-radius:999px;background:transparent}
+:host .labs-web .tab:hover{background:rgba(255,255,255,.5)}
+:host .labs-web .tab.on{height:40px;background:var(--c);color:var(--tc);box-shadow:0 4px 14px -4px var(--c)}
+:host .labs-phone .tab{height:40px;border-radius:999px;background:transparent;box-shadow:none}
+:host .labs-phone .tab.on{height:40px;background:var(--c);color:var(--tc)}
+@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){:host .labs .lb-tabs{background:rgba(243,238,228,.94)}}

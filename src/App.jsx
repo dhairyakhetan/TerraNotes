@@ -1,17 +1,20 @@
-import { useLayoutEffect } from 'react';
-import { Navigate, Route, Routes, useLocation, useParams } from 'react-router';
+import { lazy, Suspense, useLayoutEffect } from 'react';
+import { Navigate, Route, Routes, useLocation, useParams } from './router.jsx';
 import PhoneHome from './phone/PhoneHome.jsx';
 import PhoneArticle from './phone/PhoneArticle.jsx';
 import WebHome from './web/WebHome.jsx';
 import WebArticle from './web/WebArticle.jsx';
 import { EditionsPage } from './pages/EditionsPage.jsx';
 import DemoPage from './pages/DemoPage.jsx';
-import LabsPage from './articles/labs/LabsPage.jsx';
+// the AQ Labs gallery is about a third of the code: its own chunk (the embed warms it once the home page has settled)
+export const loadLabs = () => import('./articles/labs/LabsPage.jsx');
+const LabsPage = lazy(loadLabs);
 import NotFoundPage from './pages/NotFoundPage.jsx';
 import ErrorBoundary from './shared/ErrorBoundary.jsx';
 import SiteFooter from './shared/SiteFooter.jsx';
 import BuddyGames from './shared/buddy/BuddyGames.jsx';
 import { DraftTape } from './shared/Tapes.jsx';
+import { HOST } from './host.js';
 import { ALL_ARTICLES } from './data/articles.js';
 import { LATEST, articleFolder, articleLink, editionById, editionLink, editionOf, homeLink, isDraft } from './data/editions.js';
 import { editionData } from './editions/index.js';
@@ -39,6 +42,8 @@ import { ScrollMemory } from './lib/scrollMemory.js';
 // Every page belongs to an edition (lib/routes.js editionAt: /sep26… is September's, the rest the latest's): its look
 // goes on the page and its content reaches the components through useEdition() (lib/edition.js).
 // Around them: the skip link, the crash card, the footer and Buddy's games popup (these last two outlive navigation).
+// Inside AQ's website (src/host.js embedded; embed/aq/TerraNotesRoot.jsx mounts this) AQ draws the skip link and the
+// footer, so these don't.
 
 // Articles with their own page instead of the usual layout (an article's `page` in data/articles.js)
 const PAGES = { labs: LabsPage };
@@ -76,7 +81,7 @@ function ArticleRoute({ web }) {
   if (pathname !== here) return <Navigate to={here + search + hash} replace />;
   if (demo) return <DemoPage src={`${articleFolder(a)}/${a.demos[chapter]}/`} name={chapter.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())} />;
   const key = articleLink(a); // remount per article so its entrance replays
-  if (a.page) { const Own = PAGES[a.page]; return <Own key={key} article={a} web={web} chapter={chapter || null} />; }
+  if (a.page) { const Own = PAGES[a.page]; return <Suspense fallback={null}><Own key={key} article={a} web={web} chapter={chapter || null} /></Suspense>; }
   const Page = pageFor(a.edition, 'article', web);
   const same = ALL_ARTICLES.filter((x) => x.edition === a.edition);
   return <Page key={key} article={a} next={same[(same.indexOf(a) + 1) % same.length]} />;
@@ -93,7 +98,7 @@ function Look({ edition }) {
 function SkipLink() {
   const skip = (e) => {
     e.preventDefault();
-    const main = document.querySelector('#root main') || document.querySelector('#root header')?.nextElementSibling; // <main>: pages with a bar under the header (AQ Labs)
+    const main = document.querySelector('#root main') || document.querySelector('#root header')?.nextElementSibling; // <main>: pages with a bar under the header (AQ Labs). Own site only: embed-ok
     if (!main) return;
     if (!main.hasAttribute('tabindex')) main.setAttribute('tabindex', '-1');
     main.style.outline = 'none';
@@ -112,13 +117,13 @@ export default function App() {
   return (
     <EditionContext.Provider value={edition}>
       <Look edition={edition} />
-      {!bare && <SkipLink />}
+      {!bare && !HOST.embedded && <SkipLink />}
       <ScrollMemory />
       <ErrorBoundary resetKey={pathname}>
         {toWriter ? <Navigate to={{ pathname: writers, search }} replace /> : (
           <Routes>
             <Route path="/editions" element={<EditionsPage web={web} />} />
-            <Route path="/editions/:n" element={<OldEditionRoute web={web} />} />
+            <Route path="/editions/:n" element={<OldEditionRoute web={web} />} /> {/* a route, not a file: embed-ok */}
             <Route path="/:first?/:second?" element={<HomeRoute web={web} />} />
             <Route path="/articles/:slug/*" element={<ArticleRoute web={web} />} />
             <Route path="/:edition/articles/:slug/*" element={<ArticleRoute web={web} />} />
@@ -126,7 +131,7 @@ export default function App() {
           </Routes>
         )}
       </ErrorBoundary>
-      {!bare && <SiteFooter />}
+      {!bare && !HOST.embedded && <SiteFooter />}
       {!bare && <BuddyGames />}
       {edition.draft && !bare && <DraftTape />}
     </EditionContext.Provider>

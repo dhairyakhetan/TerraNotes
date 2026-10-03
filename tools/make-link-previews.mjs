@@ -12,8 +12,9 @@ import { chromium } from 'playwright';
 import { ALL_ARTICLES, tagOf } from '../src/data/articles.js';
 import { articleFolder, editionName } from '../src/data/editions.js';
 import { editionData } from '../src/editions/index.js';
+import { withBase } from '../src/lib/base.js';
 
-const root = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..');
+const root = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..'); // the project (inside AQ: its frontend/)
 const pub = (f) => path.join(root, 'public', f);
 const data = (f, type) => `data:${type};base64,${fs.readFileSync(pub(f)).toString('base64')}`;
 const esc = (t) => String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
@@ -38,7 +39,7 @@ const page = (a, coverSrc, w, h) => {
   </style></head><body>
   <div class="cover"><div class="rope"></div><div class="peg"></div><img src="${coverSrc}"></div>
   <div class="right">
-    <div class="logo"><img class="g" src="${data('brand/aquaterra-globe.webp', 'image/webp')}"><div><img class="w" src="${data('brand/aquaterra-wordmark.webp', 'image/webp')}"><span>TerraNotes</span></div></div>
+    <div class="logo"><img class="g" src="${data(withBase('/brand/aquaterra-globe.webp').slice(1), 'image/webp')}"><div><img class="w" src="${data(withBase('/brand/aquaterra-wordmark.webp').slice(1), 'image/webp')}"><span>TerraNotes</span></div></div>
     <div class="tag">${esc(a.tag)}</div>
     <h1 id="t">${esc(a.title)}</h1>
     <div class="dek">${esc(a.dek)}</div>

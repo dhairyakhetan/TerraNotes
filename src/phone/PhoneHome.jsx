@@ -7,6 +7,8 @@ import PhotoViewer from '../shared/PhotoViewer.jsx';
 import WordsGameSection from '../shared/WordsGameSection.jsx';
 import TeamSection, { teamHeight } from '../shared/TeamSection.jsx';
 import { PhoneBuddy } from '../shared/buddy/Buddy.jsx';
+import SnakeCard, { SNAKE_CARD_SPACE } from '../shared/SnakeCard.jsx';
+import { HOST } from '../host.js';
 import { homeTitle, useEdition } from '../lib/edition.js';
 import { usePauseOffscreen } from '../lib/pauseOffscreen.js';
 import { usePresence } from '../lib/usePresence.js';
@@ -21,13 +23,14 @@ export default function PhoneHome() {
   const [photo, setPhoto] = useState(null); // index open in the photo viewer
   const [shownPhoto, photoLeaving] = usePresence(photo, 180);
   const edition = useEdition(), extra = hangExtra(edition.articles);
+  const snake = HOST.embedded ? SNAKE_CARD_SPACE.phone : 0; // inside AQ: the Snake card, under the team
   useEffect(() => { document.title = homeTitle(edition); }, [edition]);
   const hangers = useRef(null);
   usePauseOffscreen(hangers); // the swinging cards hold still once scrolled away
 
   return (
     <>
-      <div id="top" className="page-home" style={{ position: "relative", width: "390px", height: `${2480 + teamHeight(edition, 'phone') + extra}px`, margin: "0 auto", overflow: "clip", background: "var(--page)", fontFamily: FONT.body, color: "var(--text)" }}>
+      <div id="top" className="page-home" style={{ position: "relative", width: "390px", height: `${2480 + teamHeight(edition, 'phone') + extra + snake}px`, margin: "0 auto", overflow: "clip", background: "var(--page)", fontFamily: FONT.body, color: "var(--text)" }}>
         <PhoneHeader current="home" />
         <PhoneBuddy />
         <HomeIntroCard />
@@ -40,6 +43,7 @@ export default function PhoneHome() {
           <WordsGameSection />
           <TeamSection />
         </div>
+        {HOST.embedded && <SnakeCard top={2480 + teamHeight(edition, 'phone') + extra + 40} />}
       </div>
       {shownPhoto != null && <PhotoViewer start={shownPhoto} closing={photoLeaving} onClose={() => setPhoto(null)} />}
     </>

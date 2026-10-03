@@ -1,3 +1,5 @@
+import { withBase } from '../lib/base.js';
+
 // TerraNotes comes out once a month; each edition is its own folder, src/editions/<id>/ (its look, articles, photo
 // wall, words and team), so every edition keeps its own look and content for good (see CLAUDE.md "New edition").
 // Newest last. The newest one that isn't a draft is the "latest": the home page (/) shows it and its articles have
@@ -6,6 +8,7 @@
 // itself the moment a newer edition goes live (old clean links redirect). Its files live in public/editions/<id>/.
 //   draft: true = still being made: not the latest, not listed anywhere (edition picker, /editions, sitemap), but
 //          viewable at its own address (/oct26) with a "draft" tape. Delete the flag to put it live.
+
 export const EDITIONS = [
   { number: 1, month: 'September 2026' },
   { number: 2, month: 'October 2026', draft: true },
@@ -22,8 +25,9 @@ export const editionLink = (n) => (n === LATEST ? '/' : `/${editionId(n)}`);
 // an edition's home page opened at a section ('articles', 'photos', 'words', 'members'): /photos, /sep26/photos
 export const homeLink = (n, section) => (n === LATEST ? `/${section || ''}` : `/${editionId(n)}${section ? `/${section}` : ''}`);
 export const articleLink = (a) => `${a.edition === LATEST ? '' : `/${editionId(a.edition)}`}/articles/${a.slug}`;
-// an article's folder of files (cover.jpg, preview.jpg, its photos): public/editions/<id>/articles/<slug>/
-export const articleFolder = (a) => `/editions/${editionId(a.edition)}/articles/${a.slug}`;
+// an article's folder of files (cover.jpg, preview.jpg, its photos): public/editions/<id>/articles/<slug>/, as a URL
+// (inside AQ's website under its /terranotes: lib/base.js)
+export const articleFolder = (a) => withBase(`/editions/${editionId(a.edition)}/articles/${a.slug}`);
 // the month a new edition is due, for the empty "previous editions" shelf
 export const nextMonth = () => {
   const [m, y] = editionOf(LATEST).month.split(' ');

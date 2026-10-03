@@ -5,7 +5,9 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "node tools/check-embed.mjs && vite build",
+    "check": "node tools/check-embed.mjs",
+    "export-aq": "node tools/export-aq.mjs",
     "preview": "vite preview"
   },
   "dependencies": {

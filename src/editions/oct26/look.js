@@ -1,6 +1,6 @@
 // October 2026's look, a copy of September's to start from: change the values to make it October's own. Every colour
 // and font the site's shared pieces are drawn with, by role. The pages use them as CSS variables (var(--ink),
-// var(--font-head): lib/edition.js puts them on <html>), so changing a value here restyles that role everywhere in this
+// var(--font-head): lib/edition.js puts them on the page), so changing a value here restyles that role everywhere in this
 // edition, and only in this edition. Every edition's look must have the same keys (src/editions/index.js stops the
 // build otherwise).
 export const LOOK = {
@@ -53,6 +53,7 @@ export const LOOK = {
     slotDark: '#262626', // the same on dark cards
     slotDarkLine: '#5A5A5A',
     slotDarkInk: '#CFCFCF',
+    snake: '#4E9C74', // the Snake card's pixel snake (inside AQ's website: shared/SnakeCard.jsx)
   },
   // font stacks (index.html loads these from Google Fonts)
   fonts: {

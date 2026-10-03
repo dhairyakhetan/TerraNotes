@@ -1,11 +1,12 @@
 /* Every endless decorative animation (all transform / opacity only, so they run on the GPU), and every rule that
    stops them: reduced motion (nothing moves), LITE (low-end devices, lib/motion.js), a section scrolled away
-   (.off-screen, lib/pauseOffscreen.js) and page swaps (html[data-nav], lib/animatedHistory.js). */
+   (.off-screen, lib/pauseOffscreen.js) and page swaps (html[data-tn-nav], lib/animatedHistory.js). Each rule that keys on <html>
+   has a :host(…) twin, for when the magazine draws inside AQ's shadow root (embed/aq/). */
 
 /* hanging cards: .hang = a tall hanger box that lets taps through (only its cards catch them); .sway = swinging on
    the string (--a = angle, --d = duration); .flutter = wobbling on the clip (--r = resting tilt).
    --wind scales every swing, --flap every wobble. */
-:root{--wind:1.5;--flap:1deg}
+:root,:host{--wind:1.5;--flap:1deg}
 .hang{pointer-events:none}
 .hang .card,.hang .label-card,.hang .card *,.hang .card-link,.hang .card-link *{pointer-events:auto}
 .sway{transform-origin:50% 0;animation:sway var(--d,5s) ease-in-out infinite alternate}
@@ -53,8 +54,10 @@
 /* stopping them */
 .off-screen,.off-screen *{animation-play-state:paused !important}
 /* while pages swap the incoming page mustn't be redrawn every frame (that made going back stutter on phones) */
-html[data-nav] :is(.sway,.flutter,.hero-sway,.fl1,.fl2,.fl3,.fl4,.fl5,.fl6,.fk1,.fk2,.fk3,.fk4,.glint,.spark,.twist,.orbit-bubble,.buddy-bob){animation-play-state:paused}
-.lite :is(.sway,.flutter,.hero-sway,.twist,.glint,.bulb,.spark,.fl1,.fl2,.fl3,.fl4,.fl5,.fl6,.orbit-bubble,.buddy-bob,.buddy-menu-call svg){animation:none}
+html[data-tn-nav] :is(.sway,.flutter,.hero-sway,.fl1,.fl2,.fl3,.fl4,.fl5,.fl6,.fk1,.fk2,.fk3,.fk4,.glint,.spark,.twist,.orbit-bubble,.buddy-bob),
+:host([data-tn-nav]) :is(.sway,.flutter,.hero-sway,.fl1,.fl2,.fl3,.fl4,.fl5,.fl6,.fk1,.fk2,.fk3,.fk4,.glint,.spark,.twist,.orbit-bubble,.buddy-bob){animation-play-state:paused}
+html.tn-lite :is(.sway,.flutter,.hero-sway,.twist,.glint,.bulb,.spark,.fl1,.fl2,.fl3,.fl4,.fl5,.fl6,.orbit-bubble,.buddy-bob,.buddy-menu-call svg),
+:host(.tn-lite) :is(.sway,.flutter,.hero-sway,.twist,.glint,.bulb,.spark,.fl1,.fl2,.fl3,.fl4,.fl5,.fl6,.orbit-bubble,.buddy-bob,.buddy-menu-call svg){animation:none}
 @media (prefers-reduced-motion: reduce){
   :is(.sway,.flutter,.hero-sway,.twist,.glint,.bulb,.spark,.fl1,.fl2,.fl3,.fl4,.fl5,.fl6){animation:none}
 }

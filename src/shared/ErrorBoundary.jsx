@@ -1,4 +1,5 @@
 import React from 'react';
+import { withBase } from '../lib/base.js';
 import { FONT } from '../styles/fonts.js';
 
 // Wraps the routes (App.jsx). If a page crashes (say, a typo in a data file), shows a "The line broke." card with
@@ -29,7 +30,7 @@ export default class ErrorBoundary extends React.Component {
           <p style={{ margin: "0 0 18px", fontFamily: FONT.hand, fontSize: "21px", lineHeight: "1.15", color: "var(--hand)" }}>this page tripped over itself. try again, or head home while we tie it back together.</p>
           <div style={{ display: "flex", gap: "10px" }}>
             <button onClick={() => location.reload()} style={{ ...btn, background: "var(--ink)", color: "var(--card)" }}>Try again</button>
-            <a href="/" style={{ ...btn, background: "var(--card)", color: "var(--ink)" }}>Home</a>
+            <a href={withBase('/')} style={{ ...btn, background: "var(--card)", color: "var(--ink)" }}>Home</a>
           </div>
         </div>
       </div>
