@@ -10,7 +10,7 @@
 // - index.html, articles.html, photos.html, words.html, members.html (the latest edition's home page and its sections),
 //   the same for each older edition under its id (sep26.html, sep26/photos.html…), and editions.html, with their own
 //   titles and text;
-// - 404.html, robots.txt, sitemap.xml, llms.txt / llms-full.txt (the site and every article as plain text for AIs).
+// - 404.html, robots.txt, sitemap.xml, feed.xml (RSS), llms.txt / llms-full.txt (the site and every article as plain text for AIs).
 import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
@@ -95,6 +95,17 @@ export default function siteFiles(host) {
       out('404.html', setTitle(withHome(base), 'Aquaterra — not found').replace('</title>', '</title>\n    <meta name="robots" content="noindex" />'));
       const paths = [...pages, '/editions', ...ARTICLES.map(articleLink)];
       out('sitemap.xml', `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${paths.map((p) => `  <url><loc>${url(p)}</loc></url>`).join('\n')}\n</urlset>\n`);
+      // feed.xml: an RSS feed of every published article, newest issue first, so readers (and apps) hear of a new one
+      const monthOf = (n) => PUBLISHED.find((e) => e.number === n)?.month;
+      const items = [...ARTICLES].sort((x, y) => y.edition - x.edition).map((a) => {
+        const when = new Date(`1 ${monthOf(a.edition)} 00:00 UTC`);
+        return ['    <item>', `      <title>${esc(a.title)}</title>`, `      <link>${url(articleLink(a))}</link>`, `      <guid isPermaLink="true">${url(articleLink(a))}</guid>`,
+          `      <description>${esc(a.dek)}</description>`, a.author ? `      <dc:creator>${esc(a.author)}</dc:creator>` : null, `      <category>${esc(a.tag)}</category>`,
+          Number.isNaN(when.getTime()) ? null : `      <pubDate>${when.toUTCString()}</pubDate>`, '    </item>'].filter(Boolean).join('\n');
+      });
+      out('feed.xml', ['<?xml version="1.0" encoding="UTF-8"?>', '<rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:atom="http://www.w3.org/2005/Atom">', '  <channel>',
+        '    <title>TerraNotes by Aquaterra</title>', `    <link>${url('/')}</link>`, `    <atom:link href="${url('/feed.xml')}" rel="self" type="application/rss+xml" />`,
+        '    <description>Aquaterra\'s monthly magazine: notes from where the land meets the water.</description>', '    <language>en</language>', ...items, '  </channel>', '</rss>', ''].join('\n'));
       out('robots.txt', ['# TerraNotes by Aquaterra: every page is open to crawlers.', '# A plain-text guide to the site and its articles, for AI assistants: /llms.txt (full text: /llms-full.txt)', 'User-agent: *', 'Allow: /', '', `Sitemap: ${url('/sitemap.xml')}`, ''].join('\n'));
 
       // llms.txt (llmstxt.org): what the site is and where everything is; llms-full.txt: every article in full

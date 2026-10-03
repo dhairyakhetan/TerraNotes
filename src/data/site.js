@@ -2,7 +2,10 @@
 // place for the site's own address and its outside links.
 // Leave a text field '' and the design's placeholder shows instead.
 export const SITE = {
-  instagram: 'ngo.aquaterra', // Aquaterra's handle, without the @ (phone menu)
+  instagram: 'ngo.aquaterra', // Aquaterra's handle, without the @ (phone menu, the follow links at an article's end)
+  // the WhatsApp channel's invite link (https://whatsapp.com/channel/…): the "follow" links at the end of every article
+  // show it first once it's set (shared/PassItOn.jsx); '' hides it
+  whatsapp: '',
   // the magazine's own site: its link previews, sitemap and llms.txt are built from this address (env SITE_URL overrides
   // it at build). Inside AQ's website, AQ's build decides the address (embed/aq/scripts/prerender.mjs).
   url: 'https://terranotes-aq.vercel.app',

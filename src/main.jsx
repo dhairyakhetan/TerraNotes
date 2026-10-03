@@ -7,6 +7,7 @@ import IntroNotebook from './shared/IntroNotebook.jsx';
 import { createAnimatedHistory } from './lib/animatedHistory.js';
 import { introWanted } from './lib/introNotebook.js';
 import { sayHello } from './lib/consoleHello.js';
+import { startAnalytics } from './lib/analytics.js';
 import { LITE } from './lib/motion.js';
 import { AQ_LOOK } from './host.js';
 import './styles/base.css';
@@ -22,6 +23,7 @@ import './styles/buddy.css';
 // opening notebook when it's due, marks low-end devices (<html class="tn-lite">, lib/motion.js), and prints the
 // console hello.
 sayHello();
+startAnalytics(); // page views and a few events (lib/analytics.js)
 watchStaleCode(); // after a deploy, a stale page reloads once instead of half-working (lib/freshCode.js)
 if (LITE) document.documentElement.classList.add('tn-lite');
 if (AQ_LOOK) document.documentElement.dataset.tnAq = ''; // AQ's look (src/host.js): the CSS keys on html[data-tn-aq]

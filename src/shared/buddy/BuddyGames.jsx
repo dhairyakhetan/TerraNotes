@@ -1,6 +1,7 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { CloseIcon, ChevronIcon } from '../Icons.jsx';
 import { usePresence } from '../../lib/usePresence.js';
+import { track } from '../../lib/analytics.js';
 import { useEdition } from '../../lib/edition.js';
 import { FONT } from '../../styles/fonts.js';
 import { lockScroll, unlockScroll } from '../../lib/scrollLock.js';
@@ -235,6 +236,7 @@ function Scores({ score, top, unit }) {
 export default function BuddyGames({ first = null }) {
   const [game, setGame] = useState(first);
   const [shown, leaving] = usePresence(game, 220);
+  useEffect(() => { if (game) track('Game opened', { game }); }, [game]);
   const card = useRef(null), from = useRef(null); // from: the tap it grows out of, as an offset from the card's centre
   useLayoutEffect(() => { // opening
     if (!game || from.current || !card.current) return;

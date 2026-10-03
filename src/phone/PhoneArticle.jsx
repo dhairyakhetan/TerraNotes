@@ -4,8 +4,10 @@ import { BackToMagazine } from '../shared/InsideAQ.jsx';
 import { AQ_LOOK } from '../host.js';
 import ArticleCard, { TagPill } from '../shared/ArticleCard.jsx';
 import ArticleBody, { AuthorBox, EndMark } from '../shared/ArticleBody.jsx';
+import PassItOn from '../shared/PassItOn.jsx';
 import { ReadingBar } from '../shared/Reading.jsx';
 import { useReadProgress } from '../lib/readProgress.js';
+import { useReadDepth } from '../lib/analytics.js';
 import BackHome from '../shared/BackHome.jsx';
 import ImageSlot from '../shared/ImageSlot.jsx';
 import { Clip, FeaturedTape } from '../shared/Tapes.jsx';
@@ -24,6 +26,7 @@ const DROP = AQ_LOOK ? 30 : 0;
 export default function PhoneArticle({ article: a, next }) {
   const hero = useRef(null), text = useRef(null);
   const read = useReadProgress(text);
+  useReadDepth(a.slug, read.p);
   useLayoutEffect(() => { flyInFromCard(hero.current, true); }, []);
   useEffect(() => { document.title = `Aquaterra — ${a.title}`; }, [a.title]);
   const tag = tagOf(a), { i, n } = placeOf(a);
@@ -62,6 +65,7 @@ export default function PhoneArticle({ article: a, next }) {
           <EndMark />
         </div>
         <AuthorBox a={a} />
+        <PassItOn a={a} />
         {/* next on the line */}
         <div style={{ position: "relative", margin: "10px -24px 0", width: "390px", height: "470px" }}>
           <div style={{ position: "absolute", left: "20px", top: "0", fontFamily: FONT.mono, fontSize: "11px", letterSpacing: "1.6px" }}>NEXT ON THE LINE</div>

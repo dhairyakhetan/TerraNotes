@@ -3,8 +3,10 @@ import WebHeader from './WebHeader.jsx';
 import { BackToMagazine } from '../shared/InsideAQ.jsx';
 import ArticleCard, { TagPill } from '../shared/ArticleCard.jsx';
 import ArticleBody, { AuthorBox, EndMark, FieldLog } from '../shared/ArticleBody.jsx';
+import PassItOn from '../shared/PassItOn.jsx';
 import { ReadingBar, ReadingRail } from '../shared/Reading.jsx';
 import { useReadProgress } from '../lib/readProgress.js';
+import { useReadDepth } from '../lib/analytics.js';
 import ImageSlot from '../shared/ImageSlot.jsx';
 import BackHome from '../shared/BackHome.jsx';
 import { Clip, FeaturedTape } from '../shared/Tapes.jsx';
@@ -24,6 +26,7 @@ const MONO = { fontFamily: FONT.mono, letterSpacing: "1px", textTransform: "uppe
 export default function WebArticle({ article: a, next }) {
   const hero = useRef(null), text = useRef(null);
   const read = useReadProgress(text);
+  useReadDepth(a.slug, read.p);
   useLayoutEffect(() => { flyInFromCard(hero.current); }, []);
   useEffect(() => { document.title = `Aquaterra — ${a.title}`; }, [a.title]);
   const tag = tagOf(a), { i, n } = placeOf(a);
@@ -73,6 +76,7 @@ export default function WebArticle({ article: a, next }) {
             </div>
           </div>
           <AuthorBox a={a} web />
+          <PassItOn a={a} web />
           {/* next on the line */}
           <div style={{ position: "relative", margin: "30px -370px 0", width: "1440px", height: "620px" }}>
             <div style={{ position: "absolute", left: "80px", top: "0", fontFamily: FONT.mono, fontSize: "12px", letterSpacing: "1.8px" }}>NEXT ON THE LINE</div>

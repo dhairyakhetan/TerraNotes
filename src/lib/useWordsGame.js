@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { pad2 } from './format.js';
+import { track } from './analytics.js';
 
 // State for the "Words we should bring back" mini game (shared/WordsGameSection.jsx): 5 random words per game from
 // `words` (the edition's WORDS; never the previous game's), three meanings each, in a new order every game. A "psst." hint appears after 16 s
@@ -51,7 +52,7 @@ export function useWordsGame(section, words) {
     def: round.meaning,
     nextLabel: last ? 'Score' : 'Next word',
     next: () => {
-      if (last) { setS({ ...s, done: true }); return; }
+      if (last) { setS({ ...s, done: true }); track('Words game done', { score: s.score, of: s.rounds.length }); return; }
       setS({ ...s, q: s.q + 1, pick: null, hint: false });
       armHint();
     },
