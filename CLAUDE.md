@@ -19,6 +19,10 @@ You usually have no push access here. The owner runs you in a chat, and gets you
    `git init -q && git add -A && git commit -qm "base"`. Patches from a ZIP base say so (see 4).
 2. **Make the change** the owner asked for, by this file's rules (house rules, editions, the AQ rules, the design
    system). Read a file's header comment before editing it. Keep each change to what was asked.
+   - **Do, don't ask.** The owner asking for something is the go-ahead, including a change to an older edition (the
+     freeze below is about not changing one by accident). Where a detail is open, pick what fits the request and the
+     design (both layouts, unless they named one; leave what they didn't mention as it is), do it, and say in one line
+     what you picked. Ask only when the request can be read two ways that lead to clearly different results.
 3. **Test it before handing it over.**
    - `npm run build` must pass (it runs `npm run check` first: the AQ guard).
    - If you can run a browser (`npx playwright`; `npm run preview` serves `dist/` on :4173), screenshot the pages you
@@ -67,7 +71,7 @@ animation). Automated browsers never get the intro.
 
 - **The console hello must never name anyone.**
 - **Writers' article text is verbatim, typos included.** Never "fix" it.
-- **Every edition keeps its look and content for good.** Once a newer edition is live, the older one's folder (`src/editions/<id>/`) is frozen: don't edit it, and don't change a shared component in a way that changes how it looks (see "Editions").
+- **Every edition keeps its look and content for good.** Once a newer edition is live, the older one's folder (`src/editions/<id>/`) is frozen: don't edit it as a side effect of other work, and don't change a shared component in a way that changes how it looks (see "Editions"). When the owner asks for a change to an older edition, make it: that's their call.
 - **No new colours** outside the edition's look (`src/editions/<id>/look.js`), unless the owner supplies them. The AQ Labs project bars use colours they supplied.
 - **Changes go to `main`.** Without push access (the usual case) that means a `.patch` for the owner (above); a session
   that can push commits to `main` unless told otherwise.
