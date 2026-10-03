@@ -3,6 +3,7 @@ import { useEdition } from '../../lib/edition.js';
 import { drawGhost } from './Ghost.jsx';
 import { FONT } from '../../styles/fonts.js';
 import { LEVELS } from './flingLevels.js';
+import { CloseIcon } from '../Icons.jsx';
 
 // Fling, the slingshot game in Buddy's games (BuddyGames.jsx), played like Angry Birds: drag Buddy back in the
 // slingshot (the further, the harder), let go, and knock down towers of planks to pop the grumpy gremlins hiding in
@@ -13,7 +14,8 @@ import { LEVELS } from './flingLevels.js';
 // the popup is open. Best score in localStorage ('aq-fling-best'), the furthest level reached too ('aq-fling-level'):
 // the game starts there, and the level picker under the canvas lists every level up to it. The 50 levels: flingLevels.js.
 // What tells you what to do: a banner at each level's start (how many gremlins to pop), a pulsing ring and "drag me"
-// on Buddy while he waits, and, while you pull, the reach of the band, a dotted line of where he'll fly and a power
+// on Buddy while he waits (the pull starts anywhere on the canvas: the finger's travel pulls him back, so a thumb
+// needn't reach the left edge), and, while you pull, the reach of the band, a dotted line of where he'll fly and a power
 // meter; Buddies and gremlins left in the corner; a line after each turn ("missed: pull further", "2 gremlins left");
 // buttons drawn on the cleared / out-of-Buddies cards; the cursor changes over Buddy; Restart level under the canvas.
 const WW = 1200, WH = 540, GROUND = 490, BASE = GROUND - 30, SLING = { x: 160, y: BASE - 92 }, PULL = 100, POWER = 0.25, BR = 17;
@@ -23,6 +25,9 @@ const best = () => { try { return Number(localStorage.getItem('aq-fling-best')) 
 const keep = (v) => { try { localStorage.setItem('aq-fling-best', String(v)); } catch { /* private mode */ } };
 // how far you've got: the furthest level open to play (the picker lists them)
 const reached = () => { try { return Math.min(LEVELS.length - 1, Number(localStorage.getItem('aq-fling-level')) || 0); } catch { return 0; } };
+// stars per level (1 for clearing it, +1 for each Buddy left, up to 3), one digit a level
+const starsOf = () => { try { return (localStorage.getItem('aq-fling-stars') || '').padEnd(LEVELS.length, '0').split('').map(Number); } catch { return LEVELS.map(() => 0); } };
+const keepStars = (a) => { try { localStorage.setItem('aq-fling-stars', a.join('')); } catch { /* private mode */ } };
 const reach = (v) => { try { localStorage.setItem('aq-fling-level', String(v)); } catch { /* private mode */ } };
 
 export default function Fling({ W, H }) {
@@ -30,7 +35,7 @@ export default function Fling({ W, H }) {
   const cv = useRef(null);
   const [score, setScore] = useState(0), [top, setTop] = useState(best), [failed, setFailed] = useState(false);
   const restart = useRef(null), jump = useRef(null);
-  const [lv, setLv] = useState(reached), [open, setOpen] = useState(reached);
+  const [lv, setLv] = useState(reached), [open, setOpen] = useState(reached), [stars, setStars] = useState(starsOf), [pick, setPick] = useState(false);
   useEffect(() => {
     let raf = 0, gone = false, cleanup = () => {};
     import('matter-js').then(({ default: M }) => {
@@ -108,7 +113,8 @@ export default function Fling({ W, H }) {
           if (s.ghost) { M.Composite.remove(engine.world, s.ghost); s.ghost = null; }
           if (!gremlins().length) { // cleared: unused Buddies count
             for (let i = 0; i < s.birds; i++) add(10000, SLING.x + i * 30, SLING.y - 60);
-            s.state = 'clear';
+            s.state = 'clear'; s.stars = 1 + Math.min(2, s.birds);
+            { const a = starsOf(); if (s.stars > a[s.lv]) { a[s.lv] = s.stars; keepStars(a); setStars(a); } }
             if (s.lv + 1 < LEVELS.length && s.lv + 1 > reached()) { reach(s.lv + 1); setOpen(s.lv + 1); }
             if (total.pts > best()) { keep(total.pts); setTop(total.pts); }
           } else if (s.birds > 0) {
@@ -177,6 +183,13 @@ export default function Fling({ W, H }) {
         lines.forEach(([text, font, y]) => { g.font = font; g.fillText(text, WW / 2, WH / 2 + u(y)); });
         button(cta, WH / 2 + u(56));
       };
+      const starRow = (y, n) => { // 3 stars, n of them filled
+        for (let i = 0; i < 3; i++) {
+          const cx = WW / 2 + (i - 1) * u(58), cy = y + (i === 1 ? -u(8) : 0), R = u(24);
+          g.beginPath(); for (let j = 0; j < 10; j++) { const a = -Math.PI / 2 + j * Math.PI / 5, r = j % 2 ? R * 0.45 : R; g.lineTo(cx + Math.cos(a) * r, cy + Math.sin(a) * r); } g.closePath();
+          g.fillStyle = i < n ? K.yellow : 'rgba(255,255,255,.15)'; g.fill(); g.strokeStyle = K.ink; g.lineWidth = 3; g.stroke();
+        }
+      };
       const hud = () => { // Buddies and gremlins left, top right
         const n = gremlins().length;
         g.textAlign = 'right'; g.font = `700 ${u(17)}px ${F.mono}`; g.fillStyle = K.ink;
@@ -223,9 +236,16 @@ export default function Fling({ W, H }) {
           g.strokeStyle = K.hand; g.lineWidth = 3; g.globalAlpha = 0.45 + pulse * 0.5;
           g.beginPath(); g.arc(SLING.x, SLING.y - 4, BR + 10 + pulse * 6, 0, Math.PI * 2); g.stroke(); g.globalAlpha = 1;
           if (!s.grabbed) {
-            g.fillStyle = K.hand; g.font = `700 ${u(28)}px ${F.hand}`; g.textAlign = 'left';
-            g.fillText('← drag me back, then let go', SLING.x + 44, SLING.y - 52 - pulse * 4);
+            const text = '← drag back from anywhere, then let go', x = SLING.x + 44;
+            g.font = `700 ${u(28)}px ${F.hand}`; const fit = Math.min(1, (WW - 20 - x) / g.measureText(text).width); // shrunk to fit a small canvas
+            g.fillStyle = K.hand; g.font = `700 ${Math.round(u(28) * fit)}px ${F.hand}`; g.textAlign = 'left';
+            g.fillText(text, x, SLING.y - 52 - pulse * 4);
           }
+        }
+        if (s.finger && Math.hypot(s.finger.p.x - SLING.x, s.finger.p.y - SLING.y) > PULL * 1.3) { // dragging away from Buddy: show the finger's pull
+          const { a, p: q } = s.finger; g.globalAlpha = 0.45; g.strokeStyle = K.ink; g.lineWidth = 2; g.setLineDash([6, 6]);
+          g.beginPath(); g.moveTo(a.x, a.y); g.lineTo(q.x, q.y); g.stroke(); g.setLineDash([]);
+          g.beginPath(); g.arc(a.x, a.y, u(10), 0, Math.PI * 2); g.stroke(); g.fillStyle = K.ink; g.beginPath(); g.arc(q.x, q.y, u(7), 0, Math.PI * 2); g.fill(); g.globalAlpha = 1;
         }
         if (s.pull) power(s.pull);
         // Buddies still waiting
@@ -249,7 +269,7 @@ export default function Fling({ W, H }) {
           g.globalAlpha = Math.min(1, s.note.life); g.textAlign = 'center'; g.fillStyle = K.hand; g.font = `700 ${u(30)}px ${F.hand}`;
           g.fillText(s.note.text, WW / 2, T + u(190)); g.globalAlpha = 1;
         }
-        if (s.state === 'clear') label([[s.lv + 1 < LEVELS.length ? 'LEVEL CLEARED!' : 'EVERY GREMLIN GONE!', `700 ${u(40)}px ${F.mono}`, -40], [`+${total.pts - s.start} this level${s.birds ? ` · ${s.birds} Buddy bonus` : ''}`, `600 ${u(30)}px ${F.hand}`, 4]], s.lv + 1 < LEVELS.length ? 'NEXT LEVEL →' : 'PLAY AGAIN ↺');
+        if (s.state === 'clear') { label([[s.lv + 1 < LEVELS.length ? 'LEVEL CLEARED!' : 'EVERY GREMLIN GONE!', `700 ${u(40)}px ${F.mono}`, -40], [`+${total.pts - s.start} this level${s.birds ? ` · ${s.birds} Buddy bonus` : ''}`, `600 ${u(30)}px ${F.hand}`, 4]], s.lv + 1 < LEVELS.length ? 'NEXT LEVEL →' : 'PLAY AGAIN ↺'); starRow(WH / 2 - u(118), s.stars); }
         if (s.state === 'failed') { const n = gremlins().length; label([['OUT OF BUDDIES', `700 ${u(40)}px ${F.mono}`, -40], [`${n} gremlin${n === 1 ? '' : 's'} still standing`, `600 ${u(30)}px ${F.hand}`, 4]], 'TRY AGAIN ↺'); }
       };
 
@@ -275,23 +295,27 @@ export default function Fling({ W, H }) {
       const world = (e) => { const r = c.getBoundingClientRect(); const wx = ((e.clientX - r.left) / r.width) * W / k, wy = ((e.clientY - r.top) / r.height) * H / k - (H / k - WH); return { x: wx, y: wy }; };
       const aimAt = (p) => { const dx = p.x - SLING.x, dy = p.y - SLING.y, d = Math.hypot(dx, dy), m = Math.min(1, PULL / (d || 1)); return { x: SLING.x + dx * m, y: SLING.y + dy * m }; };
       let dragging = false;
-      const grab = Math.max(90, 40 / k);
+      const span = Math.max(PULL, 90 / k); // a full pull: at least 90 screen px of finger travel
+      let anchor = null;
       const down = (e) => {
         e.preventDefault();
         if (s.state === 'clear') { const next = s.lv + 1 < LEVELS.length ? s.lv + 1 : 0; if (!next) { total.pts = 0; setScore(0); } build(next); return; }
         if (s.state === 'failed') { build(s.lv); return; }
         if (s.state !== 'aim' || s.calm > 0) return;
         const p = world(e);
-        if (Math.hypot(p.x - SLING.x, p.y - SLING.y) > grab) return; // grab Buddy (generously)
-        dragging = true; c.setPointerCapture?.(e.pointerId); s.pull = aimAt(p); c.style.cursor = 'grabbing';
+        // anywhere on the canvas: the finger's travel from here pulls Buddy back
+        dragging = true; anchor = p; c.setPointerCapture?.(e.pointerId); s.pull = { ...SLING }; s.finger = { a: p, p }; c.style.cursor = 'grabbing';
       };
       const move = (e) => {
-        if (dragging) { s.pull = aimAt(world(e)); s.banner = Math.min(s.banner, 0.3); return; }
-        const p = world(e);
-        c.style.cursor = s.state === 'clear' || s.state === 'failed' ? 'pointer' : s.state === 'aim' && Math.hypot(p.x - SLING.x, p.y - SLING.y) < grab ? 'grab' : 'default';
+        if (dragging) {
+          const q = world(e), f = PULL / span;
+          s.pull = aimAt({ x: SLING.x + (q.x - anchor.x) * f, y: SLING.y + (q.y - anchor.y) * f }); s.finger = { a: anchor, p: q };
+          s.banner = Math.min(s.banner, 0.3); return;
+        }
+        c.style.cursor = s.state === 'clear' || s.state === 'failed' ? 'pointer' : s.state === 'aim' ? 'grab' : 'default';
       };
-      const up = () => { if (!dragging) return; dragging = false; launch(); };
-      jump.current = (n) => { total.pts = 0; setScore(0); build(n); };
+      const up = () => { if (!dragging) return; dragging = false; s.finger = null; launch(); };
+      jump.current = (n) => { total.pts = 0; setScore(0); s.finger = null; dragging = false; build(n); };
       restart.current = () => { total.pts = s.start; setScore(total.pts); build(s.lv); };
       c.addEventListener('pointerdown', down); c.addEventListener('pointermove', move); c.addEventListener('pointerup', up); c.addEventListener('pointercancel', up);
       cleanup = () => { c.removeEventListener('pointerdown', down); c.removeEventListener('pointermove', move); c.removeEventListener('pointerup', up); c.removeEventListener('pointercancel', up); M.Engine.clear(engine); };
@@ -303,14 +327,58 @@ export default function Fling({ W, H }) {
       <div style={{ display: "flex", justifyContent: "space-between", fontFamily: FONT.mono, fontWeight: "700", letterSpacing: "1.2px", textTransform: "uppercase", fontSize: "10.5px", margin: "0 0 8px" }}>
         <span>{`${score} points`}</span><span style={{ color: "var(--muted)" }}>{`best ${top}`}</span>
       </div>
-      <canvas ref={cv} role="img" aria-label={failed ? 'Fling: out of Buddies, tap to retry' : 'Fling: drag Buddy back in the slingshot and let go to knock the towers down'} style={{ display: "block", width: `${W}px`, height: `${H}px`, border: "2px solid var(--ink)", touchAction: "none", cursor: "default", background: "var(--page)" }} />
-      <div style={{ display: "flex", alignItems: "center", gap: "12px", marginTop: "10px" }}>
-        <span style={{ flexGrow: "1", fontFamily: FONT.hand, fontSize: W < 400 ? "18px" : "20px", lineHeight: "1.1", color: "var(--hand)" }}>{W < 400 ? 'pull back · follow the dots · let go' : 'pull Buddy back · the dots show where he’ll fly · let go'}</span>
-        <select aria-label="Pick a level" value={lv} onChange={(e) => jump.current?.(Number(e.target.value))} style={{ flexShrink: "0", fontFamily: FONT.mono, fontWeight: "700", letterSpacing: "1px", textTransform: "uppercase", fontSize: "11px", minHeight: "44px", padding: "0 8px", background: "var(--card)", color: "var(--ink)", border: "2px solid var(--ink)", borderRadius: "0", boxShadow: "3px 3px 0 var(--ink)", cursor: "pointer" }}>
-          {LEVELS.slice(0, open + 1).map((_, i) => <option key={i} value={i}>{`Level ${i + 1}`}</option>)}
-        </select>
-        <button type="button" className="press btn" onClick={() => restart.current?.()} style={{ "--c": "var(--ink)", flexShrink: "0", fontFamily: FONT.mono, fontWeight: "700", letterSpacing: "1px", textTransform: "uppercase", fontSize: "11px", minHeight: "44px", padding: "0 14px", background: "var(--card)", color: "var(--ink)", border: "2px solid var(--ink)", boxShadow: "3px 3px 0 var(--ink)", cursor: "pointer" }}>{W < 400 ? '↺ Restart' : '↺ Restart level'}</button>
+      <canvas ref={cv} role="img" aria-label={failed ? 'Fling: out of Buddies, tap to retry' : 'Fling: drag back anywhere on the game and let go to fling Buddy at the towers'} style={{ display: pick ? "none" : "block", width: `${W}px`, height: `${H}px`, border: "2px solid var(--ink)", touchAction: "none", cursor: "default", background: "var(--page)" }} />
+      {pick && <LevelGrid W={W} H={H} lv={lv} open={open} stars={stars} onPick={(n) => { setPick(false); jump.current?.(n); }} onClose={() => setPick(false)} />}
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: W < 400 ? "8px" : "12px", marginTop: "12px" }}>
+        <button type="button" className="press btn" aria-label="Previous level" disabled={lv <= 0} onClick={() => jump.current?.(lv - 1)} style={{ ...BTN, width: "44px", padding: "0", opacity: lv <= 0 ? 0.35 : 1 }}>‹</button>
+        <button type="button" className="press btn" aria-label="Pick a level" aria-expanded={pick ? 'true' : 'false'} onClick={() => setPick((v) => !v)} style={{ ...BTN, "--c": "var(--yellow)", background: pick ? "var(--ink)" : "var(--card)", color: pick ? "var(--card)" : "var(--ink)", boxShadow: "3px 3px 0 var(--yellow)", padding: "0 14px", minWidth: W < 400 ? "116px" : "150px" }}>{`Level ${lv + 1}/${LEVELS.length}`} <span aria-hidden="true">{pick ? '▴' : '▾'}</span></button>
+        <button type="button" className="press btn" aria-label="Next level" disabled={lv >= open} onClick={() => jump.current?.(lv + 1)} style={{ ...BTN, width: "44px", padding: "0", opacity: lv >= open ? 0.35 : 1 }}>›</button>
+        <button type="button" className="press btn" aria-label="Restart level" onClick={() => { setPick(false); restart.current?.(); }} style={{ ...BTN, padding: W < 400 ? "0" : "0 14px", width: W < 400 ? "44px" : "auto" }}>{W < 400 ? '↺' : '↺ Restart'}</button>
       </div>
+      <p style={{ margin: "10px 0 0", textAlign: "center", fontFamily: FONT.hand, fontSize: W < 400 ? "18px" : "20px", lineHeight: "1.1", color: "var(--hand)" }}>{W < 400 ? 'drag back anywhere · follow the dots · let go' : 'drag back from anywhere on the game · the dots show where he’ll fly · let go'}</p>
     </>
+  );
+}
+
+const BTN = { "--c": "var(--ink)", flexShrink: "0", fontFamily: FONT.mono, fontWeight: "700", letterSpacing: "1px", textTransform: "uppercase", fontSize: "12px", minHeight: "44px", background: "var(--card)", color: "var(--ink)", border: "2px solid var(--ink)", boxShadow: "3px 3px 0 var(--ink)", cursor: "pointer" };
+
+// the level picker: every level as a tile, in the canvas's place while open. Played ones show their stars, the
+// current one is inked, the next one to beat has a yellow shadow, the rest are locked (dashed).
+function LevelGrid({ W, H, lv, open, stars, onPick, onClose }) {
+  const cols = W < 400 ? 6 : 10, total = stars.reduce((a, b) => a + b, 0);
+  return (
+    <div className="card-drop" role="dialog" aria-label="Pick a level" style={{ boxSizing: "border-box", width: `${W}px`, minHeight: `${H}px`, border: "2px solid var(--ink)", background: "var(--card)", padding: W < 400 ? "12px" : "18px" }}>
+      <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "12px" }}>
+        <span style={{ fontFamily: FONT.head, fontSize: W < 400 ? "18px" : "22px", textTransform: "uppercase", color: "var(--ink)" }}>Pick a level</span>
+        <span style={{ flexGrow: "1", display: "flex", alignItems: "center", gap: "6px", fontFamily: FONT.mono, fontWeight: "700", fontSize: "11px", letterSpacing: "1px", color: "var(--muted)" }}><Stars n={1} of={1} size={13} />{`${total}/${LEVELS.length * 3}`}</span>
+        <button type="button" className="press btn" aria-label="Back to the game" onClick={onClose} style={{ ...BTN, width: "44px", padding: "0" }}><CloseIcon size={14} weight={2.8} /></button>
+      </div>
+      <div style={{ display: "grid", gridTemplateColumns: `repeat(${cols}, 1fr)`, gap: W < 400 ? "6px" : "10px" }}>
+        {LEVELS.map((_, i) => {
+          const locked = i > open, here = i === lv, next = i === open && !stars[i];
+          return (
+            <button key={i} type="button" className={locked ? undefined : 'press btn'} disabled={locked} onClick={() => onPick(i)} aria-label={locked ? `Level ${i + 1}, locked` : `Level ${i + 1}${stars[i] ? `, ${stars[i]} of 3 stars` : ''}`} aria-current={here ? 'true' : undefined}
+              style={{ "--c": next ? "var(--yellow)" : "var(--ink)", minHeight: W < 400 ? "48px" : "60px", padding: "4px 0", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "2px", fontFamily: FONT.mono, fontWeight: "700", fontSize: W < 400 ? "14px" : "16px", cursor: locked ? "default" : "pointer",
+                background: here ? "var(--ink)" : locked ? "transparent" : "var(--card)", color: here ? "var(--yellow)" : locked ? "var(--muted)" : "var(--ink)",
+                border: locked ? "1.5px dashed var(--muted)" : "2px solid var(--ink)", boxShadow: locked ? "none" : `3px 3px 0 ${next ? "var(--yellow)" : "var(--ink)"}`, opacity: locked ? 0.6 : 1 }}>
+              <span>{i + 1}</span>
+              {!locked && <Stars n={stars[i]} size={W < 400 ? 9 : 12} on={here} />}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+// n of 3 (or `of`) little drawn stars, filled yellow; empty ones are outlines
+const STAR = 'M6 0.6 L7.6 4.1 L11.4 4.4 L8.5 6.9 L9.4 10.6 L6 8.6 L2.6 10.6 L3.5 6.9 L0.6 4.4 L4.4 4.1 Z';
+function Stars({ n, of = 3, size = 11, on = false }) {
+  return (
+    <span aria-hidden="true" style={{ display: "inline-flex", gap: "1px" }}>
+      {Array.from({ length: of }, (_, i) => (
+        <svg key={i} width={size} height={size} viewBox="0 0 12 12"><path d={STAR} style={{ fill: i < n ? "var(--yellow)" : "none", stroke: on ? "var(--yellow)" : "var(--ink)", strokeWidth: 1.1, strokeLinejoin: "round" }} /></svg>
+      ))}
+    </span>
   );
 }
