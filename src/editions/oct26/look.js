@@ -53,7 +53,7 @@ export const LOOK = {
     slotDark: '#262626', // the same on dark cards
     slotDarkLine: '#5A5A5A',
     slotDarkInk: '#CFCFCF',
-    snake: '#4E9C74', // the Snake card's pixel snake (inside AQ's website: shared/SnakeCard.jsx)
+    snake: '#4E9C74', // the games card's pixel snake (shared/GameCard.jsx)
   },
   // font stacks (index.html loads these from Google Fonts)
   fonts: {

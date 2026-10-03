@@ -1,40 +1,57 @@
 import { Link } from '../router.jsx';
 import BackHome from './BackHome.jsx';
-import { LatestTag } from './Tapes.jsx';
-import { LATEST, PUBLISHED, editionLink, editionName } from '../data/editions.js';
+import { EDITIONS, LATEST, editionLink, editionName } from '../data/editions.js';
+import { editionData } from '../editions/index.js';
 import { useEdition } from '../lib/edition.js';
 import { AQ_LOOK } from '../host.js';
 import { FONT } from '../styles/fonts.js';
 
-// Inside AQ's website, and on the magazine's own site while it shows AQ's look (AQ_LOOK, src/host.js). There AQ's own nav stays as it is and the magazine's header is hidden
-// (styles/base.css), so the two things only that header gave are drawn in the page instead:
-// - PastEditionsCard: the way to the other editions (the header's edition picker), at the end of the home pages, under
-//   the Snake card (with just one edition yet, it says so).
+// What the magazine's header gives, drawn in the page instead while it shows AQ's look (AQ_LOOK, src/host.js: inside
+// AQ's website, whose own nav takes the header's place, and on the own site by default):
+// - EditionsCard: every edition as a little cover to open (the header's edition picker), at the end of the home pages
+//   beside the games card (shared/EndCards.jsx). The page's own edition says "you're here"; one still being made
+//   (draft: true in data/editions.js) shows as "coming", with no link and nothing of its content.
 // - BackToMagazine: a small "← Terra Notes" pill under AQ's nav on the other pages (the header's back link).
 const MONO = { fontFamily: FONT.mono, fontWeight: "700", letterSpacing: "1.4px", textTransform: "uppercase" };
+const short = (month) => month.replace(/^(\w{3})\w*/, '$1');
 
-const otherEditions = (here) => [...PUBLISHED].reverse().filter((e) => e.number !== here);
-// how much taller the home page gets for the card (0 when it isn't drawn)
-export const pastEditionsSpace = (here, web) => (AQ_LOOK ? (web ? 240 : 230) + 64 * Math.max(0, otherEditions(here).length - 1) : 0);
+function Tile({ e, here, web }) {
+  const W = web ? 168 : 132, H = web ? 120 : 94;
+  const d = editionData(e.number), cover = (d.articles.find((a) => a.featured) || d.articles[0])?.cover;
+  const coming = e.draft && e.number !== here, current = e.number === here;
+  const inner = (
+    <>
+      <span style={{ position: "relative", display: "block", width: `${W}px`, height: `${H}px`, boxSizing: "border-box", border: coming ? "2px dashed var(--slotLine)" : "2px solid var(--ink)", background: coming ? "var(--cream)" : "var(--blank)", overflow: "hidden" }}>
+        {coming
+          ? <span style={{ position: "absolute", inset: "0", display: "flex", alignItems: "center", justifyContent: "center", textAlign: "center", fontFamily: FONT.hand, fontSize: web ? "22px" : "19px", lineHeight: "1", color: "var(--wire)", padding: "8px" }}>out end of {e.month.split(' ')[0]}</span>
+          : cover && <img src={cover} alt="" loading="lazy" decoding="async" style={{ display: "block", width: "100%", height: "100%", objectFit: "cover" }} />}
+        {current && <span style={{ position: "absolute", left: "6px", top: "6px", ...MONO, fontSize: "9px", padding: "3px 6px", background: "var(--yellow)", border: "1.5px solid var(--ink)", color: "var(--ink)" }}>you’re here</span>}
+      </span>
+      <span style={{ display: "flex", alignItems: "baseline", gap: "6px", marginTop: "8px" }}>
+        <span style={{ fontFamily: FONT.head, fontSize: web ? "16px" : "14px", textTransform: "uppercase" }}>{editionName(e.number).replace('Edition ', 'No. ')}</span>
+        <span style={{ fontFamily: FONT.hand, fontSize: web ? "21px" : "18px", color: "var(--hand)" }}>{short(e.month)}</span>
+      </span>
+      <span style={{ ...MONO, fontSize: web ? "10.5px" : "9.5px", marginTop: "2px", color: coming ? "var(--muted)" : "var(--ink)" }}>{coming ? 'coming soon' : current ? 'reading now' : 'open →'}</span>
+    </>
+  );
+  const box = { display: "flex", flexDirection: "column", flexShrink: "0", width: `${W}px`, textDecoration: "none", color: "var(--ink)", minHeight: "44px" };
+  return coming ? <div style={box}>{inner}</div> : <Link to={editionLink(e.number)} className="lift-link" aria-current={current ? 'page' : undefined} aria-label={`${editionName(e.number)}, ${e.month}${e.number === LATEST ? ', latest' : ''}`} style={box}>{inner}</Link>;
+}
 
-export function PastEditionsCard({ web, top }) {
+export function EditionsCard({ web }) {
   const { number } = useEdition();
-  const list = otherEditions(number);
   if (!AQ_LOOK) return null;
-  const W = web ? 620 : 342;
   return (
-    <nav aria-label="Other editions" style={{ position: "absolute", left: `${(web ? 1440 : 390) / 2 - W / 2}px`, top: `${top}px`, width: `${W}px`, boxSizing: "border-box", padding: web ? "22px 28px" : "16px", background: "var(--card)", border: "2px solid var(--ink)", boxShadow: `${web ? 8 : 5}px ${web ? 8 : 5}px 0 var(--yellow)`, transform: "rotate(0.8deg)", color: "var(--ink)" }}>
-      <div style={{ ...MONO, fontSize: web ? "12px" : "10px", color: "var(--dek)" }}>{number === LATEST ? 'past editions' : 'other editions'}</div>
-      {list.map((e) => (
-        <Link key={e.number} to={editionLink(e.number)} style={{ display: "flex", alignItems: "center", gap: "10px", minHeight: "48px", borderBottom: "1.5px solid var(--rule)", textDecoration: "none", color: "var(--ink)" }}>
-          <span style={{ fontFamily: FONT.head, fontSize: web ? "22px" : "17px", textTransform: "uppercase" }}>{editionName(e.number)}</span>
-          <span style={{ fontFamily: FONT.hand, fontSize: web ? "24px" : "20px", color: "var(--hand)", flexGrow: "1" }}>{e.month}</span>
-          {e.number === LATEST && <LatestTag />}
-          <span aria-hidden="true" style={{ ...MONO, fontSize: "14px" }}>→</span>
-        </Link>
-      ))}
-      {!list.length && <div style={{ padding: "8px 0 6px", fontFamily: FONT.hand, fontSize: web ? "24px" : "20px", lineHeight: "1.1", color: "var(--wire)", borderBottom: "1.5px solid var(--rule)" }}>this is the first edition: older ones will show up here.</div>}
-      <Link to="/editions" style={{ ...MONO, fontSize: web ? "12px" : "11px", display: "flex", alignItems: "center", minHeight: "44px", marginTop: "4px", textDecoration: "none", color: "var(--ink)" }}>all editions →</Link>
+    <nav aria-label="Editions" style={{ position: "relative", boxSizing: "border-box", width: web ? "600px" : "342px", padding: web ? "22px 26px" : "16px", background: "var(--card)", border: "2px solid var(--ink)", boxShadow: `${web ? 8 : 5}px ${web ? 8 : 5}px 0 var(--yellow)`, transform: "rotate(0.8deg)", color: "var(--ink)", display: "flex", flexDirection: "column" }}>
+      <div style={{ display: "flex", alignItems: "baseline", gap: "10px" }}>
+        <span style={{ fontFamily: FONT.head, fontSize: web ? "26px" : "20px", textTransform: "uppercase" }}>The editions</span>
+        <span style={{ fontFamily: FONT.hand, fontSize: web ? "22px" : "18px", color: "var(--hand)" }}>a new one every month</span>
+      </div>
+      <div style={{ display: "flex", gap: web ? "20px" : "14px", marginTop: web ? "16px" : "12px", paddingBottom: "8px", overflowX: "auto", overscrollBehaviorX: "contain" }}>
+        {[...EDITIONS].reverse().map((e) => <Tile key={e.number} e={e} here={number} web={web} />)}
+      </div>
+      <span style={{ flexGrow: "1" }} />
+      <Link to="/editions" style={{ ...MONO, fontSize: web ? "11px" : "10.5px", alignSelf: "flex-end", display: "flex", alignItems: "center", minHeight: "44px", textDecoration: "none", color: "var(--ink)" }}>all editions →</Link>
     </nav>
   );
 }

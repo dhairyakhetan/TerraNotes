@@ -250,6 +250,7 @@ src/shared/             used by both layouts:
   ArticleCard           the card (+ TagPill, TagRow)          ArticleBody   body blocks, FieldLog, AuthorBox
   TeamSection           "Meet the team" + profile card        PhotoWallSection, PhotoViewer, WordsGameSection
   HomeIntroCard         the home intro card                   SiteFooter    orbit banner (video bubbles) + footer bar
+  EndCards              the home pages' end: GameCard (Snake ↔ Float) + EditionsCard (InsideAQ, with AQ's look)
   IntroNotebook         the opening animation                 ErrorBoundary crash card
   Tapes                 Clip, ByTape, FeaturedTape, LatestTag, DraftTape    Icons   Globe, Instagram, Close, Chevron, Photo, Menu
   ImageSlot  Logo  BackHome                                    buddy/        Buddy (easter-egg ghost), Ghost, BuddyGames
