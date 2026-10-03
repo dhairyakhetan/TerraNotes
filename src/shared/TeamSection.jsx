@@ -5,7 +5,7 @@ import { Clip } from './Tapes.jsx';
 import { articlesBy, byLink } from '../lib/byWriter.js';
 import { useEdition } from '../lib/edition.js';
 import { firstName, instagramUrl, teamsOf } from '../lib/format.js';
-import { webZoom } from '../lib/layoutMode.js';
+import { pageZoom } from '../lib/layoutMode.js';
 import { usePauseOffscreen } from '../lib/pauseOffscreen.js';
 import { usePresence } from '../lib/usePresence.js';
 import { useDialogA11y } from '../lib/useDialogA11y.js';
@@ -95,7 +95,7 @@ export default function TeamSection({ web }) {
   const [cardAt, setCardAt] = useState(null);
   useLayoutEffect(() => {
     if (open == null || !card.current) return;
-    const s = S[open], top = profileTop({ section: self.current, header: L.header, cy: s.cy, height: card.current.offsetHeight, zoom: webZoom() });
+    const s = S[open], top = profileTop({ section: self.current, header: L.header, cy: s.cy, height: card.current.offsetHeight, zoom: pageZoom() });
     if (!web) { setCardAt({ left: 28, top }); return; }
     const W = L.card.width, gap = s.size / 2 + 28, sides = [s.cx + gap, s.cx - gap - W], fits = sides.filter((x) => x >= 16 && x + W <= 1424);
     setCardAt({ left: Math.round((fits.length ? fits : sides).sort((a, b) => Math.abs(a + W / 2 - 720) - Math.abs(b + W / 2 - 720))[0]), top });

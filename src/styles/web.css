@@ -1,4 +1,4 @@
-/* Web layout (900px and up; src/web/). Drawn at 1440px and scaled to fit narrower windows (CSS zoom = --web-zoom,
+/* Web layout (900px and up; src/web/). Drawn at 1440px and scaled to fit the window (CSS zoom = --web-zoom,
    set by lib/layoutMode.js). Mouse users: hover lifts things out of their hard shadow, press drops them in. */
 .web{zoom:var(--web-zoom,1)}
 html[data-layout="web"]{scroll-padding-top:calc(80px * var(--web-zoom,1))}

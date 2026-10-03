@@ -7,7 +7,7 @@ import { homeLink } from '../data/editions.js';
 import { useByWriter } from '../lib/byWriter.js';
 import { useEdition } from '../lib/edition.js';
 import { pad2 } from '../lib/format.js';
-import { webZoom } from '../lib/layoutMode.js';
+import { pageZoom } from '../lib/layoutMode.js';
 import { calm } from '../lib/motion.js';
 import { FONT } from '../styles/fonts.js';
 
@@ -171,7 +171,7 @@ export default function WebArticleLine() {
   const dragged = useRef(false);
   const onPointerDown = (e) => {
     if (e.pointerType !== 'mouse' || e.button !== 0) return;
-    const el = refs.el, x0 = e.clientX, left0 = el.scrollLeft, z = webZoom(), id = e.pointerId;
+    const el = refs.el, x0 = e.clientX, left0 = el.scrollLeft, z = pageZoom(), id = e.pointerId;
     dragged.current = false;
     const move = (ev) => {
       const dx = (ev.clientX - x0) / z;

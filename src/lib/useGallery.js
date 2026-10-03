@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react';
-import { webZoom } from './layoutMode.js';
+import { pageZoom } from './layoutMode.js';
 
 // Swipe/drag logic for the full-screen photo viewers (shared/PhotoViewer.jsx), mouse and touch alike (pointer events).
 // n photos, opened at `start`; width = one slide's width (px); far = drag distance that always changes photo;
@@ -29,7 +29,7 @@ export function useGallery(n, start, { width, far, flick }) {
     },
     onPointerMove: (e) => {
       if (!drag.current) return;
-      const d = (e.clientX - drag.current.x) / webZoom();
+      const d = (e.clientX - drag.current.x) / pageZoom();
       setDx((cur === 0 && d > 0) || (cur === n - 1 && d < 0) ? d * 0.3 : d);
     },
     onPointerUp: end,

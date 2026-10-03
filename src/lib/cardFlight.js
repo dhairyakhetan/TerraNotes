@@ -1,4 +1,4 @@
-import { webZoom } from './layoutMode.js';
+import { pageZoom } from './layoutMode.js';
 import { calm } from './motion.js';
 
 // The card ↔ article "flight" (FLIP, Web Animations API, transform only so it stays on the GPU):
@@ -17,7 +17,7 @@ function flyFrom(el, f, direct) {
   el.getAnimations().forEach((an) => an.cancel()); // replaces the usual drop-in (.hero-drop)
   const r = el.getBoundingClientRect();
   if (!r.width) return;
-  const z = webZoom(), start = `translate(${(f.x - r.left) / z}px, ${(f.y - r.top) / z}px) scale(${f.w / r.width}) rotate(-2deg)`;
+  const z = pageZoom(), start = `translate(${(f.x - r.left) / z}px, ${(f.y - r.top) / z}px) scale(${f.w / r.width}) rotate(-2deg)`;
   el.style.transformOrigin = '0 0';
   el.animate(direct ? [
     { transform: start, easing: 'cubic-bezier(0.25, 0.8, 0.3, 1)' },
@@ -43,7 +43,7 @@ export function flyInFromCard(el, direct = false) {
 export function flyBack(card, box) {
   const r = card.getBoundingClientRect();
   if (!r.width || r.bottom < 0 || r.top > innerHeight) return;
-  const z = webZoom(), base = getComputedStyle(card).transform, rest = base === 'none' ? '' : ` ${base}`;
+  const z = pageZoom(), base = getComputedStyle(card).transform, rest = base === 'none' ? '' : ` ${base}`;
   const was = { origin: card.style.transformOrigin, z: card.style.zIndex };
   card.style.transformOrigin = '0 0';
   card.style.zIndex = '30';

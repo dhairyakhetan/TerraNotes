@@ -107,6 +107,10 @@ function SkipLink() {
   return <a className="skip-link" href="#main" onClick={skip}>Skip to main content</a>;
 }
 
+// The phone pages are drawn inside .phone, which scales them to the window (styles/phone.css); the web pages wrap
+// themselves in .web
+const Zoom = ({ web, children }) => (web ? children : <div className="phone">{children}</div>);
+
 export default function App() {
   const { pathname, search } = useLocation();
   const web = useIsWeb();
@@ -121,14 +125,14 @@ export default function App() {
       <ScrollMemory />
       <ErrorBoundary resetKey={pathname}>
         {toWriter ? <Navigate to={{ pathname: writers, search }} replace /> : (
-          <Routes>
+          <Zoom web={web}><Routes>
             <Route path="/editions" element={<EditionsPage web={web} />} />
             <Route path="/editions/:n" element={<OldEditionRoute web={web} />} /> {/* a route, not a file: embed-ok */}
             <Route path="/:first?/:second?" element={<HomeRoute web={web} />} />
             <Route path="/articles/:slug/*" element={<ArticleRoute web={web} />} />
             <Route path="/:edition/articles/:slug/*" element={<ArticleRoute web={web} />} />
             <Route path="*" element={<NotFoundPage web={web} />} />
-          </Routes>
+          </Routes></Zoom>
         )}
       </ErrorBoundary>
       {!bare && !HOST.embedded && <SiteFooter />}

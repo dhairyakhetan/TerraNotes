@@ -27,6 +27,10 @@ html.tn-on[data-tn-nav]::view-transition-old(root){animation:tnVtOut 220ms ease-
 html.tn-on[data-tn-nav]::view-transition-new(root){animation:tnVtIn 260ms ease-out both}
 html.tn-on::view-transition-old(site-header){animation:none;opacity:0}
 html.tn-on::view-transition-new(site-header){animation:none}
+html.tn-on[data-tn-layout]::view-transition-old(root){animation:tnLayOut 240ms ease-in both}
+html.tn-on[data-tn-layout]::view-transition-new(root){animation:tnLayIn 420ms cubic-bezier(.2,.9,.25,1) 60ms both}
+@keyframes tnLayOut{to{opacity:0;transform:scale(.98)}}
+@keyframes tnLayIn{from{opacity:0;transform:scale(1.02)}}
 @media (prefers-reduced-motion: reduce){html.tn-on::view-transition-group(*),html.tn-on::view-transition-old(*),html.tn-on::view-transition-new(*){animation:none !important}}
 
 /* ── from styles/phone.css ── */
@@ -35,6 +39,7 @@ html.tn-on::view-transition-new(site-header){animation:none}
 /* ── from styles/web.css ── */
 
 html.tn-on[data-layout="web"]{scroll-padding-top:calc(80px * var(--web-zoom,1))}
+html.tn-on[data-layout="phone"]{scroll-padding-top:calc(64px * var(--phone-zoom,1))}
 
 /* ── from styles/intro.css ── */
 

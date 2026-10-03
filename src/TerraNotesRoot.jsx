@@ -80,6 +80,7 @@ export default function TerraNotesRoot() {
       html.dataset.tnLeft = ''; // AQ's page fades in (styles/document.css); cleared once it has
       setTimeout(() => { delete html.dataset.tnLeft; }, 320);
       html.style.removeProperty('--web-zoom');
+      html.style.removeProperty('--phone-zoom');
       html.style.removeProperty('--tn-page');
       delete html.dataset.layout;
       delete html.dataset.tnNav;

@@ -17,7 +17,7 @@ node tools/make-link-previews.mjs   # after adding an article / changing a cover
 ```
 
 There are no automated tests. Verify changes in a real browser at **both** widths: 390px (phone layout, emulate
-touch) and 1440px (web layout). Also check reduced motion, `?lite` (low-end mode) and `?intro` (forces the opening
+touch) and 1440px (web layout), and resize across 900px. Also check reduced motion, `?lite` (low-end mode) and `?intro` (forces the opening
 animation). Automated browsers never get the intro.
 
 ## House rules (from the owner)
@@ -90,11 +90,21 @@ The magazine also runs inside AQ's main website (the `dhairyakhetan/fah` repo), 
 
 ## Layout model
 
-Two separate layouts, chosen by window width (`lib/layoutMode.js`, `useIsWeb()`):
+Two separate layouts, chosen by window width (`lib/layoutMode.js`, `useIsWeb()`), each a fixed artboard drawn with CSS
+`zoom` so it fills the window at any size:
+
+- **Below 900px: phone**, scaled to the window (`--phone-zoom`, ×0.8–×1.5; phones themselves are pinned to 390px, so ×1).
+  `App.jsx` wraps the phone pages in `.phone`; the phone menu takes the zoom itself.
+- **900px and up: web**, scaled to the window (`--web-zoom`, ×0.625 up to ×1.34 on big screens).
+- **The switch** has a 24px buffer (web from 900, back to phone below 876) and waits for the resize to stop. Crossing it
+  crossfades (a view transition, `html[data-tn-layout]`, `styles/motion.css`) and opens the other layout at the same
+  section. While the window is resized, the reader's place is kept too.
+- Maths with screen pixels (`getBoundingClientRect`, pointer positions) divides by `pageZoom()`; full-screen pop-ups
+  divide `100vh` by the zoom (`styles/phone.css`, `styles/web.css`).
 
 | | Phone (`src/phone/`) | Web (`src/web/`) |
 |---|---|---|
-| Width | fixed **390px**. Phones and upright tablets are pinned to it by the viewport tag in `index.html` (inside AQ's website: `TerraNotesRoot.jsx`, while the magazine shows) | fixed **1440px**, drawn with CSS `zoom: var(--web-zoom)` to fit narrower windows (900px and up) |
+| Width | **390px**, drawn at `--phone-zoom`. Phones and upright tablets are pinned to 390px by the viewport tag in `index.html` (inside AQ's website: `TerraNotesRoot.jsx`, while the magazine shows) | **1440px**, drawn at `--web-zoom` |
 | Header | `PhoneHeader` (64px, sticky; the logo glides when the back link comes or goes) + slide-in `PhoneMenu` | `WebHeader` (80px, sticky; inner pages: "← back to home" left, logo + edition picker centred, gliding over when that changes) |
 
 - **Home pages are artboards.** Everything under the header is `position: absolute` at design coordinates (px).

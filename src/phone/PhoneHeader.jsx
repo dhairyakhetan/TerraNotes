@@ -6,6 +6,7 @@ import Logo from '../shared/Logo.jsx';
 import { MenuIcon } from '../shared/Icons.jsx';
 import PhoneMenu from './PhoneMenu.jsx';
 import { calm } from '../lib/motion.js';
+import { pageZoom } from '../lib/layoutMode.js';
 import { portalRoot } from '../lib/dom.js';
 import { FONT } from '../styles/fonts.js';
 
@@ -26,8 +27,8 @@ export default function PhoneHeader({ current, edge }) {
     const box = logo.current.getBoundingClientRect(), was = last;
     last = { home, box };
     if (!was || was.home === home || calm()) return;
-    const s = was.box.width / box.width;
-    logo.current.animate([{ transform: `translate(${was.box.left - box.left}px, ${was.box.top - box.top}px) scale(${s})` }, { transform: 'none' }], { duration: 560, delay: home ? 60 : 0, easing: EASE, fill: 'backwards' });
+    const s = was.box.width / box.width, z = pageZoom(); // boxes are in screen pixels, the transform in page pixels
+    logo.current.animate([{ transform: `translate(${(was.box.left - box.left) / z}px, ${(was.box.top - box.top) / z}px) scale(${s})` }, { transform: 'none' }], { duration: 560, delay: home ? 60 : 0, easing: EASE, fill: 'backwards' });
     back.current?.animate([{ opacity: 0, transform: 'translateX(-20px)' }, { opacity: 1, transform: 'none' }], { duration: 420, delay: 140, easing: EASE, fill: 'backwards' });
   }, [home]);
   return (

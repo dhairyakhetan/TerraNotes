@@ -107,6 +107,13 @@ html[data-tn-nav]::view-transition-new(root){animation:vtIn 260ms ease-out both}
    goes, web/WebHeader.jsx, phone/PhoneHeader.jsx), so the old logo never ghosts */
 ::view-transition-old(site-header){animation:none;opacity:0}
 ::view-transition-new(site-header){animation:none}
+/* Phone layout ↔ web layout, when the window is resized across 900px (lib/layoutMode.js sets html[data-tn-layout]
+   during the swap): the old layout fades back, the new one settles in. The header crossfades with the rest. */
+html[data-tn-layout] header.site-header,:host([data-tn-layout]) header.site-header{view-transition-name:none}
+html[data-tn-layout]::view-transition-old(root){animation:vtLayOut 240ms ease-in both}
+html[data-tn-layout]::view-transition-new(root){animation:vtLayIn 420ms cubic-bezier(.2,.9,.25,1) 60ms both}
+@keyframes vtLayOut{to{opacity:0;transform:scale(.98)}}
+@keyframes vtLayIn{from{opacity:0;transform:scale(1.02)}}
 @media (prefers-reduced-motion: reduce){::view-transition-group(*),::view-transition-old(*),::view-transition-new(*){animation:none !important}}
 
 /* "back to home": no underline; it lifts a little when hovered */
