@@ -274,7 +274,7 @@ export default function BuddyGames({ first = null }) {
       <div ref={card} role="dialog" aria-label="Buddy's games" style={{ position: "relative", boxSizing: "border-box", background: "var(--cream)", border: "2px solid var(--ink)", boxShadow: "8px 8px 0 var(--purple)", padding: small ? "14px" : "20px", transform: "rotate(-0.6deg)", maxHeight: "calc(100dvh - 24px)", overflowY: "auto" }}>
         <div className="no-cascade" style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "12px" }}>
           {tab('snake', 'Snake')}{tab('float', 'Float')}{tab('fling', 'Fling')}
-          <span style={{ flexGrow: "1", fontFamily: FONT.hand, fontSize: "20px", color: "var(--hand)", textAlign: "right", paddingRight: "8px" }}>{shown === 'snake' ? 'eat the stars' : shown === 'float' ? 'mind the posts' : small ? '' : 'knock ’em down'}</span>
+          <span style={{ flexGrow: "1", fontFamily: FONT.hand, fontSize: "20px", color: "var(--hand)", textAlign: "right", paddingRight: "8px" }}>{small ? '' : shown === 'snake' ? 'eat the stars' : shown === 'float' ? 'mind the posts' : 'knock ’em down'}</span>
           <button className="press" onClick={() => setGame(null)} aria-label="Close the games" style={{ "--c": "var(--ink)", width: "40px", height: "40px", flexShrink: "0", padding: "0", background: "var(--card)", border: "2px solid var(--ink)", boxShadow: "3px 3px 0 var(--ink)", display: "flex", alignItems: "center", justifyContent: "center" }}>
             <CloseIcon size={14} weight={2.8} />
           </button>

@@ -193,7 +193,7 @@ export default function TeamSection({ web }) {
                 {sel.photo ? <img src={sel.photo} alt={sel.name} style={photoFill} /> : <PhotoIcon size={22} />}
               </div>
             </div>
-            <div style={{ fontFamily: FONT.head, fontSize: C.name, lineHeight: "0.95", textTransform: "uppercase", color: "var(--ink)" }}>{sel.name}</div>
+            <div style={{ fontFamily: FONT.head, fontSize: C.name, lineHeight: "calc(0.95 * var(--head-lead, 1))", textTransform: "uppercase", color: "var(--ink)" }}>{sel.name}</div>
             <div style={{ fontFamily: FONT.hand, fontSize: C.role, lineHeight: "1.1", color: "var(--hand)" }}>{sel.role}</div>
             <p style={{ margin: "0", fontSize: C.bio, lineHeight: "1.5", color: "var(--bioText)" }}>{sel.bio || '[Two lines about them: where they work from, what they write or shoot, what they care about.]'}</p>
             {/* what each of their teams made (their own `credit` line instead, if they have one) */}

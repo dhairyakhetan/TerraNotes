@@ -5,6 +5,7 @@ import PhoneHeader from '../phone/PhoneHeader.jsx';
 import WebHeader from '../web/WebHeader.jsx';
 import { LatestTag } from '../shared/Tapes.jsx';
 import { BackToMagazine } from '../shared/InsideAQ.jsx';
+import { AQ_LOOK } from '../host.js';
 import { LATEST, PUBLISHED, articleLink, editionLink, editionName, editionOf, nextMonth } from '../data/editions.js';
 import { editionData } from '../editions/index.js';
 import { pad2 } from '../lib/format.js';
@@ -34,7 +35,7 @@ function Frame({ web, title, children }) {
     <div style={{ position: "relative", width: "390px", margin: "0 auto", overflow: "clip", background: "var(--page)", color: "var(--ink)", fontFamily: FONT.body, paddingBottom: "70px" }}>
       <PhoneHeader current="editions" />
       <BackToMagazine />
-      <div style={{ padding: "30px 20px 0" }}>{children}</div>
+      <div style={{ padding: AQ_LOOK ? "84px 20px 0" : "30px 20px 0" }}>{children}</div>{/* AQ's look: clear of the back pill */}
     </div>
   );
 }

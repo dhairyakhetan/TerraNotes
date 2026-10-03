@@ -19,8 +19,14 @@ import { FONT } from '../styles/fonts.js';
 // angle, --d duration), .flutter = wobbling on its clip (--r = resting tilt): styles/loops.css.
 // With ?by=<writer>, that writer's pieces come first, taped (lib/byWriter.js).
 const ROW = 300;
-// how much taller than the original design this is for these articles (PhoneHome moves the rest down)
-export const hangExtra = (articles) => 270 + Math.ceil(Math.max(0, articles.length - 6) / 2) * ROW;
+// how much taller (or, with under six cards, shorter) than the original design this is for these articles (PhoneHome
+// moves the rest by it): the photo wall starts 70px under the lowest card, so a short edition leaves no hole
+const LOWEST = [600, 780, 880, 1072, 1172]; // the bottom of the lowest card with 1–5 articles (page px)
+export const hangExtra = (articles) => {
+  const n = articles.length;
+  if (n > 0 && n < 6) return LOWEST[n - 1] + 70 - 1190;
+  return 270 + Math.ceil(Math.max(0, n - 6) / 2) * ROW;
+};
 
 const Thread = ({ left, top = 0, h }) => <div style={{ position: "absolute", left: `${left}px`, top: `${top}px`, width: "1.4px", height: `${h}px`, background: "var(--string)" }} />;
 // one hanging card: a swinging hanger (box: left, top, w, h, a, d, delay) with its string, and the card on a flutter
@@ -65,7 +71,7 @@ export default function PhoneHangingArticles() {
               <ImageSlot src={cardCover(a6.cover)} fallback={a6.cover} alt={a6.alt} box={{ width: "122px", flexShrink: "0", height: "176px" }} />
               <div style={{ display: "flex", flexDirection: "column", gap: "8px", paddingTop: "4px", flexGrow: "1" }}>
                 <TagRow a={a6} />
-                <h3 ref={fitWide} style={{ flexShrink: "0", margin: "0", fontFamily: FONT.head, fontWeight: "400", fontSize: "22px", lineHeight: "0.95", letterSpacing: "-0.3px", textTransform: "uppercase", color: "var(--ink)" }}>{a6.title}</h3>
+                <h3 ref={fitWide} style={{ flexShrink: "0", margin: "0", fontFamily: FONT.head, fontWeight: "400", fontSize: "22px", lineHeight: "calc(0.95 * var(--head-lead, 1))", letterSpacing: "-0.3px", textTransform: "uppercase", color: "var(--ink)" }}>{a6.title}</h3>
                 <p style={{ flexShrink: "0", margin: "0", fontFamily: FONT.hand, fontSize: "16px", lineHeight: "1.1", color: "var(--dek)" }}>{a6.dek}</p>
               </div>
             </article>

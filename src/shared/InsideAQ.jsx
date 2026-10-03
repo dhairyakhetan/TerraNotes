@@ -48,9 +48,10 @@ export function EditionsCard({ web }) {
   if (!AQ_LOOK) return null;
   return (
     <nav ref={box} aria-label="Editions" style={{ position: "relative", boxSizing: "border-box", width: web ? "600px" : "342px", padding: web ? "22px 26px" : "16px", background: "var(--card)", border: "2px solid var(--ink)", boxShadow: `${web ? 8 : 5}px ${web ? 8 : 5}px 0 var(--yellow)`, transform: "rotate(0.8deg)", color: "var(--ink)", display: "flex", flexDirection: "column" }}>
-      <div style={{ display: "flex", alignItems: "baseline", gap: "10px" }}>
-        <span style={{ fontFamily: FONT.head, fontSize: web ? "26px" : "20px", textTransform: "uppercase" }}>The editions</span>
-        <span style={{ fontFamily: FONT.hand, fontSize: web ? "22px" : "18px", color: "var(--hand)" }}>a new one every month</span>
+      {/* each stays on one line; the tagline drops under the heading when both don't fit (a wide heading font) */}
+      <div style={{ display: "flex", flexWrap: "wrap", alignItems: "baseline", columnGap: "10px", rowGap: "2px" }}>
+        <span style={{ fontFamily: FONT.head, fontSize: web ? "26px" : "20px", textTransform: "uppercase", whiteSpace: "nowrap" }}>The editions</span>
+        <span style={{ fontFamily: FONT.hand, fontSize: web ? "22px" : "18px", color: "var(--hand)", whiteSpace: "nowrap" }}>a new one every month</span>
       </div>
       <div className="stagger" style={{ display: "flex", gap: web ? "20px" : "14px", marginTop: web ? "16px" : "12px", paddingBottom: "8px", overflowX: "auto", overscrollBehaviorX: "contain" }}>
         {[...EDITIONS].reverse().map((e, i) => <Tile key={e.number} e={e} i={i} here={number} web={web} />)}

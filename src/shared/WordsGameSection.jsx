@@ -13,7 +13,7 @@ const PHONE = {
   section: { top: "1830px", width: "390px", height: "650px" }, btn: 'press',
   title: { left: "20px", top: "18px", width: "260px", fontSize: "36px", lineHeight: "0.98" },
   score: { right: "20px", top: "26px", textAlign: "right", fontSize: "9px", letterSpacing: "1.6px", lineHeight: "1.6" },
-  cloud: { left: 10, top: 110, w: 370, h: 200, textTop: "78px", count: { fontSize: "9.5px", letterSpacing: "1.6px" }, word: [42, 300], gap: "4px", say: { fontSize: "11px", letterSpacing: "0.5px" }, sayGap: "2px", wordSpacing: "-0.5px", ask: "20px" },
+  cloud: { left: 10, top: 110, w: 370, h: 200, textTop: "78px", count: { fontSize: "9.5px", letterSpacing: "1.6px" }, word: [42, 266], gap: "4px", say: { fontSize: "11px", letterSpacing: "0.5px" }, sayGap: "2px", wordSpacing: "-0.5px", ask: "20px" },
   options: { left: "20px", top: "330px", width: "350px", gap: "12px" },
   option: { minHeight: "52px", padding: "10px 14px", gap: "12px", boxShadow: "4px 4px 0 var(--ink)", fontSize: "15px", transition: "background-color 120ms ease, opacity 120ms ease" }, mark: ["26px", "12px"],
   hint: { left: "34px", top: "550px", width: "300px", boxShadow: "5px 5px 0 var(--yellow)", padding: "12px 16px 10px 18px" }, psst: { left: "-12px", top: "-17px", fontSize: "20px", padding: "2px 12px" }, hintText: "21px",

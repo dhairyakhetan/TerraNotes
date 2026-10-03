@@ -88,7 +88,7 @@ export default function GameCard({ web, style }) {
         <Screen id={g.id} width={web ? 230 : 118} />
         <div style={{ display: "flex", flexDirection: "column", gap: web ? "8px" : "5px", minWidth: "0" }}>
           <span style={{ ...MONO, fontSize: web ? "11px" : "9.5px", color: "var(--dek)" }}>mini game · {at + 1} of {GAMES.length}</span>
-          <span style={{ fontFamily: FONT.head, fontSize: web ? "32px" : "20px", lineHeight: "0.95", textTransform: "uppercase" }}>{g.title}</span>
+          <span style={{ fontFamily: FONT.head, fontSize: web ? "32px" : "20px", lineHeight: "calc(0.95 * var(--head-lead, 1))", textTransform: "uppercase" }}>{g.title}</span>
           <span style={{ fontFamily: FONT.hand, fontSize: web ? "23px" : "18px", lineHeight: "1.05", color: "var(--hand)" }}>{g.line}</span>
         </div>
       </div>
