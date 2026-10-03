@@ -10,13 +10,15 @@ import DemoPage from './pages/DemoPage.jsx';
 export const loadLabs = () => import('./articles/labs/LabsPage.jsx');
 const LabsPage = lazy(loadLabs);
 // Buddy's games (canvas games) load the first time someone opens them ('aq-games', lib/buddyState.js)
-const BuddyGames = lazy(() => import('./shared/buddy/BuddyGames.jsx'));
+const loadGames = () => import('./shared/buddy/BuddyGames.jsx');
+const BuddyGames = lazy(loadGames);
 function Games() {
   const [first, setFirst] = useState(null);
   useEffect(() => {
     const on = (e) => setFirst((f) => f || e.detail || 'snake');
     addEventListener('aq-games', on);
-    return () => removeEventListener('aq-games', on);
+    const warm = setTimeout(() => loadGames().catch(() => {}), 4000); // fetched ahead, so the first open isn't kept waiting
+    return () => { clearTimeout(warm); removeEventListener('aq-games', on); };
   }, []);
   return first && <Suspense fallback={null}><BuddyGames first={first} /></Suspense>;
 }

@@ -4,9 +4,9 @@
 // Leave caption '' and the design's placeholder shows instead; with no place, the viewer just says "Highlight 01".
 
 export const PHOTOS = [
-  { photo: '', caption: '', place: '', tint: '#6F8468' },
-  { photo: '', caption: '', place: '', tint: '#5E7F8C' },
-  { photo: '', caption: '', place: '', tint: '#A7765A' },
-  { photo: '', caption: '', place: '', tint: '#8A8F6A' },
-  { photo: '', caption: '', place: '', tint: '#4F6B78' },
+  { photo: '', caption: '', place: '', tint: '#8C1F1F' },
+  { photo: '', caption: '', place: '', tint: '#B8860B' },
+  { photo: '', caption: '', place: '', tint: '#5A1A2A' },
+  { photo: '', caption: '', place: '', tint: '#9C3D1E' },
+  { photo: '', caption: '', place: '', tint: '#3E2A5A' },
 ];

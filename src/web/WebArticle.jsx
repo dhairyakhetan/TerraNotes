@@ -63,12 +63,14 @@ export default function WebArticle({ article: a, next }) {
         <div className="rise-in" style={{ position: "relative", margin: "40px 0 0 370px", width: "700px", display: "flex", flexDirection: "column", gap: "28px" }}>
           <div style={{ position: "relative" }}>
             <div ref={text} style={{ display: "flex", flexDirection: "column", gap: "28px" }}>
-              {log && <FieldLog log={log} web />}
               <ArticleBody a={a} tag={tag} web />
               <EndMark web />
             </div>
             {/* the right margin: "in this piece", sticky while the text scrolls by */}
-            <div style={{ position: "absolute", left: "790px", top: "0", bottom: "0" }}><ReadingRail a={a} tag={tag} p={read.p} at={read.at} /></div>
+            <div style={{ position: "absolute", left: "790px", top: "0", bottom: "0" }}>
+              {log && <FieldLog log={log} web />}
+              <ReadingRail a={a} tag={tag} p={read.p} at={read.at} />
+            </div>
           </div>
           <AuthorBox a={a} web />
           {/* next on the line */}

@@ -66,11 +66,12 @@ function Block({ b, first, part, a, tag, web }) {
   return <Extra b={b} tag={tag} web={web} />;
 }
 
-// The yellow "Field log" box ({ log: [['PLACE', 'Kolkata'], …] }). Phone: in the text; web: in the right margin.
+// The yellow "Field log" box ({ log: [['PLACE', 'Kolkata'], …] }). Phone: in the text; web: in the right margin, at the
+// top of the column the "in this piece" rail sticks in (web/WebArticle.jsx).
 export function FieldLog({ log, web }) {
   return (
     <aside style={web
-      ? { position: "absolute", left: "740px", top: "30px", width: "260px", boxSizing: "border-box", transform: "rotate(1.5deg)", background: "var(--yellow)", border: "2px solid var(--ink)", boxShadow: "7px 7px 0 var(--ink)", padding: "16px 18px", display: "flex", flexDirection: "column", gap: "9px", fontFamily: FONT.mono, fontSize: "12px", lineHeight: "1.4" }
+      ? { position: "relative", marginBottom: "48px", width: "250px", boxSizing: "border-box", transform: "rotate(1.5deg)", background: "var(--yellow)", border: "2px solid var(--ink)", boxShadow: "7px 7px 0 var(--ink)", padding: "16px 18px", display: "flex", flexDirection: "column", gap: "9px", fontFamily: FONT.mono, fontSize: "12px", lineHeight: "1.4" }
       : { boxSizing: "border-box", width: "300px", marginLeft: "30px", transform: "rotate(1.2deg)", background: "var(--yellow)", border: "2px solid var(--ink)", boxShadow: "6px 6px 0 var(--ink)", padding: "14px 16px", display: "flex", flexDirection: "column", gap: "8px", fontFamily: FONT.mono, fontSize: "12px", lineHeight: "1.4" }}>
       <div style={{ fontFamily: FONT.head, fontSize: web ? "20px" : "18px", textTransform: "uppercase", letterSpacing: web ? undefined : "-0.2px" }}>Field log</div>
       {log.map(([label, value], i) => (

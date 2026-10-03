@@ -1,0 +1,15 @@
+/* October 2026's look, "Pujo" (src/editions/oct26/look.js): the pages wear a laal-paar saree's border, alta red with a
+   gold thread down both sides, over cream paper with a faint alpana dot pattern. Only this edition's pages get it
+   (html / the shadow host carry data-edition="oct26": lib/edition.js); loaded through src/editions/pages.js EDITION_CSS,
+   on the pages with class="page-sheet". The pages set their background inline, so these use !important. */
+html[data-edition="oct26"] .page-sheet,:host([data-edition="oct26"]) .page-sheet{
+  --b:8px;
+  background-image:linear-gradient(to right,#C8102E 0 var(--b),#F4B400 var(--b) calc(var(--b) + 2px),transparent calc(var(--b) + 2px) calc(100% - var(--b) - 2px),#F4B400 calc(100% - var(--b) - 2px) calc(100% - var(--b)),#C8102E calc(100% - var(--b))),radial-gradient(circle,rgba(200,16,46,.09) 0 2px,transparent 2.5px) !important;
+  background-size:auto,28px 28px !important;
+  background-repeat:no-repeat,repeat !important;
+}
+html[data-edition="oct26"] .web .page-sheet,:host([data-edition="oct26"]) .web .page-sheet{
+  --b:26px;
+  background-image:linear-gradient(to right,#C8102E 0 var(--b),#F4B400 var(--b) calc(var(--b) + 4px),#C8102E calc(var(--b) + 4px) calc(var(--b) + 8px),transparent calc(var(--b) + 8px) calc(100% - var(--b) - 8px),#C8102E calc(100% - var(--b) - 8px) calc(100% - var(--b) - 4px),#F4B400 calc(100% - var(--b) - 4px) calc(100% - var(--b)),#C8102E calc(100% - var(--b))),radial-gradient(circle,rgba(200,16,46,.08) 0 2.5px,transparent 3px) !important;
+  background-size:auto,36px 36px !important;
+}

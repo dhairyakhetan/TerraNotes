@@ -1,10 +1,12 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { CloseIcon, ChevronIcon } from '../Icons.jsx';
 import { usePresence } from '../../lib/usePresence.js';
 import { useEdition } from '../../lib/edition.js';
 import { FONT } from '../../styles/fonts.js';
 import { lockScroll, unlockScroll } from '../../lib/scrollLock.js';
 import { drawGhost } from './Ghost.jsx';
+import { lastTap } from '../../lib/buddyState.js';
+import { calm } from '../../lib/motion.js';
 
 // Buddy's games popup (mounted once in App.jsx; opened by openGames() in lib/buddyState.js, event 'aq-games').
 // Two tabs, each a <canvas> game drawn every frame with requestAnimationFrame (only while the popup is open):
@@ -223,11 +225,27 @@ function Scores({ score, top, unit }) {
   );
 }
 
-// The popup. Esc, the ✕ or a click outside closes it (it lifts away).
+// The popup. It grows out of the button that opened it (lib/buddyState.js lastTap) while the page dims, and shrinks
+// back there when Esc, the ✕ or a click outside closes it. Reduced motion: it just appears.
 // first: the game asked for when this was loaded (App.jsx loads it on the first 'aq-games')
 export default function BuddyGames({ first = null }) {
   const [game, setGame] = useState(first);
-  const [shown, leaving] = usePresence(game, 200);
+  const [shown, leaving] = usePresence(game, 220);
+  const card = useRef(null), from = useRef(null); // from: the tap it grows out of, as an offset from the card's centre
+  useLayoutEffect(() => { // opening
+    if (!game || from.current || !card.current) return;
+    const r = card.current.getBoundingClientRect();
+    const dx = lastTap.x == null ? 0 : lastTap.x - (r.left + r.width / 2), dy = lastTap.y == null ? 40 : lastTap.y - (r.top + r.height / 2);
+    from.current = { dx, dy };
+    if (calm()) return;
+    card.current.animate([{ translate: `${dx}px ${dy}px`, scale: '0.15', opacity: 0 }, { opacity: 1, offset: 0.35 }, { translate: '0 0', scale: '1', opacity: 1 }], { duration: 460, easing: 'cubic-bezier(.2,.9,.25,1.08)' });
+  }, [game]);
+  useLayoutEffect(() => { // closing: back to where it came from
+    if (!leaving || !card.current) return;
+    const { dx = 0, dy = 40 } = from.current || {};
+    from.current = null;
+    if (!calm()) card.current.animate([{ translate: '0 0', scale: '1', opacity: 1 }, { translate: `${dx * 0.8}px ${dy * 0.8}px`, scale: '0.2', opacity: 0 }], { duration: 220, easing: 'cubic-bezier(.5,0,.75,0)', fill: 'forwards' });
+  }, [leaving]);
   useEffect(() => {
     const on = (e) => setGame(e.detail || 'snake');
     addEventListener('aq-games', on);
@@ -248,7 +266,7 @@ export default function BuddyGames({ first = null }) {
   );
   return (
     <div className={leaving ? 'fade-out' : 'fade-in'} onClick={(e) => { if (e.target === e.currentTarget) setGame(null); }} style={{ position: "fixed", inset: "0", zIndex: "900", display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(17,17,17,.55)", padding: "12px" }}>
-      <div className={leaving ? 'card-lift' : 'card-drop'} role="dialog" aria-label="Buddy's games" style={{ position: "relative", boxSizing: "border-box", background: "var(--cream)", border: "2px solid var(--ink)", boxShadow: "8px 8px 0 var(--purple)", padding: small ? "14px" : "20px", transform: "rotate(-0.6deg)", maxHeight: "calc(100dvh - 24px)", overflowY: "auto" }}>
+      <div ref={card} role="dialog" aria-label="Buddy's games" style={{ position: "relative", boxSizing: "border-box", background: "var(--cream)", border: "2px solid var(--ink)", boxShadow: "8px 8px 0 var(--purple)", padding: small ? "14px" : "20px", transform: "rotate(-0.6deg)", maxHeight: "calc(100dvh - 24px)", overflowY: "auto" }}>
         <div className="no-cascade" style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "12px" }}>
           {tab('snake', 'Snake')}{tab('float', 'Float')}
           <span style={{ flexGrow: "1", fontFamily: FONT.hand, fontSize: "20px", color: "var(--hand)", textAlign: "right", paddingRight: "8px" }}>{shown === 'snake' ? 'eat the stars' : 'mind the posts'}</span>

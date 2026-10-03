@@ -16,3 +16,8 @@ export function useBuddy() {
   return { here, fresh };
 }
 export const openGames = (game) => dispatchEvent(new CustomEvent('aq-games', { detail: game }));
+
+// Where the last tap / click landed (screen px), so Buddy's games popup can grow out of the button that opened it
+// (shared/buddy/BuddyGames.jsx). Recorded before any click handler runs.
+export const lastTap = { x: null, y: null };
+if (typeof window !== 'undefined') addEventListener('pointerdown', (e) => { lastTap.x = e.clientX; lastTap.y = e.clientY; }, { capture: true, passive: true });
