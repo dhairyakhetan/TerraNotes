@@ -13,3 +13,18 @@ html[data-edition="oct26"] .web .page-sheet,:host([data-edition="oct26"]) .web .
   background-image:linear-gradient(to right,#C8102E 0 var(--b),#F4B400 var(--b) calc(var(--b) + 4px),#C8102E calc(var(--b) + 4px) calc(var(--b) + 8px),transparent calc(var(--b) + 8px) calc(100% - var(--b) - 8px),#C8102E calc(100% - var(--b) - 8px) calc(100% - var(--b) - 4px),#F4B400 calc(100% - var(--b) - 4px) calc(100% - var(--b)),#C8102E calc(100% - var(--b))),radial-gradient(circle,rgba(200,16,46,.08) 0 2.5px,transparent 3px) !important;
   background-size:auto,36px 36px !important;
 }
+
+/* the home page's decorations move a little (Decor.jsx, class .dz: stopped by reduced motion, LITE and page changes in
+   styles/loops.css, paused off screen by shared/EditionDecor.jsx). translate / rotate / scale only, so their tilt stays. */
+.oct-leaf{transform-box:fill-box;transform-origin:50% 0;animation:oct-leaf 3.4s ease-in-out infinite alternate}
+@keyframes oct-leaf{from{rotate:-7deg}to{rotate:7deg}}
+.oct-alpana{animation:oct-alpana 80s linear infinite}
+@keyframes oct-alpana{to{rotate:360deg}}
+.oct-dhak{animation:oct-dhak 2.6s ease-out infinite}
+@keyframes oct-dhak{0%,10%,20%,100%{scale:1}5%,15%{scale:1.09}}
+.oct-tag{transform-origin:50% 0;animation:oct-tag 4.2s ease-in-out infinite alternate}
+@keyframes oct-tag{from{rotate:-3deg}to{rotate:3deg}}
+.oct-conch{animation:oct-conch 5.5s ease-in-out infinite alternate}
+@keyframes oct-conch{from{translate:0 0;rotate:0deg}to{translate:-6px -9px;rotate:-4deg}}
+.oct-petal{animation:oct-petal 9.6s linear infinite}
+@keyframes oct-petal{0%{translate:0 0;rotate:0deg;opacity:0}6%{opacity:.9}25%{translate:16px 110px}50%{translate:-10px 220px;opacity:.8}70%,100%{translate:12px 320px;rotate:300deg;opacity:0}}

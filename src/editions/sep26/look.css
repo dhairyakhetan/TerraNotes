@@ -18,3 +18,14 @@ html[data-edition="sep26"] .web .page-sheet,:host([data-edition="sep26"]) .web .
   background-position:0 140px,0 0,0 128px !important;
   background-repeat:repeat-y,no-repeat,repeat !important;
 }
+
+/* the home page's doodles move a little (Decor.jsx, class .dz: stopped by reduced motion, LITE and page changes in
+   styles/loops.css, paused off screen by shared/EditionDecor.jsx). translate / rotate / scale only, so their tilt stays. */
+.sep-plane{animation:sep-plane 6s ease-in-out infinite alternate}
+@keyframes sep-plane{from{translate:0 0;rotate:0deg}to{translate:-14px -10px;rotate:-3deg}}
+.sep-star{animation:sep-star 2.8s ease-in-out infinite alternate}
+@keyframes sep-star{from{scale:1;opacity:.75}to{scale:1.14;opacity:1}}
+.sep-sticky{transform-origin:50% 0;animation:sep-sticky 4.6s ease-in-out infinite alternate}
+@keyframes sep-sticky{from{rotate:0deg}to{rotate:-2.5deg}}
+.sep-float{animation:sep-float 10s ease-in-out infinite}
+@keyframes sep-float{0%{translate:0 0;rotate:-6deg;opacity:0}12%{opacity:.55}40%{opacity:.45}55%,100%{translate:8px -60px;rotate:8deg;opacity:0}}

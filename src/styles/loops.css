@@ -51,8 +51,11 @@
 .fl5{animation:flB 5.8s ease-in-out infinite -0.8s}
 .fl6{animation:flC 6.2s ease-in-out infinite -4s}
 
-/* stopping them */
+/* stopping them (.dz: an edition's own background loops, in its look.css: src/editions/<id>/Decor.jsx) */
 .off-screen,.off-screen *{animation-play-state:paused !important}
+html[data-tn-nav] .dz,:host([data-tn-nav]) .dz{animation-play-state:paused}
+html.tn-lite .dz,:host(.tn-lite) .dz{animation:none !important}
+@media (prefers-reduced-motion: reduce){.dz{animation:none !important}}
 /* while pages swap the incoming page mustn't be redrawn every frame (that made going back stutter on phones) */
 html[data-tn-nav] :is(.sway,.flutter,.hero-sway,.fl1,.fl2,.fl3,.fl4,.fl5,.fl6,.fk1,.fk2,.fk3,.fk4,.glint,.spark,.twist,.buddy-bob),
 :host([data-tn-nav]) :is(.sway,.flutter,.hero-sway,.fl1,.fl2,.fl3,.fl4,.fl5,.fl6,.fk1,.fk2,.fk3,.fk4,.glint,.spark,.twist,.buddy-bob){animation-play-state:paused}
