@@ -33,6 +33,10 @@
 .nb-imp-small,.nb-imp-name{color:rgba(0,0,0,.42);text-shadow:0 1px 0 rgba(255,255,255,.16),0 -1px 0 rgba(0,0,0,.35)}
 .nb-imp-small{font:400 calc(var(--pw) * .036)/1.2 var(--font-mono);letter-spacing:.18em;text-transform:uppercase}
 .nb-imp-name{font:italic 400 calc(var(--pw) * .11)/1 var(--font-serif)}
+.nb-imp-issue{display:flex;align-items:center;gap:calc(var(--pw) * .035);white-space:nowrap}
+/* the edition's number, foil-stamped like "Top secret" so it's the second thing you read */
+.nb-imp-issue b{font:400 calc(var(--pw) * .13)/1 var(--font-head);color:var(--yellow);opacity:.9;padding:calc(var(--pw) * .012) calc(var(--pw) * .035);
+  border:2px solid var(--yellow);text-shadow:0 -1px 0 rgba(0,0,0,.45),0 1px 0 rgba(255,255,255,.2);box-shadow:inset 0 1px 0 rgba(0,0,0,.35),0 1px 0 rgba(255,255,255,.15)}
 .nb-imp-rule{width:60%;height:0;border-top:2px solid rgba(0,0,0,.32);box-shadow:0 1px 0 rgba(255,255,255,.14)}
 .nb-imp-secret{margin:calc(var(--pw) * .02) 0;font:400 calc(var(--pw) * .15)/.9 var(--font-head);text-transform:uppercase;letter-spacing:.02em;color:var(--yellow);
   opacity:.82;text-shadow:0 -1px 0 rgba(0,0,0,.45),0 1px 0 rgba(255,255,255,.2);transform:rotate(-4deg);
