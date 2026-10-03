@@ -88,8 +88,8 @@ export default function IntroNotebook() {
                     <div className="nb-imp-small">do not open before the bell</div>
                     <div className="nb-imp-rule" />
                     <div className="nb-imp-name">TerraNotes</div>
-                    <div className="nb-imp-issue"><span className="nb-imp-small">issue</span><b>{issue}</b></div>
-                    <div className="nb-imp-small">{month.toLowerCase()}</div>
+                    <div className="nb-imp-issue">Issue {issue}</div>
+                    <div className="nb-imp-month">{month}</div>
                   </div>
                 </div>
                 <div className="nb-face nb-back">
