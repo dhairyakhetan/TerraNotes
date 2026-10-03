@@ -8,7 +8,9 @@
     "build": "node tools/check-embed.mjs && vite build",
     "check": "node tools/check-embed.mjs",
     "export-aq": "node tools/export-aq.mjs",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test:visual": "playwright test",
+    "test:visual:update": "playwright test --update-snapshots"
   },
   "dependencies": {
     "@vercel/analytics": "^2.0.1",

@@ -57,9 +57,13 @@ npm run check    # tools/check-embed.mjs: the mistakes that only break inside AQ
 node tools/make-card-covers.mjs    # after adding an article / changing a cover: its WebP copies (cover-card.webp for cards, cover-page.webp for the article page)
 node tools/make-link-previews.mjs   # after adding an article / changing a cover / a new edition: every link preview, in public/og/ (needs `npm i -D playwright`)
 node tools/check-fling-levels.mjs   # after adding / changing a Fling level (shared/buddy/flingLevels.js): plays each, checks it stands and can be cleared
+npm run test:visual           # after a build: screenshots of key pages at 390 + 1440 vs tests/visual/screenshots/ (PW_CHROMIUM=… for another Chromium)
+npm run test:visual:update    # after a change you meant: save new screenshots (commit them)
 ```
 
-There are no automated tests. Verify changes in a real browser at **both** widths: 390px (phone layout, emulate
+The one automated test is visual (`playwright.config.js`, `tests/visual/`, run on every push by `.github/workflows/visual.yml`):
+the home page, an article and `/sep26` (+ one of its articles) at both widths, compared with saved screenshots; a
+change you meant needs new ones (`npm run test:visual:update`, or the workflow run by hand with "update"). Still verify changes in a real browser at **both** widths: 390px (phone layout, emulate
 touch) and 1440px (web layout), and resize across 900px. Also check reduced motion, `?lite` (low-end mode) and `?intro` (forces the opening
 animation). Automated browsers never get the intro.
 
