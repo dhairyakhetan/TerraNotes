@@ -11,16 +11,12 @@ The next export **replaces `src/terranotes/` and `scripts/terranotes/` whole**, 
 
 - **Change the magazine** (articles, a new edition, a fix, a restyle) in the TerraNotes repo, following its
   `CLAUDE.md`. Then export into this repo and commit:
-  `node tools/export-aq.mjs <path to this repo>/frontend --verify` (run it from the TerraNotes repo; its CLAUDE.md,
-  "Integrating into AQ's website", has the steps).
+  `node tools/export-aq.mjs <path to this repo>/frontend --dry`, then `--verify` (run it from the TerraNotes repo; the
+  top of that file has the options). Then `npm run dev` here (`/terranotes`, an article, `/terranotes/articles/labs`,
+  1440px and 390px), `npm run build`, and commit only the three folders.
 - **Change how AQ hosts it** (the shadow root, AQ's nav around it, the prerender) in the TerraNotes repo too. Those
   parts live there as `src/TerraNotesRoot.jsx`, `src/styles/document.css` and `embed/aq/` (this README, `prerender.mjs`,
   the fonts). What AQ's own code has to keep doing for it is at the top of `shared/AqNavSlot.jsx`.
-- **An update can come as a patch file** (`terranotes-for-aq.patch`, from the export's `--patch`), with a prompt from
-  the owner. Apply it as that prompt says: a new branch from an up-to-date main, `git am --3way <patch>` (on a conflict
-  in these three folders take the patch's side; if it won't apply, `git am --abort` and report, never hand-edit),
-  `git show --stat HEAD` touches only the three folders, then `npx tsc -b`, `node scripts/verify-routing.mjs`,
-  `npm run build`, a look in `npm run dev` (below), and a PR. A failure is fixed in the TerraNotes repo, not here.
 - `public/terranotes/` is only added to by an export, never cleared; the export lists files there it doesn't know.
   The card covers (`cover-card.webp`) and link previews come from the TerraNotes repo now.
 

@@ -1,5 +1,5 @@
-// Integrating the magazine into AQ's main website (the dhairyakhetan/fah repo). Only for that job: see CLAUDE.md,
-// "Integrating into AQ's website". It writes the magazine's three folders there, from this repo:
+// Writes the magazine into AQ's main website (a checkout of AQ's site repo, its frontend/ folder). AQ's side runs this
+// when they integrate; day-to-day work here never does (CLAUDE.md, "Inside AQ's website"). Its three folders there:
 //   <frontend>/src/terranotes/      this repo's src/ (all but main.jsx, the own site's entry), with src/host.js saying
 //                                   "under /terranotes, embedded" and the router package named as AQ has it
 //                                   (react-router-dom), + embed/aq/README.md
@@ -10,15 +10,9 @@
 // src/terranotes and scripts/terranotes are generated: replaced whole. public/terranotes only gains and updates files
 // (AQ may keep files of its own there), and lists the ones this repo doesn't have.
 //
-//   node tools/export-aq.mjs <fah>/frontend            check, then write into a checkout of AQ's site
-//   node tools/export-aq.mjs <fah>/frontend --dry      check and list what would change, write nothing
-//   node tools/export-aq.mjs <fah>/frontend --verify   …then run AQ's typecheck (npx tsc -b) and routing check there
-//   node tools/export-aq.mjs <fah>/frontend --patch    …and turn what changed in the three folders into one commit, as
-//                                                      out/terranotes-for-aq.patch (git format-patch, made with a
-//                                                      temporary index: the checkout's own index, branch and HEAD stay
-//                                                      as they are), + out/terranotes-for-aq.md: how to hand it over
-//                                                      (for the owner) and the prompt for Claude in fah (embed/aq/HANDOFF.md).
-//                                                      Use a clean checkout of AQ's latest main. Combine with --verify.
+//   node tools/export-aq.mjs <AQ>/frontend            check, then write into a checkout of AQ's site
+//   node tools/export-aq.mjs <AQ>/frontend --dry      check and list what would change, write nothing
+//   node tools/export-aq.mjs <AQ>/frontend --verify   …then run AQ's typecheck (npx tsc -b) and routing check there
 //   node tools/export-aq.mjs                           → out/aq/ and out/terranotes-for-aq.zip, to hand over
 // It first runs tools/check-embed.mjs and stops if that finds anything.
 import fs from 'node:fs';
@@ -27,7 +21,7 @@ import { execFileSync, spawnSync } from 'node:child_process';
 
 const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..');
 const args = process.argv.slice(2);
-const DRY = args.includes('--dry'), VERIFY = args.includes('--verify'), PATCH = args.includes('--patch');
+const DRY = args.includes('--dry'), VERIFY = args.includes('--verify');
 const target = args.find((a) => !a.startsWith('--'));
 const DEST = path.resolve(target || path.join(ROOT, 'out/aq'));
 const BASE = '/terranotes';
@@ -41,11 +35,8 @@ const guard = spawnSync(process.execPath, [path.join(ROOT, 'tools/check-embed.mj
 if (guard.status !== 0) fail('tools/check-embed.mjs found problems (above). Fix them first: they would break the magazine inside AQ.');
 if (target) {
   const looks = ['package.json', 'src/App.tsx', 'src/components/PublicLayout.tsx'].every((f) => fs.existsSync(at(f)));
-  if (!looks) fail(`${DEST} doesn't look like AQ's frontend/ folder (no package.json, src/App.tsx, src/components/PublicLayout.tsx). Pass <fah checkout>/frontend.`);
+  if (!looks) fail(`${DEST} doesn't look like AQ's frontend/ folder (no package.json, src/App.tsx, src/components/PublicLayout.tsx). Pass <AQ's checkout>/frontend.`);
 }
-if (PATCH && (!target || DRY)) fail('--patch needs a checkout of AQ\'s site (<fah>/frontend), and writes: no --dry.');
-const git = (gitArgs, opts = {}) => execFileSync('git', gitArgs, { cwd: opts.cwd || DEST, env: { ...process.env, ...opts.env }, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }).trim();
-if (PATCH) try { git(['rev-parse', 'HEAD']); } catch { fail(`${DEST} is not inside a git checkout with a commit: --patch diffs against its HEAD.`); }
 
 // ---- 1. what the three folders should hold: published path → contents
 const SRC_SKIP = new Set(['main.jsx']); // the own site's entry
@@ -122,7 +113,7 @@ if (!target) {
   process.exit(0);
 }
 
-// ---- 4. in a checkout of AQ's site: optional checks there, then what to do next (or the patch)
+// ---- 4. in a checkout of AQ's site: optional checks there, then what to do next
 if (VERIFY) {
   for (const [name, cmd, cmdArgs] of [['typecheck', 'npx', ['tsc', '-b']], ['routing check', process.execPath, ['scripts/verify-routing.mjs']]]) {
     if (cmdArgs[0].endsWith('.mjs') && !fs.existsSync(at(cmdArgs[0]))) continue;
@@ -130,33 +121,6 @@ if (VERIFY) {
     console.log(`AQ ${name}: ${r.status === 0 ? 'ok' : 'FAILED (above)'}`);
     if (r.status !== 0) process.exitCode = 1;
   }
-}
-if (PATCH) {
-  if (process.exitCode) fail('AQ\'s checks failed (above): no patch made.');
-  const top = git(['rev-parse', '--show-toplevel']), folders = FOLDERS.map((f) => path.relative(top, at(f)));
-  const index = path.join(ROOT, 'out', `.patch-index-${process.pid}`), env = { GIT_INDEX_FILE: index };
-  fs.mkdirSync(path.join(ROOT, 'out'), { recursive: true });
-  try {
-    git(['read-tree', 'HEAD'], { cwd: top, env });
-    git(['add', '-A', '--', ...folders], { cwd: top, env });
-    const tree = git(['write-tree'], { cwd: top, env }), base = git(['rev-parse', 'HEAD'], { cwd: top });
-    if (tree === git(['rev-parse', 'HEAD^{tree}'], { cwd: top })) { console.log('No changes against AQ\'s HEAD: no patch needed.'); process.exit(0); }
-    const stat = git(['diff', '--shortstat', base, tree, '--', ...folders], { cwd: top });
-    let source = 'working tree'; try { source = git(['rev-parse', '--short', 'HEAD'], { cwd: ROOT }) + (git(['status', '--porcelain'], { cwd: ROOT }) ? ' + uncommitted changes' : ''); } catch {}
-    const date = new Date().toISOString().slice(0, 10);
-    const who = (k) => { try { return git(['config', k], { cwd: top }); } catch { return ''; } };
-    const id = who('user.email') ? {} : { GIT_AUTHOR_NAME: 'TerraNotes export', GIT_AUTHOR_EMAIL: 'terranotes-export@users.noreply.github.com', GIT_COMMITTER_NAME: 'TerraNotes export', GIT_COMMITTER_EMAIL: 'terranotes-export@users.noreply.github.com' };
-    const msg = `TerraNotes: ${date} update (export of TerraNotes ${source})\n\nGenerated by the TerraNotes repo's tools/export-aq.mjs: only frontend/{src,public,scripts}/terranotes.\nDon't edit these folders by hand; changes go in the TerraNotes repo.\n\n${stat}\n`;
-    const commit = git(['commit-tree', tree, '-p', base, '-m', msg], { cwd: top, env: id });
-    const patch = execFileSync('git', ['format-patch', '-1', '--binary', '--stdout', commit], { cwd: top, maxBuffer: 1 << 30 });
-    const out = path.join(ROOT, 'out/terranotes-for-aq.patch'), how = path.join(ROOT, 'out/terranotes-for-aq.md');
-    fs.writeFileSync(out, patch);
-    fs.writeFileSync(how, fs.readFileSync(path.join(ROOT, 'embed/aq/HANDOFF.md'), 'utf8')
-      .replaceAll('{{DATE}}', date).replaceAll('{{SOURCE}}', source).replaceAll('{{BASE}}', base.slice(0, 12)).replaceAll('{{COUNTS}}', stat));
-    console.log(`Patch: ${out} (${(patch.length / 1048576).toFixed(1)} MB; against fah ${base.slice(0, 12)}; ${stat})\nHand-over notes + the prompt for Claude in fah: ${how}`);
-    console.log(`The files are also written in ${DEST}; to leave that checkout clean: git -C ${top} checkout -- ${folders.join(' ')} && git -C ${top} clean -fdq -- ${folders.join(' ')}`);
-  } finally { fs.rmSync(index, { force: true }); }
-  process.exit(0);
 }
 console.log(`Next, in ${DEST}:
   git status -- ${FOLDERS.join(' ')}     (only these three folders should have changed)

@@ -4,6 +4,49 @@ Vite + React 19 + React Router 8, static site on Vercel. No backend, no UI libra
 edition has its own folder, `src/editions/<id>/`, with its look and content; site-wide content is in `src/data/`. Every
 file starts with a comment saying what it does; read that before editing it.
 
+## How you work: clone, change, hand over a .patch
+
+You usually have no push access here. The owner runs you in a chat, and gets your changes into the repo as a
+`.patch` file. So, in every conversation:
+
+1. **First thing, before answering anything about the code: get a fresh copy.** Never work from memory of the files,
+   or from a copy made in an earlier conversation.
+   ```bash
+   git clone https://github.com/dhairyakhetan/TerraNotes.git && cd TerraNotes && npm install
+   ```
+   If the clone fails (no network, or the repo is private to you), ask the owner to upload the repo as a ZIP (GitHub →
+   Code → Download ZIP), unzip it, then make it a git repo so a patch can be made from it:
+   `git init -q && git add -A && git commit -qm "base"`. Patches from a ZIP base say so (see 4).
+2. **Make the change** the owner asked for, by this file's rules (house rules, editions, the AQ rules, the design
+   system). Read a file's header comment before editing it. Keep each change to what was asked.
+3. **Test it before handing it over.**
+   - `npm run build` must pass (it runs `npm run check` first: the AQ guard).
+   - If you can run a browser (`npx playwright`; `npm run preview` serves `dist/` on :4173), screenshot the pages you
+     touched at 390px (touch) and 1440px, and check an older edition (`/sep26`) still looks the same. Look at the
+     screenshots.
+   - Can't run something? Say exactly what you didn't test. Never say "tested" for what you only read.
+4. **Commit locally and make the patch.** One commit per change, with a clear message (what changed and why), then
+   everything since the clone in one file:
+   ```bash
+   git add -A && git commit -qm "Short summary of the change"
+   git format-patch --binary --stdout origin/main > terranotes-<what-it-does>.patch   # ZIP base: use the "base" commit instead of origin/main
+   ```
+   Later changes in the same conversation go on top as new commits; hand over a new patch with all of them, and say
+   it **replaces** the earlier one (apply only the newest).
+5. **Give the owner the `.patch` file**, a few lines on what changed and what you tested, and these instructions
+   (copy them as they are, with the file name filled in):
+
+   > **To apply `terranotes-<what-it-does>.patch`**
+   > - **Easiest:** open Claude Code on `dhairyakhetan/TerraNotes` (claude.ai/code), attach the file and say:
+   >   *"Apply this patch with `git am --3way`, run `npm run build`, check the changed pages at 390px and 1440px, then
+   >   push to main."*
+   > - **On your own computer**, in the TerraNotes folder: `git pull`, then `git am --3way terranotes-<…>.patch`, then
+   >   `npm install && npm run build && npm run preview` and open http://localhost:4173 (phone width too). If it looks
+   >   right, `git push`.
+   > - **If it won't apply:** `git am --abort`, and send me the error; I'll make a new patch from a fresh copy.
+
+   Patch files are hand-over only: never commit them to the repo.
+
 ## Commands
 
 ```bash
@@ -13,7 +56,6 @@ npm run build    # → dist/ (also writes per-article HTML, sitemap, robots, 404
 npm run preview  # serve dist/ on :4173
 npm run check    # tools/check-embed.mjs: the mistakes that only break inside AQ's website (the build runs it first)
 node tools/make-card-covers.mjs    # after adding an article / changing a cover: the small card copies (cover-card.webp)
-node tools/export-aq.mjs …         # ONLY when integrating into AQ's website (see "Integrating into AQ's website"; --patch: a file to hand over)
 node tools/make-link-previews.mjs   # after adding an article / changing a cover (needs `npm i -D playwright`)
 ```
 
@@ -27,7 +69,8 @@ animation). Automated browsers never get the intro.
 - **Writers' article text is verbatim, typos included.** Never "fix" it.
 - **Every edition keeps its look and content for good.** Once a newer edition is live, the older one's folder (`src/editions/<id>/`) is frozen: don't edit it, and don't change a shared component in a way that changes how it looks (see "Editions").
 - **No new colours** outside the edition's look (`src/editions/<id>/look.js`), unless the owner supplies them. The AQ Labs project bars use colours they supplied.
-- **Commit to `main`** unless told otherwise.
+- **Changes go to `main`.** Without push access (the usual case) that means a `.patch` for the owner (above); a session
+  that can push commits to `main` unless told otherwise.
 
 ## Editions
 
@@ -59,10 +102,10 @@ look after October is out.
 
 ## Inside AQ's website
 
-The magazine also runs inside AQ's main website (the `dhairyakhetan/fah` repo), at `/terranotes`, from this same code.
+The magazine also runs inside AQ's main website, at `/terranotes`, from this same code. Putting it there is AQ's job,
+not part of the work here (`tools/export-aq.mjs` is their tool; don't run it unless the owner asks). Your job: keep
+every change working there too, by the rules below.
 
-- **Updating it there:** only through the export tool, and only when asked to integrate: see "Integrating into AQ's
-  website" below. Never edit its folders in fah by hand: the next export replaces them.
 - **`src/host.js` is what differs:** AQ's copy says `{ base: '/terranotes', embedded: true }`. AQ-only behaviour checks
   `HOST.embedded` (the phone "call Buddy" button, no skip link of its own, AQ Labs running full width,
   and `shared/InsideAQ.jsx`: the editions card at the end of the home pages and a "← Back to home" pill under AQ's
@@ -91,38 +134,7 @@ The magazine also runs inside AQ's main website (the `dhairyakhetan/fah` repo), 
   `isTnPath`, `lib/animatedHistory.js` `createAnimatedHistory()` with `onShown()`, and `embed/aq/scripts/prerender.mjs`
   (`terraNotesPages()`, `terraNotesLlms()`, `terraNotesSitemapPaths()`; it builds on `build/staticCopy.js`).
 - **AQ-only files:** `src/TerraNotesRoot.jsx`, `src/styles/document.css`, the `.d.ts` stubs, and `embed/aq/` (the
-  README Claude reads in fah, the prerender, the card-cover tool, the self-hosted fonts).
-
-## Integrating into AQ's website (only when asked)
-
-Use this ONLY when the owner asks to put the current magazine into AQ's website. Day-to-day work (articles,
-editions, fixes, design) happens in this repo and never touches AQ's.
-
-1. Get AQ's repo next to this one (`dhairyakhetan/fah`; ask for access if it isn't in the session) and work on a branch
-   there, as its owner says.
-2. From this repo: `node tools/export-aq.mjs <fah>/frontend --dry`. It runs `npm run check` first, refuses a folder that
-   isn't AQ's `frontend/`, and lists what would be added, changed and removed in AQ's `src/terranotes/`,
-   `public/terranotes/` and `scripts/terranotes/`. Read the list: only the magazine's own changes should be in it.
-3. `node tools/export-aq.mjs <fah>/frontend --verify` writes them, then runs AQ's typecheck (`npx tsc -b`) and routing
-   check. Both must say ok.
-4. In fah: `npm run dev` and look at `/terranotes`, an article and `/terranotes/articles/labs`, at 1440px and 390px;
-   then `npm run build` (AQ's whole chain, prerender included). Commit only those three folders, and push / open a PR
-   the way AQ's owner wants.
-5. AQ's own code doesn't change for an export. What it must keep doing is listed in `shared/AqNavSlot.jsx` (its nav,
-   `--nav-h`, no nav padding on `/terranotes`) and in "What AQ's code uses from here" above.
-
-**As a patch file** (the usual way when fah can't be pushed from this session, or the owner asks for one):
-1. A clean checkout of fah's latest `main` next to this repo (a `git worktree` of `origin/main` is enough; link its
-   `frontend/node_modules` from an installed copy for the checks).
-2. `node tools/export-aq.mjs <that checkout>/frontend --verify --patch`: the checks above, then
-   `out/terranotes-for-aq.patch` (one commit with only the three folders, made without touching that checkout's
-   index or HEAD) and `out/terranotes-for-aq.md`: what the owner does with it, and the prompt to paste to Claude in fah
-   (template: `embed/aq/HANDOFF.md`; the same steps are in `embed/aq/README.md` for Claude there).
-3. Test it before handing it over: in another clean checkout, `git am --3way` the patch, `git show --stat HEAD`, then
-   `npm run build` in `frontend/`.
-4. Send the owner both files (and say the patch is for AQ's repo, not this one).
-
-Without a path, the tool writes `out/aq/` and `out/terranotes-for-aq.zip` instead, to hand over by hand.
+  README for AQ's side, the prerender, the card-cover tool, the self-hosted fonts).
 
 ## Layout model
 
@@ -265,7 +277,7 @@ build/siteFiles.js      at build: an .html per article at its address (own title
 build/staticCopy.js     each page's text as plain HTML inside #root, for crawlers without JavaScript
 tools/make-link-previews.mjs   preview.jpg in each article's folder (1200×630 link preview)
 tools/check-embed.mjs   the guard for AQ's website (see "Inside AQ's website")   tools/export-aq.mjs   writes the magazine into it
-embed/aq/               AQ-only: README (for Claude in fah), scripts/ (prerender.mjs), public/fonts/
+embed/aq/               AQ-only: README (for AQ's side), scripts/ (prerender.mjs), public/fonts/
 src/host.js             where this copy runs (own site / AQ's website)
 src/main.jsx            the own site's entry: router with the animated history, intro, lite class, console hello, CSS imports
 src/TerraNotesRoot.jsx  AQ's entry: the shadow-root mount (+ styles/document.css, the .d.ts stubs)

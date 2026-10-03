@@ -4,7 +4,7 @@ import { FONT } from '../styles/fonts.js';
 // (src/host.js AQ_LOOK; ?aq=0 hides it), so the pages can be checked as they will sit inside AQ's website. Inside AQ
 // this is not drawn: AQ's real nav is there.
 //
-// FOR CLAUDE IN AQ'S REPO (dhairyakhetan/fah), when integrating the magazine:
+// FOR CLAUDE IN AQ'S WEBSITE REPO, when integrating the magazine:
 //   1. Nothing to build here. Keep AQ's own nav (<AQNav>) and phone dock (<MobileMenuBar>) on /terranotes pages as on
 //      every other page: PublicLayout.tsx already draws them; do NOT hide them for /terranotes.
 //   2. The magazine leaves room for the nav itself: its own header is hidden but keeps its box (80px on laptops, 64px
