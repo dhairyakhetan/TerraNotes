@@ -5,7 +5,7 @@
 
 export const PHOTOS = [
   { photo: '', caption: '', place: '', tint: '#FF4F8B' },
-  { photo: '/editions/oct26/photos/durga.webp', caption: 'Maa Durga, drawn for the Pujo issue', place: '', tint: '#FFB400' },
+  { photo: '/editions/oct26/photos/durga.webp', caption: 'Maa Durga', place: '', tint: '#FFB400' },
   { photo: '', caption: '', place: '', tint: '#18C7B8' },
   { photo: '', caption: '', place: '', tint: '#FF7A2F' },
   { photo: '', caption: '', place: '', tint: '#B6E04B' },
