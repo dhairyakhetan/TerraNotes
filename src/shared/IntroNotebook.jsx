@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
 import { cardCover } from './ArticleCard.jsx';
-import { ARTICLES } from '../data/articles.js';
-import { LATEST } from '../data/editions.js';
+import { editionOf } from '../data/editions.js';
 import { editionData } from '../editions/index.js';
+import { editionAt } from '../lib/routes.js';
+import { useLocation } from '../router.jsx';
 import { withBase } from '../lib/base.js';
 import { introSeen } from '../lib/introNotebook.js';
 import { calm } from '../lib/motion.js';
@@ -10,13 +11,18 @@ import { calm } from '../lib/motion.js';
 // The opening animation (when: lib/introNotebook.js), over the site while it loads underneath: a notebook slides in
 // spinning, opens on the Aquaterra logo, "TerraNotes" is written in, a CERTIFIED stamp thumps down, and it lifts away
 // after 4.3 s (1.8 s with reduced motion). Skip button, Enter or Space ends it early. Meanwhile the covers and photos
-// start downloading. All timings: styles/intro.css.
+// start downloading. It's the edition of the page it opens on (an older one's address shows that one): its number and
+// month on the cover's label and the stamp, and its cover picture pasted on the front. All timings: styles/intro.css.
 const PLAY = 4300, REDUCED = 1800, LEAVE = 450;
+const WORDS = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve'];
 
 export default function IntroNotebook() {
   const [leaving, setLeaving] = useState(false);
   const [gone, setGone] = useState(false);
   const skip = useRef(null);
+  const n = editionAt(useLocation().pathname), { month } = editionOf(n), data = editionData(n);
+  const cover = (data.articles.find((a) => a.featured) || data.articles[0])?.cover;
+  const issue = String(n).padStart(2, '0');
 
   const leave = () => setLeaving(true);
 
@@ -25,7 +31,7 @@ export default function IntroNotebook() {
     window.aqIntro = true; // (AQ's site reads this too)
     dispatchEvent(new Event('aq-intro'));
     // fetch what the pages will need while the notebook plays
-    for (const src of [withBase('/brand/aquaterra-globe.webp'), withBase('/brand/aquaterra-wordmark.webp'), ...ARTICLES.map((a) => cardCover(a.cover)), ...editionData(LATEST).photos.map((p) => p.photo)].filter(Boolean)) {
+    for (const src of [withBase('/brand/aquaterra-globe.webp'), withBase('/brand/aquaterra-wordmark.webp'), ...data.articles.map((a) => cardCover(a.cover)), ...data.photos.map((p) => p.photo)].filter(Boolean)) {
       const img = new Image();
       img.src = src;
     }
@@ -67,7 +73,7 @@ export default function IntroNotebook() {
                 <div className="nb-line">notes from where the land meets the water</div>
                 <div className="nb-stamp">
                   <div className="nb-stamp-in">
-                    <div className="nb-stamp-small">Aquaterra · Issue one</div>
+                    <div className="nb-stamp-small">Aquaterra · Issue {WORDS[n] || issue}</div>
                     <div className="nb-stamp-big">Certified</div>
                     <div className="nb-stamp-small">Field approved</div>
                   </div>
@@ -76,8 +82,10 @@ export default function IntroNotebook() {
               {/* the cover: its outside, then (once it swings past halfway) its inside with the logo */}
               <div className="nb-cover">
                 <div className="nb-face nb-front">
-                  <img src={withBase('/brand/aquaterra-globe.webp')} alt="" className="nb-front-logo" />
-                  <div className="nb-label">TerraNotes<span>issue 01</span></div>
+                  {cover
+                    ? <img src={cardCover(cover)} onError={(ev) => { if (ev.currentTarget.src !== cover) ev.currentTarget.src = cover; }} alt="" className="nb-front-cover" />
+                    : <img src={withBase('/brand/aquaterra-globe.webp')} alt="" className="nb-front-logo" />}
+                  <div className="nb-label">TerraNotes<span>issue {issue} · {month.toLowerCase()}</span></div>
                 </div>
                 <div className="nb-face nb-back">
                   <img src={withBase('/brand/aquaterra-globe.webp')} alt="" className="nb-logo" />

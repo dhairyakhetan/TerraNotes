@@ -27,6 +27,8 @@
 @keyframes nbFront{0%{opacity:1}50%,100%{opacity:0}}
 .nb-front::before{content:"";position:absolute;left:calc(var(--pw) * .06);top:6%;bottom:6%;border-left:1.5px dashed rgba(243,238,228,.35)}
 .nb-front-logo{width:calc(var(--pw) * .34);height:auto}
+/* the edition's cover, pasted on the front (IntroNotebook.jsx) */
+.nb-front-cover{width:calc(var(--pw) * .6);aspect-ratio:4/5;object-fit:cover;border:2px solid var(--ink);box-shadow:4px 4px 0 var(--yellow);transform:rotate(2deg)}
 .nb-label{background:var(--page);border:2px solid var(--ink);box-shadow:3px 3px 0 var(--red);padding:calc(var(--pw) * .025) calc(var(--pw) * .06);text-align:center;
   font:400 calc(var(--pw) * .085)/1 var(--font-head);text-transform:uppercase;color:var(--ink);transform:rotate(-2deg)}
 .nb-label span{display:block;margin-top:calc(var(--pw) * .02);font:400 calc(var(--pw) * .042)/1 var(--font-mono);letter-spacing:.15em}

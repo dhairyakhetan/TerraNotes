@@ -192,7 +192,7 @@ line) and `lib/ruled.js` `useRuledPage` sets each block's first baseline on a ru
 Tom Riddle-style diary under "Meet the team" that writes random lines in a script font after you stay a while). October
 2026 (the latest edition) is **"Pujo"**, Durga Puja: laal-paar saree cream and alta red, maroon ink, sindoor handwriting,
 marigold strings, a pandal-night photo wall, Rozha One headings; `look.css` the saree border and an alpana dot pattern;
-`Decor.jsx` a marigold toran, alpana, dhak, conch and a "Subho Sharodiya!" tag; `Horn.jsx`, an engraving-style S-horn that now and then slides in from
+`Decor.jsx` a marigold toran, alpana, dhak, conch and a "Subho Sharodiya!" tag; `Horn.jsx`, an engraving-style S-horn that now and then slides in upright from
 the page edge by the team legend (left on web, right on phones), is blown and slides back out; Pujo words; two sample articles. A new edition starts from a copy of the newest look and changes the values; its own CSS and
 doodles are registered in `src/editions/pages.js` (`EDITION_CSS`, `DECOR`, `TEAM_NOTE` for a secret by the team legend: under it on web, beside it on phones).
 Use the variables, nothing else (the look lists a few more, for the photo wall, dark panels and details).
@@ -305,7 +305,7 @@ src/shared/             used by both layouts:
   TeamSection           "Meet the team" + profile card        PhotoWallSection, PhotoViewer, WordsGameSection
   HomeIntroCard         the home intro card                   AqNavSlot     placeholder for AQ's nav (AQ's look, own site)
   EndCards              the home pages' end: GameCard (Snake ↔ Float) + EditionsCard (InsideAQ, with AQ's look)
-  IntroNotebook         the opening animation                 ErrorBoundary crash card
+  IntroNotebook         the opening animation (the address's edition: its cover, number, month)              ErrorBoundary crash card
   Tapes                 Clip, ByTape, FeaturedTape, LatestTag, DraftTape    Icons   Globe, Instagram, Close, Chevron, Photo, Menu
   ImageSlot  Logo  BackHome                                    buddy/        Buddy (easter-egg ghost), Ghost, BuddyGames
 src/lib/                logic only, no JSX:

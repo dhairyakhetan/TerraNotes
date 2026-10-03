@@ -4,8 +4,8 @@ import { calm, LITE } from '../../lib/motion.js';
 // October 2026's horn, at the height of the "Meet the team" legend's foot (src/editions/pages.js TEAM_NOTE;
 // shared/TeamSection.jsx gives the top): the curved S-horn blown at Pujo, drawn like an old engraving (ink outline,
 // hatching down its shaded side, beaded bands) in the look's colours. It lives just off the page's edge, as if someone
-// out of sight holds it: now and then, while that part of the page is on screen, it slides in (from the left on web,
-// from the right on phones, mirrored), lifts, sound rings roll out of the bell, and it slides back out. One-shot
+// out of sight holds it: now and then, while that part of the page is on screen, it slides in upright (from the left on
+// web, from the right on phones, mirrored), lifts, sound rings roll out of the bell, and it slides back out. One-shot
 // animations (look.css .horn-*) started from here. With reduced motion or on a low-end device it just rests in view,
 // still. Decoration only: hidden from screen readers.
 
@@ -41,13 +41,13 @@ export default function Horn({ style, web }) {
     io.observe(box.current);
     return () => { io.disconnect(); clearTimeout(timer); };
   }, []);
-  const s = web ? 1.3 : 0.9, W = 200 * s, H = 120 * s;
+  const s = web ? 1.3 : 0.8, W = 136 * s, H = 206 * s;
   return (
     <div ref={box} aria-hidden="true" style={{ position: "absolute", top: style.top, [web ? 'left' : 'right']: "0", width: `${W}px`, height: `${H}px`, pointerEvents: "none" }}>
       <div key={blow} className={blow ? 'horn-pop' : undefined} style={{ width: "100%", height: "100%", '--out': web ? '-105%' : '105%', translate: still ? "0" : "var(--out)" }}>
-        <svg width={W} height={H} viewBox="0 -10 200 120" style={{ overflow: "visible", display: "block", transform: web ? undefined : "scaleX(-1)" }}>
-          {/* lying down: mouthpiece at the page's edge, bell towards the page */}
-          <g transform="translate(200 0) rotate(90)">
+        <svg width={W} height={H} viewBox="-6 0 136 206" style={{ overflow: "visible", display: "block", transform: web ? undefined : "scaleX(-1)" }}>
+          {/* upright: mouthpiece low at the page's edge, the bell up and towards the page */}
+          <g>
             <g className={blow ? 'horn-lift' : undefined} style={{ transformOrigin: `${P[0][0]}px ${P[0][1]}px`, transformBox: "view-box" }}>
               <path d={BODY} style={{ ...ink, fill: "var(--yellow)", strokeWidth: "2.2" }} />
               {HATCH.map((d, i) => <path key={i} d={d} style={{ ...ink, fill: "none", strokeWidth: "0.9", opacity: String(0.55 - i * 0.12) }} />)}
