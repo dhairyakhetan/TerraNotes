@@ -8,7 +8,7 @@ export const RULE = { web: { start: 128, gap: 32, margin: 104 }, phone: { start:
 // the ruling's (or a whole number of rules), and shared/TeamSection.jsx drops each block's first baseline on a ruled
 // line (lib/ruled.js, as the diary does), so the rest of its lines follow. Tops are where a block starts roughly: the
 // fit moves it by less than half a rule. No ink divider over the section: the page's own lines do that job. The legend
-// is two by two, a team every two rules (tap targets stay 44px). Only September reads this.
+// (two by two, as in every edition) puts a team every two rules (tap targets stay 44px). Only September reads this.
 export const TEAM_FIT = {
   web: {
     rule: { display: 'none' },
@@ -16,17 +16,15 @@ export const TEAM_FIT = {
     count: { top: '26px', lineHeight: '32px' },
     blurb: { left: '128px', top: '204px', lineHeight: '32px' },
     note: { left: '128px', top: '382px', lineHeight: '32px', transform: 'none' },
-    legend: { left: '118px', top: '520px', width: '440px', display: 'grid', gridTemplateColumns: '1fr 1fr', gridAutoRows: '64px', alignItems: 'center', columnGap: '24px', gap: undefined },
-    chip: { minHeight: '44px' },
-    extra: { left: 128, top: 680, width: 430, size: 28, under: false },
+    legend: { left: '118px', top: '520px', gridAutoRows: '64px' },
+    extra: { left: 128, top: 680, width: 430, size: 28 },
   },
   phone: {
     rule: { display: 'none' },
     title: { left: '28px', top: '22px', lineHeight: '56px' },
     blurb: { left: '28px', top: '146px', width: '334px', lineHeight: '28px' },
     note: { left: '28px', top: '324px', width: '330px', lineHeight: '28px', transform: 'none' },
-    legend: { left: '20px', top: '394px', width: '350px', display: 'grid', gridTemplateColumns: '1fr 1fr', gridAutoRows: '56px', alignItems: 'center', columnGap: '12px', gap: undefined },
-    chip: { minHeight: '44px' },
+    legend: { left: '20px', top: '394px', gridAutoRows: '56px' },
     extra: { left: 28, top: 522, width: 334, size: 21 },
     faces: { top: 660 },
   },

@@ -23,14 +23,14 @@ import { hangExtra } from '../phone/PhoneHangingArticles.jsx';
 // An edition on ruled paper (September's notebook) overrides some of them (src/editions/pages.js TEAM_FIT) so its text
 // starts clear of the margin, and gets each text block's first baseline put on a ruled line (lib/ruled.js).
 const PHONE = {
-  faces: { rows: [[72, 196, 318], [134, 256]], sizes: [92, 80, 98, 84, 88, 96, 82, 90], nudgeX: [-6, 5, -3, 8, -8, 4, 2, -5, 7], nudgeY: [0, 16, -10, 8, 20, -6, 12, -14, 4, 18, -4], top: 510, rowH: 176 },
+  faces: { rows: [[72, 196, 318], [134, 256]], sizes: [92, 80, 98, 84, 88, 96, 82, 90], nudgeX: [-6, 5, -3, 8, -8, 4, 2, -5, 7], nudgeY: [0, 16, -10, 8, 20, -6, 12, -14, 4, 18, -4], top: 610, rowH: 176 },
   width: 390, top: 2470, bend: 18, line: [1.2, '3 5'], header: 64,
   rule: { left: "20px", width: "350px" },
   title: { left: "18px", top: "22px", fontSize: "46px", lineHeight: "0.92", letterSpacing: "-1px" },
   count: { right: "20px", top: "30px", fontSize: "9px", letterSpacing: "1.6px", lineHeight: "1.6" },
   blurb: { left: "20px", top: "136px", width: "340px", fontSize: "15px", lineHeight: "1.5" },
   note: { left: "22px", top: "270px", width: "250px", fontSize: "21px" },
-  legend: { left: "16px", top: "340px", width: "142px", gap: "4px" }, extra: { left: 172, top: 350, width: 200, size: 23, under: false }, chip: { minHeight: "32px", padding: "0 10px 0 6px", gap: "8px", fontSize: "9.5px", letterSpacing: "1.2px" }, dot: "12px",
+  legend: { left: "20px", top: "340px", width: "350px", display: "grid", gridTemplateColumns: "1fr 1fr", gridAutoRows: "48px", alignItems: "center", columnGap: "12px" }, extra: { left: 28, top: 448, width: 334, size: 23 }, chip: { minHeight: "44px", padding: "0 10px 0 6px", gap: "8px", fontSize: "9.5px", letterSpacing: "1.2px" }, dot: "12px",
   face: { half: 58, gap: "8px", shadow: "6px 5px 0", icon: 20, font: "11px", name: "12px", role: "8.5px", roleSpacing: "1px", roleGap: "3px", pad: "2px 6px", bump: "transform .12s ease" },
   dim: "rgba(17,17,17,.55)",
   card: { width: 334, shadow: "8px 8px 0", padding: "18px", clip: [34, 10, "-7px"], close: { right: "10px", top: "10px" }, photo: "96px", name: "30px", role: "20px", bio: "14px", credit: "13px" },
@@ -43,7 +43,7 @@ const WEB = {
   count: { left: "1080px", top: "30px", width: "280px", fontSize: "11px", letterSpacing: "1.8px" },
   blurb: { left: "80px", top: "200px", width: "440px", fontSize: "17px", lineHeight: "1.55" },
   note: { left: "82px", top: "360px", width: "400px", fontSize: "27px" },
-  legend: { left: "78px", top: "440px", width: "220px", gap: "6px" }, extra: { left: 128, top: 440, width: 430, size: 34, under: true }, chip: { minHeight: "40px", padding: "0 14px 0 8px", gap: "10px", fontSize: "11px", letterSpacing: "1.4px" }, dot: "14px",
+  legend: { left: "78px", top: "440px", width: "440px", display: "grid", gridTemplateColumns: "1fr 1fr", gridAutoRows: "52px", alignItems: "center", columnGap: "24px" }, extra: { left: 84, top: 560, width: 470, size: 34 }, chip: { minHeight: "44px", padding: "0 14px 0 8px", gap: "10px", fontSize: "11px", letterSpacing: "1.4px" }, dot: "14px",
   face: { half: 66, gap: "10px", shadow: "8px 6px 0", icon: 22, font: "13px", name: "15px", role: "10px", roleSpacing: "1.2px", roleGap: "4px", pad: "2px 8px", bump: "transform 180ms cubic-bezier(0.32, 0.72, 0, 1)" },
   dim: "rgba(17,17,17,.35)",
   card: { width: 360, shadow: "9px 9px 0", padding: "22px", clip: [36, 11, "-8px"], close: { right: "12px", top: "12px" }, photo: "108px", name: "34px", role: "23px", bio: "15px", credit: "14px" },
@@ -146,16 +146,16 @@ export default function TeamSection({ web }) {
       <svg width={L.width} height={H} viewBox={`0 0 ${L.width} ${H}`} style={{ position: "absolute", left: "0", top: "0", pointerEvents: "none" }} aria-hidden="true" fill="none" strokeWidth={L.line[0]} strokeDasharray={L.line[1]} strokeLinecap="round">
         {L.links.map((l) => <path key={l.team} d={l.d} stroke={TEAMS[l.team].color} opacity={team == null ? 0.55 : team === l.team ? 0.95 : 0.12} style={{ transition: "opacity .25s" }} />)}
       </svg>
-      {/* the edition's own note, if it has one (src/editions/pages.js TEAM_NOTE): web under the legend, phone beside it */}
-      {Note && <Note web={web} size={L.extra.size} style={{ left: `${L.extra.left}px`, top: `${L.extra.under ? L.extra.top + Object.keys(TEAMS).length * 46 + 34 : L.extra.top}px`, width: `${L.extra.width}px` }} />}
-      {/* legend: pick a team to fade everyone else */}
-      <div style={{ position: "absolute", display: "flex", flexDirection: "column", ...L.legend, ...snap('legend') }}>
+      {/* the edition's own note, if it has one (src/editions/pages.js TEAM_NOTE): under the legend */}
+      {Note && <Note web={web} size={L.extra.size} style={{ left: `${L.extra.left}px`, top: `${L.extra.top}px`, width: `${L.extra.width}px` }} />}
+      {/* legend: pick a team to fade everyone else; two by two, every chip the same size */}
+      <div style={{ position: "absolute", ...L.legend, ...snap('legend') }}>
         {Object.entries(TEAMS).map(([key, t], row) => {
           const on = team === key;
           return (
             <button key={key} className="legend-chip" onClick={() => setTeam(on ? null : key)} aria-pressed={on ? 'true' : 'false'} style={{ width: "100%", display: "flex", alignItems: "center", background: on ? 'var(--ink)' : 'transparent', color: on ? 'var(--card)' : 'var(--ink)', border: `1.5px solid ${on ? 'var(--ink)' : 'transparent'}`, borderRadius: "999px", fontFamily: FONT.mono, fontWeight: "700", textTransform: "uppercase", textAlign: "left", ...L.chip }}>
               <span style={{ width: L.dot, height: L.dot, flexShrink: "0", borderRadius: "50%", background: t.color, border: "1.5px solid var(--ink)", boxSizing: "border-box" }} />
-              <span style={{ flexGrow: "1" }}>{row === 0 && probe('legend')}{t.label}</span>
+              <span style={{ flexGrow: "1", whiteSpace: "nowrap" }}>{row === 0 && probe('legend')}{t.label}</span>
               <span>{MEMBERS.filter((m) => teamsOf(m).includes(key)).length}</span>
             </button>
           );

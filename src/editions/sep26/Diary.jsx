@@ -4,7 +4,7 @@ import { FONT } from '../../styles/fonts.js';
 import { RULE } from './ruled.js';
 
 // September 2026's diary, under "Meet the team" (src/editions/pages.js TEAM_NOTE; shared/TeamSection.jsx places it:
-// web under the legend, phone beside it). Like Tom Riddle's diary: stay on the section a while and a line writes
+// under the legend). Like Tom Riddle's diary: stay on the section a while and a line writes
 // itself out in a neat copperplate script (the look's script font), letter by letter, sits a moment, then sinks back
 // into the page; another comes a little later, picked at random. It writes on the notebook's ruled lines: its line
 // height is the ruling's, and it shifts itself so the script's baseline sits on a line (RULE: ruled.js = look.css).

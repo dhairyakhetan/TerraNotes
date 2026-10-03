@@ -4,6 +4,7 @@ import Sep26Diary from './sep26/Diary.jsx';
 import { RULE as Sep26Rule, TEAM_FIT as Sep26TeamFit } from './sep26/ruled.js';
 import oct26Css from './oct26/look.css?inline';
 import Oct26Decor from './oct26/Decor.jsx';
+import Oct26Horn from './oct26/Horn.jsx';
 
 // Pages an edition draws its own way, for a month that wants more than a new look.js: its own home page and/or article
 // page, per layout. Start from a copy of the shared one (src/web/WebHome.jsx, src/phone/PhoneHome.jsx,
@@ -20,9 +21,9 @@ export const OWN_PAGES = {};
 // - DECOR: a component drawn on its home pages' artboard ({ web }: which layout), for doodles and the like
 export const EDITION_CSS = { sep26: sep26Css, oct26: oct26Css };
 export const DECOR = { sep26: Sep26Decor, oct26: Oct26Decor };
-// - TEAM_NOTE: a component drawn in its "Meet the team" section ({ style, size }: where and how big, from
-//   shared/TeamSection.jsx: web under the legend, phone beside it), e.g. September's diary
-export const TEAM_NOTE = { sep26: Sep26Diary };
+// - TEAM_NOTE: a component drawn in its "Meet the team" section, under the legend ({ style, size, web }: where and how
+//   big, from shared/TeamSection.jsx), e.g. September's diary, October's horn
+export const TEAM_NOTE = { sep26: Sep26Diary, oct26: Oct26Horn };
 // - RULED / TEAM_FIT: for an edition whose pages are ruled paper: its ruling ({ web, phone }: { start, gap, margin }),
 //   which the home pages write on (lib/ruled.js useRuledPage: every [data-ruled] element), and its "Meet the team"
 //   text laid out on it (overrides for shared/TeamSection.jsx's tables; the section sets its own blocks' baselines)

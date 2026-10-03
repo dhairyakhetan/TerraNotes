@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { pad2 } from './format.js';
 
 // State for the "Words we should bring back" mini game (shared/WordsGameSection.jsx): 5 random words per game from
-// `words` (the edition's WORDS; never the previous game's), three meanings each. A "psst." hint appears after 16 s
+// `words` (the edition's WORDS; never the previous game's), three meanings each, in a new order every game. A "psst." hint appears after 16 s
 // without an answer; its clock only starts once the section (ref `section`) is on screen.
 const ROUNDS = 5, HINT_DELAY = 16000;
 
@@ -11,7 +11,13 @@ const shuffle = (xs) => {
   for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; }
   return a;
 };
-const draw = (words, prev = []) => shuffle(words.filter((w) => !prev.includes(w))).slice(0, ROUNDS);
+// a round: the word with its three meanings in a random order (the data can list the right one anywhere, usually
+// first), `answer` following it; `src` is the word as written, so the next game can leave it out
+const dealt = (w) => {
+  const order = shuffle([0, 1, 2].slice(0, w.options.length));
+  return { ...w, src: w, options: order.map((k) => w.options[k]), answer: order.indexOf(w.answer) };
+};
+const draw = (words, prev = []) => shuffle(words.filter((w) => !prev.some((r) => r.src === w))).slice(0, ROUNDS).map(dealt);
 
 // Font size that keeps a word inside its cloud (Archivo Black caps run ~0.66em wide).
 export const fitWord = (word, max, width) => `${Math.min(max, Math.floor(width / (word.length * 0.66)))}px`;
