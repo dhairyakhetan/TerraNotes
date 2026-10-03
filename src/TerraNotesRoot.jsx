@@ -8,8 +8,6 @@ import { applyLook } from './lib/edition.js';
 import { introWanted } from './lib/introNotebook.js';
 import { LITE } from './lib/motion.js';
 import { setRoot, clearRoot } from './lib/dom.js';
-import { forgetWebHeader } from './web/WebHeader.jsx';
-import { forgetPhoneHeader } from './phone/PhoneHeader.jsx';
 import './styles/document.css';
 import base from './styles/base.css?inline';
 import loops from './styles/loops.css?inline';
@@ -85,8 +83,6 @@ export default function TerraNotesRoot() {
       delete html.dataset.layout;
       delete html.dataset.tnNav;
       delete html.dataset.tnLabs;
-      forgetWebHeader();
-      forgetPhoneHeader();
       if (html.style.overflow === 'hidden') html.style.overflow = ''; // a pop-up or the opening animation may have been holding the scroll lock (anything else set there is AQ's)
     };
   }, []);

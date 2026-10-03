@@ -9,7 +9,8 @@ import { FONT } from '../styles/fonts.js';
 // aren't listed) and a link to /editions. Shows the edition of the page you're on. Esc / outside click closes.
 const MONO = { fontFamily: FONT.mono, fontWeight: "700", letterSpacing: "1.2px", textTransform: "uppercase" };
 
-export default function WebEditionPicker() {
+// onDark: drawn on the header's coloured "Terra Notes" pill (light outline, no shadow)
+export default function WebEditionPicker({ onDark }) {
   const [open, setOpen] = useState(false);
   const cur = useEdition(), here = cur.number;
   const box = useRef(null);
@@ -23,13 +24,13 @@ export default function WebEditionPicker() {
   return (
     <div ref={box} style={{ position: "relative" }}>
       <button className="edition-btn" onClick={() => setOpen(!open)} aria-expanded={open ? 'true' : 'false'} aria-haspopup="true" aria-label={`${editionName(cur.number)}, ${cur.month}${cur.number === LATEST ? ', latest' : ''}. Choose an edition`}
-        style={{ ...MONO, fontSize: "11px", minHeight: "40px", display: "flex", alignItems: "center", gap: "8px", padding: "0 12px", background: "var(--card)", color: "var(--ink)", border: "2px solid var(--ink)", boxShadow: "3px 3px 0 var(--ink)", cursor: "pointer" }}>
+        style={{ ...MONO, fontSize: onDark ? "10px" : "11px", minHeight: onDark ? "36px" : "40px", display: "flex", alignItems: "center", gap: "8px", padding: "0 12px", cursor: "pointer", ...(onDark ? { background: "transparent", color: "var(--card)", border: "1.5px solid var(--card)", borderRadius: "999px" } : { background: "var(--card)", color: "var(--ink)", border: "2px solid var(--ink)", boxShadow: "3px 3px 0 var(--ink)" }) }}>
         <span>{`${editionName(cur.number)} · ${cur.month.replace(/^(\w{3})\w*/, '$1')}`}</span>
         {cur.number === LATEST && <LatestTag />}
         <svg width="10" height="7" viewBox="0 0 10 7" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true" style={{ transform: open ? "rotate(180deg)" : "none", transition: "transform .15s" }}><path d="M1 1 L5 5 L9 1" /></svg>
       </button>
       {open && (
-        <div className="card-drop" role="menu" style={{ position: "absolute", left: "0", top: "calc(100% + 10px)", zIndex: "60", width: "280px", boxSizing: "border-box", background: "var(--card)", border: "2px solid var(--ink)", boxShadow: "6px 6px 0 var(--ink)", padding: "8px" }}>
+        <div className="card-drop" role="menu" style={{ position: "absolute", ...(onDark ? { right: "0" } : { left: "0" }), top: "calc(100% + 10px)", zIndex: "60", width: "280px", boxSizing: "border-box", background: "var(--card)", border: "2px solid var(--ink)", boxShadow: "6px 6px 0 var(--ink)", padding: "8px" }}>
           <div style={{ ...MONO, fontSize: "9.5px", color: "var(--muted)", padding: "6px 8px" }}>Editions</div>
           {[...PUBLISHED].reverse().map((e) => (
             <Link key={e.number} role="menuitem" to={editionLink(e.number)} onClick={() => setOpen(false)} aria-current={e.number === here ? 'true' : undefined}

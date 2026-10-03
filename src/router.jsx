@@ -31,3 +31,9 @@ export function useNavigate() {
   const navigate = useRRNavigate();
   return useCallback((to, opts) => (typeof to === 'number' ? navigate(to) : navigate(prefixed(to), opts)), [navigate]);
 }
+
+// Going to a page OUTSIDE the magazine (AQ's own /projects, /teams… inside AQ's website): no /terranotes prefix.
+// Only shared/AQNav.jsx uses it; on the magazine's own site those links go to AQ's site instead (data/aqNav.js).
+export function useOutsideNavigate() {
+  return useRRNavigate();
+}

@@ -48,10 +48,13 @@ The same code runs as the magazine's own site and here; `src/terranotes/host.js`
 4. **Page-change animation** (card flights, crossfades) is `lib/animatedHistory.js`, which is AQ's router history
    (`App.tsx` `AppRouter`). It only animates changes that stay inside `/terranotes`; everything else passes through.
    Its `useTransitions={false}` toggle in `AppRouter` is needed for the flights: don't remove it.
-5. **AQ's nav, dock and footer wrap it; the magazine's own header is hidden** (`:host header.site-header{visibility:hidden}`
-   in `styles/base.css`), its box kept as the spacer under AQ's fixed nav. So, here only: no own footer or skip link,
+5. **Its header is AQ's nav, with the magazine inside it** (`shared/AQNav.jsx`, `data/aqNav.js`): on laptops AQ's pill
+   with "terra notes" opened up into the magazine's sections; on phones AQ's top pill and dock, "notes" opening the
+   magazine's menu. **To do on AQ's side** (the full notes are at the top of `shared/AQNav.jsx`): hide `<AQNav>` and
+   `<MobileMenuBar>` on `/terranotes` pages in `PublicLayout.tsx` (`isTnPath`), and answer the `aq-nav` event (search,
+   log in / profile, ⋯ menu) with AQ's own. AQ's footer still wraps it. So, here only: no own footer or skip link,
    a visible "call Buddy" button on phones (`shared/buddy/Buddy.jsx`), cards load `cover-card.webp`, and AQ Labs runs
-   full width with its chapter pill under AQ's nav. The viewport tag is pinned to `width=390` on phones only while the magazine shows.
+   full width. The viewport tag is pinned to `width=390` on phones only while the magazine shows.
 6. **Editions.** Every month is its own folder, `editions/<id>/` (look, articles, photo wall, words, team), kept for
    good: the latest edition is `/terranotes`, an older one `/terranotes/sep26`, a draft (`draft: true` in
    `data/editions.js`) only at its own address with a "Draft" tape, and nowhere in the prerender or sitemap.

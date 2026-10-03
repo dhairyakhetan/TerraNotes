@@ -330,12 +330,3 @@ html.tn-lite .labs :is(.cq .spin,.cq .onode,.print),:host(.tn-lite) .labs :is(.c
 .labs-phone .tab{height:40px;border-radius:999px;background:transparent;box-shadow:none}
 .labs-phone .tab.on{height:40px;background:var(--c);color:var(--tc)}
 @supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){.labs .lb-tabs{background:rgba(243,238,228,.94)}}
-
-/* ===== inside AQ's website only (:host = drawn in its shadow root, embed/aq/) =====
-   AQ's own nav floats over the top of the page, so the gallery runs full width, its header slot is gone and the pill
-   sits under AQ's nav. The intro keeps its 134px offset so the polaroids sit where they were designed to. */
-:host .labs > header.site-header{display:none !important}
-:host .labs-web .lb-intro{margin-top:134px}
-:host .labs-web .lb-tabs{top:78px;margin:0 auto -52px}
-:host .labs-phone{padding-top:72px}
-:host .labs-phone .lb-tabs{margin:0 8px 8px}

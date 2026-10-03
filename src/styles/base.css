@@ -14,10 +14,6 @@ a,button{-webkit-tap-highlight-color:transparent}
 html,a,button{touch-action:manipulation} /* no double-tap zoom, so no tap delay */
 #top{box-shadow:0 0 0 1px var(--edge)} /* the home pages' edge against the darker background */
 :host #top{box-shadow:none}
-/* Inside AQ, AQ's own nav floats over the top of the page, so the magazine's header is not drawn: its box stays as the
-   spacer under that nav (every artboard is positioned against its 64px / 80px), visibility so nothing that measures
-   it breaks. */
-:host header.site-header{visibility:hidden}
 
 /* press feedback: links and buttons dim while pressed, except the ones with their own press style */
 :where(a,button):active{opacity:.6}
