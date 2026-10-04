@@ -237,6 +237,7 @@ function Scores({ score, top, unit }) {
 // The popup. It grows out of the button that opened it (lib/buddyState.js lastTap) while the page dims, and shrinks
 // back there when Esc, the ✕ or a click outside closes it. Reduced motion: it just appears.
 // first: the game asked for when this was loaded (App.jsx loads it on the first 'aq-games')
+const ORDER = ['snake', 'float', 'fling']; // the tabs, left to right
 export default function BuddyGames({ first = null }) {
   const [game, setGame] = useState(first);
   const [shown, leaving] = usePresence(game, 220);
@@ -267,6 +268,21 @@ export default function BuddyGames({ first = null }) {
     if (calm()) return;
     card.current.animate([{ translate: `${dx}px ${dy}px`, scale: '0.15', opacity: 0 }, { opacity: 1, offset: 0.35 }, { translate: '0 0', scale: '1', opacity: 1 }], { duration: 460, easing: 'cubic-bezier(.2,.9,.25,1.08)' });
   }, [game]);
+  // switching games: the card eases from the old game's size to the new one's (Fling's is far wider than Snake's) while
+  // the new game slides in from the side of its tab (right of the old one: from the right). Reduced motion: it just swaps.
+  const size = useRef(null), was = useRef(null), stage = useRef(null);
+  useLayoutEffect(() => {
+    const el = card.current;
+    if (!el || !shown) { size.current = was.current = null; return; }
+    const before = size.current, old = was.current, now = { w: el.offsetWidth, h: el.offsetHeight };
+    size.current = now; was.current = shown;
+    if (!before || !old || old === shown || calm()) return;
+    const dir = ORDER.indexOf(shown) > ORDER.indexOf(old) ? 1 : -1, ease = 'cubic-bezier(0.32, 0.72, 0, 1)';
+    if (before.w !== now.w || before.h !== now.h) {
+      el.animate([{ width: `${before.w}px`, height: `${before.h}px`, overflow: 'hidden' }, { width: `${now.w}px`, height: `${now.h}px`, overflow: 'hidden' }], { duration: 380, easing: ease });
+    }
+    stage.current?.animate([{ translate: `${dir * 56}px 0`, opacity: 0 }, { translate: '0 0', opacity: 1 }], { duration: 360, delay: 60, easing: ease, fill: 'backwards' });
+  }, [shown]);
   useLayoutEffect(() => { // closing: back to where it came from
     if (!leaving || !card.current) return;
     const { dx = 0, dy = 40 } = from.current || {};
@@ -302,7 +318,7 @@ export default function BuddyGames({ first = null }) {
             <CloseIcon size={14} weight={2.8} />
           </button>
         </div>
-        <div className="no-cascade" key={shown}>{shown === 'snake' ? <Snake W={W} small={small} /> : shown === 'float' ? <Float W={W} H={H} /> : <Fling W={fw} H={small ? Math.round(fw * 0.62) : Math.round(Math.min(fw * 0.5, innerHeight - 280))} />}</div>
+        <div ref={stage} className="no-cascade" key={shown}>{shown === 'snake' ? <Snake W={W} small={small} /> : shown === 'float' ? <Float W={W} H={H} /> : <Fling W={fw} H={small ? Math.round(fw * 0.62) : Math.round(Math.min(fw * 0.5, innerHeight - 280))} />}</div>
       </div>
     </div>
   );
