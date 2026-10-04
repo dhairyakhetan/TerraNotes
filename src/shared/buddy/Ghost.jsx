@@ -14,6 +14,35 @@ export default function Ghost({ size = 60, face = 'happy', style, className }) {
   );
 }
 
+// Buddy's trophy (won in Fling: lib/buddyState.js), drawn over his head: a gold cup with a star, handles, stem and base.
+export function Trophy({ size = 30, style, className }) {
+  return (
+    <svg className={className} width={size} height={size} viewBox="0 0 40 40" style={style} aria-hidden="true">
+      <path d="M10 6 h20 v6 a10 10 0 0 1 -20 0 Z" style={{ fill: "var(--yellow)", stroke: "var(--ink)", strokeWidth: 2, strokeLinejoin: "round" }} />
+      <path d="M10 9 h-5 a5 5 0 0 0 6 7 M30 9 h5 a5 5 0 0 1 -6 7" style={{ fill: "none", stroke: "var(--ink)", strokeWidth: 2, strokeLinecap: "round" }} />
+      <path d="M17 21 h6 v6 h-6 Z" style={{ fill: "var(--yellow)", stroke: "var(--ink)", strokeWidth: 2 }} />
+      <path d="M11 27 h18 v6 h-18 Z" style={{ fill: "var(--peg)", stroke: "var(--ink)", strokeWidth: 2 }} />
+      <path d="M20 8.5 l1.4 2.8 3.1.4-2.3 2.1.6 3-2.8-1.5-2.8 1.5.6-3-2.3-2.1 3.1-.4z" style={{ fill: "var(--card)" }} />
+    </svg>
+  );
+}
+
+// The same trophy on a canvas: centre (x, y), height h.
+export function drawTrophy(g, x, y, h, C) {
+  const k = h / 40;
+  g.save(); g.translate(x - 20 * k, y - 20 * k); g.scale(k, k);
+  g.lineWidth = 2; g.lineJoin = 'round'; g.lineCap = 'round'; g.strokeStyle = C.ink;
+  g.beginPath(); g.moveTo(10, 9); g.lineTo(5, 9); g.arc(8, 12.5, 4.2, -Math.PI * 0.75, Math.PI * 0.6, true); g.stroke();
+  g.beginPath(); g.moveTo(30, 9); g.lineTo(35, 9); g.arc(32, 12.5, 4.2, -Math.PI * 0.25, Math.PI * 0.4); g.stroke();
+  g.fillStyle = C.yellow; g.beginPath(); g.moveTo(10, 6); g.lineTo(30, 6); g.lineTo(30, 12); g.arc(20, 12, 10, 0, Math.PI); g.closePath(); g.fill(); g.stroke();
+  g.fillRect(17, 21, 6, 6); g.strokeRect(17, 21, 6, 6);
+  g.fillStyle = C.peg; g.fillRect(11, 27, 18, 6); g.strokeRect(11, 27, 18, 6);
+  g.fillStyle = C.card; g.beginPath();
+  for (let i = 0; i < 10; i++) { const a = -Math.PI / 2 + i * Math.PI / 5, r = i % 2 ? 1.6 : 4; g.lineTo(20 + Math.cos(a) * r, 12.5 + Math.sin(a) * r); }
+  g.closePath(); g.fill();
+  g.restore();
+}
+
 // The same ghost on a canvas (for the games). (x, y) = centre of his head; r = head radius; C = the look's colours;
 // look = where his pupils point (-1…1 each way); t = seconds, for the wiggling hem; face as above.
 export function drawGhost(g, x, y, r, C, { look = [0, 0], t = 0, face = 'happy', tilt = 0, sx = 1, sy = 1 } = {}) {

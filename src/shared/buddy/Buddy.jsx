@@ -1,35 +1,37 @@
 import { useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate } from '../../router.jsx';
-import Ghost from './Ghost.jsx';
+import Ghost, { Trophy } from './Ghost.jsx';
 import { editionLink } from '../../data/editions.js';
-import { callBuddy, openGames, useBuddy } from '../../lib/buddyState.js';
+import { callBuddy, openGames, useBuddy, useTrophy } from '../../lib/buddyState.js';
 import { useEdition } from '../../lib/edition.js';
 import { AQ_LOOK } from '../../host.js';
 import { FONT } from '../../styles/fonts.js';
 import { calm } from '../../lib/motion.js';
 
 // Buddy, a little green ghost (an easter egg). Called from a hidden button in the web home page's top-right corner
-// (it peeks out now and then while the pointer is near; he's lowered on a rope) or from "click me" at the bottom of
-// the phone menu (he floats in beside the intro card). He stays until a reload (lib/buddyState.js).
-// Tap him: a random trick (spin, hop, flip, vanish, boo, wobble), then his games open (BuddyGames.jsx; the address
-// becomes the edition's /games/<game>).
+// (it peeks out now and then while the pointer is near) or from "click me" at the bottom of the phone menu: he drops in
+// from above, fast, stretched, and lands with a squash and a bounce. He stays until a reload (lib/buddyState.js).
+// Tap him: a random trick (backflip, boing, twirl, jelly, dash, vanish, boo, wobble), then his games open
+// (BuddyGames.jsx; the address becomes the edition's /games/<game>). Once Fling's last level is won he wears its
+// trophy over his head for good (lib/buddyState.js useTrophy). Animations: styles/buddy.css.
 // Animations: styles/buddy.css.
-const TRICKS = ['spin', 'hop', 'flip', 'vanish', 'boo', 'wobble'];
+const TRICKS = ['backflip', 'boing', 'twirl', 'jelly', 'dash', 'vanish', 'boo', 'wobble'];
 
 function TapGhost({ size }) {
   const [trick, setTrick] = useState(null);
-  const last = useRef(null), wait = useRef(0);
+  const last = useRef(null), wait = useRef(0), trophy = useTrophy();
   useEffect(() => () => clearTimeout(wait.current), []);
   const tap = () => {
     let t; do t = TRICKS[Math.floor(Math.random() * TRICKS.length)]; while (t === last.current);
     last.current = t;
     setTrick(null); requestAnimationFrame(() => setTrick(t)); // restart even if it's mid-trick
     clearTimeout(wait.current);
-    wait.current = setTimeout(() => openGames(), calm() ? 0 : 420); // a moment for the trick, then his games
+    wait.current = setTimeout(() => openGames(), calm() ? 0 : 640); // the trick, then his games
   };
   return (
-    <button className="buddy-ghost" onClick={tap} aria-label="Buddy the ghost: tap him to play his games">
-      <span className={trick ? `buddy-trick buddy-${trick}` : 'buddy-trick'} onAnimationEnd={() => setTrick(null)}>
+    <button className="buddy-ghost" onClick={tap} aria-label={trophy ? 'Buddy the ghost, with his trophy: tap him to play his games' : 'Buddy the ghost: tap him to play his games'}>
+      <span className={trick ? `buddy-trick buddy-${trick}` : 'buddy-trick'} onAnimationEnd={(e) => { if (e.target === e.currentTarget) setTrick(null); }} style={{ position: "relative" }}>
+        {trophy && <Trophy size={Math.round(size * 0.56)} className="buddy-trophy" style={{ position: "absolute", left: "50%", top: `${-Math.round(size * 0.5)}px`, marginLeft: `${-Math.round(size * 0.28)}px` }} />}
         <Ghost size={size} face={trick === 'boo' ? 'boo' : 'happy'} />
       </span>
     </button>
@@ -71,13 +73,11 @@ function CallButton() {
 // Web home, top right, under the Website / Instagram buttons.
 export function WebBuddy() {
   const { here, fresh } = useBuddy();
-  const [rope, setRope] = useState(true); // the rope lowers him, then pulls back up and leaves him floating
   return (
     <>
       {!here && <CallButton />}
       {here && (
         <div className={fresh ? 'buddy-arrive' : undefined} style={{ position: "absolute", left: "1296px", top: "80px", width: "64px", zIndex: "6" }}>
-          {fresh && rope && <div className="buddy-line" onAnimationEnd={() => setRope(false)} style={{ position: "absolute", left: "31px", top: "0", width: "2px", height: "114px", background: "var(--wire)" }} />}
           <div className="buddy-hang" style={{ paddingTop: "108px" }}>
             <div className="buddy-bob">
               <TapGhost size={64} />
@@ -92,7 +92,7 @@ export function WebBuddy() {
 
 // Phone home: he floats next to the intro card.
 export function PhoneBuddy() {
-  const { here, fresh } = useBuddy();
+  const { here, fresh } = useBuddy(), trophy = useTrophy();
   // The phone menu's "click me" (MenuCall) calls him; inside AQ's website that menu isn't drawn, so a small visible
   // ghost button stands where he floats and calls him instead (44px: a touch target).
   if (!here) {
@@ -107,7 +107,7 @@ export function PhoneBuddy() {
   return (
     <div className={fresh ? 'buddy-float-in' : undefined} style={{ position: "absolute", left: "298px", top: "170px", width: "70px", zIndex: "5" }}>
       <div style={{ fontFamily: FONT.hand, fontSize: "18px", color: "var(--hand)", transform: "rotate(6deg)", whiteSpace: "nowrap", pointerEvents: "none", textAlign: "center", marginBottom: "4px" }}>tap him</div>
-      <div className="buddy-bob" style={{ display: "flex", justifyContent: "center" }}>
+      <div className="buddy-bob" style={{ display: "flex", justifyContent: "center", marginTop: trophy ? "26px" : "0" }}>
         <TapGhost size={46} />
       </div>
     </div>

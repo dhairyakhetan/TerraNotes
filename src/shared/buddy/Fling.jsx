@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useEdition } from '../../lib/edition.js';
-import { drawGhost } from './Ghost.jsx';
+import { drawGhost, drawTrophy } from './Ghost.jsx';
+import { giveTrophy } from '../../lib/buddyState.js';
 import { FONT } from '../../styles/fonts.js';
 import { LEVELS } from './flingLevels.js';
 import { CloseIcon } from '../Icons.jsx';
@@ -120,6 +121,11 @@ export default function Fling({ W, H }) {
             for (let i = 0; i < s.birds; i++) add(10000, SLING.x + i * 30, SLING.y - 60);
             s.state = 'clear'; s.stars = 1 + Math.min(2, s.birds);
             { const a = starsOf(); if (s.stars > a[s.lv]) { a[s.lv] = s.stars; keepStars(a); setStars(a); } }
+            if (s.lv === LEVELS.length - 1) { // the last level: the winner's screen, and Buddy's trophy for good
+              s.state = 'won'; s.allStars = starsOf().reduce((a, b) => a + b, 0); giveTrophy();
+              const hues = [K.yellow, K.red, K.blue, K.green, K.purple, K.pink];
+              s.confetti = Array.from({ length: 140 }, (_, i) => ({ x: Math.random() * WW, y: T - Math.random() * 500, vx: (Math.random() - 0.5) * 80, vy: 120 + Math.random() * 160, r: Math.random() * 6, vr: (Math.random() - 0.5) * 8, w: 8 + Math.random() * 8, c: hues[i % hues.length] }));
+            }
             if (s.lv + 1 < LEVELS.length && s.lv + 1 > reached()) { reach(s.lv + 1); setOpen(s.lv + 1); }
             if (total.pts > best()) { keep(total.pts); setTop(total.pts); }
           } else if (s.birds > 0) {
@@ -286,6 +292,16 @@ export default function Fling({ W, H }) {
           g.globalAlpha = Math.min(1, s.note.life); g.textAlign = 'center'; g.fillStyle = K.hand; g.font = `700 ${u(30)}px ${F.hand}`;
           g.fillText(s.note.text, WW / 2, T + u(190)); g.globalAlpha = 1;
         }
+        if (s.state === 'won') { // the winner's screen: confetti, the trophy, the score
+          g.fillStyle = 'rgba(17,17,17,.7)'; g.fillRect(-400, -400, WW + 800, WH + 800);
+          for (const c of s.confetti) { g.save(); g.translate(c.x, c.y); g.rotate(c.r); g.fillStyle = c.c; g.fillRect(-c.w / 2, -c.w / 4, c.w, c.w / 2); g.restore(); }
+          const top = Math.max(T + u(20), WH / 2 - u(230)), bob = Math.sin(s.t * 2.4) * u(4);
+          drawTrophy(g, WW / 2, top + u(62) + bob, u(116), K);
+          g.textAlign = 'center'; g.fillStyle = K.yellow; g.font = `400 ${u(64)}px ${F.head}`; g.fillText('WINNER!', WW / 2, top + u(178));
+          g.fillStyle = K.page; g.font = `700 ${u(20)}px ${F.mono}`; g.fillText(`ALL ${LEVELS.length} LEVELS · ★ ${s.allStars} / ${LEVELS.length * 3}`, WW / 2, top + u(214));
+          g.font = `700 ${u(30)}px ${F.hand}`; g.fillText('Buddy keeps the trophy. call him to see it on.', WW / 2, top + u(254));
+          button('PLAY AGAIN ↺', top + u(278));
+        }
         if (s.state === 'clear') { label([[s.lv + 1 < LEVELS.length ? 'LEVEL CLEARED!' : 'EVERY GREMLIN GONE!', `700 ${u(40)}px ${F.mono}`, -40], [`+${total.pts - s.start} this level${s.birds ? ` · ${s.birds} Buddy bonus` : ''}`, `600 ${u(30)}px ${F.hand}`, 4]], s.lv + 1 < LEVELS.length ? 'NEXT LEVEL →' : 'PLAY AGAIN ↺'); starRow(WH / 2 - u(118), s.stars); }
         if (s.state === 'failed') { const n = gremlins().length; label([['OUT OF BUDDIES', `700 ${u(40)}px ${F.mono}`, -40], [`${n} gremlin${n === 1 ? '' : 's'} still standing`, `600 ${u(30)}px ${F.hand}`, 4]], 'TRY AGAIN ↺'); }
       };
@@ -301,6 +317,7 @@ export default function Fling({ W, H }) {
         if (s.ghost) { s.trail.push({ x: s.ghost.position.x, y: s.ghost.position.y }); if (s.trail.length > 400) s.trail.shift(); }
         if (s.state === 'flying') settle(dt);
         s.bits.forEach((p) => { p.x += p.vx * dt; p.y += p.vy * dt; p.vy += 700 * dt; p.life -= dt * 1.6; });
+        if (s.confetti) for (const c of s.confetti) { c.x += c.vx * dt; c.y += c.vy * dt; c.r += c.vr * dt; if (c.y > WH + 40) { c.y = T - 20; c.x = Math.random() * WW; } } // it keeps falling
         s.bits = s.bits.filter((p) => p.life > 0);
         s.pops.forEach((p) => { p.life -= dt * 0.9; });
         s.pops = s.pops.filter((p) => p.life > 0);
@@ -316,6 +333,7 @@ export default function Fling({ W, H }) {
       let anchor = null;
       const down = (e) => {
         e.preventDefault();
+        if (s.state === 'won') { total.pts = 0; setScore(0); build(0); return; }
         if (s.state === 'clear') { const next = s.lv + 1 < LEVELS.length ? s.lv + 1 : 0; if (!next) { total.pts = 0; setScore(0); } build(next); return; }
         if (s.state === 'failed') { build(s.lv); return; }
         if (s.state !== 'aim' || s.calm > 0) return;
@@ -329,7 +347,7 @@ export default function Fling({ W, H }) {
           s.pull = aimAt({ x: SLING.x + (q.x - anchor.x) * f, y: SLING.y + (q.y - anchor.y) * f }); s.finger = { a: anchor, p: q };
           s.banner = Math.min(s.banner, 0.3); return;
         }
-        c.style.cursor = s.state === 'clear' || s.state === 'failed' ? 'pointer' : s.state === 'aim' ? 'grab' : 'default';
+        c.style.cursor = s.state === 'clear' || s.state === 'failed' || s.state === 'won' ? 'pointer' : s.state === 'aim' ? 'grab' : 'default';
       };
       const up = () => { if (!dragging) return; dragging = false; s.finger = null; launch(); };
       jump.current = (n) => { total.pts = 0; setScore(0); s.finger = null; dragging = false; build(n); };
