@@ -28,6 +28,9 @@ const reached = () => { try { return Math.min(LEVELS.length - 1, Number(localSto
 // stars per level (1 for clearing it, +1 for each Buddy left, up to 3), one digit a level
 const starsOf = () => { try { return (localStorage.getItem('aq-fling-stars') || '').padEnd(LEVELS.length, '0').split('').map(Number); } catch { return LEVELS.map(() => 0); } };
 const keepStars = (a) => { try { localStorage.setItem('aq-fling-stars', a.join('')); } catch { /* private mode */ } };
+// the how-to card: shown the first time Fling opens (then on the ? button)
+const howtoSeen = () => { try { return !!localStorage.getItem('aq-fling-howto'); } catch { return false; } };
+const howtoDone = () => { try { localStorage.setItem('aq-fling-howto', '1'); } catch { /* private mode */ } };
 const reach = (v) => { try { localStorage.setItem('aq-fling-level', String(v)); } catch { /* private mode */ } };
 
 export default function Fling({ W, H }) {
@@ -35,6 +38,8 @@ export default function Fling({ W, H }) {
   const cv = useRef(null);
   const [score, setScore] = useState(0), [top, setTop] = useState(best), [failed, setFailed] = useState(false);
   const restart = useRef(null), jump = useRef(null);
+  const [howto, setHowto] = useState(() => !howtoSeen());
+  const closeHowto = () => { howtoDone(); setHowto(false); };
   const [lv, setLv] = useState(reached), [open, setOpen] = useState(reached), [stars, setStars] = useState(starsOf), [pick, setPick] = useState(false);
   useEffect(() => {
     let raf = 0, gone = false, cleanup = () => {};
@@ -67,7 +72,7 @@ export default function Fling({ W, H }) {
           return b;
         });
         M.Composite.add(engine.world, things);
-        s = { lv, birds: 3, broke: 0, state: 'aim', ghost: null, pull: null, trail: [], since: 0, calm: 0.8, pops: [], bits: [], t: 0, banner: 2.2, note: null, hit: 0, grabbed: s?.grabbed || false, start: total.pts };
+        s = { lv, birds: 3, total: things.filter((b) => b.kind === 'gremlin').length, broke: 0, state: 'aim', ghost: null, pull: null, trail: [], since: 0, calm: 0.8, pops: [], bits: [], t: 0, banner: 2.2, note: null, hit: 0, grabbed: s?.grabbed || false, start: total.pts };
         setFailed(false); setLv(lv);
       };
       build(reached());
@@ -190,15 +195,27 @@ export default function Fling({ W, H }) {
           g.fillStyle = i < n ? K.yellow : 'rgba(255,255,255,.15)'; g.fill(); g.strokeStyle = K.ink; g.lineWidth = 3; g.stroke();
         }
       };
-      const hud = () => { // Buddies and gremlins left, top right
-        const n = gremlins().length;
-        g.textAlign = 'right'; g.font = `700 ${u(17)}px ${F.mono}`; g.fillStyle = K.ink;
-        g.fillText(`× ${n}`, WW - 18, T + u(31));
-        const gx = WW - 18 - g.measureText(`× ${n}`).width - u(18);
-        g.fillStyle = K.green; ink(2); g.beginPath(); g.arc(gx, T + u(25), u(10), 0, Math.PI * 2); g.fill(); g.stroke();
-        const bx = gx - u(40), left = s.birds;
-        g.fillStyle = K.ink; g.fillText(`× ${left}`, bx, T + u(31));
-        drawGhost(g, bx - g.measureText(`× ${left}`).width - u(16), T + u(24), u(10), K, { t: s.t, look: [1, 0] });
+      const hud = () => { // the mission, top right: the goal, a pip per gremlin (ticked once popped), Buddies left, the 3★ goal
+        const n = s.total, left = gremlins().length, w = u(254), h = u(124), x = WW - 16 - w, y = T + u(12);
+        g.save(); g.translate(x + w / 2, y + h / 2); g.rotate(0.012); g.translate(-x - w / 2, -y - h / 2); // a little crooked, like the cards
+        g.fillStyle = K.ink; g.fillRect(x + u(5), y + u(5), w, h); g.fillStyle = K.card; g.fillRect(x, y, w, h); ink(2); g.strokeRect(x, y, w, h);
+        g.font = `700 ${u(12)}px ${F.mono}`; const tag = 'MISSION', tw = g.measureText(tag).width + u(16); // a tape with the word on it
+        g.fillStyle = K.yellow; g.fillRect(x + u(12), y - u(9), tw, u(20)); ink(1.5); g.strokeRect(x + u(12), y - u(9), tw, u(20));
+        g.fillStyle = K.ink; g.textAlign = 'left'; g.fillText(tag, x + u(20), y + u(6));
+        g.fillStyle = K.hand; g.font = `700 ${u(23)}px ${F.hand}`;
+        g.fillText(left ? `pop all ${n} gremlin${n === 1 ? '' : 's'}` : 'all popped!', x + u(14), y + u(38));
+        const pr = u(8), gap = Math.min(u(22), (w - u(28)) / Math.max(n, 1));
+        for (let i = 0; i < n; i++) { // popped first: ticked
+          const cx = x + u(14) + pr + i * gap, cy = y + u(56), done = i < n - left;
+          g.fillStyle = done ? K.card : K.green; ink(1.5); g.beginPath(); g.arc(cx, cy, pr, 0, Math.PI * 2); g.fill(); g.stroke();
+          if (done) { g.strokeStyle = K.hand; g.lineWidth = u(2.5); g.beginPath(); g.moveTo(cx - pr * 0.5, cy); g.lineTo(cx - pr * 0.1, cy + pr * 0.45); g.lineTo(cx + pr * 0.6, cy - pr * 0.5); g.stroke(); }
+        }
+        g.fillStyle = K.ink; g.font = `700 ${u(12)}px ${F.mono}`; g.fillText('BUDDIES', x + u(14), y + u(86));
+        const bx0 = x + u(14) + g.measureText('BUDDIES').width + u(18);
+        for (let i = 0; i < 3; i++) { g.globalAlpha = i < s.birds ? 1 : 0.2; drawGhost(g, bx0 + i * u(26), y + u(80), u(9), K, { t: s.t + i, look: [1, 0] }); }
+        g.globalAlpha = 1; g.fillStyle = K.muted; g.font = `700 ${u(11)}px ${F.mono}`;
+        g.fillText('3★: CLEAR IT WITH ONE BUDDY', x + u(14), y + u(110));
+        g.restore();
       };
       const power = (p) => { // in the ground band: how hard
         const f = Math.min(1, Math.hypot(p.x - SLING.x, p.y - SLING.y) / PULL);
@@ -327,12 +344,17 @@ export default function Fling({ W, H }) {
       <div style={{ display: "flex", justifyContent: "space-between", fontFamily: FONT.mono, fontWeight: "700", letterSpacing: "1.2px", textTransform: "uppercase", fontSize: "10.5px", margin: "0 0 8px" }}>
         <span>{`${score} points`}</span><span style={{ color: "var(--muted)" }}>{`best ${top}`}</span>
       </div>
-      <canvas ref={cv} role="img" aria-label={failed ? 'Fling: out of Buddies, tap to retry' : 'Fling: drag back anywhere on the game and let go to fling Buddy at the towers'} style={{ display: pick ? "none" : "block", width: `${W}px`, height: `${H}px`, border: "2px solid var(--ink)", touchAction: "none", cursor: "default", background: "var(--page)" }} />
+      <div style={{ position: "relative", display: pick || (howto && W < 400) ? "none" : "block" }}>
+        <canvas ref={cv} role="img" aria-label={failed ? 'Fling: out of Buddies, tap to retry' : 'Fling: drag back anywhere on the game and let go to fling Buddy at the towers'} style={{ display: "block", width: `${W}px`, height: `${H}px`, border: "2px solid var(--ink)", touchAction: "none", cursor: "default", background: "var(--page)" }} />
+        {howto && W >= 400 && <HowTo onClose={closeHowto} />}
+      </div>
+      {howto && W < 400 && !pick && <HowTo small onClose={closeHowto} />}
       {pick && <LevelGrid W={W} H={H} lv={lv} open={open} stars={stars} onPick={(n) => { setPick(false); jump.current?.(n); }} onClose={() => setPick(false)} />}
       <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: W < 400 ? "8px" : "12px", marginTop: "12px" }}>
         <button type="button" className="press btn" aria-label="Previous level" disabled={lv <= 0} onClick={() => jump.current?.(lv - 1)} style={{ ...BTN, width: "44px", padding: "0", opacity: lv <= 0 ? 0.35 : 1 }}>‹</button>
         <button type="button" className="press btn" aria-label="Pick a level" aria-expanded={pick ? 'true' : 'false'} onClick={() => setPick((v) => !v)} style={{ ...BTN, "--c": "var(--yellow)", background: pick ? "var(--ink)" : "var(--card)", color: pick ? "var(--card)" : "var(--ink)", boxShadow: "3px 3px 0 var(--yellow)", padding: "0 14px", minWidth: W < 400 ? "116px" : "150px" }}>{`Level ${lv + 1}/${LEVELS.length}`} <span aria-hidden="true">{pick ? '▴' : '▾'}</span></button>
         <button type="button" className="press btn" aria-label="Next level" disabled={lv >= open} onClick={() => jump.current?.(lv + 1)} style={{ ...BTN, width: "44px", padding: "0", opacity: lv >= open ? 0.35 : 1 }}>›</button>
+        <button type="button" className="press btn" aria-label="How to play" aria-expanded={howto ? 'true' : 'false'} onClick={() => { setPick(false); setHowto((v) => !v); }} style={{ ...BTN, width: "44px", padding: "0", fontSize: "16px" }}>?</button>
         <button type="button" className="press btn" aria-label="Restart level" onClick={() => { setPick(false); restart.current?.(); }} style={{ ...BTN, padding: W < 400 ? "0" : "0 14px", width: W < 400 ? "44px" : "auto" }}>{W < 400 ? '↺' : '↺ Restart'}</button>
       </div>
       <p style={{ margin: "10px 0 0", textAlign: "center", fontFamily: FONT.hand, fontSize: W < 400 ? "18px" : "20px", lineHeight: "1.1", color: "var(--hand)" }}>{W < 400 ? 'drag back anywhere · follow the dots · let go' : 'drag back from anywhere on the game · the dots show where he’ll fly · let go'}</p>
@@ -380,5 +402,33 @@ function Stars({ n, of = 3, size = 11, on = false }) {
         <svg key={i} width={size} height={size} viewBox="0 0 12 12"><path d={STAR} style={{ fill: i < n ? "var(--yellow)" : "none", stroke: on ? "var(--yellow)" : "var(--ink)", strokeWidth: 1.1, strokeLinejoin: "round" }} /></svg>
       ))}
     </span>
+  );
+}
+
+// How to play: a small card over the game (it takes the taps while it shows; on a phone, whose game is short, it takes
+// the game's place instead): drag anywhere, follow the dots, let go, pop every gremlin; stars for Buddies left. The
+// first time Fling opens, and on the ? button.
+const STEPS = [
+  ['drag back from anywhere', 'put a finger (or the mouse) down anywhere on the game and pull back. no need to grab Buddy.'],
+  ['follow the dots', 'they show where he\u2019ll fly. pull further for more power, aim higher to lob.'],
+  ['let go', 'Buddy flies. knock the forts over: every gremlin popped clears the level.'],
+];
+function HowTo({ small, onClose }) {
+  return (
+    <div className="fade-in" onClick={(e) => { if (e.target === e.currentTarget) onClose(); }} style={small ? { padding: "4px 6px 6px 0" } : { position: "absolute", inset: "2px", display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(17,17,17,.45)", padding: "16px" }}>
+      <div className="card-drop" role="dialog" aria-label="How to play Fling" style={{ position: "relative", boxSizing: "border-box", width: small ? "100%" : "440px", background: "var(--card)", border: "2px solid var(--ink)", boxShadow: "6px 6px 0 var(--green)", padding: small ? "12px 14px" : "18px 22px", transform: "rotate(-0.8deg)" }}>
+        <div style={{ fontFamily: FONT.head, fontSize: small ? "18px" : "24px", textTransform: "uppercase", color: "var(--ink)" }}>How to fling</div>
+        <ol style={{ listStyle: "none", margin: small ? "8px 0 0" : "12px 0 0", padding: "0", display: "flex", flexDirection: "column", gap: small ? "6px" : "10px" }}>
+          {STEPS.map(([head, text], i) => (
+            <li key={head} style={{ display: "flex", gap: "10px", alignItems: "flex-start" }}>
+              <span style={{ flexShrink: "0", width: small ? "22px" : "26px", height: small ? "22px" : "26px", display: "flex", alignItems: "center", justifyContent: "center", background: "var(--ink)", color: "var(--yellow)", fontFamily: FONT.mono, fontWeight: "700", fontSize: small ? "11px" : "13px" }}>{i + 1}</span>
+              <span style={{ fontFamily: FONT.body, fontSize: small ? "12.5px" : "14.5px", lineHeight: "1.35", color: "var(--text)" }}><strong style={{ fontWeight: "700", color: "var(--ink)" }}>{head}.</strong> {text}</span>
+            </li>
+          ))}
+        </ol>
+        <div style={{ marginTop: small ? "8px" : "12px", fontFamily: FONT.hand, fontSize: small ? "17px" : "20px", lineHeight: "1.1", color: "var(--hand)" }}>the mission card (top right) says what to pop. fewer Buddies used = more ★</div>
+        <button type="button" className="press btn" onClick={onClose} style={{ ...BTN, "--c": "var(--yellow)", marginTop: small ? "10px" : "14px", padding: "0 18px", background: "var(--ink)", color: "var(--card)", boxShadow: "4px 4px 0 var(--yellow)" }}>Got it, let’s fling →</button>
+      </div>
+    </div>
   );
 }
