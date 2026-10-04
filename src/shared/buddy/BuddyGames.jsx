@@ -17,7 +17,9 @@ import Fling from './Fling.jsx';
 // Buddy's games popup (mounted once in App.jsx; opened by openGames() in lib/buddyState.js, event 'aq-games').
 // Two tabs, each a <canvas> game drawn every frame with requestAnimationFrame (only while the popup is open):
 //   Snake: Buddy's head + a tail of wisps eating stars; arrows / WASD / swipe / the on-screen pad (keys light up while
-//          held, big screens); it speeds up a little per star; only the Play again button restarts.
+//          held, big screens). Made to feel quick: he glides between cells, turns queue (two), a turn past halfway to the
+//          next cell happens at once, swipes act mid-drag, the pad acts on press, a step's grace at walls; it speeds up a
+//          little per star; only the Play again button restarts.
 //   Float: flappy style; tap / click / space floats him up between the posts.
 //   Fling: Angry Birds style; drag Buddy back in a slingshot and knock down towers of planks onto gremlins (Fling.jsx,
 //          real physics, fetched the first time the tab opens).
@@ -53,30 +55,47 @@ function Snake({ W, small }) {
   const [top, setTop] = useState(() => best('aq-snake-best'));
   useEffect(() => {
     const N = 15, C = W / N, g = setup(cv.current, W, W);
-    let snake, dir, next, food, state = 'ready', acc = 0, last = performance.now(), raf = 0, pts = 0;
+    let snake, was, dir, queue, food, state = 'ready', acc = 0, last = performance.now(), raf = 0, pts = 0, grace = false, pops = [], bump = 0, shake = 0;
     const free = () => { let f; do f = [Math.floor(Math.random() * N), Math.floor(Math.random() * N)]; while (snake.some(([x, y]) => x === f[0] && y === f[1])); return f; };
-    const reset = () => { snake = [[7, 7], [6, 7], [5, 7]]; dir = [1, 0]; next = null; food = free(); pts = 0; setScore(0); };
+    const reset = () => { snake = [[7, 7], [6, 7], [5, 7]]; was = snake.map((c) => [...c]); dir = [1, 0]; queue = []; food = free(); pts = 0; grace = false; pops = []; setScore(0); };
     reset();
+    const step = () => Math.max(85, 160 - pts * 3); // ms per move: brisk from the start, a little quicker with every star
     const steer = (d) => {
       if (state === 'over') return; // only the Play again button restarts, so the score stays up
-      if (state === 'ready') state = 'playing';
-      // one turn per step, no queue: a later press before the next step replaces the earlier one, so a burst of
-      // presses never plays itself out over the following steps
-      if (d[0] === -dir[0] && d[1] === -dir[1]) return; // no turning back on yourself
-      next = d[0] === dir[0] && d[1] === dir[1] ? null : d;
+      // turns queue up (two at most), each checked against the one before it, so a quick up-then-left lands both
+      const ref = queue.length ? queue[queue.length - 1] : dir;
+      if ((d[0] === -ref[0] && d[1] === -ref[1]) || (d[0] === ref[0] && d[1] === ref[1])) { if (state === 'ready') { state = 'playing'; acc = step(); } return; }
+      if (queue.length < 2) queue.push(d);
+      if (state === 'ready') { state = 'playing'; acc = step(); return; } // the first press moves him at once
+      if (queue.length === 1 && acc >= step() * 0.45) acc = step(); // past halfway to the next cell: turn now, not a step later
     };
     turn.current = steer;
     again.current = () => { reset(); state = 'ready'; setOver(false); };
     const tick = () => {
-      if (next) { dir = next; next = null; }
-      const head = [snake[0][0] + dir[0], snake[0][1] + dir[1]];
+      const d = queue.length ? queue[0] : dir;
+      const head = [snake[0][0] + d[0], snake[0][1] + d[1]];
       const hit = head[0] < 0 || head[1] < 0 || head[0] >= N || head[1] >= N || snake.some(([x, y], i) => i < snake.length - 1 && x === head[0] && y === head[1]);
-      if (hit) { state = 'over'; setOver(true); if (pts > best('aq-snake-best')) { keep('aq-snake-best', pts); setTop(pts); } return; }
+      if (hit) {
+        // a moment's grace at a wall or his tail: one step to turn away before it counts
+        if (!grace) { grace = true; was = snake.map((c) => [...c]); return; }
+        state = 'over'; setOver(true); shake = calm() ? 0 : 1; navigator.vibrate?.(60);
+        if (pts > best('aq-snake-best')) { keep('aq-snake-best', pts); setTop(pts); }
+        return;
+      }
+      grace = false; if (queue.length) dir = queue.shift();
+      was = snake.map((c) => [...c]);
       snake.unshift(head);
-      if (head[0] === food[0] && head[1] === food[1]) { pts++; setScore(pts); food = free(); } else snake.pop();
+      if (head[0] === food[0] && head[1] === food[1]) {
+        pts++; setScore(pts); pops.push({ x: (food[0] + 0.5) * C, y: (food[1] + 0.5) * C, life: 1 }); bump = 1; navigator.vibrate?.(12);
+        food = free();
+      } else snake.pop();
     };
-    const draw = (t) => {
-      g.fillStyle = K.page; g.fillRect(0, 0, W, W);
+    const draw = (t, dt) => {
+      const a = state === 'playing' && !grace ? Math.min(1, acc / step()) : 1; // how far between the last cell and this one
+      const at = (i) => { const c = snake[i], p = was[i] || was[was.length - 1] || c; return [(p[0] + (c[0] - p[0]) * a + 0.5) * C, (p[1] + (c[1] - p[1]) * a + 0.5) * C]; };
+      g.save();
+      if (shake > 0) { g.translate((Math.random() - 0.5) * 8 * shake, (Math.random() - 0.5) * 8 * shake); shake = Math.max(0, shake - dt * 3); }
+      g.fillStyle = K.page; g.fillRect(-10, -10, W + 20, W + 20);
       g.fillStyle = K.outside;
       for (let x = 0; x < N; x++) for (let y = 0; y < N; y++) { g.beginPath(); g.arc((x + 0.5) * C, (y + 0.5) * C, 1.3, 0, Math.PI * 2); g.fill(); }
       // food: a little yellow star, twinkling
@@ -84,46 +103,59 @@ function Snake({ W, small }) {
       g.save(); g.translate((fx + 0.5) * C, (fy + 0.5) * C); g.rotate(t / 900); g.beginPath();
       for (let i = 0; i < 10; i++) { const r = i % 2 ? s * 0.45 : s; g.lineTo(Math.cos((i * Math.PI) / 5) * r, Math.sin((i * Math.PI) / 5) * r); }
       g.closePath(); g.fillStyle = K.yellow; g.fill(); g.strokeStyle = K.ink; g.lineWidth = 1.5; g.stroke(); g.restore();
-      // tail: wisps that get smaller and fainter
+      // tail: wisps that glide cell to cell, smaller and fainter towards the end
       for (let i = snake.length - 1; i > 0; i--) {
-        const [x, y] = snake[i], k = 1 - i / (snake.length + 2);
+        const [x, y] = at(i), k = 1 - i / (snake.length + 2);
         g.globalAlpha = 0.3 + 0.6 * k; g.fillStyle = K.green;
-        g.beginPath(); g.arc((x + 0.5) * C, (y + 0.5) * C, C * (0.24 + 0.16 * k), 0, Math.PI * 2); g.fill();
+        g.beginPath(); g.arc(x, y, C * (0.24 + 0.16 * k), 0, Math.PI * 2); g.fill();
       }
       g.globalAlpha = 1;
-      const [hx, hy] = snake[0];
-      drawGhost(g, (hx + 0.5) * C, (hy + 0.42) * C, C * 0.38, K, { look: dir, t: t / 1000, face: state === 'over' ? 'boo' : 'happy' });
+      // eaten stars: a ring and a +1 that float off
+      for (const p of pops) {
+        p.life -= dt * 2.2; if (p.life <= 0) continue;
+        g.globalAlpha = p.life; g.strokeStyle = K.yellow; g.lineWidth = 3;
+        g.beginPath(); g.arc(p.x, p.y, C * (0.4 + (1 - p.life) * 0.9), 0, Math.PI * 2); g.stroke();
+        g.fillStyle = K.ink; g.font = `700 ${Math.round(C * 0.55)}px ${F.mono}`; g.textAlign = 'center'; g.fillText('+1', p.x, p.y - C * (0.5 + (1 - p.life) * 0.8));
+      }
+      pops = pops.filter((p) => p.life > 0); g.globalAlpha = 1;
+      const [hx, hy] = at(0), face = queue[0] || dir;
+      bump = Math.max(0, bump - dt * 5);
+      drawGhost(g, hx, hy - C * 0.08, C * (0.38 + bump * 0.08), K, { look: face, t: t / 1000, face: state === 'over' ? 'boo' : 'happy' });
+      g.restore();
       if (state === 'ready') card(g, K, W, W, [['SNAKE, BUT SPOOKY', `700 ${Math.round(W / 16)}px ${F.mono}`, -8], ['arrows, WASD or swipe to start', `${Math.round(W / 14)}px ${F.hand}`, 24]]);
       if (state === 'over') card(g, K, W, W, [[`BOO. ${pts} ${pts === 1 ? 'STAR' : 'STARS'}`, `700 ${Math.round(W / 14)}px ${F.mono}`, -8], [`best ${Math.max(pts, best('aq-snake-best'))}`, `${Math.round(W / 14)}px ${F.hand}`, 22]], -30);
     };
     const loop = (t) => {
       raf = requestAnimationFrame(loop);
-      const step = Math.max(120, 230 - pts * 4); // ms per move: gentle at first, a little quicker with every star
-      if (state === 'playing') { acc += t - last; while (acc >= step && state === 'playing') { acc -= step; tick(); } } else acc = 0;
-      last = t; draw(t);
+      const dt = Math.min(0.1, (t - last) / 1000);
+      if (state === 'playing') { acc += t - last; while (acc >= step() && state === 'playing') { acc -= step(); tick(); } } else acc = 0;
+      last = t; draw(t, dt);
     };
     raf = requestAnimationFrame(loop);
-    const key = (e) => { const d = DIRS[e.key] || DIRS[e.key.toLowerCase?.()]; if (d) { e.preventDefault(); setHeld(d.join()); steer(d); } };
+    const key = (e) => { const d = DIRS[e.key] || DIRS[e.key.toLowerCase?.()]; if (d) { e.preventDefault(); setHeld(d.join()); if (!e.repeat) steer(d); } };
     const lift = (e) => { const d = DIRS[e.key] || DIRS[e.key.toLowerCase?.()]; if (d) setHeld((h) => (h === d.join() ? null : h)); };
     addEventListener('keyup', lift);
     addEventListener('keydown', key);
-    // swipes
-    let sx = null, sy = null;
+    // swipes: they turn him as soon as the finger has moved a little (not when it lifts), and one drag can turn
+    // him again and again; a tap starts a new game
+    let sx = null, sy = null, moved = false;
     const c = cv.current;
-    const down = (e) => { sx = e.clientX; sy = e.clientY; };
-    const up = (e) => {
+    const down = (e) => { sx = e.clientX; sy = e.clientY; moved = false; c.setPointerCapture?.(e.pointerId); };
+    const move = (e) => {
       if (sx == null) return;
-      const dx = e.clientX - sx, dy = e.clientY - sy; sx = null;
-      if (Math.max(Math.abs(dx), Math.abs(dy)) < 18) { if (state !== 'playing') steer(dir); return; }
+      const dx = e.clientX - sx, dy = e.clientY - sy;
+      if (Math.max(Math.abs(dx), Math.abs(dy)) < 14) return;
       steer(Math.abs(dx) > Math.abs(dy) ? [Math.sign(dx), 0] : [0, Math.sign(dy)]);
+      sx = e.clientX; sy = e.clientY; moved = true;
     };
-    c.addEventListener('pointerdown', down); c.addEventListener('pointerup', up);
-    return () => { cancelAnimationFrame(raf); removeEventListener('keydown', key); removeEventListener('keyup', lift); c.removeEventListener('pointerdown', down); c.removeEventListener('pointerup', up); };
+    const up = () => { if (sx != null && !moved && state === 'ready') steer(dir); sx = null; };
+    c.addEventListener('pointerdown', down); c.addEventListener('pointermove', move); c.addEventListener('pointerup', up); c.addEventListener('pointercancel', up);
+    return () => { cancelAnimationFrame(raf); removeEventListener('keydown', key); removeEventListener('keyup', lift); c.removeEventListener('pointerdown', down); c.removeEventListener('pointermove', move); c.removeEventListener('pointerup', up); c.removeEventListener('pointercancel', up); };
   }, [W]);
   const pad = (label, d, dir) => {
     const on = !small && held === d.join();
     return (
-      <button className="press" aria-label={label} onClick={() => turn.current?.(d)} style={{ "--c": "var(--ink)", width: "52px", height: "44px", padding: "0", background: on ? "var(--yellow)" : "var(--card)", border: "2px solid var(--ink)", boxShadow: on ? "1px 1px 0 var(--ink)" : "3px 3px 0 var(--ink)", transform: on ? "translate(2px, 2px)" : "none", display: "flex", alignItems: "center", justifyContent: "center" }}>
+      <button className="press" aria-label={label} onPointerDown={(e) => { e.preventDefault(); turn.current?.(d); }} onClick={(e) => { if (e.detail === 0) turn.current?.(d); }} style={{ "--c": "var(--ink)", width: "52px", height: "44px", padding: "0", background: on ? "var(--yellow)" : "var(--card)", border: "2px solid var(--ink)", boxShadow: on ? "1px 1px 0 var(--ink)" : "3px 3px 0 var(--ink)", transform: on ? "translate(2px, 2px)" : "none", display: "flex", alignItems: "center", justifyContent: "center" }}>
         <ChevronIcon dir={dir} size={18} />
       </button>
     );
