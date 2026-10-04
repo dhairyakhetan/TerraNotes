@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useEdition } from '../../lib/edition.js';
 import { drawCrown, drawGhost, drawTrophy } from './Ghost.jsx';
-import { giveReward, hasReward } from '../../lib/buddyState.js';
+import { giveReward, hasReward, useRewards } from '../../lib/buddyState.js';
 import { FONT } from '../../styles/fonts.js';
 import { LEVELS } from './flingLevels.js';
 import { CloseIcon } from '../Icons.jsx';
@@ -19,6 +19,8 @@ import { CloseIcon } from '../Icons.jsx';
 // needn't reach the left edge), and, while you pull, the reach of the band, a dotted line of where he'll fly and a power
 // meter; Buddies and gremlins left in the corner; a line after each turn ("missed: pull further", "2 gremlins left");
 // buttons drawn on the cleared / out-of-Buddies cards; the cursor changes over Buddy; Restart level under the canvas.
+// Once the crown is won (level 50 beaten), a "Reset progress" button (asks first) on the winner's screen and in the level
+// picker wipes the levels, stars and best scores to play it all again; Buddy keeps his crown and trophy.
 const WW = 1200, WH = 540, GROUND = 490, BASE = GROUND - 30, SLING = { x: 160, y: BASE - 92 }, PULL = 100, POWER = 0.25, BR = 17;
 // the slingshot stands on a mound at the left (BASE is its top), the gremlins' forts far out at the right, like Angry Birds
 const HP = { gremlin: 1, glass: 3, wood: 8, stone: 16 }, PTS = { gremlin: 5000, glass: 300, wood: 500, stone: 800 };
@@ -35,6 +37,7 @@ const keepStars = (a) => { try { localStorage.setItem('aq-fling-stars', a.join('
 const howtoSeen = () => { try { return !!localStorage.getItem('aq-fling-howto'); } catch { return false; } };
 const howtoDone = () => { try { localStorage.setItem('aq-fling-howto', '1'); } catch { /* private mode */ } };
 const reach = (v) => { try { localStorage.setItem('aq-fling-level', String(v)); } catch { /* private mode */ } };
+const wipe = () => { try { ['aq-fling-level', 'aq-fling-stars', 'aq-fling-scores'].forEach((k) => localStorage.removeItem(k)); } catch { /* private mode */ } };
 
 export default function Fling({ W, H }) {
   const { colors: K, fonts: F } = useEdition().look; // a canvas can't read CSS variables: the values themselves
@@ -43,7 +46,10 @@ export default function Fling({ W, H }) {
   const restart = useRef(null), jump = useRef(null);
   const [howto, setHowto] = useState(() => !howtoSeen());
   const closeHowto = () => { howtoDone(); setHowto(false); };
-  const [lv, setLv] = useState(reached), [open, setOpen] = useState(reached), [stars, setStars] = useState(starsOf), [pick, setPick] = useState(false);
+  const [lv, setLv] = useState(reached), [open, setOpen] = useState(reached), [stars, setStars] = useState(starsOf), [pick, setPick] = useState(false), [won, setWon] = useState(false);
+  const { crown } = useRewards();
+  const inline = W < 400 || H < 380; // the how-to card takes the game's place (a short game can't hold it over itself)
+  const reset = () => { wipe(); setStars(starsOf()); setScores(scoresOf()); setOpen(0); setPick(false); setWon(false); jump.current?.(0); };
   useEffect(() => {
     let raf = 0, gone = false, cleanup = () => {};
     import('matter-js').then(({ default: M }) => {
@@ -76,7 +82,7 @@ export default function Fling({ W, H }) {
         });
         M.Composite.add(engine.world, things);
         s = { lv, birds: 3, total: things.filter((b) => b.kind === 'gremlin').length, broke: 0, state: 'aim', ghost: null, pull: null, trail: [], since: 0, calm: 0.8, pops: [], bits: [], t: 0, banner: 2.2, note: null, hit: 0, grabbed: s?.grabbed || false, start: total.pts };
-        setFailed(false); setLv(lv); setScore(0);
+        setFailed(false); setWon(false); setLv(lv); setScore(0);
       };
       build(reached());
 
@@ -128,7 +134,7 @@ export default function Fling({ W, H }) {
             s.allStars = starsOf().reduce((a, b) => a + b, 0);
             if (s.allStars === LEVELS.length * 3 && !hasReward('trophy')) { giveReward('trophy'); s.newTrophy = true; s.state = 'stars'; } // every star: Buddy's trophy
             if (s.lv === LEVELS.length - 1) { // the last level: the winner's screen, and Buddy's crown for good
-              s.state = 'won'; giveReward('crown');
+              s.state = 'won'; giveReward('crown'); setWon(true);
               const hues = [K.yellow, K.red, K.blue, K.green, K.purple, K.pink];
               s.confetti = Array.from({ length: 140 }, (_, i) => ({ x: Math.random() * WW, y: T - Math.random() * 500, vx: (Math.random() - 0.5) * 80, vy: 120 + Math.random() * 160, r: Math.random() * 6, vr: (Math.random() - 0.5) * 8, w: 8 + Math.random() * 8, c: hues[i % hues.length] }));
             }
@@ -186,9 +192,9 @@ export default function Fling({ W, H }) {
         }
         return dots;
       };
-      const button = (text, y, fill = K.yellow) => { // a drawn button (the whole card takes the tap)
-        g.font = `700 ${u(22)}px ${F.mono}`; const w = g.measureText(text).width + 56, x = WW / 2 - w / 2;
-        const bh = u(52);
+      const button = (text, y, fill = K.yellow, f = 1) => { // a drawn button (the whole card takes the tap); f: smaller
+        g.font = `700 ${u(22) * f}px ${F.mono}`; const w = g.measureText(text).width + 56 * f, x = WW / 2 - w / 2;
+        const bh = u(52) * f;
         g.fillStyle = K.ink; g.fillRect(x + 5, y + 5, w, bh);
         g.fillStyle = fill; g.fillRect(x, y, w, bh); g.strokeStyle = K.ink; g.lineWidth = 3; g.strokeRect(x, y, w, bh);
         g.fillStyle = K.ink; g.textAlign = 'center'; g.fillText(text, WW / 2, y + bh * 0.65);
@@ -300,16 +306,17 @@ export default function Fling({ W, H }) {
         if (s.state === 'won' || s.state === 'stars') { // the winner's screen (crown) / every star (trophy): confetti, the prize
           g.fillStyle = 'rgba(17,17,17,.7)'; g.fillRect(-400, -400, WW + 800, WH + 800);
           for (const c of s.confetti) { g.save(); g.translate(c.x, c.y); g.rotate(c.r); g.fillStyle = c.c; g.fillRect(-c.w / 2, -c.w / 4, c.w, c.w / 2); g.restore(); }
-          const top = Math.max(T + u(20), WH / 2 - u(230)), bob = Math.sin(s.t * 2.4) * u(4);
+          const f = Math.min(1, (WH - T) / u(360)), v = (px) => u(px) * f; // a short game (a phone's) gets it smaller, so it all fits
+          const top = Math.max(T + v(20), WH / 2 - v(230)), bob = Math.sin(s.t * 2.4) * v(4);
           const won = s.state === 'won';
-          if (won && s.newTrophy) { drawCrown(g, WW / 2 - u(70), top + u(66) + bob, u(84), K); drawTrophy(g, WW / 2 + u(70), top + u(62) - bob, u(110), K); }
-          else if (won) drawCrown(g, WW / 2, top + u(66) + bob, u(96), K);
-          else drawTrophy(g, WW / 2, top + u(62) + bob, u(116), K);
-          g.textAlign = 'center'; g.fillStyle = K.yellow; g.font = `400 ${u(64)}px ${F.head}`; g.fillText(won ? 'WINNER!' : 'EVERY STAR!', WW / 2, top + u(178));
-          g.fillStyle = K.page; g.font = `700 ${u(20)}px ${F.mono}`; g.fillText(won ? `ALL ${LEVELS.length} LEVELS · ★ ${s.allStars} / ${LEVELS.length * 3}` : `★ ${s.allStars} / ${LEVELS.length * 3} · EVERY LEVEL, 3 STARS`, WW / 2, top + u(214));
-          g.font = `700 ${u(30)}px ${F.hand}`;
-          g.fillText(won ? (s.newTrophy ? 'the crown AND the trophy: Buddy wears both now.' : 'Buddy wears the winner’s crown now. call him!') : 'Buddy gets the trophy. call him to see it.', WW / 2, top + u(254));
-          button(won || s.lv + 1 >= LEVELS.length ? 'PLAY AGAIN ↺' : 'NEXT LEVEL →', top + u(278));
+          if (won && s.newTrophy) { drawCrown(g, WW / 2 - v(70), top + v(66) + bob, v(84), K); drawTrophy(g, WW / 2 + v(70), top + v(62) - bob, v(110), K); }
+          else if (won) drawCrown(g, WW / 2, top + v(66) + bob, v(96), K);
+          else drawTrophy(g, WW / 2, top + v(62) + bob, v(116), K);
+          g.textAlign = 'center'; g.fillStyle = K.yellow; g.font = `400 ${v(64)}px ${F.head}`; g.fillText(won ? 'WINNER!' : 'EVERY STAR!', WW / 2, top + v(178));
+          g.fillStyle = K.page; g.font = `700 ${v(20)}px ${F.mono}`; g.fillText(won ? `ALL ${LEVELS.length} LEVELS · ★ ${s.allStars} / ${LEVELS.length * 3}` : `★ ${s.allStars} / ${LEVELS.length * 3} · EVERY LEVEL, 3 STARS`, WW / 2, top + v(214));
+          g.font = `700 ${v(30)}px ${F.hand}`;
+          g.fillText(won ? (s.newTrophy ? 'the crown AND the trophy: Buddy wears both now.' : 'Buddy wears the winner’s crown now. call him!') : 'Buddy gets the trophy. call him to see it.', WW / 2, top + v(254));
+          button(won || s.lv + 1 >= LEVELS.length ? 'PLAY AGAIN ↺' : 'NEXT LEVEL →', top + v(278), K.yellow, f);
         }
         if (s.state === 'clear') { label([[s.lv + 1 < LEVELS.length ? 'LEVEL CLEARED!' : 'EVERY GREMLIN GONE!', `700 ${u(40)}px ${F.mono}`, -40], [`+${s.pts} this level${s.birds ? ` · ${s.birds} Buddy bonus` : ''}${s.pts > s.wasBest ? ' · new best!' : ` · best ${s.wasBest}`}`, `600 ${u(30)}px ${F.hand}`, 4]], s.lv + 1 < LEVELS.length ? 'NEXT LEVEL →' : 'PLAY AGAIN ↺'); starRow(WH / 2 - u(118), s.stars); }
         if (s.state === 'failed') { const n = gremlins().length; label([['OUT OF BUDDIES', `700 ${u(40)}px ${F.mono}`, -40], [`${n} gremlin${n === 1 ? '' : 's'} still standing`, `600 ${u(30)}px ${F.hand}`, 4]], 'TRY AGAIN ↺'); }
@@ -371,12 +378,12 @@ export default function Fling({ W, H }) {
       <div style={{ display: "flex", justifyContent: "space-between", fontFamily: FONT.mono, fontWeight: "700", letterSpacing: "1.2px", textTransform: "uppercase", fontSize: "10.5px", margin: "0 0 8px" }}>
         <span>{`${score} points`}</span><span style={{ color: "var(--muted)" }}>{`level ${lv + 1} best ${scores[lv]}`}</span>
       </div>
-      <div style={{ position: "relative", display: pick || (howto && W < 400) ? "none" : "block" }}>
+      <div style={{ position: "relative", display: pick || (howto && inline) ? "none" : "block" }}>
         <canvas ref={cv} role="img" aria-label={failed ? 'Fling: out of Buddies, tap to retry' : 'Fling: drag back anywhere on the game and let go to fling Buddy at the towers'} style={{ display: "block", width: `${W}px`, height: `${H}px`, border: "2px solid var(--ink)", touchAction: "none", cursor: "default", background: "var(--page)" }} />
-        {howto && W >= 400 && <HowTo onClose={closeHowto} />}
+        {howto && !inline && <HowTo onClose={closeHowto} />}
       </div>
-      {howto && W < 400 && !pick && <HowTo small onClose={closeHowto} />}
-      {pick && <LevelGrid W={W} H={H} lv={lv} open={open} stars={stars} scores={scores} onPick={(n) => { setPick(false); jump.current?.(n); }} onClose={() => setPick(false)} />}
+      {howto && inline && !pick && <HowTo W={W} small={W < 400} inline onClose={closeHowto} />}
+      {pick && <LevelGrid W={W} H={Math.max(H, innerHeight - 250)} lv={lv} open={open} stars={stars} scores={scores} onReset={crown ? reset : null} onPick={(n) => { setPick(false); jump.current?.(n); }} onClose={() => setPick(false)} />}
       <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: W < 400 ? "8px" : "12px", marginTop: "12px" }}>
         <button type="button" className="press btn" aria-label="Previous level" disabled={lv <= 0} onClick={() => jump.current?.(lv - 1)} style={{ ...BTN, width: "44px", padding: "0", opacity: lv <= 0 ? 0.35 : 1 }}>‹</button>
         <button type="button" className="press btn" aria-label="Pick a level" aria-expanded={pick ? 'true' : 'false'} onClick={() => setPick((v) => !v)} style={{ ...BTN, "--c": "var(--yellow)", background: pick ? "var(--ink)" : "var(--card)", color: pick ? "var(--card)" : "var(--ink)", boxShadow: "3px 3px 0 var(--yellow)", padding: "0 14px", minWidth: W < 400 ? "116px" : "150px" }}>{`Level ${lv + 1}/${LEVELS.length}`} <span aria-hidden="true">{pick ? '▴' : '▾'}</span></button>
@@ -384,6 +391,7 @@ export default function Fling({ W, H }) {
         <button type="button" className="press btn" aria-label="How to play" aria-expanded={howto ? 'true' : 'false'} onClick={() => { setPick(false); setHowto((v) => !v); }} style={{ ...BTN, width: "44px", padding: "0", fontSize: "16px" }}>?</button>
         <button type="button" className="press btn" aria-label="Restart level" onClick={() => { setPick(false); restart.current?.(); }} style={{ ...BTN, padding: W < 400 ? "0" : "0 14px", width: W < 400 ? "44px" : "auto" }}>{W < 400 ? '↺' : '↺ Restart'}</button>
       </div>
+      {won && !pick && <div style={{ display: "flex", justifyContent: "center", marginTop: "14px" }}><ResetProgress W={W} onReset={reset} /></div>}
       <p style={{ margin: "10px 0 0", textAlign: "center", fontFamily: FONT.hand, fontSize: W < 400 ? "18px" : "20px", lineHeight: "1.1", color: "var(--hand)" }}>{W < 400 ? 'drag back anywhere · follow the dots · let go' : 'drag back from anywhere on the game · the dots show where he’ll fly · let go'}</p>
     </>
   );
@@ -391,12 +399,12 @@ export default function Fling({ W, H }) {
 
 const BTN = { "--c": "var(--ink)", flexShrink: "0", fontFamily: FONT.mono, fontWeight: "700", letterSpacing: "1px", textTransform: "uppercase", fontSize: "12px", minHeight: "44px", background: "var(--card)", color: "var(--ink)", border: "2px solid var(--ink)", boxShadow: "3px 3px 0 var(--ink)", cursor: "pointer" };
 
-// the level picker: every level as a tile, in the canvas's place while open. Played ones show their stars, the
+// the level picker: every level as a tile, in the canvas’s place while open (as tall as the window allows; it scrolls). Played ones show their stars, the
 // current one is inked, the next one to beat has a yellow shadow, the rest are locked (dashed).
-function LevelGrid({ W, H, lv, open, stars, scores, onPick, onClose }) {
+function LevelGrid({ W, H, lv, open, stars, scores, onPick, onClose, onReset }) {
   const cols = W < 400 ? 6 : 10, total = stars.reduce((a, b) => a + b, 0);
   return (
-    <div className="card-drop" role="dialog" aria-label="Pick a level" style={{ boxSizing: "border-box", width: `${W}px`, minHeight: `${H}px`, border: "2px solid var(--ink)", background: "var(--card)", padding: W < 400 ? "12px" : "18px" }}>
+    <div className="card-drop" role="dialog" aria-label="Pick a level" style={{ boxSizing: "border-box", width: `${W}px`, height: `${H}px`, overflowY: "auto", border: "2px solid var(--ink)", background: "var(--card)", padding: W < 400 ? "12px" : "18px" }}>
       <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "12px" }}>
         <span style={{ fontFamily: FONT.head, fontSize: W < 400 ? "18px" : "22px", textTransform: "uppercase", color: "var(--ink)" }}>Pick a level</span>
         <span style={{ flexGrow: "1", display: "flex", alignItems: "center", gap: "6px", fontFamily: FONT.mono, fontWeight: "700", fontSize: "11px", letterSpacing: "1px", color: "var(--muted)" }}><Stars n={1} of={1} size={13} />{`${total}/${LEVELS.length * 3}`}</span>
@@ -417,6 +425,21 @@ function LevelGrid({ W, H, lv, open, stars, scores, onPick, onClose }) {
           );
         })}
       </div>
+      {onReset && <div style={{ display: "flex", justifyContent: "center", marginTop: W < 400 ? "14px" : "18px" }}><ResetProgress W={W} onReset={onReset} /></div>}
+    </div>
+  );
+}
+
+// Reset progress (only once level 50 is beaten): asks first, then wipes the levels, stars and best scores
+function ResetProgress({ W, onReset }) {
+  const [sure, setSure] = useState(false);
+  const small = W < 400;
+  if (!sure) return <button type="button" className="press btn" onClick={() => setSure(true)} style={{ ...BTN, "--c": "var(--red)", boxShadow: "3px 3px 0 var(--red)", padding: "0 16px" }}>↺ Reset progress</button>;
+  return (
+    <div role="group" aria-label="Reset progress?" style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "center", gap: small ? "8px" : "12px", maxWidth: "100%" }}>
+      <span style={{ fontFamily: FONT.hand, fontSize: small ? "18px" : "20px", lineHeight: "1.1", color: "var(--hand)", textAlign: "center" }}>wipe every level, star and score? (Buddy keeps his crown)</span>
+      <button type="button" className="press btn" onClick={() => { setSure(false); onReset(); }} style={{ ...BTN, "--c": "var(--red)", background: "var(--ink)", color: "var(--card)", boxShadow: "3px 3px 0 var(--red)", padding: "0 16px" }}>Yes, reset</button>
+      <button type="button" className="press btn" onClick={() => setSure(false)} style={{ ...BTN, padding: "0 16px" }}>Keep it</button>
     </div>
   );
 }
@@ -441,9 +464,9 @@ const STEPS = [
   ['follow the dots', 'they show where he\u2019ll fly. pull further for more power, aim higher to lob.'],
   ['let go', 'Buddy flies. knock the forts over: every gremlin popped clears the level.'],
 ];
-function HowTo({ small, onClose }) {
+function HowTo({ W, small, inline, onClose }) {
   return (
-    <div className="fade-in" onClick={(e) => { if (e.target === e.currentTarget) onClose(); }} style={small ? { padding: "4px 6px 6px 0" } : { position: "absolute", inset: "2px", display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(17,17,17,.45)", padding: "16px" }}>
+    <div className="fade-in" onClick={(e) => { if (e.target === e.currentTarget) onClose(); }} style={inline ? { boxSizing: "border-box", width: `${W}px`, display: "flex", justifyContent: "center", padding: "4px 6px 6px 0" } : { position: "absolute", inset: "2px", display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(17,17,17,.45)", padding: "16px" }}>
       <div className="card-drop" role="dialog" aria-label="How to play Fling" style={{ position: "relative", boxSizing: "border-box", width: small ? "100%" : "440px", background: "var(--card)", border: "2px solid var(--ink)", boxShadow: "6px 6px 0 var(--green)", padding: small ? "12px 14px" : "18px 22px", transform: "rotate(-0.8deg)" }}>
         <div style={{ fontFamily: FONT.head, fontSize: small ? "18px" : "24px", textTransform: "uppercase", color: "var(--ink)" }}>How to fling</div>
         <ol style={{ listStyle: "none", margin: small ? "8px 0 0" : "12px 0 0", padding: "0", display: "flex", flexDirection: "column", gap: small ? "6px" : "10px" }}>

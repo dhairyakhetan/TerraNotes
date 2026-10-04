@@ -303,10 +303,11 @@ export default function BuddyGames({ first = null }) {
   }, [game]);
   if (!shown) return null;
   const small = window.innerWidth < 600 || document.documentElement.dataset.layout === 'phone';
-  const W = small ? 290 : 400, H = small ? 360 : 460;
+  const room = innerHeight - 24 - 129; // the window's height less the popup's frame, tabs and score line: the games fit it
+  const W = small ? 290 : Math.max(220, Math.min(400, room - 120)), H = small ? Math.min(360, Math.max(240, room - 10)) : Math.max(260, Math.min(460, room - 10)); // Snake's pad sits under its board
   const fw = small ? Math.min(360, innerWidth - 56) : Math.min(1040, innerWidth - 120); // Fling: as big as the window allows
   const tab = (id, label) => (
-    <button onClick={() => setGame(id)} aria-pressed={shown === id ? 'true' : 'false'} style={{ ...MONO, fontSize: "11px", minHeight: "40px", padding: "0 14px", border: "2px solid var(--ink)", background: shown === id ? 'var(--ink)' : 'var(--card)', color: shown === id ? 'var(--page)' : 'var(--ink)', cursor: "pointer" }}>{label}</button>
+    <button onClick={() => setGame(id)} aria-pressed={shown === id ? 'true' : 'false'} style={{ ...MONO, fontSize: "11px", minHeight: "44px", padding: "0 14px", border: "2px solid var(--ink)", background: shown === id ? 'var(--ink)' : 'var(--card)', color: shown === id ? 'var(--page)' : 'var(--ink)', cursor: "pointer" }}>{label}</button>
   );
   return (
     <div className={leaving ? 'fade-out' : 'fade-in'} onClick={(e) => { if (e.target === e.currentTarget) setGame(null); }} style={{ position: "fixed", inset: "0", zIndex: "900", display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(17,17,17,.55)", padding: "12px" }}>
@@ -314,7 +315,7 @@ export default function BuddyGames({ first = null }) {
         <div className="no-cascade" style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "12px" }}>
           {tab('snake', 'Snake')}{tab('float', 'Float')}{tab('fling', 'Fling')}
           <span style={{ flexGrow: "1", fontFamily: FONT.hand, fontSize: "20px", color: "var(--hand)", textAlign: "right", paddingRight: "8px" }}>{small ? '' : shown === 'snake' ? 'eat the stars' : shown === 'float' ? 'mind the posts' : 'knock ’em down'}</span>
-          <button className="press" onClick={() => setGame(null)} aria-label="Close the games" style={{ "--c": "var(--ink)", width: "40px", height: "40px", flexShrink: "0", padding: "0", background: "var(--card)", border: "2px solid var(--ink)", boxShadow: "3px 3px 0 var(--ink)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <button className="press" onClick={() => setGame(null)} aria-label="Close the games" style={{ "--c": "var(--ink)", width: "44px", height: "44px", flexShrink: "0", padding: "0", background: "var(--card)", border: "2px solid var(--ink)", boxShadow: "3px 3px 0 var(--ink)", display: "flex", alignItems: "center", justifyContent: "center" }}>
             <CloseIcon size={14} weight={2.8} />
           </button>
         </div>

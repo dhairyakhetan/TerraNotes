@@ -67,7 +67,7 @@ export function useFaceColors(filter, teams) {
 // while staying level with the tapped face (face centre cy at least `hug` px inside the card), always wholly on screen.
 // header = sticky header height; zoom = --web-zoom.
 export function profileTop({ section, header, cy, height, zoom = 1, hug = 70, pad = 16 }) {
-  const y0 = scrollY / zoom - section.offsetTop;
+  const y0 = -section.getBoundingClientRect().top / zoom; // how far the screen's top is into the section (offsetTop misses the artboard's own offset)
   const vTop = y0 + header + pad, vBot = y0 + innerHeight / zoom - pad;
   let top = (vTop + vBot - height) / 2;
   top = Math.min(Math.max(top, cy - height + hug), cy - hug);
