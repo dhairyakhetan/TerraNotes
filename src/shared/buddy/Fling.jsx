@@ -3,7 +3,7 @@ import { useEdition } from '../../lib/edition.js';
 import { drawCrown, drawGhost, drawTrophy } from './Ghost.jsx';
 import { giveReward, hasReward, useRewards } from '../../lib/buddyState.js';
 import { FONT } from '../../styles/fonts.js';
-import { LEVELS } from './flingLevels.js';
+import { LEVELS, ORDER, WAS } from './flingLevels.js';
 import { CloseIcon } from '../Icons.jsx';
 
 // Fling, the slingshot game in Buddy's games (BuddyGames.jsx), played like Angry Birds: drag Buddy back in the
@@ -12,7 +12,7 @@ import { CloseIcon } from '../Icons.jsx';
 // a retry. Real physics (matter-js, fetched only when this tab opens): planks topple, slide and break when hit hard
 // enough; a gremlin pops on a hard enough knock, from Buddy, a plank or a fall. Points: gremlin 5000, stone 800, wood
 // 500, glass 300, unused Buddy 10000. No sleeping bodies: a plank left unheld falls. The world is 1200 × 540, drawn scaled into the canvas; the canvas only draws while
-// the popup is open. Each level's best score in localStorage ('aq-fling-scores': the highest, not the latest), the furthest level reached too ('aq-fling-level'):
+// the popup is open. Each level's best score in localStorage ('aq-fling-scores': the highest, not the latest), the furthest level reached too ('aq-fling-level'; 'aq-fling-order' marks saves already moved to the levels' new order):
 // the game starts there, and the level picker under the canvas lists every level up to it. The 50 levels: flingLevels.js.
 // What tells you what to do: a banner at each level's start (how many gremlins to pop), a pulsing ring and "drag me"
 // on Buddy while he waits (the pull starts anywhere on the canvas: the finger's travel pulls him back, so a thumb
@@ -36,6 +36,19 @@ const keepStars = (a) => { try { localStorage.setItem('aq-fling-stars', a.join('
 // the how-to card: shown the first time Fling opens (then on the ? button)
 const howtoSeen = () => { try { return !!localStorage.getItem('aq-fling-howto'); } catch { return false; } };
 const howtoDone = () => { try { localStorage.setItem('aq-fling-howto', '1'); } catch { /* private mode */ } };
+// the levels were put in a new order (easy to hard): once, move a player's stars and best scores with their levels, and
+// keep every level they'd reached or starred open
+if (typeof window !== 'undefined') try {
+  if (Number(localStorage.getItem('aq-fling-order') || 1) < ORDER) {
+    const st = starsOf(), sc = scoresOf(), was = reached();
+    const ns = WAS.map((o) => st[o] || 0), nc = WAS.map((o) => sc[o] || 0);
+    const lastStar = ns.reduce((m, v, i) => (v ? i : m), -1);
+    if (localStorage.getItem('aq-fling-stars') != null) keepStars(ns);
+    if (localStorage.getItem('aq-fling-scores') != null) keepScores(nc);
+    if (localStorage.getItem('aq-fling-level') != null || lastStar >= 0) localStorage.setItem('aq-fling-level', String(Math.min(LEVELS.length - 1, Math.max(was, lastStar + 1))));
+    localStorage.setItem('aq-fling-order', String(ORDER));
+  }
+} catch { /* private mode */ }
 const reach = (v) => { try { localStorage.setItem('aq-fling-level', String(v)); } catch { /* private mode */ } };
 const wipe = () => { try { ['aq-fling-level', 'aq-fling-stars', 'aq-fling-scores'].forEach((k) => localStorage.removeItem(k)); } catch { /* private mode */ } };
 
