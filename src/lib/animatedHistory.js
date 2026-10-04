@@ -52,10 +52,12 @@ export function createAnimatedHistory() {
   let shownIdx = idx();
   let direct = false; // inside our own push/replace, whose listener call must run synchronously
   const shownListeners = new Set(); // a history takes ONE listener (the router's): anything else that wants to know goes here
-  const go = (method) => (to, state) => swap(shown, pathOf(to), () => {
-    direct = true;
-    try { h[method](to, state); } finally { direct = false; }
-  });
+  const go = (method) => (to, state) => {
+    const update = () => { direct = true; try { h[method](to, state); } finally { direct = false; } };
+    // { quiet: true }: the same page under a new address (a section dropping off, AQ Labs' tabs, a game's address while
+    // its popup is open): nothing to animate. A crossfade there flashes the whole screen.
+    if (state?.quiet) update(); else swap(shown, pathOf(to), update);
+  };
   return {
     get action() { return h.action; },
     get location() { return h.location; },
