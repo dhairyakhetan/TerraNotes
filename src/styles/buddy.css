@@ -41,9 +41,12 @@
   100%{translate:0 0;rotate:0deg;scale:1 1}
 }
 
-/* his trophy (won in Fling): over his head, catching the light now and then */
-.buddy-trophy{pointer-events:none;transform-origin:50% 100%;animation:buddyTrophy 3.2s ease-in-out infinite}
-@keyframes buddyTrophy{0%,70%,100%{rotate:-6deg;scale:1}80%{rotate:6deg;scale:1.12}90%{rotate:-3deg;scale:1}}
+/* his Fling rewards: the winner's crown on his head (tilted, catching the light now and then), the trophy beside him */
+.buddy-crown,.buddy-trophy{pointer-events:none;transform-origin:50% 100%}
+.buddy-crown{animation:buddyCrown 3.2s ease-in-out infinite}
+.buddy-trophy{animation:buddyTrophy 3.2s ease-in-out 1.6s infinite}
+@keyframes buddyCrown{0%,70%,100%{rotate:-10deg;scale:1}80%{rotate:-2deg;scale:1.12}90%{rotate:-12deg;scale:1}}
+@keyframes buddyTrophy{0%,70%,100%{rotate:8deg;scale:1}80%{rotate:-4deg;scale:1.12}90%{rotate:10deg;scale:1}}
 
 /* tricks: each a short squash-and-stretch move on the inner span (its origin: his feet) */
 .buddy-trick{transform-origin:50% 90%}
@@ -69,7 +72,7 @@
 .buddy-menu-call svg{animation:buddyBob 2s ease-in-out infinite}
 
 @media (prefers-reduced-motion: reduce){
-  .buddy-bob,.buddy-float-in,.buddy-menu-call svg,.buddy-arrive .buddy-hang,.buddy-trick,.buddy-trophy{animation:none!important}
+  .buddy-bob,.buddy-float-in,.buddy-menu-call svg,.buddy-arrive .buddy-hang,.buddy-trick,.buddy-crown,.buddy-trophy{animation:none!important}
   .buddy-call,.buddy-call-label{transition:none}
   .buddy-peek:not(:hover){animation:buddyPeekStill 1.8s linear}
   @keyframes buddyPeekStill{0%,100%{opacity:0}20%,80%{opacity:.9}}

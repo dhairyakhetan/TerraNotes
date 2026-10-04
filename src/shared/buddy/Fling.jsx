@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useEdition } from '../../lib/edition.js';
-import { drawGhost, drawTrophy } from './Ghost.jsx';
-import { giveTrophy } from '../../lib/buddyState.js';
+import { drawCrown, drawGhost, drawTrophy } from './Ghost.jsx';
+import { giveReward, hasReward } from '../../lib/buddyState.js';
 import { FONT } from '../../styles/fonts.js';
 import { LEVELS } from './flingLevels.js';
 import { CloseIcon } from '../Icons.jsx';
@@ -12,7 +12,7 @@ import { CloseIcon } from '../Icons.jsx';
 // a retry. Real physics (matter-js, fetched only when this tab opens): planks topple, slide and break when hit hard
 // enough; a gremlin pops on a hard enough knock, from Buddy, a plank or a fall. Points: gremlin 5000, stone 800, wood
 // 500, glass 300, unused Buddy 10000. No sleeping bodies: a plank left unheld falls. The world is 1200 × 540, drawn scaled into the canvas; the canvas only draws while
-// the popup is open. Best score in localStorage ('aq-fling-best'), the furthest level reached too ('aq-fling-level'):
+// the popup is open. Each level's best score in localStorage ('aq-fling-scores': the highest, not the latest), the furthest level reached too ('aq-fling-level'):
 // the game starts there, and the level picker under the canvas lists every level up to it. The 50 levels: flingLevels.js.
 // What tells you what to do: a banner at each level's start (how many gremlins to pop), a pulsing ring and "drag me"
 // on Buddy while he waits (the pull starts anywhere on the canvas: the finger's travel pulls him back, so a thumb
@@ -22,8 +22,10 @@ import { CloseIcon } from '../Icons.jsx';
 const WW = 1200, WH = 540, GROUND = 490, BASE = GROUND - 30, SLING = { x: 160, y: BASE - 92 }, PULL = 100, POWER = 0.25, BR = 17;
 // the slingshot stands on a mound at the left (BASE is its top), the gremlins' forts far out at the right, like Angry Birds
 const HP = { gremlin: 1, glass: 3, wood: 8, stone: 16 }, PTS = { gremlin: 5000, glass: 300, wood: 500, stone: 800 };
-const best = () => { try { return Number(localStorage.getItem('aq-fling-best')) || 0; } catch { return 0; } };
-const keep = (v) => { try { localStorage.setItem('aq-fling-best', String(v)); } catch { /* private mode */ } };
+// each level's best score (its points: pops, breaks and Buddy bonus), kept as the highest, never the latest
+const scoresOf = () => { try { const a = JSON.parse(localStorage.getItem('aq-fling-scores') || '[]'); return LEVELS.map((_, i) => Number(a[i]) || 0); } catch { return LEVELS.map(() => 0); } };
+const keepScores = (a) => { try { localStorage.setItem('aq-fling-scores', JSON.stringify(a)); } catch { /* private mode */ } };
+const short = (n) => (n >= 1000 ? `${Math.round(n / 100) / 10}k` : String(n)); // 12400 → "12.4k"
 // how far you've got: the furthest level open to play (the picker lists them)
 const reached = () => { try { return Math.min(LEVELS.length - 1, Number(localStorage.getItem('aq-fling-level')) || 0); } catch { return 0; } };
 // stars per level (1 for clearing it, +1 for each Buddy left, up to 3), one digit a level
@@ -37,7 +39,7 @@ const reach = (v) => { try { localStorage.setItem('aq-fling-level', String(v)); 
 export default function Fling({ W, H }) {
   const { colors: K, fonts: F } = useEdition().look; // a canvas can't read CSS variables: the values themselves
   const cv = useRef(null);
-  const [score, setScore] = useState(0), [top, setTop] = useState(best), [failed, setFailed] = useState(false);
+  const [score, setScore] = useState(0), [scores, setScores] = useState(scoresOf), [failed, setFailed] = useState(false); // score: this level's points
   const restart = useRef(null), jump = useRef(null);
   const [howto, setHowto] = useState(() => !howtoSeen());
   const closeHowto = () => { howtoDone(); setHowto(false); };
@@ -57,7 +59,7 @@ export default function Fling({ W, H }) {
       let s; // the game's state
       const s0 = {}; // what stays across levels (the mound's outline)
       const total = { pts: 0 };
-      const add = (n, x, y) => { total.pts += n; setScore(total.pts); s.pops.push({ x, y, text: String(n), life: 1 }); };
+      const add = (n, x, y) => { total.pts += n; setScore(total.pts - s.start); s.pops.push({ x, y, text: String(n), life: 1 }); };
 
       const build = (lv) => {
         M.Composite.clear(engine.world, false);
@@ -74,7 +76,7 @@ export default function Fling({ W, H }) {
         });
         M.Composite.add(engine.world, things);
         s = { lv, birds: 3, total: things.filter((b) => b.kind === 'gremlin').length, broke: 0, state: 'aim', ghost: null, pull: null, trail: [], since: 0, calm: 0.8, pops: [], bits: [], t: 0, banner: 2.2, note: null, hit: 0, grabbed: s?.grabbed || false, start: total.pts };
-        setFailed(false); setLv(lv);
+        setFailed(false); setLv(lv); setScore(0);
       };
       build(reached());
 
@@ -121,19 +123,22 @@ export default function Fling({ W, H }) {
             for (let i = 0; i < s.birds; i++) add(10000, SLING.x + i * 30, SLING.y - 60);
             s.state = 'clear'; s.stars = 1 + Math.min(2, s.birds);
             { const a = starsOf(); if (s.stars > a[s.lv]) { a[s.lv] = s.stars; keepStars(a); setStars(a); } }
-            if (s.lv === LEVELS.length - 1) { // the last level: the winner's screen, and Buddy's trophy for good
-              s.state = 'won'; s.allStars = starsOf().reduce((a, b) => a + b, 0); giveTrophy();
+            s.pts = total.pts - s.start; s.wasBest = scoresOf()[s.lv];
+            { const a = scoresOf(); if (s.pts > a[s.lv]) { a[s.lv] = s.pts; keepScores(a); setScores(a); } }
+            s.allStars = starsOf().reduce((a, b) => a + b, 0);
+            if (s.allStars === LEVELS.length * 3 && !hasReward('trophy')) { giveReward('trophy'); s.newTrophy = true; s.state = 'stars'; } // every star: Buddy's trophy
+            if (s.lv === LEVELS.length - 1) { // the last level: the winner's screen, and Buddy's crown for good
+              s.state = 'won'; giveReward('crown');
               const hues = [K.yellow, K.red, K.blue, K.green, K.purple, K.pink];
               s.confetti = Array.from({ length: 140 }, (_, i) => ({ x: Math.random() * WW, y: T - Math.random() * 500, vx: (Math.random() - 0.5) * 80, vy: 120 + Math.random() * 160, r: Math.random() * 6, vr: (Math.random() - 0.5) * 8, w: 8 + Math.random() * 8, c: hues[i % hues.length] }));
             }
             if (s.lv + 1 < LEVELS.length && s.lv + 1 > reached()) { reach(s.lv + 1); setOpen(s.lv + 1); }
-            if (total.pts > best()) { keep(total.pts); setTop(total.pts); }
           } else if (s.birds > 0) {
             const n = gremlins().length;
             s.state = 'aim';
             s.note = { text: s.hit ? `nice! ${n} gremlin${n === 1 ? '' : 's'} left` : s.broke ? `close! ${n} gremlin${n === 1 ? '' : 's'} left` : 'missed: aim with the dots, pull further', life: 2.6 };
           }
-          else { s.state = 'failed'; setFailed(true); if (total.pts > best()) { keep(total.pts); setTop(total.pts); } }
+          else { s.state = 'failed'; setFailed(true); }
         }
       };
 
@@ -292,17 +297,21 @@ export default function Fling({ W, H }) {
           g.globalAlpha = Math.min(1, s.note.life); g.textAlign = 'center'; g.fillStyle = K.hand; g.font = `700 ${u(30)}px ${F.hand}`;
           g.fillText(s.note.text, WW / 2, T + u(190)); g.globalAlpha = 1;
         }
-        if (s.state === 'won') { // the winner's screen: confetti, the trophy, the score
+        if (s.state === 'won' || s.state === 'stars') { // the winner's screen (crown) / every star (trophy): confetti, the prize
           g.fillStyle = 'rgba(17,17,17,.7)'; g.fillRect(-400, -400, WW + 800, WH + 800);
           for (const c of s.confetti) { g.save(); g.translate(c.x, c.y); g.rotate(c.r); g.fillStyle = c.c; g.fillRect(-c.w / 2, -c.w / 4, c.w, c.w / 2); g.restore(); }
           const top = Math.max(T + u(20), WH / 2 - u(230)), bob = Math.sin(s.t * 2.4) * u(4);
-          drawTrophy(g, WW / 2, top + u(62) + bob, u(116), K);
-          g.textAlign = 'center'; g.fillStyle = K.yellow; g.font = `400 ${u(64)}px ${F.head}`; g.fillText('WINNER!', WW / 2, top + u(178));
-          g.fillStyle = K.page; g.font = `700 ${u(20)}px ${F.mono}`; g.fillText(`ALL ${LEVELS.length} LEVELS · ★ ${s.allStars} / ${LEVELS.length * 3}`, WW / 2, top + u(214));
-          g.font = `700 ${u(30)}px ${F.hand}`; g.fillText('Buddy keeps the trophy. call him to see it on.', WW / 2, top + u(254));
-          button('PLAY AGAIN ↺', top + u(278));
+          const won = s.state === 'won';
+          if (won && s.newTrophy) { drawCrown(g, WW / 2 - u(70), top + u(66) + bob, u(84), K); drawTrophy(g, WW / 2 + u(70), top + u(62) - bob, u(110), K); }
+          else if (won) drawCrown(g, WW / 2, top + u(66) + bob, u(96), K);
+          else drawTrophy(g, WW / 2, top + u(62) + bob, u(116), K);
+          g.textAlign = 'center'; g.fillStyle = K.yellow; g.font = `400 ${u(64)}px ${F.head}`; g.fillText(won ? 'WINNER!' : 'EVERY STAR!', WW / 2, top + u(178));
+          g.fillStyle = K.page; g.font = `700 ${u(20)}px ${F.mono}`; g.fillText(won ? `ALL ${LEVELS.length} LEVELS · ★ ${s.allStars} / ${LEVELS.length * 3}` : `★ ${s.allStars} / ${LEVELS.length * 3} · EVERY LEVEL, 3 STARS`, WW / 2, top + u(214));
+          g.font = `700 ${u(30)}px ${F.hand}`;
+          g.fillText(won ? (s.newTrophy ? 'the crown AND the trophy: Buddy wears both now.' : 'Buddy wears the winner’s crown now. call him!') : 'Buddy gets the trophy. call him to see it.', WW / 2, top + u(254));
+          button(won || s.lv + 1 >= LEVELS.length ? 'PLAY AGAIN ↺' : 'NEXT LEVEL →', top + u(278));
         }
-        if (s.state === 'clear') { label([[s.lv + 1 < LEVELS.length ? 'LEVEL CLEARED!' : 'EVERY GREMLIN GONE!', `700 ${u(40)}px ${F.mono}`, -40], [`+${total.pts - s.start} this level${s.birds ? ` · ${s.birds} Buddy bonus` : ''}`, `600 ${u(30)}px ${F.hand}`, 4]], s.lv + 1 < LEVELS.length ? 'NEXT LEVEL →' : 'PLAY AGAIN ↺'); starRow(WH / 2 - u(118), s.stars); }
+        if (s.state === 'clear') { label([[s.lv + 1 < LEVELS.length ? 'LEVEL CLEARED!' : 'EVERY GREMLIN GONE!', `700 ${u(40)}px ${F.mono}`, -40], [`+${s.pts} this level${s.birds ? ` · ${s.birds} Buddy bonus` : ''}${s.pts > s.wasBest ? ' · new best!' : ` · best ${s.wasBest}`}`, `600 ${u(30)}px ${F.hand}`, 4]], s.lv + 1 < LEVELS.length ? 'NEXT LEVEL →' : 'PLAY AGAIN ↺'); starRow(WH / 2 - u(118), s.stars); }
         if (s.state === 'failed') { const n = gremlins().length; label([['OUT OF BUDDIES', `700 ${u(40)}px ${F.mono}`, -40], [`${n} gremlin${n === 1 ? '' : 's'} still standing`, `600 ${u(30)}px ${F.hand}`, 4]], 'TRY AGAIN ↺'); }
       };
 
@@ -334,7 +343,7 @@ export default function Fling({ W, H }) {
       const down = (e) => {
         e.preventDefault();
         if (s.state === 'won') { total.pts = 0; setScore(0); build(0); return; }
-        if (s.state === 'clear') { const next = s.lv + 1 < LEVELS.length ? s.lv + 1 : 0; if (!next) { total.pts = 0; setScore(0); } build(next); return; }
+        if (s.state === 'clear' || s.state === 'stars') { const next = s.lv + 1 < LEVELS.length ? s.lv + 1 : 0; if (!next) { total.pts = 0; setScore(0); } build(next); return; }
         if (s.state === 'failed') { build(s.lv); return; }
         if (s.state !== 'aim' || s.calm > 0) return;
         const p = world(e);
@@ -347,7 +356,7 @@ export default function Fling({ W, H }) {
           s.pull = aimAt({ x: SLING.x + (q.x - anchor.x) * f, y: SLING.y + (q.y - anchor.y) * f }); s.finger = { a: anchor, p: q };
           s.banner = Math.min(s.banner, 0.3); return;
         }
-        c.style.cursor = s.state === 'clear' || s.state === 'failed' || s.state === 'won' ? 'pointer' : s.state === 'aim' ? 'grab' : 'default';
+        c.style.cursor = s.state === 'clear' || s.state === 'failed' || s.state === 'won' || s.state === 'stars' ? 'pointer' : s.state === 'aim' ? 'grab' : 'default';
       };
       const up = () => { if (!dragging) return; dragging = false; s.finger = null; launch(); };
       jump.current = (n) => { total.pts = 0; setScore(0); s.finger = null; dragging = false; build(n); };
@@ -360,14 +369,14 @@ export default function Fling({ W, H }) {
   return (
     <>
       <div style={{ display: "flex", justifyContent: "space-between", fontFamily: FONT.mono, fontWeight: "700", letterSpacing: "1.2px", textTransform: "uppercase", fontSize: "10.5px", margin: "0 0 8px" }}>
-        <span>{`${score} points`}</span><span style={{ color: "var(--muted)" }}>{`best ${top}`}</span>
+        <span>{`${score} points`}</span><span style={{ color: "var(--muted)" }}>{`level ${lv + 1} best ${scores[lv]}`}</span>
       </div>
       <div style={{ position: "relative", display: pick || (howto && W < 400) ? "none" : "block" }}>
         <canvas ref={cv} role="img" aria-label={failed ? 'Fling: out of Buddies, tap to retry' : 'Fling: drag back anywhere on the game and let go to fling Buddy at the towers'} style={{ display: "block", width: `${W}px`, height: `${H}px`, border: "2px solid var(--ink)", touchAction: "none", cursor: "default", background: "var(--page)" }} />
         {howto && W >= 400 && <HowTo onClose={closeHowto} />}
       </div>
       {howto && W < 400 && !pick && <HowTo small onClose={closeHowto} />}
-      {pick && <LevelGrid W={W} H={H} lv={lv} open={open} stars={stars} onPick={(n) => { setPick(false); jump.current?.(n); }} onClose={() => setPick(false)} />}
+      {pick && <LevelGrid W={W} H={H} lv={lv} open={open} stars={stars} scores={scores} onPick={(n) => { setPick(false); jump.current?.(n); }} onClose={() => setPick(false)} />}
       <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: W < 400 ? "8px" : "12px", marginTop: "12px" }}>
         <button type="button" className="press btn" aria-label="Previous level" disabled={lv <= 0} onClick={() => jump.current?.(lv - 1)} style={{ ...BTN, width: "44px", padding: "0", opacity: lv <= 0 ? 0.35 : 1 }}>‹</button>
         <button type="button" className="press btn" aria-label="Pick a level" aria-expanded={pick ? 'true' : 'false'} onClick={() => setPick((v) => !v)} style={{ ...BTN, "--c": "var(--yellow)", background: pick ? "var(--ink)" : "var(--card)", color: pick ? "var(--card)" : "var(--ink)", boxShadow: "3px 3px 0 var(--yellow)", padding: "0 14px", minWidth: W < 400 ? "116px" : "150px" }}>{`Level ${lv + 1}/${LEVELS.length}`} <span aria-hidden="true">{pick ? '▴' : '▾'}</span></button>
@@ -384,7 +393,7 @@ const BTN = { "--c": "var(--ink)", flexShrink: "0", fontFamily: FONT.mono, fontW
 
 // the level picker: every level as a tile, in the canvas's place while open. Played ones show their stars, the
 // current one is inked, the next one to beat has a yellow shadow, the rest are locked (dashed).
-function LevelGrid({ W, H, lv, open, stars, onPick, onClose }) {
+function LevelGrid({ W, H, lv, open, stars, scores, onPick, onClose }) {
   const cols = W < 400 ? 6 : 10, total = stars.reduce((a, b) => a + b, 0);
   return (
     <div className="card-drop" role="dialog" aria-label="Pick a level" style={{ boxSizing: "border-box", width: `${W}px`, minHeight: `${H}px`, border: "2px solid var(--ink)", background: "var(--card)", padding: W < 400 ? "12px" : "18px" }}>
@@ -403,6 +412,7 @@ function LevelGrid({ W, H, lv, open, stars, onPick, onClose }) {
                 border: locked ? "1.5px dashed var(--muted)" : "2px solid var(--ink)", boxShadow: locked ? "none" : `3px 3px 0 ${next ? "var(--yellow)" : "var(--ink)"}`, opacity: locked ? 0.6 : 1 }}>
               <span>{i + 1}</span>
               {!locked && <Stars n={stars[i]} size={W < 400 ? 9 : 12} on={here} />}
+              {!locked && scores[i] > 0 && <span style={{ fontSize: W < 400 ? "8px" : "9.5px", letterSpacing: "0.5px", fontWeight: "700", opacity: ".8" }}>{short(scores[i])}</span>}
             </button>
           );
         })}

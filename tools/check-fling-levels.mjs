@@ -1,5 +1,6 @@
-// Plays every Fling level (src/shared/buddy/flingLevels.js) to check it: it must stand still until hit, and 3 Buddies
-// must be able to clear it (for each Buddy it tries 76 shots and keeps the best). The physics and knocks copy
+// Plays every Fling level (src/shared/buddy/flingLevels.js) to check it: it must stand still until hit, 3 Buddies
+// must be able to clear it (for each Buddy it tries 76 shots and keeps the best), and so must one (3 stars: a finer
+// sweep of ~870 single shots), so every level's 3 stars can be won. The physics and knocks copy
 // Fling.jsx: change one, change both. Run after adding or changing levels: node tools/check-fling-levels.mjs [n…]
 import M from 'matter-js';
 import { LEVELS } from '../src/shared/buddy/flingLevels.js';
@@ -29,6 +30,7 @@ function world(lv){
   return {e,bs,st,step,grem,shoot};
 }
 const cands=[]; for(let a=-15;a<=75;a+=5) for(const pw of [0.55,0.7,0.85,1]) cands.push([a*Math.PI/180,pw]);
+const fine = []; for (let a = -20; a <= 80; a += 1.5) for (let pw = 1; pw >= 0.4; pw -= 0.05) fine.push([a * Math.PI / 180, pw]);
 const pick = process.argv.slice(2).map((n) => Number(n) - 1);
 let bad = 0;
 for (const lv of pick.length ? pick : LEVELS.map((_, i) => i)) {
@@ -38,7 +40,10 @@ for (const lv of pick.length ? pick : LEVELS.map((_, i) => i)) {
   for(let k=0;k<3&&left>0;k++){ let best=null;
     for(const c of cands){ const x=world(lv); for(let t=0;t<60;t++) x.step(); for(const s of shots) x.shoot(s); x.shoot(c); const g=x.grem(); const sc=g*1000-x.st.broke; if(!best||sc<best.sc) best={sc,c,g}; }
     shots.push(best.c); left=best.g; }
-  const ok = moved < 20 && !w.st.broke && !left; if (!ok) bad++;
-  console.log(`${ok ? 'ok ' : 'BAD'} level ${lv + 1}: ${n0} gremlins, ${w.st.broke ? `${w.st.broke} broke on its own` : `settles ${moved.toFixed(0)}px`}, ${left ? `${left} left after 3 Buddies` : `cleared with ${shots.length}`}`);
+  // 3 stars (cleared with one Buddy) must be possible too: a finer sweep of single shots
+  let one = shots.length === 1;
+  for (let i = 0; !one && i < fine.length; i++) { const x = world(lv); for (let t = 0; t < 60; t++) x.step(); x.shoot(fine[i]); one = !x.grem(); }
+  const ok = moved < 20 && !w.st.broke && !left && one; if (!ok) bad++;
+  console.log(`${ok ? 'ok ' : 'BAD'} level ${lv + 1}: ${n0} gremlins, ${w.st.broke ? `${w.st.broke} broke on its own` : `settles ${moved.toFixed(0)}px`}, ${left ? `${left} left after 3 Buddies` : `cleared with ${shots.length}`}${one ? ', 3★ possible' : ', 3★ NOT possible (no single shot clears it)'}`);
 }
 process.exit(bad ? 1 : 0);

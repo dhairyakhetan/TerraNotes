@@ -17,20 +17,27 @@ export function useBuddy() {
 }
 export const openGames = (game) => dispatchEvent(new CustomEvent('aq-games', { detail: game }));
 
-// Buddy's trophy: won by clearing Fling's last level (shared/buddy/Fling.jsx), kept for good on this device
-// (localStorage 'aq-buddy-trophy'); he wears it over his head whenever he's called. 'aq-trophy' tells him at once.
-const TROPHY = 'aq-buddy-trophy';
-const hasTrophy = () => { try { return !!localStorage.getItem(TROPHY); } catch { return false; } };
-export function giveTrophy() {
-  try { localStorage.setItem(TROPHY, String(Date.now())); } catch { /* private mode: just this visit */ }
-  won = true;
-  dispatchEvent(new Event('aq-trophy'));
+// Buddy's rewards from Fling (shared/buddy/Fling.jsx), kept for good on this device and shown whenever he's called:
+//   crown   clearing its last level: the winner's crown, on his head            (localStorage 'aq-buddy-crown')
+//   trophy  every star of every level (150): a trophy he holds beside him        ('aq-buddy-trophy-stars')
+// 'aq-reward' tells him at once. (Before the crown, a won last level was stored as 'aq-buddy-trophy': it becomes the crown.)
+const KEYS = { crown: 'aq-buddy-crown', trophy: 'aq-buddy-trophy-stars' };
+const read = () => {
+  const has = (k) => { try { return !!localStorage.getItem(k); } catch { return false; } };
+  try { if (localStorage.getItem('aq-buddy-trophy')) { localStorage.setItem(KEYS.crown, localStorage.getItem('aq-buddy-trophy')); localStorage.removeItem('aq-buddy-trophy'); } } catch { /* no storage */ }
+  return { crown: has(KEYS.crown), trophy: has(KEYS.trophy) };
+};
+let rewards = typeof window !== 'undefined' ? read() : { crown: false, trophy: false };
+export const hasReward = (kind) => rewards[kind];
+export function giveReward(kind) {
+  try { localStorage.setItem(KEYS[kind], String(Date.now())); } catch { /* private mode: just this visit */ }
+  rewards = { ...rewards, [kind]: true };
+  dispatchEvent(new Event('aq-reward'));
 }
-let won = typeof window !== 'undefined' && hasTrophy();
-export function useTrophy() {
-  const [has, setHas] = useState(won);
-  useEffect(() => { const on = () => setHas(true); addEventListener('aq-trophy', on); return () => removeEventListener('aq-trophy', on); }, []);
-  return has;
+export function useRewards() {
+  const [now, setNow] = useState(rewards);
+  useEffect(() => { const on = () => setNow(rewards); addEventListener('aq-reward', on); return () => removeEventListener('aq-reward', on); }, []);
+  return now;
 }
 
 // Where the last tap / click landed (screen px), so Buddy's games popup can grow out of the button that opened it

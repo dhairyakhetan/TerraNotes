@@ -27,6 +27,29 @@ export function Trophy({ size = 30, style, className }) {
   );
 }
 
+// The winner's crown (Fling's last level won), worn on his head: three gold points with gems, a band.
+export function Crown({ size = 30, style, className }) {
+  return (
+    <svg className={className} width={size} height={size * 0.75} viewBox="0 0 40 30" style={style} aria-hidden="true">
+      <path d="M4 24 L6 8 L13 16 L20 4 L27 16 L34 8 L36 24 Z" style={{ fill: "var(--yellow)", stroke: "var(--ink)", strokeWidth: 2, strokeLinejoin: "round" }} />
+      <rect x="4" y="22" width="32" height="5" style={{ fill: "var(--yellow)", stroke: "var(--ink)", strokeWidth: 2 }} />
+      <circle cx="20" cy="4" r="2.4" style={{ fill: "var(--red)", stroke: "var(--ink)", strokeWidth: 1.2 }} />
+      <circle cx="6" cy="8" r="2" style={{ fill: "var(--blue)", stroke: "var(--ink)", strokeWidth: 1.2 }} />
+      <circle cx="34" cy="8" r="2" style={{ fill: "var(--blue)", stroke: "var(--ink)", strokeWidth: 1.2 }} />
+      <circle cx="20" cy="24.5" r="1.8" style={{ fill: "var(--red)" }} />
+    </svg>
+  );
+}
+export function drawCrown(g, x, y, h, C) { // centre (x, y), height h
+  const k = h / 30;
+  g.save(); g.translate(x - 20 * k, y - 15 * k); g.scale(k, k); g.lineJoin = 'round'; g.strokeStyle = C.ink; g.lineWidth = 2;
+  g.fillStyle = C.yellow; g.beginPath(); [[4, 24], [6, 8], [13, 16], [20, 4], [27, 16], [34, 8], [36, 24]].forEach(([a, b], i) => (i ? g.lineTo(a, b) : g.moveTo(a, b))); g.closePath(); g.fill(); g.stroke();
+  g.fillRect(4, 22, 32, 5); g.strokeRect(4, 22, 32, 5);
+  g.lineWidth = 1.2; for (const [a, b, r, c] of [[20, 4, 2.4, C.red], [6, 8, 2, C.blue], [34, 8, 2, C.blue]]) { g.fillStyle = c; g.beginPath(); g.arc(a, b, r, 0, Math.PI * 2); g.fill(); g.stroke(); }
+  g.fillStyle = C.red; g.beginPath(); g.arc(20, 24.5, 1.8, 0, Math.PI * 2); g.fill();
+  g.restore();
+}
+
 // The same trophy on a canvas: centre (x, y), height h.
 export function drawTrophy(g, x, y, h, C) {
   const k = h / 40;

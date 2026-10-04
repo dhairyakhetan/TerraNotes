@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate } from '../../router.jsx';
-import Ghost, { Trophy } from './Ghost.jsx';
+import Ghost, { Crown, Trophy } from './Ghost.jsx';
 import { editionLink } from '../../data/editions.js';
-import { callBuddy, openGames, useBuddy, useTrophy } from '../../lib/buddyState.js';
+import { callBuddy, openGames, useBuddy, useRewards } from '../../lib/buddyState.js';
 import { useEdition } from '../../lib/edition.js';
 import { AQ_LOOK } from '../../host.js';
 import { FONT } from '../../styles/fonts.js';
@@ -12,14 +12,14 @@ import { calm } from '../../lib/motion.js';
 // (it peeks out now and then while the pointer is near) or from "click me" at the bottom of the phone menu: he drops in
 // from above, fast, stretched, and lands with a squash and a bounce. He stays until a reload (lib/buddyState.js).
 // Tap him: a random trick (backflip, boing, twirl, jelly, dash, vanish, boo, wobble), then his games open
-// (BuddyGames.jsx; the address becomes the edition's /games/<game>). Once Fling's last level is won he wears its
-// trophy over his head for good (lib/buddyState.js useTrophy). Animations: styles/buddy.css.
+// (BuddyGames.jsx; the address becomes the edition's /games/<game>). His Fling rewards, for good (lib/buddyState.js
+// useRewards): the winner's crown on his head (its last level won), a trophy beside him (all 150 stars). Animations: styles/buddy.css.
 // Animations: styles/buddy.css.
 const TRICKS = ['backflip', 'boing', 'twirl', 'jelly', 'dash', 'vanish', 'boo', 'wobble'];
 
 function TapGhost({ size }) {
   const [trick, setTrick] = useState(null);
-  const last = useRef(null), wait = useRef(0), trophy = useTrophy();
+  const last = useRef(null), wait = useRef(0), { crown, trophy } = useRewards();
   useEffect(() => () => clearTimeout(wait.current), []);
   const tap = () => {
     let t; do t = TRICKS[Math.floor(Math.random() * TRICKS.length)]; while (t === last.current);
@@ -29,9 +29,10 @@ function TapGhost({ size }) {
     wait.current = setTimeout(() => openGames(), calm() ? 0 : 640); // the trick, then his games
   };
   return (
-    <button className="buddy-ghost" onClick={tap} aria-label={trophy ? 'Buddy the ghost, with his trophy: tap him to play his games' : 'Buddy the ghost: tap him to play his games'}>
+    <button className="buddy-ghost" onClick={tap} aria-label={`Buddy the ghost${crown || trophy ? `, with his ${[crown && 'crown', trophy && 'trophy'].filter(Boolean).join(' and ')}` : ''}: tap him to play his games`}>
       <span className={trick ? `buddy-trick buddy-${trick}` : 'buddy-trick'} onAnimationEnd={(e) => { if (e.target === e.currentTarget) setTrick(null); }} style={{ position: "relative" }}>
-        {trophy && <Trophy size={Math.round(size * 0.56)} className="buddy-trophy" style={{ position: "absolute", left: "50%", top: `${-Math.round(size * 0.5)}px`, marginLeft: `${-Math.round(size * 0.28)}px` }} />}
+        {crown && <Crown size={Math.round(size * 0.56)} className="buddy-crown" style={{ position: "absolute", left: "50%", top: `${-Math.round(size * 0.3)}px`, marginLeft: `${-Math.round(size * 0.28)}px` }} />}
+        {trophy && <Trophy size={Math.round(size * 0.5)} className="buddy-trophy" style={{ position: "absolute", left: `${Math.round(size * 0.78)}px`, top: `${Math.round(size * 0.48)}px` }} />}
         <Ghost size={size} face={trick === 'boo' ? 'boo' : 'happy'} />
       </span>
     </button>
@@ -92,7 +93,7 @@ export function WebBuddy() {
 
 // Phone home: he floats next to the intro card.
 export function PhoneBuddy() {
-  const { here, fresh } = useBuddy(), trophy = useTrophy();
+  const { here, fresh } = useBuddy(), { crown } = useRewards();
   // The phone menu's "click me" (MenuCall) calls him; inside AQ's website that menu isn't drawn, so a small visible
   // ghost button stands where he floats and calls him instead (44px: a touch target).
   if (!here) {
@@ -107,7 +108,7 @@ export function PhoneBuddy() {
   return (
     <div className={fresh ? 'buddy-float-in' : undefined} style={{ position: "absolute", left: "298px", top: "170px", width: "70px", zIndex: "5" }}>
       <div style={{ fontFamily: FONT.hand, fontSize: "18px", color: "var(--hand)", transform: "rotate(6deg)", whiteSpace: "nowrap", pointerEvents: "none", textAlign: "center", marginBottom: "4px" }}>tap him</div>
-      <div className="buddy-bob" style={{ display: "flex", justifyContent: "center", marginTop: trophy ? "26px" : "0" }}>
+      <div className="buddy-bob" style={{ display: "flex", justifyContent: "center", marginTop: crown ? "16px" : "0" }}>
         <TapGhost size={46} />
       </div>
     </div>
