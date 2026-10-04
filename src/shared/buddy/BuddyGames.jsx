@@ -8,6 +8,9 @@ import { lockScroll, unlockScroll } from '../../lib/scrollLock.js';
 import { drawGhost } from './Ghost.jsx';
 import { lastTap } from '../../lib/buddyState.js';
 import { calm } from '../../lib/motion.js';
+import { useLocation, useNavigate } from '../../router.jsx';
+import { homeOf } from '../../lib/routes.js';
+import { gameLink, gameOf } from '../../data/games.js';
 import Fling from './Fling.jsx';
 
 // Buddy's games popup (mounted once in App.jsx; opened by openGames() in lib/buddyState.js, event 'aq-games').
@@ -237,6 +240,23 @@ export default function BuddyGames({ first = null }) {
   const [game, setGame] = useState(first);
   const [shown, leaving] = usePresence(game, 220);
   useEffect(() => { if (game) track('Game opened', { game }); }, [game]);
+  // the address follows the popup over the latest home page: /games/<id> while a game is open (a link straight to it,
+  // with its own link preview: data/games.js), back to the address it had once it closes. Elsewhere (an article, an
+  // older edition) the address stays: /games is the latest edition's page.
+  const { pathname, search } = useLocation(), navigate = useNavigate(), back = useRef(null), at = useRef(pathname), title = useRef(null);
+  at.current = pathname;
+  useEffect(() => {
+    const p = at.current, onGames = /^\/games(\/|$)/.test(p), onHome = onGames || homeOf(p)?.id === '';
+    if (game && onHome) {
+      if (!onGames) back.current = p + search;
+      title.current ??= document.title; // the tab names the game too (as its page's title does: build/siteFiles.js)
+      document.title = `${gameOf(game).title} · TerraNotes games`;
+      if (p !== gameLink(game)) navigate(gameLink(game), { replace: true, state: { quiet: true } });
+    } else if (!game && onGames) {
+      if (title.current) { document.title = title.current; title.current = null; }
+      navigate(back.current || '/', { replace: true, state: { quiet: true } });
+    }
+  }, [game]);
   const card = useRef(null), from = useRef(null); // from: the tap it grows out of, as an offset from the card's centre
   useLayoutEffect(() => { // opening
     if (!game || from.current || !card.current) return;

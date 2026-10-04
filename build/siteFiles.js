@@ -9,7 +9,7 @@
 //   name so chat apps don't keep showing an old picture;
 // - index.html, articles.html, photos.html, words.html, members.html (the latest edition's home page and its sections),
 //   the same for each older edition under its id (sep26.html, sep26/photos.html…), and editions.html, with their own
-//   titles and text;
+//   titles and text; games.html and games/<id>.html (Buddy's games, data/games.js: their own titles and pictures);
 // - 404.html, robots.txt, sitemap.xml, feed.xml (RSS), llms.txt / llms-full.txt (the site and every article as plain text for AIs).
 import fs from 'node:fs';
 import path from 'node:path';
@@ -17,6 +17,7 @@ import crypto from 'node:crypto';
 import { ALL_ARTICLES } from '../src/data/articles.js';
 import { LATEST, PUBLISHED, articleLink, editionName, homeLink, isDraft, ogImage } from '../src/data/editions.js';
 import { SITE } from '../src/data/site.js';
+import { GAMES, gameLink } from '../src/data/games.js';
 import { editionData } from '../src/editions/index.js';
 import { articleHtml, editionsHtml, homeHtml, withContent } from './staticCopy.js';
 
@@ -95,7 +96,16 @@ export default function siteFiles(host) {
       out('editions.html', withContent(withHome(setMeta(setMeta(setTitle(base, 'Aquaterra — Editions'), 'property', 'og:title', 'Editions · TerraNotes'), 'property', 'og:url', url('/editions'))), editionsHtml()));
 
       out('404.html', setTitle(withHome(base), 'Aquaterra — not found').replace('</title>', '</title>\n    <meta name="robots" content="noindex" />'));
-      const paths = [...pages, '/editions', ...ARTICLES.map(articleLink)];
+      // /games and /games/<id>: the home page with Buddy's games open (App.jsx), each with its own title and link preview
+      const gamePage = (g) => {
+        const title = g ? `${g.title} · TerraNotes games` : 'Buddy’s games · TerraNotes', about = g ? g.about : `Three mini games with Buddy the ghost: ${GAMES.map((x) => x.name).join(', ')}. In TerraNotes, Aquaterra’s monthly magazine.`;
+        let html = setMeta(setMeta(setTitle(base, title), 'property', 'og:title', title), 'property', 'og:url', url(gameLink(g?.id)));
+        html = setMeta(setMeta(html, 'name', 'description', about), 'property', 'og:description', about);
+        const pic = og(g ? ogImage.game(g.id) : ogImage.games());
+        out(`${gameLink(g?.id).slice(1)}.html`, pic ? withImage(html, pic, title) : withHome(html));
+      };
+      [null, ...GAMES].forEach(gamePage);
+      const paths = [...pages, '/editions', ...ARTICLES.map(articleLink), gameLink(), ...GAMES.map((g) => gameLink(g.id))];
       out('sitemap.xml', `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${paths.map((p) => `  <url><loc>${url(p)}</loc></url>`).join('\n')}\n</urlset>\n`);
       // feed.xml: an RSS feed of every published article, newest issue first, so readers (and apps) hear of a new one
       const monthOf = (n) => PUBLISHED.find((e) => e.number === n)?.month;

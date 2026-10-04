@@ -7,15 +7,19 @@
 //                       photo wall) hanging on a string
 //   <id>-<slug>.jpg     each article (sep26-labs.jpg): on its edition's paper, the cover hanging in a frame its own shape
 //                       (never cropped), a "TerraNotes · No. 01 · September 2026" tape, the tag, title, dek and byline
+//   game-<id>.jpg       each of Buddy's games (data/games.js; its address /games/<id>): on the latest edition's paper,
+//                       its title and how-to, and its little arcade screen (the games card's, shared/GameCard.jsx) big
+//   games.jpg           /games: the three screens together
 // The build (build/siteFiles.js; inside AQ, its prerender) points each page at its picture under a content-hashed name.
 // Run after adding an article, changing a cover or adding an edition:  node tools/make-link-previews.mjs
-// (needs Playwright: npm i -D playwright; env CHROMIUM = a browser to use, FONTS_DIR = serve the Google Fonts from a
-// local folder: fonts.css + files named after their URL)
+// (needs Playwright: npm install; env CHROMIUM = a browser to use). The fonts are the site's own (public/fonts,
+// src/styles/fontfaces.css), put in each picture's page, so nothing is fetched.
 import fs from 'node:fs';
 import path from 'node:path';
 import { chromium } from 'playwright';
 import { ALL_ARTICLES, tagOf } from '../src/data/articles.js';
-import { EDITIONS, editionId, ogImage } from '../src/data/editions.js';
+import { EDITIONS, LATEST, editionId, ogImage } from '../src/data/editions.js';
+import { GAMES } from '../src/data/games.js';
 import { editionData } from '../src/editions/index.js';
 import { withBase } from '../src/lib/base.js';
 
@@ -25,7 +29,8 @@ const TYPES = { jpg: 'image/jpeg', jpeg: 'image/jpeg', png: 'image/png', webp: '
 const data = (url) => `data:${TYPES[url.split('.').pop().toLowerCase()]};base64,${fs.readFileSync(pub(url)).toString('base64')}`;
 const esc = (t) => String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 const pad = (n) => String(n).padStart(2, '0');
-const FONTS = 'https://fonts.googleapis.com/css2?family=Archivo+Black&family=Caveat:wght@600;700&family=Instrument+Serif:ital@0;1&family=Space+Mono:wght@400;700&family=Figtree:wght@500&display=block';
+// every font face the site has, with its file inlined (so the screenshots never wait on, or miss, a font)
+const FACES = fs.readFileSync(path.join(root, 'src/styles/fontfaces.css'), 'utf8').replace(/url\((\/fonts\/[^)]+\.woff2)\)/g, (m, f) => `url(data:font/woff2;base64,${fs.readFileSync(pub(f)).toString('base64')})`);
 const globe = data(withBase('/brand/aquaterra-globe.webp')), word = data(withBase('/brand/aquaterra-wordmark.webp'));
 // a cover: its small card copy when there is one (tools/make-card-covers.mjs), else the original
 const cover = (a) => { const card = a.cover.replace(/cover\.jpg$/, 'cover-card.webp'); return data(fs.existsSync(pub(card)) ? card : a.cover); };
@@ -52,7 +57,7 @@ const TAGLINE = { sep26: 'exam season: write-ups, photos & words', oct26: 'the P
 function shell(e, inner, extraCss = '') {
   const { look: { colors: C, fonts: F, fontsCss } } = editionData(e.number);
   const sep = e.id === 'sep26';
-  return `<!doctype html><html><head><link rel="stylesheet" href="${FONTS}">${fontsCss ? `<link rel="stylesheet" href="${fontsCss}">` : ''}<style>
+  return `<!doctype html><html><head><style>${FACES}</style>${fontsCss ? `<link rel="stylesheet" href="${fontsCss}">` : ''}<style>
   *{box-sizing:border-box} body{margin:0;width:1200px;height:630px;overflow:hidden;position:relative;font-family:${F.body};color:${C.ink}}
   ${paper(e.id, C)}
   .toran{position:absolute;left:0;top:0}
@@ -124,7 +129,7 @@ function mainCard() {
       <div class="imp"><div class="s">Aquaterra · field notes</div><div class="sec" style="color:${c.yellow};font-family:${f.head}">Top<br>secret</div>
       <div class="rule"></div><div class="nm" style="font-family:${f.serif}">TerraNotes</div>
       <div class="iss" style="color:${c.yellow};border-color:${c.yellow};font-family:${f.head}">Issue ${pad(e.number)}</div><div class="mo" style="color:${c.page}">${esc(e.month)}</div></div></div>`; }).join('');
-  return `<!doctype html><html><head><link rel="stylesheet" href="${FONTS}">${[...new Set(eds.map((e) => editionData(e.number).look.fontsCss).filter(Boolean))].map((h) => `<link rel="stylesheet" href="${h}">`).join('')}<style>
+  return `<!doctype html><html><head><style>${FACES}</style>${[...new Set(eds.map((e) => editionData(e.number).look.fontsCss).filter(Boolean))].map((h) => `<link rel="stylesheet" href="${h}">`).join('')}<style>
   *{box-sizing:border-box} body{margin:0;width:1200px;height:630px;overflow:hidden;position:relative;background:#EFEBE1;background-image:radial-gradient(rgba(24,33,58,.09) 1.2px,transparent 1.6px);background-size:22px 22px;font-family:${F.body};color:#18213A}
   .left{position:absolute;left:84px;top:118px;width:520px}
   .kicker{font:700 17px/1 ${F.mono};letter-spacing:3px;text-transform:uppercase;color:#253048}
@@ -153,13 +158,49 @@ function mainCard() {
 }
 
 
+// Buddy's games: the games card's little arcade screens (shared/GameCard.jsx, drawn the same way), in the look's colours
+const GHOST = '<path d="M6 30 C6 14 17 4 30 4 C43 4 54 14 54 30 V60 a8 8 0 0 1 -16 0 a8 8 0 0 1 -16 0 a8 8 0 0 1 -16 0 Z" fill="var(--green)"/><circle cx="21" cy="27" r="6.5" fill="var(--card)"/><circle cx="39" cy="27" r="6.5" fill="var(--card)"/><circle cx="23" cy="25" r="3.4" fill="var(--ink)"/><circle cx="41" cy="25" r="3.4" fill="var(--ink)"/>';
+const ART = {
+  snake: () => { const c = 14, body = [[1, 4], [2, 4], [3, 4], [3, 3], [3, 2], [4, 2], [5, 2]];
+    return body.map(([x, y], i) => `<rect x="${x * c + 12}" y="${y * c + 3}" width="${c - 2}" height="${c - 2}" rx="3" fill="var(--${i === body.length - 1 ? 'mint' : 'snake'})"/>`).join('')
+      + `<circle cx="${5 * c + 21}" cy="${2 * c + 7}" r="1.6" fill="var(--ink)"/><path d="M118 24l3.2 8 8.4.8-6.4 5.6 2 8.4-7.2-4.4-7.2 4.4 2-8.4-6.4-5.6 8.4-.8z" transform="translate(2 -4)" fill="var(--yellow)"/>`
+      + [[40, 18], [96, 70], [128, 64]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="1.4" fill="var(--card)" opacity=".45"/>`).join(''); },
+  float: () => { const post = (x, top, h, k) => `<rect x="${x}" y="${top}" width="18" height="${h}" fill="var(--${k})"/><rect x="${x - 3}" y="${top || h - 7}" width="24" height="7" fill="var(--${k})"/>`;
+    return post(88, 0, 26, 'red') + post(88, 64, 29, 'red') + post(128, 0, 44, 'blue')
+      + [[22, 60, 3], [30, 66, 2.2], [36, 58, 1.6]].map(([x, y, r]) => `<circle cx="${x}" cy="${y}" r="${r}" fill="var(--card)" opacity=".5"/>`).join('')
+      + `<g transform="translate(40 26) scale(0.5)">${GHOST}<ellipse cx="30" cy="44" rx="5" ry="6" fill="var(--ink)"/></g>`; },
+  fling: () => '<rect x="0" y="80" width="150" height="13" fill="var(--text)"/><path d="M22 80 L24 58 L18 50 M24 58 L30 50" fill="none" stroke="var(--peg)" stroke-width="4" stroke-linecap="round"/>'
+    + [[96, 52, 6, 28], [124, 52, 6, 28], [92, 46, 40, 6]].map(([x, y, w, h]) => `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="var(--peg)" stroke="var(--ink)" stroke-width="1.2"/>`).join('')
+    + '<circle cx="112" cy="72" r="7" fill="var(--green)" stroke="var(--ink)" stroke-width="1.2"/><circle cx="112" cy="39" r="6" fill="var(--green)" stroke="var(--ink)" stroke-width="1.2"/>'
+    + [[40, 44], [52, 34], [64, 28], [76, 26]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="1.6" fill="var(--card)" opacity=".6"/>`).join('')
+    + `<g transform="translate(78 12) scale(0.36)">${GHOST}</g>`,
+};
+const screen = (id, w, extra = '') => `<svg class="screen" ${extra} width="${w}" height="${Math.round(w * 0.62)}" viewBox="0 0 150 93"><rect width="150" height="93" fill="var(--text)"/>${ART[id]()}</svg>`;
+const SHADE = { snake: 'purple', float: 'blue', fling: 'green' };
+function gameCard(e, g) { // one game (or all three, g = null) on the latest edition's paper
+  const { colors: C, fonts: F } = editionData(e.number).look, sep = e.id === 'sep26';
+  const vars = Object.entries(C).map(([k, v]) => `--${k}:${v}`).join(';');
+  const css = `
+  :root{${vars}}
+  .left{position:absolute;left:${sep ? 150 : 80}px;top:${sep ? 100 : 120}px;width:${g ? 470 : 520}px}
+  .kicker{font:700 17px/1 ${F.mono};letter-spacing:3px;text-transform:uppercase;color:${C.text}}
+  h1{margin:18px 0 0;font:400 ${g ? 76 : 84}px/0.95 ${F.head};text-transform:uppercase;letter-spacing:-1px;color:${C.ink}}
+  .hand{margin-top:18px;font:700 40px/1.05 ${F.hand};color:${C.hand}}
+  .play{margin-top:28px;display:inline-block;background:${C.ink};color:${C.card};border:3px solid ${C.ink};box-shadow:6px 6px 0 ${C.yellow};padding:14px 22px;font:700 20px/1 ${F.mono};letter-spacing:2px;text-transform:uppercase}
+  .screen{position:absolute;border:3px solid ${C.ink};border-radius:16px;display:block}
+  .foot{position:absolute;left:${sep ? 150 : 80}px;bottom:40px}`;
+  const big = g ? screen(g.id, 560, `style="left:${sep ? 600 : 590}px;top:${sep ? 150 : 160}px;box-shadow:14px 14px 0 ${C[SHADE[g.id]]};transform:rotate(2deg)"`)
+    : GAMES.map((x, i) => screen(x.id, 300, `style="left:${640 + (i % 2) * 230}px;top:${[110, 190, 330][i]}px;box-shadow:10px 10px 0 ${C[SHADE[x.id]]};transform:rotate(${[-4, 3, -2][i]}deg);z-index:${i}"`)).join('');
+  return shell(e, `
+    <div class="left"><div class="kicker">TerraNotes · ${g ? 'a mini game' : 'mini games'}</div><h1>${esc(g ? g.title : 'Buddy’s games')}</h1>
+      <div class="hand">${esc(g ? g.line : 'snake, float & fling, with a ghost')}</div>
+      <div class="play">${g ? 'Play it in your browser →' : 'Three games · play free →'}</div></div>
+    ${big}
+    <div class="foot logo"><img class="g" src="${globe}"><img class="w" src="${word}"></div>`, css);
+}
+
 const browser = await chromium.launch(process.env.CHROMIUM ? { executablePath: process.env.CHROMIUM } : {});
 const ctx = await browser.newContext({ viewport: { width: 1200, height: 630 }, deviceScaleFactor: 1 });
-if (process.env.FONTS_DIR) { // offline: serve Google Fonts from a local folder (fonts.css + files named after their URL)
-  const css = fs.readFileSync(path.join(process.env.FONTS_DIR, 'fonts.css'), 'utf8');
-  await ctx.route(/fonts\.googleapis\.com/, (r) => r.fulfill({ body: css, contentType: 'text/css' }));
-  await ctx.route(/fonts\.gstatic\.com/, (r) => r.fulfill({ path: path.join(process.env.FONTS_DIR, r.request().url().replace('https://fonts.gstatic.com/', '').replace(/\//g, '_')), contentType: 'font/woff2' }));
-}
 const p = await ctx.newPage();
 const measure = async (srcs) => { for (const s of srcs) if (!SIZE.has(s)) SIZE.set(s, await p.evaluate((u) => new Promise((ok) => { const i = new Image(); i.onload = () => ok([i.naturalWidth, i.naturalHeight]); i.src = u; }), s)); };
 const shot = async (html, url) => {
@@ -173,6 +214,9 @@ const shot = async (html, url) => {
   console.log(url, Math.round(fs.statSync(file).size / 1024), 'KB');
 };
 await shot(mainCard(), ogImage.home());
+const latest = { ...EDITIONS.find((x) => x.number === LATEST), id: editionId(LATEST) };
+await shot(gameCard(latest, null), ogImage.games());
+for (const g of GAMES) await shot(gameCard(latest, g), ogImage.game(g.id));
 for (const ed of EDITIONS) {
   const e = { ...ed, id: editionId(ed.number) }, d = editionData(e.number), mine = ALL_ARTICLES.filter((a) => a.edition === e.number && a.cover);
   await measure([...mine.map(cover), ...d.photos.filter((x) => x.photo).map((x) => data(x.photo))]);

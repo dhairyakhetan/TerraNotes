@@ -8,8 +8,7 @@ import { HOST } from '../host.js';
 //   startAnalytics()           main.jsx, the own site only (inside AQ's website, AQ counts its own pages)
 //   track(name, props)         one event; never throws
 //   useReadDepth(slug, p)      an article page: "Read depth" at 25 / 50 / 75 / 100 % of the text, once each a visit
-// Events: Read depth { article, depth } · Game opened { game } · Shared { article, method } · Follow { channel }
-//         · Words game done { score, of }
+// Events: Read depth { article, depth } · Game opened { game } · Shared { article, method } · Words game done { score, of }
 export function startAnalytics() {
   if (HOST.embedded || /^(localhost|127\.0\.0\.1)$/.test(location.hostname)) return; // its script is only served on Vercel
   try { inject({ mode: import.meta.env.PROD ? 'production' : 'development', debug: false }); } catch { /* blocked: fine */ }

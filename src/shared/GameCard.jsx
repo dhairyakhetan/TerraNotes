@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { openGames } from '../lib/buddyState.js';
 import { calm, LITE } from '../lib/motion.js';
 import { FONT } from '../styles/fonts.js';
+import { GAMES as ALL_GAMES } from '../data/games.js';
 import { useReveal } from '../lib/reveal.js';
 
 // The mini games card at the end of the home pages (shared/EndCards.jsx places it): Buddy's two games, one tap away
@@ -9,11 +10,8 @@ import { useReveal } from '../lib/reveal.js';
 // it's off screen, or while the pointer or focus is on it), and its button opens the one showing, in the same popup
 // Buddy uses (shared/buddy/BuddyGames.jsx, event 'aq-games'). The pills underneath pick one by hand.
 // web = the 1440 artboard (600 × 300), else the 390 one (342 wide).
-const GAMES = [
-  { id: 'snake', name: 'Snake', title: 'Snake, but spooky', line: 'eat the stars. don’t eat yourself.', shadow: 'var(--purple)' },
-  { id: 'float', name: 'Float', title: 'Float, little ghost', line: 'tap to rise. mind the posts.', shadow: 'var(--blue)' },
-  { id: 'fling', name: 'Fling', title: 'Fling, little ghost', line: 'pull back. let go. knock ’em down.', shadow: 'var(--green)' },
-];
+const SHADOW = { snake: 'var(--purple)', float: 'var(--blue)', fling: 'var(--green)' };
+const GAMES = ALL_GAMES.map((g) => ({ ...g, shadow: SHADOW[g.id] })); // titles and lines: data/games.js
 const EVERY = 4200; // ms each game shows for
 const MONO = { fontFamily: FONT.mono, fontWeight: "700", letterSpacing: "1.4px", textTransform: "uppercase" };
 

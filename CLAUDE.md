@@ -180,6 +180,7 @@ Two separate layouts, chosen by window width (`lib/layoutMode.js`, `useIsWeb()`)
   - Its CSS (`labs.css`) is scoped to `.labs`. Its class names must not match any in `src/styles/` (it had to rename `.intro` and `.orbit`). Its loops keep the motion rules below, inside `labs.css`: transform / opacity only, stopped by reduced motion, `.tn-lite`, `.off-screen` and `html[data-tn-nav]` (with their `:host` twins). It brings its own stylesheet (`labs.css?inline`, a `<style>` beside the page), so it loads with the gallery.
 - **Shared components** (`src/shared/`) take a `web` prop (or `look`) and keep a `PHONE` / `WEB` table of positions and sizes. Change a value in the right table; don't fork the component.
 - **The home page also answers at `/articles`, `/photos`, `/words` and `/members`** (an older edition's at `/sep26/photos`…) and scrolls to that section: element ids `articles`, `photos`, `words`, `members`. See `lib/routes.js` and `lib/scrollMemory.js`.
+- **Each of Buddy's games has an address**, `/games/<id>` (`/games`: the first), from `data/games.js`: the latest home page with that game open (`HomeRoute` in `App.jsx`). While the popup is open over the latest home page the address follows it (and goes back on close); its pages and link previews (`og/game-<id>.jpg`, `og/games.jpg`) are built like an article's.
 - **Section addresses drop off by themselves.** Once you scroll a screen away from the section an address names (`/photos`, `/sep26/words`, `/articles/labs/photon`), `lib/scrollMemory.js` replaces it with the plain page (`/`, `/sep26`, `/articles/labs`) in place, with state `{ quiet: true }`, so nothing scrolls or remounts. `?by=` addresses stay.
   - To change the address from a page without scrolling, use `navigate(path, { replace: true, state: { quiet: true } })`.
   - The home page (`/:first?/:second?`) and an article with its chapters (`/articles/:slug/*`) are one route each, so the page survives the change.
@@ -284,7 +285,7 @@ vite.config.js          plugins: React, %SITE_URL% + the latest edition's look, 
 build/siteFiles.js      at build: an .html per article at its address (own title + preview image), each edition's home and section
                         pages, 404, sitemap, robots, llms.txt (drafts left out)
 build/staticCopy.js     each page's text as plain HTML inside #root, for crawlers without JavaScript
-tools/make-link-previews.mjs   every link preview (1200×630) into public/og/: the main page, each edition, each article, on the edition's paper
+tools/make-link-previews.mjs   every link preview (1200×630) into public/og/: the main page, each edition, each article, each game, on the edition's paper
 tools/check-embed.mjs   the guard for AQ's website (see "Inside AQ's website")   tools/export-aq.mjs   writes the magazine into it
 embed/aq/               AQ-only: README (for AQ's side), scripts/ (prerender.mjs)
 src/host.js             where this copy runs (own site / AQ's website)
@@ -298,6 +299,7 @@ src/editions/           one folder per edition (see "Editions"): <id>/look.js, a
   pages.js              editions' own pages (OWN_PAGES), CSS (EDITION_CSS) and home doodles (DECOR)
 src/data/               site-wide content (each file documents its fields at the top)
   site.js               site URL, Aquaterra website + Instagram, a line about Aquaterra
+  games.js              Buddy's games: titles, how-to lines, link-preview text; gameLink (/games/<id>)
   articles.js           article fields + body block formats (top), ALL_ARTICLES, ARTICLES (latest edition), placeOf(), tagOf()
   editions.js           EDITIONS (newest last, drafts), LATEST, PUBLISHED, editionId, articleLink, editionLink, homeLink, articleFolder
   labs.js               the AQ Labs gallery's teams (chapter ids, labels, colours)

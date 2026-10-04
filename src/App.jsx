@@ -29,6 +29,8 @@ import NotFoundPage from './pages/NotFoundPage.jsx';
 import ErrorBoundary from './shared/ErrorBoundary.jsx';
 import { DraftTape } from './shared/Tapes.jsx';
 import { HOST, AQ_LOOK } from './host.js';
+import { gameOf } from './data/games.js';
+import { openGames } from './lib/buddyState.js';
 import AqNavSlot from './shared/AqNavSlot.jsx';
 import { ALL_ARTICLES } from './data/articles.js';
 import { LATEST, articleFolder, articleLink, editionById, editionLink, editionOf, homeLink, isDraft } from './data/editions.js';
@@ -42,6 +44,7 @@ import { ScrollMemory } from './lib/scrollMemory.js';
 // The routes, per layout (lib/layoutMode.js: 900px+ wide = web, else phone):
 //   /                         home (PhoneHome / WebHome): the latest edition's
 //   /articles /photos /words /members   the home page, opened at that section (lib/scrollMemory.js scrolls)
+//   /games, /games/<id>       the latest home page with Buddy's games open at that game (data/games.js)
 //   /<id>, /<id>/photos…      an older edition's home page (or a draft's), e.g. /sep26: its own look and content
 //   /articles/<slug>          an article in the latest edition (PhoneArticle / WebArticle, or its own page: PAGES);
 //                             `next` = the following one in its edition
@@ -68,13 +71,24 @@ const pageFor = (n, kind, web) => { const k = web ? 'web' : 'phone'; return OWN_
 
 // A home page: / and /articles, /photos… (the latest edition's), or /sep26 and /sep26/photos… (an older edition's or a
 // draft's; the latest's id goes to /). One route, so the address can change in place without a remount.
+// /games and /games/<id> (data/games.js) are the latest home page with that game open: a link to a game. The popup
+// itself keeps the address in step while it's open over the latest home page (shared/buddy/BuddyGames.jsx).
+function OpenGame({ id }) {
+  useEffect(() => { const t = setTimeout(() => openGames(id || 'snake')); return () => clearTimeout(t); }, [id]); // after the games popup's listener is up
+  return null;
+}
 function HomeRoute({ web }) {
   const { first, second } = useParams();
+  if (first === 'games') { // same element as the home page below, so opening or closing a game never redraws the page
+    if (second && !gameOf(second)) return <NotFoundPage web={web} />;
+    const Home = pageFor(LATEST, 'home', web);
+    return <><Home key={LATEST} /><OpenGame id={second} /></>;
+  }
   const e = first && editionById(first), section = e ? second : first;
   if ((!e && second) || (section && !SECTIONS.includes(section))) return <NotFoundPage web={web} />;
   if (e && e.number === LATEST) return <Navigate to={homeLink(LATEST, section)} replace />;
   const n = e ? e.number : LATEST, Home = pageFor(n, 'home', web);
-  return <Home key={n} />; // another edition's home page is a new page (fresh words game, entrance)
+  return <><Home key={n} /></>; // another edition's home page is a new page (fresh words game, entrance)
 }
 
 function OldEditionRoute({ web }) {

@@ -36,6 +36,8 @@ export const ogImage = {
   home: () => withBase('/og/home.jpg'),
   edition: (n) => withBase(`/og/${editionId(n)}.jpg`),
   article: (a) => withBase(`/og/${editionId(a.edition)}-${a.slug}.jpg`),
+  games: () => withBase('/og/games.jpg'), // /games: Buddy's three games
+  game: (id) => withBase(`/og/game-${id}.jpg`), // /games/snake, /games/float, /games/fling
 };
 // the month a new edition is due, for the empty "previous editions" shelf
 export const nextMonth = () => {
