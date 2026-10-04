@@ -7,9 +7,9 @@
 //                       photo wall) hanging on a string
 //   <id>-<slug>.jpg     each article (sep26-labs.jpg): on its edition's paper, the cover hanging in a frame its own shape
 //                       (never cropped), a "TerraNotes · No. 01 · September 2026" tape, the tag, title, dek and byline
-//   game-<id>.jpg       each of Buddy's games (data/games.js; its address /games/<id>): on the latest edition's paper,
-//                       its title and how-to, and its little arcade screen (the games card's, shared/GameCard.jsx) big
-//   games.jpg           /games: the three screens together
+//   <id>-game-<g>.jpg   each of Buddy's games in each edition (data/games.js; /games/<g>, /sep26/games/<g>): on the
+//                       edition's paper, its title and how-to, and its little arcade screen (shared/GameCard.jsx) big
+//   <id>-games.jpg      an edition's /games: the three screens together
 // The build (build/siteFiles.js; inside AQ, its prerender) points each page at its picture under a content-hashed name.
 // Run after adding an article, changing a cover or adding an edition:  node tools/make-link-previews.mjs
 // (needs Playwright: npm install; env CHROMIUM = a browser to use). The fonts are the site's own (public/fonts,
@@ -18,7 +18,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { chromium } from 'playwright';
 import { ALL_ARTICLES, tagOf } from '../src/data/articles.js';
-import { EDITIONS, LATEST, editionId, ogImage } from '../src/data/editions.js';
+import { EDITIONS, editionId, ogImage } from '../src/data/editions.js';
 import { GAMES } from '../src/data/games.js';
 import { editionData } from '../src/editions/index.js';
 import { withBase } from '../src/lib/base.js';
@@ -177,12 +177,12 @@ const ART = {
 };
 const screen = (id, w, extra = '') => `<svg class="screen" ${extra} width="${w}" height="${Math.round(w * 0.62)}" viewBox="0 0 150 93"><rect width="150" height="93" fill="var(--text)"/>${ART[id]()}</svg>`;
 const SHADE = { snake: 'purple', float: 'blue', fling: 'green' };
-function gameCard(e, g) { // one game (or all three, g = null) on the latest edition's paper
+function gameCard(e, g) { // one game (or all three, g = null) on an edition's paper
   const { colors: C, fonts: F } = editionData(e.number).look, sep = e.id === 'sep26';
   const vars = Object.entries(C).map(([k, v]) => `--${k}:${v}`).join(';');
   const css = `
   :root{${vars}}
-  .left{position:absolute;left:${sep ? 150 : 80}px;top:${sep ? 100 : 120}px;width:${g ? 470 : 520}px}
+  .left{position:absolute;left:${sep ? 150 : 80}px;top:${sep ? 70 : 120}px;width:${g ? (sep ? 420 : 470) : 520}px}
   .kicker{font:700 17px/1 ${F.mono};letter-spacing:3px;text-transform:uppercase;color:${C.text}}
   h1{margin:18px 0 0;font:400 ${g ? 76 : 84}px/0.95 ${F.head};text-transform:uppercase;letter-spacing:-1px;color:${C.ink}}
   .hand{margin-top:18px;font:700 40px/1.05 ${F.hand};color:${C.hand}}
@@ -214,13 +214,13 @@ const shot = async (html, url) => {
   console.log(url, Math.round(fs.statSync(file).size / 1024), 'KB');
 };
 await shot(mainCard(), ogImage.home());
-const latest = { ...EDITIONS.find((x) => x.number === LATEST), id: editionId(LATEST) };
-await shot(gameCard(latest, null), ogImage.games());
-for (const g of GAMES) await shot(gameCard(latest, g), ogImage.game(g.id));
+
 for (const ed of EDITIONS) {
   const e = { ...ed, id: editionId(ed.number) }, d = editionData(e.number), mine = ALL_ARTICLES.filter((a) => a.edition === e.number && a.cover);
   await measure([...mine.map(cover), ...d.photos.filter((x) => x.photo).map((x) => data(x.photo))]);
   await shot(editionCard(e), ogImage.edition(e.number));
   for (const a of mine) await shot(articleCard(e, a), ogImage.article(a));
+  await shot(gameCard(e, null), ogImage.games(e.number));
+  for (const g of GAMES) await shot(gameCard(e, g), ogImage.game(g.id, e.number));
 }
 await browser.close();

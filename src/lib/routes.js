@@ -26,6 +26,13 @@ export function sectionOf(p) {
   const m = p.match(/^((?:\/[a-z]{3}\d{2})?\/articles\/[^/]+)\/([^/]+)\/?$/);
   return m && { id: m[2], base: m[1] };
 }
+// a game's address (data/games.js): /games/<id> or /sep26/games/<id> (or without the id) → { id: the edition's id ('' =
+// the latest's), game: the game's id or '' }, or null
+export function gamesOf(p) {
+  const m = p.match(/^(?:\/([a-z]{3}\d{2}))?\/games(?:\/([a-z]+))?\/?$/);
+  const e = m?.[1] && editionById(m[1]);
+  return m && (!m[1] || e) ? { id: e && e.number !== LATEST ? m[1] : '', game: m[2] || '' } : null;
+}
 // an article's demo, opened full-window in its own tab: <article>/<chapter>/demo
 export const isDemoPath = (p) => /^(?:\/[a-z]{3}\d{2})?\/articles\/[^/]+\/[^/]+\/demo\/?$/.test(p);
 

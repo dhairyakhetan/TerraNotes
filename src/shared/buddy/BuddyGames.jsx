@@ -9,7 +9,8 @@ import { drawGhost } from './Ghost.jsx';
 import { lastTap } from '../../lib/buddyState.js';
 import { calm } from '../../lib/motion.js';
 import { useLocation, useNavigate } from '../../router.jsx';
-import { homeOf } from '../../lib/routes.js';
+import { gamesOf, homeOf } from '../../lib/routes.js';
+import { LATEST, editionById } from '../../data/editions.js';
 import { gameLink, gameOf } from '../../data/games.js';
 import Fling from './Fling.jsx';
 
@@ -240,21 +241,21 @@ export default function BuddyGames({ first = null }) {
   const [game, setGame] = useState(first);
   const [shown, leaving] = usePresence(game, 220);
   useEffect(() => { if (game) track('Game opened', { game }); }, [game]);
-  // the address follows the popup over the latest home page: /games/<id> while a game is open (a link straight to it,
-  // with its own link preview: data/games.js), back to the address it had once it closes. Elsewhere (an article, an
-  // older edition) the address stays: /games is the latest edition's page.
+  // the address follows the popup over a home page: its edition's /games/<id> while a game is open (a link straight to
+  // it, with its own link preview: data/games.js), back to the address it had once it closes. Over an article it stays.
   const { pathname, search } = useLocation(), navigate = useNavigate(), back = useRef(null), at = useRef(pathname), title = useRef(null);
   at.current = pathname;
   useEffect(() => {
-    const p = at.current, onGames = /^\/games(\/|$)/.test(p), onHome = onGames || homeOf(p)?.id === '';
+    const p = at.current, g = gamesOf(p), home = g || homeOf(p), onGames = !!g, onHome = !!home;
+    const n = home?.id ? editionById(home.id).number : LATEST;
     if (game && onHome) {
       if (!onGames) back.current = p + search;
       title.current ??= document.title; // the tab names the game too (as its page's title does: build/siteFiles.js)
       document.title = `${gameOf(game).title} · TerraNotes games`;
-      if (p !== gameLink(game)) navigate(gameLink(game), { replace: true, state: { quiet: true } });
+      if (p !== gameLink(game, n)) navigate(gameLink(game, n), { replace: true, state: { quiet: true } });
     } else if (!game && onGames) {
       if (title.current) { document.title = title.current; title.current = null; }
-      navigate(back.current || '/', { replace: true, state: { quiet: true } });
+      navigate(back.current || (n === LATEST ? '/' : `/${home.id}`), { replace: true, state: { quiet: true } });
     }
   }, [game]);
   const card = useRef(null), from = useRef(null); // from: the tap it grows out of, as an offset from the card's centre

@@ -1,5 +1,5 @@
 import { stripBase } from './base.js';
-import { isDemoPath } from './routes.js';
+import { gamesOf, isDemoPath } from './routes.js';
 
 // When the opening notebook animation (shared/IntroNotebook.jsx) plays: on a first visit, again 2½ hours after it was
 // last seen, on a hard refresh (Ctrl/Cmd+Shift+R), and always with ?intro in the address (the ?intro is then dropped).
@@ -28,6 +28,7 @@ export function introWanted() {
 function decide() {
   try {
     if (isDemoPath(stripBase(location.pathname))) return false; // a demo opened in its own tab
+    if (gamesOf(stripBase(location.pathname))) return false; // a link to a game: straight to the game
     const q = new URLSearchParams(location.search);
     if (q.has('intro')) {
       q.delete('intro');

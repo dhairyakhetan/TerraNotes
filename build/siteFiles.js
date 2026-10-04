@@ -9,7 +9,8 @@
 //   name so chat apps don't keep showing an old picture;
 // - index.html, articles.html, photos.html, words.html, members.html (the latest edition's home page and its sections),
 //   the same for each older edition under its id (sep26.html, sep26/photos.html…), and editions.html, with their own
-//   titles and text; games.html and games/<id>.html (Buddy's games, data/games.js: their own titles and pictures);
+//   titles and text; each edition's games.html and games/<id>.html (Buddy's games, data/games.js: their own titles and
+//   pictures; an older edition's under its id);
 // - 404.html, robots.txt, sitemap.xml, feed.xml (RSS), llms.txt / llms-full.txt (the site and every article as plain text for AIs).
 import fs from 'node:fs';
 import path from 'node:path';
@@ -96,15 +97,18 @@ export default function siteFiles(host) {
       out('editions.html', withContent(withHome(setMeta(setMeta(setTitle(base, 'Aquaterra — Editions'), 'property', 'og:title', 'Editions · TerraNotes'), 'property', 'og:url', url('/editions'))), editionsHtml()));
 
       out('404.html', setTitle(withHome(base), 'Aquaterra — not found').replace('</title>', '</title>\n    <meta name="robots" content="noindex" />'));
-      // /games and /games/<id>: the home page with Buddy's games open (App.jsx), each with its own title and link preview
-      const gamePage = (g) => {
-        const title = g ? `${g.title} · TerraNotes games` : 'Buddy’s games · TerraNotes', about = g ? g.about : `Three mini games with Buddy the ghost: ${GAMES.map((x) => x.name).join(', ')}. In TerraNotes, Aquaterra’s monthly magazine.`;
-        let html = setMeta(setMeta(setTitle(base, title), 'property', 'og:title', title), 'property', 'og:url', url(gameLink(g?.id)));
+      // each edition's /games and /games/<id> (the latest's unprefixed, /sep26/games… for an older one): its home page with
+      // Buddy's games open (App.jsx), each with its own title and link preview, on the edition's paper
+      const gamePage = (e, g) => {
+        const old = e.number !== LATEST ? ` · ${editionName(e.number)}` : '';
+        const title = g ? `${g.title} · TerraNotes games${old}` : `Buddy’s games · TerraNotes${old}`, about = g ? g.about : `Three mini games with Buddy the ghost: ${GAMES.map((x) => x.name).join(', ')}. In TerraNotes, Aquaterra’s monthly magazine.`;
+        const p = gameLink(g?.id, e.number);
+        let html = setMeta(setMeta(setTitle(base, title), 'property', 'og:title', title), 'property', 'og:url', url(p));
         html = setMeta(setMeta(html, 'name', 'description', about), 'property', 'og:description', about);
-        const pic = og(g ? ogImage.game(g.id) : ogImage.games());
-        out(`${gameLink(g?.id).slice(1)}.html`, pic ? withImage(html, pic, title) : withHome(html));
+        const pic = og(g ? ogImage.game(g.id, e.number) : ogImage.games(e.number));
+        out(`${p.slice(1)}.html`, pic ? withImage(html, pic, title) : withHome(html));
       };
-      [null, ...GAMES].forEach(gamePage);
+      for (const e of PUBLISHED) [null, ...GAMES].forEach((g) => gamePage(e, g));
       const paths = [...pages, '/editions', ...ARTICLES.map(articleLink), gameLink(), ...GAMES.map((g) => gameLink(g.id))];
       out('sitemap.xml', `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${paths.map((p) => `  <url><loc>${url(p)}</loc></url>`).join('\n')}\n</urlset>\n`);
       // feed.xml: an RSS feed of every published article, newest issue first, so readers (and apps) hear of a new one
