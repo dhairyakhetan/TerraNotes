@@ -50,7 +50,7 @@ const WEB = {
 };
 const layoutOf = (L, { members, teams }, web) => {
   const spots = faceSpots(L.faces, members.length), bottom = Math.max(...spots.map((s) => s.cy + s.size / 2));
-  const height = web ? Math.max(900, bottom + 110) : bottom + 64;
+  const height = web ? Math.max(L.minHeight ?? 900, bottom + 110) : bottom + 64; // web: at least as tall as its text column (minHeight)
   return { ...L, spots, links: teamLinks(spots, L.bend, members, teams), height };
 };
 // an edition's own values for a layout's table (src/editions/pages.js TEAM_FIT: September's text on its ruled lines),
@@ -77,7 +77,7 @@ const NUMBER_WORDS = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'sev
 const photoFill = { width: "100%", height: "100%", objectFit: "cover", display: "block" };
 
 // crown: true in team.js → a crown on their photo in the profile card
-const Crown = () => (
+export const Crown = () => (
   <svg width="44" height="34" viewBox="0 0 44 34" aria-hidden="true" style={{ position: "absolute", left: "-12px", top: "-18px", transform: "rotate(-22deg)", zIndex: "1" }}>
     <path d="M4 28 L2 8 L13 17 L22 3 L31 17 L42 8 L40 28 Z" strokeWidth="2.4" strokeLinejoin="round" style={{ fill: "var(--yellow)", stroke: "var(--ink)" }} />
     <path d="M4 28 H40" strokeWidth="2.4" style={{ stroke: "var(--ink)" }} />
@@ -87,7 +87,7 @@ const Crown = () => (
 
 // badge: { img, text } in team.js → a small picture in the card's corner; its text slides out on hover / tap
 // (styles/motion.css .card-badge). The pictures are fetched and decoded once, early, so they're there when a card opens.
-const Badge = ({ b }) => (
+export const Badge = ({ b }) => (
   <button type="button" className="card-badge" aria-label={b.text}>
     <span>{b.text}</span>
     <img src={b.img} alt="" width="24" height="24" decoding="sync" />

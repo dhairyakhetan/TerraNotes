@@ -14,11 +14,14 @@ export const TEAM_FIT = {
     rule: { display: 'none' },
     title: { left: '128px', top: '20px', lineHeight: '64px' },
     count: { top: '26px', lineHeight: '32px' },
-    blurb: { left: '128px', top: '204px', lineHeight: '32px' },
-    note: { left: '128px', top: '382px', lineHeight: '32px', transform: 'none' },
-    legend: { left: '118px', top: '520px', gridAutoRows: '64px' },
-    extra: { left: 128, top: 680, width: 430, size: 28 },
-    face: { role: '10px', roleSpacing: '1.2px' }, // the type sizes September came out with (the shared ones grew later)
+    blurb: { left: '128px', top: '172px', lineHeight: '32px' },
+    note: { left: '128px', top: '348px', lineHeight: '32px', transform: 'none' },
+    legend: { left: '118px', top: '428px', gridAutoRows: '64px' },
+    extra: { left: 128, top: 572, width: 430, size: 28 },
+    face: { role: '10px', roleSpacing: '1.2px', half: 62, name: '14px' }, // the type sizes September came out with (the shared ones grew later)
+    // compact (Oct 2026, the owner's ask: the whole section on a laptop's screen): six faces a row, smaller, closer rows
+    faces: { rows: [[624, 762, 900, 1038, 1176, 1314], [693, 831, 969, 1107, 1245]], sizes: [92, 82, 96, 86, 90, 94, 84, 88, 80], nudgeX: [-6, 5, -3, 7, -5, 4, 2, -7, 6, -4], nudgeY: [0, 14, -8, 6, 16, -6, 10, -10, 4, 14, -4], top: 92, rowH: 168 },
+    minHeight: 640,
   },
   phone: {
     rule: { display: 'none' },
@@ -27,7 +30,8 @@ export const TEAM_FIT = {
     note: { left: '28px', top: '324px', width: '330px', lineHeight: '28px', transform: 'none' },
     legend: { left: '20px', top: '394px', gridAutoRows: '56px' },
     extra: { left: 204, top: 400, width: 170, size: 21 },
-    faces: { top: 700, rows: [[72, 196, 318], [134, 256]] },
-    count: { fontSize: '9px', letterSpacing: '1.6px' }, chip: { fontSize: '9.5px', letterSpacing: '1.2px' }, face: { role: '8.5px', roleSpacing: '1px' }, // as September came out
+    // compact (Oct 2026, the owner's ask): four faces a row then three, smaller, closer rows
+    faces: { top: 640, rows: [[54, 148, 242, 336], [101, 195, 289]], sizes: [72, 64, 76, 66, 70, 74, 64, 68], nudgeX: [0], nudgeY: [0, 10, -6, 6, 12, -4, 8, -8, 2, 10, -2], rowH: 136 },
+    count: { fontSize: '9px', letterSpacing: '1.6px' }, chip: { fontSize: '9.5px', letterSpacing: '1.2px' }, face: { role: '8px', roleSpacing: '0.6px', half: 47, name: '8.5px', gap: '6px' }, // as September came out; the face's label box fits the closer columns
   },
 };
