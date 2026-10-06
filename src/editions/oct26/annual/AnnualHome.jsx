@@ -55,7 +55,7 @@ function AnnualHome({ web }) {
   const sheet = (
     <div id="top" className={web ? 'an-home' : 'page-home an-home'} style={{ position: "relative", width: `${w}px`, margin: "0 auto", overflow: "clip", background: "var(--page)", fontFamily: FONT.body, color: "var(--ink)" }}>
       {web ? <WebHeader /> : <PhoneHeader current="home" />}
-      {web ? <WebBuddy /> : <PhoneBuddy />}
+      {web ? <WebBuddy at={{ left: 1338, top: 112 }} /> : <PhoneBuddy at={{ left: 282, top: 776 }} />}{/* his own spot: right of the cover (web), right of the Contents heading (phone) */}
       <Cover web={web} lead={list[0]} lines={list.slice(0, 3)} />
       <div style={{ padding: `0 ${pad}px` }}>
         <Contents web={web} list={list} />

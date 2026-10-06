@@ -71,19 +71,20 @@ function CallButton() {
   );
 }
 
-// Web home, top right, under the Website / Instagram buttons.
-export function WebBuddy() {
+// Web home, top right, under the Website / Instagram buttons. at: a page's own spot for him (October's annual: beside its
+// cover), { left, top } on the artboard, with "tap him" above him instead of to his left.
+export function WebBuddy({ at }) {
   const { here, fresh } = useBuddy();
   return (
     <>
       {!here && <CallButton />}
       {here && (
-        <div className={fresh ? 'buddy-arrive' : undefined} style={{ position: "absolute", left: "1296px", top: "80px", width: "64px", zIndex: "6" }}>
-          <div className="buddy-hang" style={{ paddingTop: "108px" }}>
+        <div className={fresh ? 'buddy-arrive' : undefined} style={{ position: "absolute", left: `${at ? at.left : 1296}px`, top: `${at ? at.top : 80}px`, width: "64px", zIndex: "6" }}>
+          <div className="buddy-hang" style={{ paddingTop: at ? "52px" : "108px" }}>
             <div className="buddy-bob">
               <TapGhost size={64} />
             </div>
-            <div className={fresh ? 'buddy-note buddy-note-late' : 'buddy-note'} style={{ position: "absolute", right: "74px", top: "118px", fontFamily: FONT.hand, fontSize: "21px", color: "var(--hand)", transform: "rotate(-6deg)", whiteSpace: "nowrap", pointerEvents: "none" }}>tap him →</div>
+            <div className={fresh ? 'buddy-note buddy-note-late' : 'buddy-note'} style={{ position: "absolute", ...(at ? { left: "50%", top: "0px", translate: "-50% 0" } : { right: "74px", top: "118px" }), fontFamily: FONT.hand, fontSize: "21px", color: "var(--hand)", transform: "rotate(-6deg)", whiteSpace: "nowrap", pointerEvents: "none" }}>{at ? 'tap him ↓' : 'tap him →'}</div>
           </div>
         </div>
       )}
@@ -91,14 +92,15 @@ export function WebBuddy() {
   );
 }
 
-// Phone home: he floats next to the intro card.
-export function PhoneBuddy() {
+// Phone home: he floats next to the intro card, above its sticky note. at: a page's own spot, { left, top } (October's
+// annual: beside its "Contents" heading, under the cover)
+export function PhoneBuddy({ at }) {
   const { here, fresh } = useBuddy(), { crown } = useRewards();
   // The phone menu's "click me" (MenuCall) calls him; inside AQ's website that menu isn't drawn, so a small visible
   // ghost button stands where he floats and calls him instead (44px: a touch target).
   if (!here) {
     return AQ_LOOK ? (
-      <div style={{ position: "absolute", left: "312px", top: "176px", width: "44px", height: "44px", zIndex: "5" }}>
+      <div style={{ position: "absolute", left: `${at ? at.left + 13 : 312}px`, top: `${at ? at.top + 30 : 132}px`, width: "44px", height: "44px", zIndex: "5" }}>
         <button className="buddy-call buddy-near" onClick={callBuddy} aria-label="Call buddy the ghost" style={{ width: "44px", height: "44px" }}>
           <Ghost size={24} />
         </button>
@@ -106,7 +108,7 @@ export function PhoneBuddy() {
     ) : null;
   }
   return (
-    <div className={fresh ? 'buddy-float-in' : undefined} style={{ position: "absolute", left: "298px", top: "170px", width: "70px", zIndex: "5" }}>
+    <div className={fresh ? 'buddy-float-in' : undefined} style={{ position: "absolute", left: `${at ? at.left : 298}px`, top: `${at ? at.top : 108}px`, width: "70px", zIndex: "5" }}>
       <div style={{ fontFamily: FONT.hand, fontSize: "18px", color: "var(--hand)", transform: "rotate(6deg)", whiteSpace: "nowrap", pointerEvents: "none", textAlign: "center", marginBottom: "4px" }}>tap him</div>
       <div className="buddy-bob" style={{ display: "flex", justifyContent: "center", marginTop: crown ? "16px" : "0" }}>
         <TapGhost size={46} />
