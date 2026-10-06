@@ -3,7 +3,7 @@
 //   ?pandal=1   October's "pandal hopping" home page and the curtain that opens its articles (src/editions/oct26/pandal/)
 //   ?pandal=0   back to the live design
 // Going live: set LIVE.pandal to true (the switch then does nothing).
-const LIVE = { pandal: false };
+const LIVE = { pandal: true }; // pandal: live for everyone since 6 Oct 2026
 
 function on(name) {
   if (LIVE[name]) return true;

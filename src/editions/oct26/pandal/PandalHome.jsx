@@ -44,7 +44,14 @@ function PandalHome({ web }) {
   const edition = useEdition(), P = plan(edition, web), S = SHARED[web ? 'web' : 'phone'];
   useEffect(() => { document.title = homeTitle(edition); }, [edition]);
   const page = useRef(null);
-  usePauseEach(page, '.pd-bulb,.pd-flag,.pd-flame,.oct-leaf,.oct-alpana,.oct-dhak,.oct-conch,.oct-twinkle,.spark,.bulb,.buddy-bob,.fl1,.fl2,.fl3,.fl4,.fl5,.fl6,.fk1,.fk2,.fk3,.fk4');
+  usePauseEach(page, '.pd-twinkle,.pd-flame,.oct-leaf,.oct-alpana,.oct-dhak,.oct-conch,.oct-twinkle,.spark,.bulb,.buddy-bob,.fl1,.fl2,.fl3,.fl4,.fl5,.fl6,.fk1,.fk2,.fk3,.fk4');
+  useEffect(() => { // while the page scrolls, its decorations hold still (class .pd-scrolling, pandal.css): scrolling stays smooth
+    const el = page.current;
+    let t = 0;
+    const on = () => { if (!t) el.classList.add('pd-scrolling'); clearTimeout(t); t = setTimeout(() => { t = 0; el.classList.remove('pd-scrolling'); }, 180); };
+    addEventListener('scroll', on, { passive: true });
+    return () => { removeEventListener('scroll', on); clearTimeout(t); };
+  }, []);
   const at = (y) => ({ position: "absolute", left: "0", top: `${y}px`, width: web ? "1440px" : "390px", height: "0" });
   const w = web ? 1440 : 390;
   const sheet = (

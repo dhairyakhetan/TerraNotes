@@ -3,6 +3,7 @@ import { useReveal } from '../../../lib/reveal.js';
 import { usePauseOffscreen } from '../../../lib/pauseOffscreen.js';
 import { FONT } from '../../../styles/fonts.js';
 import { Dhak, Toran } from '../Decor.jsx';
+import Bulbs from './Bulbs.jsx';
 
 // The pieces October's pandal home page (PandalHome.jsx) puts round the shared sections, plus its own ending:
 //   Canopy     over the photo wall: a pandal's red cloth canopy, a scalloped marigold edge and a string of bulbs
@@ -15,14 +16,17 @@ export function Canopy({ left, top, width, web }) {
   const h = web ? 34 : 22, r = web ? 17 : 11, n = Math.ceil(width / (2 * r)), bulbs = [];
   for (let x = 20; x < width; x += web ? 44 : 30) bulbs.push(x);
   const sag = (x) => h + r + (web ? 26 : 16) * Math.sin(Math.PI * ((x / (width / 3)) % 1));
+  const H = h + r + (web ? 50 : 34);
   return (
-    <svg aria-hidden="true" width={width} height={h + r + (web ? 50 : 34)} viewBox={`0 0 ${width} ${h + r + (web ? 50 : 34)}`} style={{ position: "absolute", left: `${left}px`, top: `${top}px`, overflow: "visible", zIndex: "2" }}>
+    <div aria-hidden="true" style={{ position: "absolute", left: `${left}px`, top: `${top}px`, width: `${width}px`, height: `${H}px`, zIndex: "2" }}>
+    <Bulbs points={bulbs.map((x) => [x, sag(x)])} r={web ? 6 : 4} w={width} h={H} still={!web} />
+    <svg width={width} height={H} viewBox={`0 0 ${width} ${H}`} style={{ position: "absolute", left: "0", top: "0", overflow: "visible" }}>
       <path d={`M0 ${h + r} ${Array.from({ length: 3 }, (_, k) => `Q${(k + 0.5) * width / 3} ${h + r + (web ? 52 : 32)} ${(k + 1) * width / 3} ${h + r}`).join(' ')}`} style={{ fill: "none", stroke: "var(--ink)", strokeWidth: "1.4" }} />
-      {bulbs.map((x, i) => <circle key={x} className="dz pd-bulb" cx={x} cy={sag(x)} r={web ? 6 : 4} style={{ fill: "var(--bulb)", stroke: "var(--ink)", strokeWidth: "1", animationDelay: `${-(i % 4) * 0.45}s` }} />)}
       {Array.from({ length: n }, (_, i) => <circle key={`s${i}`} cx={r + i * 2 * r} cy={h} r={r} style={{ fill: i % 2 ? "var(--yellow)" : "var(--red)", stroke: "var(--ink)", strokeWidth: "2" }} />)}
       <rect x="0" y="0" width={width} height={h} style={{ fill: "var(--red)", stroke: "var(--ink)", strokeWidth: "2" }} />
       <rect x="0" y={h * 0.55} width={width} height={web ? 5 : 3} style={{ fill: "var(--yellow)" }} />
     </svg>
+    </div>
   );
 }
 

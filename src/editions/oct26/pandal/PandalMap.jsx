@@ -63,11 +63,11 @@ function Roof({ w, h, color, dashed }) {
       <polygon points={`4,${base} ${w / 2},${h * 0.12} ${w - 4},${base}`} style={ink(color)} />
       <polygon points={`${w * 0.2},${base} ${w / 2},${h * 0.42} ${w * 0.8},${base}`} style={ink("var(--yellow)")} />
       <path d={`M${w / 2} ${h * 0.12} V0`} style={s || { stroke: "var(--ink)", strokeWidth: "2.2" }} />
-      {!dashed && <path className="dz pd-flag" d={`M${w / 2} 0 l18 5 l-18 5 Z`} style={ink("var(--green)")} />}
+      {!dashed && <path d={`M${w / 2} 0 l18 5 l-18 5 Z`} style={ink("var(--green)")} />}
       <rect x="0" y={base} width={w} height={band} style={ink(color)} />
       {!dashed && beads.map((x, i) => <circle key={x} cx={x} cy={h + 1} r="6" style={{ fill: i % 3 === 1 ? "var(--red)" : "var(--yellow)", stroke: "var(--ink)", strokeWidth: "1.2" }} />)}
-      {!dashed && [0.25, 0.5, 0.75].map((k) => <circle key={k} className="dz pd-bulb" cx={4 + (w / 2 - 4) * k} cy={base - (base - h * 0.12) * k - 4} r="3.6" style={{ fill: "var(--bulb)", stroke: "var(--ink)", strokeWidth: "1", animationDelay: `${-k * 2}s` }} />)}
-      {!dashed && [0.25, 0.5, 0.75].map((k) => <circle key={`r${k}`} className="dz pd-bulb" cx={w - 4 - (w / 2 - 4) * k} cy={base - (base - h * 0.12) * k - 4} r="3.6" style={{ fill: "var(--bulb)", stroke: "var(--ink)", strokeWidth: "1", animationDelay: `${-k * 2 - 0.7}s` }} />)}
+      {!dashed && [0.25, 0.5, 0.75].map((k) => <circle key={k} cx={4 + (w / 2 - 4) * k} cy={base - (base - h * 0.12) * k - 4} r="3.6" style={{ fill: "var(--bulb)", stroke: "var(--ink)", strokeWidth: "1" }} />)}
+      {!dashed && [0.25, 0.5, 0.75].map((k) => <circle key={`r${k}`} cx={w - 4 - (w / 2 - 4) * k} cy={base - (base - h * 0.12) * k - 4} r="3.6" style={{ fill: "var(--bulb)", stroke: "var(--ink)", strokeWidth: "1" }} />)}
     </svg>
   );
 }
@@ -82,7 +82,7 @@ function Stop({ a, i, at, web, mine }) {
         <article style={{ position: "relative", marginTop: "-4px", boxSizing: "border-box", background: "var(--card)", border: "2px solid var(--ink)", boxShadow: `${web ? 8 : 6}px ${web ? 8 : 6}px 0 ${a.featured ? "var(--yellow)" : color}`, padding: web ? "12px" : "10px", display: "flex", flexDirection: "column", gap: web ? "10px" : "8px" }}>
           {mine && <ByTape name={a.author} />}
           {a.featured && <FeaturedTape />}
-          <ImageSlot src={cardCover(a.cover)} fallback={a.cover} alt={a.alt} first={i < 3} box={{ height: `${L.img}px` }} />
+          <ImageSlot src={cardCover(a.cover)} fallback={a.cover} alt={a.alt} first={i < 6} box={{ height: `${L.img}px` }} />
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "8px" }}>
             <span style={{ fontFamily: FONT.mono, fontWeight: "700", fontSize: web ? "11px" : "10px", letterSpacing: "1.4px" }}>{`STOP ${pad2(i + 1)}`}</span>
             <TagPill a={a} size={web ? "10px" : "9px"} pad="3px 9px" lh="1.3" fit />

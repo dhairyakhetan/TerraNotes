@@ -4,11 +4,13 @@ import { calm, LITE } from '../../../lib/motion.js';
 import { byId } from '../../../lib/dom.js';
 import { FONT } from '../../../styles/fonts.js';
 import { Alpana, Conch, Dhak, Sparkle, Toran } from '../Decor.jsx';
+import Bulbs from './Bulbs.jsx';
 
 // The top of October's pandal home page (PandalHome.jsx): a pandal's gate, lit with bulbs, and the issue inside its
 // arch: "Land. Water. City.", the edition's intro and a way in to the route of articles. Scrolling walks you in: the
 // gate grows and fades past you while the words inside drift up more slowly (transform / opacity on scroll, drawn in
-// one requestAnimationFrame per scroll; not with reduced motion or LITE). Bulbs twinkle (.pd-bulb, pandal.css).
+// one requestAnimationFrame per scroll; not with reduced motion or LITE). The drawing itself never changes, so the
+// browser paints it once; its bulbs twinkle on their own layers (Bulbs.jsx).
 // G: the drawing's numbers per layout (artboard px; the SVG's own coordinates start at the gate's top).
 const G = {
   web: { top: 80, w: 1440, h: 900, cx: 720, tower: [220, 330], towerTop: 210, base: 860, facade: [330, 1110, 250], roof: [[300, 262], [720, 92], [1140, 262]], roofIn: [[390, 252], [720, 146], [1050, 252]], spire: 40, arch: [430, 1010, 520], cusp: 17, tiers: [300, 420, 540, 660, 780], dome: 55,
@@ -18,16 +20,20 @@ const G = {
 };
 const ink = { stroke: "var(--ink)", strokeWidth: "3", strokeLinejoin: "round" };
 
-function Drawing({ L, web }) {
-  const [tl, tr] = L.tower, W = L.w, rTop = L.towerTop, [fl, fr, ft] = L.facade, [al, ar, spring] = L.arch, r = (ar - al) / 2, cx = L.cx;
-  const sw = web ? 3 : 2;
-  const pts = (p) => p.map((q) => q.join(',')).join(' ');
-  const bulbs = [];
-  // bulbs round the arch, up the towers and along the roof
+function bulbsOf(L, web) {
+  const [tl, tr] = L.tower, W = L.w, rTop = L.towerTop, [al, ar, spring] = L.arch, r = (ar - al) / 2, cx = L.cx, bulbs = [];
   for (let a = 180; a >= 0; a -= web ? 7 : 10) { const t = (a * Math.PI) / 180; bulbs.push([cx + Math.cos(t) * (r + (web ? 22 : 12)), spring - Math.sin(t) * (r + (web ? 22 : 12))]); }
   for (let y = rTop + 20; y < L.base - 10; y += web ? 38 : 30) { bulbs.push([tl + (tr - tl) / 2, y]); bulbs.push([W - tl - (tr - tl) / 2, y]); }
   const [p0, p1, p2] = L.roof;
   for (let k = 0; k <= 1; k += web ? 0.05 : 0.08) { bulbs.push([p0[0] + (p1[0] - p0[0]) * k, p0[1] + (p1[1] - p0[1]) * k - (web ? 8 : 5)]); bulbs.push([p2[0] + (p1[0] - p2[0]) * k, p2[1] + (p1[1] - p2[1]) * k - (web ? 8 : 5)]); }
+  return bulbs;
+}
+
+function Drawing({ L, web }) {
+  const [tl, tr] = L.tower, W = L.w, rTop = L.towerTop, [fl, fr, ft] = L.facade, [al, ar, spring] = L.arch, r = (ar - al) / 2, cx = L.cx;
+  const sw = web ? 3 : 2;
+  const pts = (p) => p.map((q) => q.join(',')).join(' ');
+  const [p0, p1, p2] = L.roof;
   return (
     <svg width={W} height={L.h} viewBox={`0 0 ${W} ${L.h}`} aria-hidden="true" style={{ position: "absolute", left: "0", top: "0", overflow: "visible" }}>
       {/* the steps */}
@@ -46,14 +52,13 @@ function Drawing({ L, web }) {
       <polygon points={pts(L.roof)} style={{ fill: "var(--red)", ...ink, strokeWidth: sw }} />
       <polygon points={pts(L.roofIn)} style={{ fill: "var(--pink)", ...ink, strokeWidth: sw }} />
       <path d={`M${cx} ${p1[1]} V${L.spire}`} style={{ ...ink, strokeWidth: sw }} />
-      <path className="dz pd-flag" d={`M${cx} ${L.spire} l${web ? 46 : 26} ${web ? 12 : 7} l-${web ? 46 : 26} ${web ? 12 : 7} Z`} style={{ fill: "var(--green)", ...ink, strokeWidth: sw * 0.7 }} />
+      <path d={`M${cx} ${L.spire} l${web ? 46 : 26} ${web ? 12 : 7} l-${web ? 46 : 26} ${web ? 12 : 7} Z`} style={{ fill: "var(--green)", ...ink, strokeWidth: sw * 0.7 }} />
       {/* the arch: the night inside, a cusped edge */}
       <path d={`M${al} ${L.base} V${spring} A${r} ${r} 0 0 1 ${ar} ${spring} V${L.base} Z`} style={{ fill: "var(--wall)", ...ink, strokeWidth: sw }} />
       {Array.from({ length: 13 }, (_, i) => { const t = (Math.PI * (i + 0.5)) / 13; return <circle key={i} cx={cx - Math.cos(t) * r} cy={spring - Math.sin(t) * r} r={L.cusp} style={{ fill: "var(--yellow)", ...ink, strokeWidth: sw * 0.7 }} />; })}
       {[al, ar].map((x) => <circle key={x} cx={x} cy={spring} r={L.cusp} style={{ fill: "var(--yellow)", ...ink, strokeWidth: sw * 0.7 }} />)}
       {/* little stars in the night inside */}
-      {[[0.18, 0.15], [0.82, 0.2], [0.1, 0.55], [0.9, 0.6], [0.5, 0.06]].map(([x, y], i) => <circle key={i} className="dz pd-bulb" cx={al + (ar - al) * x} cy={spring - r + (L.base - spring + r) * y} r={web ? 3 : 2} style={{ fill: "var(--spark)", animationDelay: `${i * 0.4}s` }} />)}
-      {bulbs.map(([x, y], i) => <circle key={`b${i}`} className="dz pd-bulb" cx={x} cy={y} r={web ? 5 : 3.2} style={{ fill: "var(--bulb)", stroke: "var(--ink)", strokeWidth: "1", animationDelay: `${-(i % 5) * 0.35}s` }} />)}
+      {[[0.18, 0.15], [0.82, 0.2], [0.1, 0.55], [0.9, 0.6], [0.5, 0.06]].map(([x, y], i) => <circle key={i} cx={al + (ar - al) * x} cy={spring - r + (L.base - spring + r) * y} r={web ? 3 : 2} style={{ fill: "var(--spark)" }} />)}
     </svg>
   );
 }
@@ -79,8 +84,9 @@ export default function Gate({ web }) {
   const T = L.text;
   return (
     <section aria-label="The gate" style={{ position: "absolute", left: "0", top: `${L.top}px`, width: `${L.w}px`, height: `${L.h}px` }}>
-      <div ref={front} style={{ position: "absolute", inset: "0", transformOrigin: `${L.cx}px ${L.arch[2]}px`, willChange: web ? "transform" : undefined }}>
+      <div ref={front} style={{ position: "absolute", inset: "0", transformOrigin: `${L.cx}px ${L.arch[2]}px`, willChange: web ? "transform, opacity" : undefined }}>
         <Drawing L={L} web={web} />
+        <Bulbs points={bulbsOf(L, web)} r={web ? 5 : 3.2} w={L.w} h={L.h} still={!web} />
       </div>
       <div aria-hidden="true" style={{ position: "absolute", left: "0", top: "0", width: "0", height: "0" }}>
         <Toran width={L.w} top={0} swags={web ? 4 : 2} sag={web ? 26 : 14} />
@@ -91,7 +97,7 @@ export default function Gate({ web }) {
           {[[120, 300, 30, "mint", 0], [1300, 420, 26, "pink", 0.8], [90, 560, 22, "yellow", 1.6], [1330, 640, 20, "mint", 0.4]].map(([x, y, s, c, d]) => <Sparkle key={x} left={x} top={y} s={s} c={c} delay={d} />)}
         </> : null}
       </div>
-      <div ref={words} style={{ position: "absolute", left: `${T.left}px`, top: `${T.top}px`, width: `${T.width}px`, textAlign: "center", color: "var(--page)" }}>
+      <div ref={words} style={{ willChange: web ? "transform" : undefined, position: "absolute", left: `${T.left}px`, top: `${T.top}px`, width: `${T.width}px`, textAlign: "center", color: "var(--page)" }}>
         <div style={{ fontFamily: FONT.mono, fontSize: L.mono, letterSpacing: web ? "1.8px" : "1.2px", color: "var(--labelDark)" }}>{`${web ? 'TERRANOTES · ' : ''}ISSUE ${String(number).padStart(2, '0')} · ${month.toUpperCase()}`}</div>
         <h1 style={{ margin: web ? "16px 0 0" : "10px 0 0", fontFamily: FONT.head, fontWeight: "400", fontSize: L.title, lineHeight: "1", textTransform: "uppercase", color: "var(--page)" }}>
           Land<span style={{ color: "var(--yellow)" }}>.</span> Water<span style={{ color: "var(--yellow)" }}>.</span><br />City<span style={{ color: "var(--yellow)" }}>.</span>
