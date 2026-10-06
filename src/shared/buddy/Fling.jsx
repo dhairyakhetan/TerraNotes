@@ -131,6 +131,22 @@ export default function Fling({ W, H }) {
         M.Body.setVelocity(ghost, { x: (SLING.x - p.x) * POWER, y: (SLING.y - p.y) * POWER });
         s.ghost = ghost; s.birds--; s.state = 'flying'; s.since = 0; s.trail = []; s.hit = 0; s.broke = 0; s.grabbed = true; s.note = null;
       };
+      // the level is cleared (every gremlin gone): unused Buddies count, stars and best score are kept, rewards given
+      const cleared = () => {
+        for (let i = 0; i < s.birds; i++) add(10000, SLING.x + i * 30, SLING.y - 60);
+        s.state = 'clear'; s.stars = 1 + Math.min(2, s.birds);
+        { const a = starsOf(); if (s.stars > a[s.lv]) { a[s.lv] = s.stars; keepStars(a); setStars(a); } }
+        s.pts = total.pts - s.start; s.wasBest = scoresOf()[s.lv];
+        { const a = scoresOf(); if (s.pts > a[s.lv]) { a[s.lv] = s.pts; keepScores(a); setScores(a); } }
+        s.allStars = starsOf().reduce((a, b) => a + b, 0);
+        if (s.allStars === LEVELS.length * 3 && !hasReward('trophy')) { giveReward('trophy'); s.newTrophy = true; s.state = 'stars'; } // every star: Buddy's trophy
+        if (s.lv === LEVELS.length - 1) { // the last level: the winner's screen, and Buddy's crown for good
+          s.state = 'won'; giveReward('crown'); setWon(true);
+          const hues = [K.yellow, K.red, K.blue, K.green, K.purple, K.pink];
+          s.confetti = Array.from({ length: 140 }, (_, i) => ({ x: Math.random() * WW, y: T - Math.random() * 500, vx: (Math.random() - 0.5) * 80, vy: 120 + Math.random() * 160, r: Math.random() * 6, vr: (Math.random() - 0.5) * 8, w: 8 + Math.random() * 8, c: hues[i % hues.length] }));
+        }
+        if (s.lv + 1 < LEVELS.length && s.lv + 1 > reached()) { reach(s.lv + 1); setOpen(s.lv + 1); }
+      };
       // a turn ends when everything has (nearly) stopped, Buddy has left the world, or 9 s have passed
       const settle = (dt) => {
         s.since += dt;
@@ -138,21 +154,8 @@ export default function Fling({ W, H }) {
         const out = s.ghost && (s.ghost.position.x > WW + 60 || s.ghost.position.x < -60);
         if ((s.since > 1.2 && !moving) || out || s.since > 9) {
           if (s.ghost) { M.Composite.remove(engine.world, s.ghost); s.ghost = null; }
-          if (!gremlins().length) { // cleared: unused Buddies count
-            for (let i = 0; i < s.birds; i++) add(10000, SLING.x + i * 30, SLING.y - 60);
-            s.state = 'clear'; s.stars = 1 + Math.min(2, s.birds);
-            { const a = starsOf(); if (s.stars > a[s.lv]) { a[s.lv] = s.stars; keepStars(a); setStars(a); } }
-            s.pts = total.pts - s.start; s.wasBest = scoresOf()[s.lv];
-            { const a = scoresOf(); if (s.pts > a[s.lv]) { a[s.lv] = s.pts; keepScores(a); setScores(a); } }
-            s.allStars = starsOf().reduce((a, b) => a + b, 0);
-            if (s.allStars === LEVELS.length * 3 && !hasReward('trophy')) { giveReward('trophy'); s.newTrophy = true; s.state = 'stars'; } // every star: Buddy's trophy
-            if (s.lv === LEVELS.length - 1) { // the last level: the winner's screen, and Buddy's crown for good
-              s.state = 'won'; giveReward('crown'); setWon(true);
-              const hues = [K.yellow, K.red, K.blue, K.green, K.purple, K.pink];
-              s.confetti = Array.from({ length: 140 }, (_, i) => ({ x: Math.random() * WW, y: T - Math.random() * 500, vx: (Math.random() - 0.5) * 80, vy: 120 + Math.random() * 160, r: Math.random() * 6, vr: (Math.random() - 0.5) * 8, w: 8 + Math.random() * 8, c: hues[i % hues.length] }));
-            }
-            if (s.lv + 1 < LEVELS.length && s.lv + 1 > reached()) { reach(s.lv + 1); setOpen(s.lv + 1); }
-          } else if (s.birds > 0) {
+          if (!gremlins().length) cleared(); // every gremlin gone
+          else if (s.birds > 0) {
             const n = gremlins().length;
             s.state = 'aim';
             s.note = { text: s.hit ? `nice! ${n} gremlin${n === 1 ? '' : 's'} left` : s.broke ? `close! ${n} gremlin${n === 1 ? '' : 's'} left` : 'missed: aim with the dots, pull further', life: 2.6 };
@@ -345,6 +348,9 @@ export default function Fling({ W, H }) {
         for (const b of M.Composite.allBodies(engine.world)) if (b.kind && !b.dead && b.position.y > WH + 200) breakUp(b); // fell off the world
         if (s.ghost) { s.trail.push({ x: s.ghost.position.x, y: s.ghost.position.y }); if (s.trail.length > 400) s.trail.shift(); }
         if (s.state === 'flying') settle(dt);
+        // a gremlin can still fall after a turn has ended (a plank toppling late, a slow roll off the edge): the moment the
+        // last one goes, the level is cleared, even while aiming
+        else if ((s.state === 'aim' && !s.pull) || s.state === 'failed') { if (!gremlins().length) { setFailed(false); cleared(); } }
         s.bits.forEach((p) => { p.x += p.vx * dt; p.y += p.vy * dt; p.vy += 700 * dt; p.life -= dt * 1.6; });
         if (s.confetti) for (const c of s.confetti) { c.x += c.vx * dt; c.y += c.vy * dt; c.r += c.vr * dt; if (c.y > WH + 40) { c.y = T - 20; c.x = Math.random() * WW; } } // it keeps falling
         s.bits = s.bits.filter((p) => p.life > 0);
