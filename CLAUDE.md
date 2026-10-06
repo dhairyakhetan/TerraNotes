@@ -201,16 +201,15 @@ Tom Riddle-style diary under "Meet the team" that writes random lines in a scrip
 2026 (the latest edition) is **"Pujo"**, Durga Puja: laal-paar saree cream and alta red, maroon ink, sindoor handwriting,
 marigold strings, a pandal-night photo wall, Rozha One headings; `look.css` the saree border and an alpana dot pattern;
 `Decor.jsx` a marigold toran, alpana, dhak, conch and a "Subho Sharodiya!" tag; `Horn.jsx`, an engraving-style S-horn that now and then slides in upright from
-the page edge by the team legend (left on web, right on phones), is blown and slides back out; Pujo words; two sample articles. October's home page is its own design, **"a night of pandal hopping"** (live since 6 Oct; it started behind a preview
-switch, `src/lib/preview.js`, which a future design can use the same way: `?<name>=1`, then `LIVE.<name> = true`):
-its own home page on both layouts (`src/editions/oct26/pandal/`: `PandalHome.jsx` places the parts; `Gate.jsx` a lit
-pandal gate with the issue in its arch, which grows past you as you scroll; `PandalMap.jsx` the articles as pandals on a
-winding road, one stop each, ending in a dashed "coming soon" pandal; `Frames.jsx` a canopy over the photo wall, a
-stall's awning over the words game, "The Pujo Committee" banner in the team's heading spot (TeamSection `title={false}
-garland`: marigold rings round the faces) and the Dashami goodbye) and its articles opening with a pandal's curtains
-parting (`Curtain.jsx`, when a card was tapped: `takeTap()` in `lib/cardFlight.js`). The shared photo wall, words game and
-team sections are reused, moved into place by an offset box. Its CSS: `pandal.css` (classes `pc-` / `pd-`). Kept light: strings of bulbs twinkle a whole layer at a time (`Bulbs.jsx`; still on
-phones, to save graphics memory), and every loop on the page pauses while it scrolls (`.pd-scrolling`). A new edition starts from a copy of the newest look and changes the values; its own CSS and
+the page edge by the team legend (left on web, right on phones), is blown and slides back out; Pujo words; two sample articles. October's home page is its own design, **"the Pujo annual"** (a Pujabarshiki: the fat special issue Bengal's magazines
+bring out every Pujo), laid out like print, both layouts (`src/editions/oct26/annual/`: `AnnualHome.jsx` stacks the parts;
+`Cover.jsx` a red hardback front cover with the cover lines and the lead story in an arched window; `Contents.jsx` the
+contents page and a note from the editors (id `articles`); `Stories.jsx` the lead story as a spread, the rest in ruled
+columns; `Photos.jsx` the photo wall as a picture page; the shared words game framed as the puzzle corner; `Board.jsx` the
+team as an editorial board, a column per team, with its own profile card; `BackCover.jsx` the Dashami goodbye; `parts.jsx`
+the folios and page numbers). Unlike the shared home pages its parts flow one under another inside the artboard, so
+anything can grow. Its articles open with a page turn (`PageTurn.jsx`, when tapped on the home page: `takeTap()` in
+`lib/cardFlight.js`). Its CSS: `annual.css` (classes `an-`). A new edition starts from a copy of the newest look and changes the values; its own CSS and
 doodles are registered in `src/editions/pages.js` (`EDITION_CSS`, `DECOR`, `TEAM_NOTE` for a secret by the team legend: under it on web, beside it on phones; `LAYOUT` switches on newer layouts of the shared home sections per edition, so older ones keep theirs: copy the newest edition's entry).
 Use the variables, nothing else (the look lists a few more, for the photo wall, dark panels and details).
 

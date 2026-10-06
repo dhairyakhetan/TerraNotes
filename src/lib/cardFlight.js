@@ -9,7 +9,7 @@ let last = null;
 let tapped = 0;
 export const rememberBox = (r) => { last = { x: r.left, y: r.top, w: r.width, t: Date.now() }; tapped = last.t; };
 // Was this page opened by tapping a card in the last 4 s? Asked once (it forgets), by an edition's own article
-// opening (October's curtain: src/editions/oct26/pandal/Curtain.jsx).
+// opening (October's page turn: src/editions/oct26/annual/PageTurn.jsx).
 export const takeTap = () => { const t = Date.now() - tapped < 4000; tapped = 0; return t; };
 export const rememberCard = (e) => rememberBox(e.currentTarget.getBoundingClientRect());
 // Props for a card's link: remember the tap, or, for an article with its own page (no cover to land on, e.g. AQ Labs),

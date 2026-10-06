@@ -5,9 +5,8 @@ import { RULE as Sep26Rule, TEAM_FIT as Sep26TeamFit } from './sep26/ruled.js';
 import oct26Css from './oct26/look.css?inline';
 import Oct26Decor from './oct26/Decor.jsx';
 import Oct26Horn from './oct26/Horn.jsx';
-import pandalCss from './oct26/pandal/pandal.css?inline';
-import { PANDAL } from '../lib/preview.js';
-import { PANDAL_PAGES } from './oct26/pandal/pages.jsx';
+import annualCss from './oct26/annual/annual.css?inline';
+import { ANNUAL_PAGES } from './oct26/annual/pages.jsx';
 
 // Pages an edition draws its own way, for a month that wants more than a new look.js: its own home page and/or article
 // page, per layout. Start from a copy of the shared one (src/web/WebHome.jsx, src/phone/PhoneHome.jsx,
@@ -17,13 +16,13 @@ import { PANDAL_PAGES } from './oct26/pandal/pages.jsx';
 //   import Oct26WebHome from './oct26/WebHome.jsx';
 //   export const OWN_PAGES = { oct26: { home: { web: Oct26WebHome } } };
 // keys: edition id → { home: { web, phone }, article: { web, phone } }
-// October's "pandal hopping" design is drawn this way, for now only behind its preview switch (lib/preview.js: ?pandal=1).
-export const OWN_PAGES = PANDAL ? { oct26: PANDAL_PAGES } : {};
+// October is drawn its own way: "the Pujo annual" (src/editions/oct26/annual/)
+export const OWN_PAGES = { oct26: ANNUAL_PAGES };
 
 // An edition's own decorations, beyond its look.js colours and fonts:
 // - EDITION_CSS: its look.css (scoped to [data-edition="<id>"]), put on the page while one of its pages shows (App.jsx)
 // - DECOR: a component drawn on its home pages' artboard ({ web }: which layout), for doodles and the like
-export const EDITION_CSS = { sep26: sep26Css, oct26: PANDAL ? oct26Css + pandalCss : oct26Css };
+export const EDITION_CSS = { sep26: sep26Css, oct26: oct26Css + annualCss };
 export const DECOR = { sep26: Sep26Decor, oct26: Oct26Decor };
 // - TEAM_NOTE: a component drawn in its "Meet the team" section, web under the legend, phone beside it ({ style, size,
 //   web }: where and how big, from shared/TeamSection.jsx), e.g. September's diary, October's horn

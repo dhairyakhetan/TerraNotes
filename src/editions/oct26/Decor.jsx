@@ -12,7 +12,7 @@ import { FONT } from '../../styles/fonts.js';
 const line = { stroke: "var(--ink)", strokeWidth: "2.2", fill: "none", strokeLinecap: "round", strokeLinejoin: "round" };
 
 // a garland in swags: marigold beads along the string, a mango leaf hanging every few beads
-export function Toran({ width, top, swags, sag }) {
+function Toran({ width, top, swags, sag }) {
   const seg = width / swags, beads = [], leaves = [];
   const y = (x) => { const t = (x % seg) / seg; return 6 + sag * Math.sin(Math.PI * t); };
   for (let x = 6; x < width; x += 13) beads.push(x);
@@ -24,7 +24,7 @@ export function Toran({ width, top, swags, sag }) {
     </svg>
   );
 }
-export const Alpana = ({ left, top, d }) => (
+const Alpana = ({ left, top, d }) => (
   <svg className="dz oct-alpana" width={d} height={d} viewBox="0 0 100 100" style={{ position: "absolute", left: `${left}px`, top: `${top}px`, opacity: ".55" }}>
     <circle cx="50" cy="50" r="46" style={{ fill: "var(--red)" }} />
     <circle cx="50" cy="50" r="38" style={{ fill: "none", stroke: "var(--card)", strokeWidth: "2.5" }} />
@@ -33,7 +33,7 @@ export const Alpana = ({ left, top, d }) => (
     {Array.from({ length: 24 }, (_, i) => <circle key={i} cx="50" cy="7" r="1.6" transform={`rotate(${i * 15} 50 50)`} style={{ fill: "var(--card)" }} />)}
   </svg>
 );
-export const Dhak = ({ left, top, s }) => (
+const Dhak = ({ left, top, s }) => (
   <svg className="dz oct-dhak" width={s} height={s} viewBox="0 0 100 100" style={{ position: "absolute", left: `${left}px`, top: `${top}px`, transform: "rotate(-10deg)" }}>
     {[0, 1, 2, 3, 4, 5, 6].map((i) => <path key={i} d={`M58 38 Q${62 + i * 4} ${14 - (i % 3) * 3} ${70 + i * 5} ${8 + (i % 2) * 4}`} style={{ ...line, stroke: "var(--wire)", strokeWidth: "1.6" }} />)}
     <rect x="14" y="40" width="72" height="42" rx="18" style={{ ...line, fill: "var(--card)" }} />
@@ -42,7 +42,7 @@ export const Dhak = ({ left, top, s }) => (
     <path d="M22 44 L78 78 M22 78 L78 44" style={{ ...line, stroke: "var(--red)", strokeWidth: "1.6" }} />
   </svg>
 );
-export const Conch = ({ left, top, s }) => (
+const Conch = ({ left, top, s }) => (
   <svg className="dz oct-conch" width={s} height={s * 0.7} viewBox="0 0 120 84" style={{ position: "absolute", left: `${left}px`, top: `${top}px`, transform: "rotate(8deg)" }}>
     <path d="M8 46 C20 18 70 10 104 30 C112 36 112 50 102 56 C80 70 34 74 8 46 Z" style={{ ...line, fill: "var(--card)" }} />
     <path d="M30 44 C46 34 72 32 96 40 M40 54 C56 46 76 46 98 50" style={{ ...line, strokeWidth: "1.5" }} />
@@ -65,7 +65,7 @@ const Petal = ({ left, top, delay, red }) => (
 );
 
 // a four-point sparkle that twinkles (scale / rotate / opacity only), in one of the look's bright colours
-export const Sparkle = ({ left, top, s, c, delay }) => (
+const Sparkle = ({ left, top, s, c, delay }) => (
   <svg className="dz oct-twinkle" width={s} height={s} viewBox="0 0 100 100" style={{ position: "absolute", left: `${left}px`, top: `${top}px`, animationDelay: `${delay}s` }}>
     <path d="M50 4 C55 36 64 45 96 50 C64 55 55 64 50 96 C45 64 36 55 4 50 C36 45 45 36 50 4 Z" style={{ fill: `var(--${c})`, stroke: "var(--ink)", strokeWidth: "4", strokeLinejoin: "round" }} />
   </svg>
