@@ -96,7 +96,9 @@ const Badge = ({ b }) => (
 const badges = new Map(); // picture → its preloaded Image
 const preloadBadges = (members) => members.filter((m) => m.badge && !badges.has(m.badge.img)).forEach((m) => { const i = new Image(); i.src = m.badge.img; i.decode?.().catch(() => {}); badges.set(m.badge.img, i); });
 
-export default function TeamSection({ web }) {
+// title: false = no "Meet the team" heading (a page that draws its own there, e.g. October's committee banner);
+// garland: a ring of marigold beads round every face (the same page)
+export default function TeamSection({ web, title = true, garland = false }) {
   const edition = useEdition(), { members: MEMBERS, teams: TEAMS } = edition;
   const L = layoutFor(edition)[web ? 'web' : 'phone'], S = L.spots, H = L.height, Note = TEAM_NOTE[edition.id];
   useEffect(() => preloadBadges(MEMBERS), [MEMBERS]);
@@ -139,7 +141,7 @@ export default function TeamSection({ web }) {
   return (
     <section ref={self} id="members" style={{ position: "absolute", left: "0", top: `${L.top}px`, width: `${L.width}px`, height: `${H}px` }}>
       <div style={{ position: "absolute", top: "0", height: "2px", background: "var(--ink)", ...L.rule }} />
-      <h2 style={{ position: "absolute", margin: "0", fontFamily: FONT.head, fontWeight: "400", textTransform: "uppercase", color: "var(--ink)", ...L.title, ...snap('title') }}>{probe('title')}Meet<br />the team</h2>
+      {title && <h2 style={{ position: "absolute", margin: "0", fontFamily: FONT.head, fontWeight: "400", textTransform: "uppercase", color: "var(--ink)", ...L.title, ...snap('title') }}>{probe('title')}Meet<br />the team</h2>}
       <div style={{ position: "absolute", textAlign: "right", fontFamily: FONT.mono, color: "var(--ink)", ...L.count, ...snap('count') }}>{web && probe('count')}{web ? `${count.toUpperCase()} OF US · CLICK A FACE` : <>{count.toUpperCase()} OF US<br />TAP A FACE</>}</div>
       <p style={{ position: "absolute", margin: "0", color: "var(--text)", ...L.blurb, ...snap('blurb') }}>{probe('blurb')}one magazine, a meeting every Friday, {count} people who are all doing something else the rest of the week. writing writes the articles, design made this site's look and layout, tech built it, and the heads keep everyone on track.</p>
       <div style={{ position: "absolute", fontFamily: FONT.hand, lineHeight: "1.1", color: "var(--hand)", transform: "rotate(-2deg)", ...L.note, ...snap('note') }}>{probe('note')}nobody here is a professional. that is the point.</div>
@@ -166,6 +168,7 @@ export default function TeamSection({ web }) {
         const m = MEMBERS[i];
         return (
           <div key={m.name} className={web ? `${s.float} face` : s.float} style={{ position: "absolute", left: `${s.cx - F.half}px`, top: `${s.cy - s.size / 2}px`, width: `${F.half * 2}px`, display: "flex", flexDirection: "column", alignItems: "center", gap: F.gap, opacity: team == null || teamsOf(m).includes(team) ? 1 : 0.18, transition: "opacity .25s" }}>
+            {garland && <span aria-hidden="true" style={{ position: "absolute", left: "50%", top: "0", width: `${s.size + 18}px`, height: `${s.size + 18}px`, margin: `-9px 0 0 -${(s.size + 18) / 2}px`, boxSizing: "border-box", borderRadius: "50%", border: `${web ? 7 : 6}px dotted var(--yellow)`, pointerEvents: "none" }} />}
             <button className="bub" onClick={() => setOpen(i)} aria-label={`${m.name}, ${m.role} — open profile`} style={{ width: `${s.size}px`, height: `${s.size}px`, padding: "0", borderRadius: "50%", border: "2px solid var(--ink)", background: "var(--blank)", boxShadow: `${F.shadow} ${colorFor(m)}`, transition: `box-shadow ${fade} ease, ${F.bump}`, overflow: "hidden", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: web ? "4px" : "3px", fontSize: F.font, color: "var(--slotInk)" }}>
               {m.photo ? <img src={m.photo} alt="" loading="lazy" decoding="async" width="400" height="400" style={photoFill} /> : <><PhotoIcon size={F.icon} /><span>{firstName(m.name).toLowerCase()}</span></>}
             </button>

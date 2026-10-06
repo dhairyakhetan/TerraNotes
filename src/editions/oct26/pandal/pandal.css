@@ -1,0 +1,27 @@
+/* October's "pandal hopping" design (preview: lib/preview.js PANDAL), loaded with the edition's look.css
+   (src/editions/pages.js EDITION_CSS). Class names start pc- (the article curtain, Curtain.jsx) or pd- (the home page,
+   PandalHome.jsx and its parts); no other stylesheet uses them. Loops are transform / opacity only and carry the
+   shared class .dz too, so reduced motion, LITE and page changes stop them (styles/loops.css); one-shots never run
+   with reduced motion (the components check calm()). */
+
+/* the curtain: closed, then apart */
+.pc-left{animation:pc-left 1.05s cubic-bezier(.6,.05,.25,1) .32s both}
+.pc-right{animation:pc-right 1.05s cubic-bezier(.6,.05,.25,1) .32s both}
+@keyframes pc-left{to{transform:translateX(-104%)}}
+@keyframes pc-right{to{transform:translateX(104%)}}
+.pc-valance{animation:pc-valance .5s ease-in 1.05s both}
+@keyframes pc-valance{to{transform:translateY(-110%)}}
+.pc-knot{animation:pc-knot .62s ease-out both}
+@keyframes pc-knot{0%{opacity:0;scale:.6}35%{opacity:1;scale:1.08}60%{scale:1}100%{opacity:0;scale:.9}}
+.pc-petal{opacity:0;animation:pc-petal 1.25s cubic-bezier(.3,.2,.6,1) both}
+@keyframes pc-petal{0%{opacity:0;transform:translateY(0) rotate(0)}10%{opacity:1}85%{opacity:1}100%{opacity:0;transform:translateY(105vh) rotate(var(--r))}}
+.pc-stage{animation:pc-stage .25s linear 1.45s both}
+@keyframes pc-stage{to{opacity:0}}
+
+/* the home page: bulbs twinkle, flags flutter, a diya's flame flickers (all .dz too) */
+.pd-bulb{animation:pd-bulb 1.6s ease-in-out infinite alternate}
+@keyframes pd-bulb{from{opacity:.45}to{opacity:1}}
+.pd-flag{transform-box:fill-box;transform-origin:0 50%;animation:pd-flag 1.8s ease-in-out infinite alternate}
+@keyframes pd-flag{from{transform:scaleX(.8) skewY(-6deg)}to{transform:scaleX(1.05) skewY(5deg)}}
+.pd-flame{transform-box:fill-box;transform-origin:50% 100%;animation:pd-flame .9s ease-in-out infinite alternate}
+@keyframes pd-flame{from{transform:scale(.92,1) rotate(-3deg)}to{transform:scale(1.04,1.12) rotate(3deg)}}
