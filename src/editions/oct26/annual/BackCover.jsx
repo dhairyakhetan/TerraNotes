@@ -4,7 +4,8 @@ import { useReveal } from '../../../lib/reveal.js';
 import { FONT } from '../../../styles/fonts.js';
 import { p2 } from './parts.jsx';
 
-// The annual's back cover (AnnualHome.jsx), the Dashami goodbye: the same alta red cloth and marigold frame as the
+// The annual's back cover (AnnualHome.jsx), the Dashami goodbye (on the red: big words cream, small labels on ink chips,
+// the paragraph on a cream slip, for contrast): the same alta red cloth and marigold frame as the
 // front, "Subho Bijoya!", "asche bochor abar hobe" (see you next year), a line about Dashami, and a printed barcode
 // with the issue number, as on the back of a real annual. Element id "back-cover" (the contents page links to it).
 const BARS = [3, 1, 2, 1, 1, 3, 1, 2, 2, 1, 3, 1, 1, 2, 1, 3, 2, 1, 1, 2, 3, 1, 2, 1, 1, 3, 1, 2, 1, 2];
@@ -20,10 +21,10 @@ export default function BackCover({ web }) {
         <div style={{ position: "absolute", inset: web ? "20px" : "10px", border: `${web ? 4 : 3}px solid var(--yellow)`, pointerEvents: "none" }} />
         <div style={{ position: "absolute", inset: web ? "30px" : "16px", border: "1.5px solid var(--yellow)", pointerEvents: "none" }} />
         <div style={{ position: "absolute", left: web ? "70px" : "32px", top: web ? "64px" : "40px", width: web ? "820px" : "290px" }}>
-          <div style={{ fontFamily: FONT.mono, fontSize: web ? "12px" : "9.5px", letterSpacing: "2px", color: "var(--yellow)" }}>DASHAMI · THE LAST PAGE</div>
+          <div style={{ display: "inline-block", background: "var(--ink)", padding: "3px 7px", fontFamily: FONT.mono, fontSize: web ? "12px" : "9.5px", letterSpacing: "2px", color: "var(--yellow)" }}>DASHAMI · THE LAST PAGE</div>
           <h2 style={{ margin: web ? "10px 0 0" : "8px 0 0", fontFamily: FONT.head, fontWeight: "400", fontSize: web ? "92px" : "50px", lineHeight: "1", textTransform: "uppercase", color: "var(--page)" }}>Subho Bijoya!</h2>
-          <div style={{ marginTop: web ? "8px" : "8px", fontFamily: FONT.hand, fontSize: web ? "38px" : "25px", lineHeight: "1.05", color: "var(--yellow)", transform: "rotate(-1.5deg)" }}>asche bochor abar hobe: see you next year</div>
-          <p style={{ margin: web ? "20px 0 0" : "14px 0 0", maxWidth: web ? "600px" : "100%", fontFamily: FONT.read, fontSize: web ? "18px" : "15.5px", lineHeight: "1.55", color: "var(--page)" }}>On Dashami the idols go to the river, everyone smears sindoor on everyone, and the city waits a whole year to hear the dhak again. This issue stays right here: come back to it any time.</p>
+          <div style={{ marginTop: web ? "8px" : "8px", fontFamily: FONT.hand, fontSize: web ? "38px" : "25px", lineHeight: "1.05", color: "var(--page)", transform: "rotate(-1.5deg)" }}>asche bochor abar hobe: see you next year</div>
+          <p style={{ margin: web ? "22px 0 0" : "14px 0 0", maxWidth: web ? "600px" : "100%", boxSizing: "border-box", padding: web ? "14px 18px" : "10px 12px", background: "var(--card)", border: "2px solid var(--ink)", boxShadow: "4px 4px 0 var(--ink)", transform: "rotate(-0.6deg)", fontFamily: FONT.read, fontSize: web ? "18px" : "15px", lineHeight: "1.5", color: "var(--text)" }}>On Dashami the idols go to the river, everyone smears sindoor on everyone, and the city waits a whole year to hear the dhak again. This issue stays right here: come back to it any time.</p>
         </div>
         <div aria-hidden="true" style={{ position: "absolute", right: web ? "70px" : "auto", left: web ? "auto" : "32px", bottom: web ? "64px" : "36px", background: "var(--card)", padding: web ? "12px 14px 8px" : "8px 10px 6px", border: "2px solid var(--ink)" }}>
           <div style={{ display: "flex", alignItems: "stretch", gap: web ? "2px" : "1.5px", height: web ? "64px" : "40px" }}>

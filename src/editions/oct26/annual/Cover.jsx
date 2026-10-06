@@ -9,7 +9,9 @@ import { p2 } from './parts.jsx';
 
 // The annual's front cover (AnnualHome.jsx): a hardback in alta red with a marigold double frame and a dark spine,
 // "TERRANOTES" across the top, "the Pujo issue", the cover lines (the issue's first few stories, each a link), and the
-// lead story's cover in an arched window on the right (a link too). A round marigold sticker says what it costs.
+// lead story's cover in a marigold-framed window on the right (a link too; the window doesn't clip the cover's own words).
+// Text on the red: big words in cream (4:1, enough for large type), small labels as marigold on ink chips (yellow on
+// the red itself is only 2.7:1). A round marigold sticker says what it costs.
 // Bengali year 1433 = 2026's autumn.
 const C = {
   web: { w: 1140, h: 780, spine: 34, pad: 50, mast: "150px", issue: "13px", line: "30px", art: [420, 450], sticker: 132 },
@@ -20,7 +22,7 @@ export default function Cover({ web, lead, lines }) {
   const L = C[web ? 'web' : 'phone'], { number, month } = useEdition();
   const frame = { position: "absolute", pointerEvents: "none" };
   const Art = lead && (
-    <Link to={articleLink(lead)} {...flight(lead)} aria-label={`Cover story: ${lead.title}`} className="press btn" style={{ "--c": "var(--ink)", display: "block", width: `${L.art[0]}px`, height: `${L.art[1]}px`, boxSizing: "border-box", border: `${web ? 7 : 5}px solid var(--yellow)`, borderRadius: `${L.art[0] / 2}px ${L.art[0] / 2}px 0 0`, overflow: "hidden", boxShadow: `${web ? 10 : 6}px ${web ? 10 : 6}px 0 var(--ink)`, background: "var(--blank)", flexShrink: "0" }}>
+    <Link to={articleLink(lead)} {...flight(lead)} aria-label={`Cover story: ${lead.title}`} className="press btn" style={{ "--c": "var(--ink)", display: "block", width: `${L.art[0]}px`, height: `${L.art[1]}px`, boxSizing: "border-box", border: `${web ? 7 : 5}px solid var(--yellow)`, overflow: "hidden", transform: "rotate(1.2deg)", boxShadow: `${web ? 10 : 6}px ${web ? 10 : 6}px 0 var(--ink)`, background: "var(--blank)", flexShrink: "0" }}>
       <ImageSlot src={lead.cover} srcSet={coverSet(lead.cover)} sizes={web ? '420px' : '300px'} alt={lead.alt} first box={{ width: "100%", height: "100%" }} />
     </Link>
   );
@@ -37,30 +39,30 @@ export default function Cover({ web, lead, lines }) {
         <div style={{ ...frame, left: `${L.spine + (web ? 30 : 16)}px`, top: web ? "30px" : "16px", right: web ? "30px" : "16px", bottom: web ? "30px" : "16px", border: "1.5px solid var(--yellow)" }} />
         <div style={{ position: "absolute", left: `${L.spine + L.pad}px`, right: `${L.pad}px`, top: web ? "52px" : "30px" }}>
           <div style={{ display: "flex", justifyContent: "space-between", fontFamily: FONT.mono, fontSize: L.issue, letterSpacing: web ? "2.4px" : "1.2px", color: "var(--yellow)" }}>
-            <span>{`ISSUE ${p2(number)} · ${month.toUpperCase()}`}</span><span>SHARADIYA 1433</span>
+            <span style={{ background: "var(--ink)", padding: "3px 7px", }}>{`ISSUE ${p2(number)} · ${month.toUpperCase()}`}</span><span style={{ background: "var(--ink)", padding: "3px 7px", }}>SHARADIYA 1433</span>
           </div>
           <h1 style={{ margin: web ? "4px 0 0" : "6px 0 0", fontFamily: FONT.head, fontWeight: "400", fontSize: L.mast, lineHeight: "1", letterSpacing: web ? "2px" : "0", textTransform: "uppercase", color: "var(--page)", textAlign: "center" }}>TerraNotes</h1>
           <div style={{ marginTop: web ? "2px" : "0", borderTop: `${web ? 3 : 2}px solid var(--yellow)`, borderBottom: "1px solid var(--yellow)", height: web ? "4px" : "3px" }} />
           <div style={{ display: "flex", flexDirection: web ? "row" : "column", gap: web ? "50px" : "14px", marginTop: web ? "34px" : "14px", alignItems: web ? "flex-start" : "center" }}>
             <div style={{ flexGrow: "1", minWidth: "0", alignSelf: "stretch" }}>
-              <div style={{ fontFamily: FONT.serif, fontStyle: "italic", fontSize: web ? "54px" : "28px", lineHeight: "1", color: "var(--yellow)" }}>The Pujo issue</div>
+              <div style={{ fontFamily: FONT.serif, fontStyle: "italic", fontSize: web ? "54px" : "28px", lineHeight: "1", color: "var(--page)" }}>The Pujo issue</div>
               {web && <ol style={{ listStyle: "none", margin: "28px 0 0", padding: "0", display: "flex", flexDirection: "column", gap: "18px" }}>
                 {lines.map((a) => (
                   <li key={a.slug}>
                     <Link to={articleLink(a)} {...flight(a)} className="an-line" style={{ display: "block", textDecoration: "none", color: "var(--page)" }}>
-                      <span style={{ display: "block", fontFamily: FONT.mono, fontSize: "11px", letterSpacing: "1.8px", color: "var(--yellow)" }}>{a.tag.toUpperCase()}</span>
+                      <span style={{ display: "inline-block", background: "var(--ink)", padding: "3px 7px", fontFamily: FONT.mono, fontSize: "11px", letterSpacing: "1.8px", color: "var(--yellow)" }}>{a.tag.toUpperCase()}</span>
                       <span style={{ display: "block", marginTop: "4px", fontFamily: FONT.head, fontSize: L.line, lineHeight: "1.05", textTransform: "uppercase" }}>{a.title}</span>
                     </Link>
                   </li>
                 ))}
               </ol>}
-              {web && <div style={{ marginTop: "26px", fontFamily: FONT.hand, fontSize: "28px", lineHeight: "1.1", color: "var(--yellow)", transform: "rotate(-1.5deg)" }}>+ a photo page, a word puzzle and the people who made it all</div>}
+              {web && <div style={{ marginTop: "26px", fontFamily: FONT.hand, fontSize: "28px", lineHeight: "1.1", color: "var(--page)", transform: "rotate(-1.5deg)" }}>+ a photo page, a word puzzle and the people who made it all</div>}
             </div>
             {Art}
           </div>
           {!web && lines[0] && (
             <div style={{ marginTop: "16px", textAlign: "center" }}>
-              <span style={{ display: "block", fontFamily: FONT.mono, fontSize: "9px", letterSpacing: "1.4px", color: "var(--yellow)" }}>{`INSIDE · ${lines.length} ${lines.length === 1 ? 'STORY' : 'STORIES'}`}</span>
+              <span style={{ display: "inline-block", background: "var(--ink)", padding: "3px 7px", fontFamily: FONT.mono, fontSize: "9px", letterSpacing: "1.4px", color: "var(--yellow)" }}>{`INSIDE · ${lines.length} ${lines.length === 1 ? 'STORY' : 'STORIES'}`}</span>
               <span style={{ display: "block", marginTop: "4px", fontFamily: FONT.head, fontSize: L.line, lineHeight: "1.08", textTransform: "uppercase" }}>{lines.map((a) => a.title).join(' · ')}</span>
             </div>
           )}

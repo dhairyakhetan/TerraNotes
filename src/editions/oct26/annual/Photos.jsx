@@ -21,7 +21,7 @@ function Print({ web, p, i, big, onOpen }) {
         </div>
       </button>
       <figcaption style={{ marginTop: big ? "12px" : "8px", fontFamily: FONT.serif, fontStyle: "italic", fontSize: web ? (big ? "22px" : "17px") : "15px", lineHeight: "1.2", color: "var(--ink)" }}>
-        <span style={{ fontFamily: FONT.mono, fontStyle: "normal", fontSize: web ? "11px" : "9.5px", letterSpacing: "1.2px", color: "var(--red)" }}>{`FIG. ${i + 1}  `}</span>
+        <span style={{ fontFamily: FONT.mono, fontStyle: "normal", fontSize: web ? "11px" : "9.5px", letterSpacing: "1.2px", color: "var(--hand)" }}>{`FIG. ${i + 1}  `}</span>
         {p.caption || '[caption]'}{p.place ? `, ${p.place}` : ''}
       </figcaption>
     </figure>

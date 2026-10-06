@@ -20,4 +20,4 @@
 
 /* /words lands on the puzzle corner's heading, not on the game inside it (its element id is the shared game's) */
 .an-home #words{scroll-margin-top:230px}
-.web .an-home #words{scroll-margin-top:300px}
+.web .an-home #words{scroll-margin-top:205px}

@@ -13,7 +13,7 @@ import { Folio, Head, p2, pagesOf } from './parts.jsx';
 // The annual's stories (AnnualHome.jsx), laid out like a printed magazine: the lead story as a spread (its cover big on
 // the left; on the right its tag, title, dek, the opening of its first paragraph under a drop cap, and "Read the story")
 // then every other story in columns with thin rules between them (web three across, phones one under another), and a
-// dashed "more stories soon" slot when a row has room. Each story is a link; its cover flies out (lib/cardFlight.js) and
+// dashed "more stories soon" slot filling the rest of the last row, so no row is left lopsided. Each story is a link; its cover flies out (lib/cardFlight.js) and
 // the page turns (PageTurn.jsx). ?by=<writer>: their pieces first, taped (lib/byWriter.js, from AnnualHome).
 const opening = (a) => { const t = (a.body || []).find((b) => typeof b === 'string') || a.dek || ''; return t.length > 230 ? `${t.slice(0, 230).replace(/\s+\S*$/, '')}…` : t; };
 const meta = (a) => [a.author || 'TerraNotes', a.readTime && `${a.readTime} min read`].filter(Boolean).join(' · ').toUpperCase();
@@ -33,10 +33,10 @@ function Lead({ web, a, mine }) {
       <div style={{ minWidth: "0", paddingTop: web ? "6px" : "0" }}>
         <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
           <TagPill a={a} size={web ? "11px" : "9.5px"} pad="3px 10px" lh="1.3" />
-          <span style={{ fontFamily: FONT.mono, fontSize: web ? "11px" : "9.5px", letterSpacing: "1.6px", color: "var(--red)" }}>COVER STORY</span>
+          <span style={{ fontFamily: FONT.mono, fontSize: web ? "11px" : "9.5px", letterSpacing: "1.6px", color: "var(--hand)" }}>COVER STORY</span>
         </div>
-        <h3 style={{ margin: web ? "16px 0 0" : "10px 0 0", fontFamily: FONT.head, fontWeight: "400", fontSize: web ? "54px" : "32px", lineHeight: "calc(1.02 * var(--head-lead, 1))", textTransform: "uppercase" }}>{a.title}</h3>
-        <div style={{ marginTop: web ? "12px" : "8px", fontFamily: FONT.hand, fontSize: web ? "30px" : "22px", lineHeight: "1.05", color: "var(--dek)" }}>{a.dek}</div>
+        <h3 style={{ margin: web ? "16px 0 0" : "10px 0 0", fontFamily: FONT.head, fontWeight: "400", fontSize: web ? "54px" : "32px", lineHeight: "calc(1.02 * var(--head-lead, 1))", textTransform: "uppercase", textWrap: "balance" }}>{a.title}</h3>
+        <div style={{ marginTop: web ? "12px" : "8px", fontFamily: FONT.hand, fontSize: web ? "30px" : "22px", lineHeight: "1.05", color: "var(--dek)", textWrap: "pretty" }}>{a.dek}</div>
         <p style={{ margin: web ? "20px 0 0" : "14px 0 0", fontFamily: FONT.read, fontSize: web ? "19px" : "16.5px", lineHeight: "1.6", color: "var(--text)" }}>
           <span className="an-drop" style={{ float: "left", fontFamily: FONT.head, fontSize: web ? "78px" : "56px", lineHeight: "0.82", color: "var(--red)", margin: web ? "8px 10px 0 0" : "6px 8px 0 0" }}>{opening(a).charAt(0)}</span>
           {opening(a).slice(1)}
@@ -61,8 +61,8 @@ function Column({ web, a, i, page, mine }) {
         <TagPill a={a} size={web ? "10px" : "9.5px"} pad="3px 9px" lh="1.3" fit />
         <span style={{ fontFamily: FONT.mono, fontSize: web ? "11px" : "10px", color: "var(--ink)" }}>{`p. ${p2(page)}`}</span>
       </div>
-      <h3 style={{ margin: "10px 0 0", fontFamily: FONT.head, fontWeight: "400", fontSize: web ? "28px" : "25px", lineHeight: "calc(1.05 * var(--head-lead, 1))", textTransform: "uppercase" }}>{a.title}</h3>
-      <div style={{ marginTop: "6px", fontFamily: FONT.hand, fontSize: web ? "23px" : "21px", lineHeight: "1.05", color: "var(--dek)" }}>{a.dek}</div>
+      <h3 style={{ margin: "10px 0 0", fontFamily: FONT.head, fontWeight: "400", fontSize: web ? "28px" : "25px", lineHeight: "calc(1.05 * var(--head-lead, 1))", textTransform: "uppercase", textWrap: "balance" }}>{a.title}</h3>
+      <div style={{ marginTop: "6px", fontFamily: FONT.hand, fontSize: web ? "23px" : "21px", lineHeight: "1.05", color: "var(--dek)", textWrap: "pretty" }}>{a.dek}</div>
       <div style={{ marginTop: "10px", fontFamily: FONT.mono, fontSize: web ? "10.5px" : "9.5px", letterSpacing: "1.3px", color: "var(--muted)" }}>{`${meta(a)} · READ →`}</div>
     </Link>
   );
@@ -86,7 +86,7 @@ export default function Stories({ web, list, isMine }) {
       <Lead web={web} a={lead} mine={isMine(lead)} />
       <div style={{ display: "grid", gridTemplateColumns: web ? "repeat(3, 1fr)" : "1fr", columnGap: web ? "0" : "0", rowGap: web ? "40px" : "34px", marginTop: web ? "40px" : "30px" }}>
         {[...rest, ...(rest.length % 3 || !rest.length ? [null] : [])].map((a, i) => (
-          <div key={a ? a.slug : 'soon'} style={web ? { padding: "0 30px", borderLeft: i % 3 ? "1px solid var(--rule)" : "none", ...(i % 3 === 0 && { paddingLeft: "0" }), ...(i % 3 === 2 && { paddingRight: "0" }) } : null}>
+          <div key={a ? a.slug : 'soon'} style={web ? { padding: "0 30px", borderLeft: i % 3 ? "1px solid var(--rule)" : "none", ...(i % 3 === 0 && { paddingLeft: "0" }), ...((i % 3 === 2 || !a) && { paddingRight: "0" }), ...(!a && { gridColumn: `span ${3 - (i % 3)}` }) } : null}>
             {a ? <Column web={web} a={a} i={i} page={P.story(articles.indexOf(a))} mine={isMine(a)} /> : <Soon web={web} />}
           </div>
         ))}

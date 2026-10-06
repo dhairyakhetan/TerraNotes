@@ -18,7 +18,7 @@ const go = (id) => () => byId(id)?.scrollIntoView({ behavior: calm() ? 'auto' : 
 function Row({ web, num, title, meta, page, to, a, onClick }) {
   const inner = (
     <>
-      <span style={{ fontFamily: FONT.mono, fontSize: web ? "13px" : "11px", color: "var(--red)", width: web ? "34px" : "26px", flexShrink: "0", paddingTop: web ? "10px" : "6px" }}>{num}</span>
+      <span style={{ fontFamily: FONT.mono, fontSize: web ? "13px" : "11px", color: "var(--hand)", width: web ? "34px" : "26px", flexShrink: "0", paddingTop: web ? "10px" : "6px" }}>{num}</span>
       <span style={{ flexGrow: "1", minWidth: "0" }}>
         <span style={{ display: "flex", alignItems: "baseline", gap: "10px" }}>
           <span style={{ fontFamily: FONT.serif, fontSize: web ? "32px" : "22px", lineHeight: "1.1", color: "var(--ink)" }}>{title}</span>
@@ -58,7 +58,7 @@ export default function Contents({ web, list }) {
         <aside style={{ width: web ? "380px" : "100%", flexShrink: "0", boxSizing: "border-box", background: "var(--card)", border: "2px solid var(--ink)", boxShadow: `${web ? 8 : 6}px ${web ? 8 : 6}px 0 var(--yellow)`, transform: "rotate(0.6deg)" }}>
           <div style={{ height: web ? "14px" : "10px", background: "var(--red)", borderBottom: "3px solid var(--yellow)" }} />
           <div style={{ padding: web ? "24px 28px 26px" : "18px 20px 20px" }}>
-            <div style={{ fontFamily: FONT.mono, fontSize: web ? "11px" : "9.5px", letterSpacing: "1.8px", color: "var(--red)" }}>FROM THE EDITORS</div>
+            <div style={{ fontFamily: FONT.mono, fontSize: web ? "11px" : "9.5px", letterSpacing: "1.8px", color: "var(--hand)" }}>FROM THE EDITORS</div>
             <p style={{ margin: web ? "12px 0 0" : "10px 0 0", fontFamily: FONT.read, fontSize: web ? "18px" : "16px", lineHeight: "1.55", color: "var(--text)" }}>
               Every Pujo, Bengal’s magazines bring out a fat annual: stories, pictures, puzzles, the lot. This is ours.
             </p>

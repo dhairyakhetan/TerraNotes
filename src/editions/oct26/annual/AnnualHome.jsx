@@ -26,8 +26,10 @@ import { Folio, Head, pagesOf } from './parts.jsx';
 // under another inside the artboard (its width fixed, its height whatever they need), so stories, photos and people can
 // be added freely. The words game is the shared section (it places itself on the shared page's artboard), moved into
 // its frame by an offset box. Element ids for the section addresses: articles, photos, words, members.
-// SHARED_WORDS: where the shared words game places itself, and its size (WordsGameSection.jsx)
-const SHARED_WORDS = { web: { left: 40, top: 1910, height: 600 }, phone: { left: 0, top: 1830, height: 650 } };
+// SHARED_WORDS: where the shared words game places itself and its size (WordsGameSection.jsx), and how it's fitted into
+// the page's column: its content spans x 70–1360 on web (10–380 on phones), wider than the column, so it's drawn a
+// little smaller (scale) and shifted (left) to sit centred in the frame
+const SHARED_WORDS = { web: { top: 1910, height: 600, scale: 0.88, left: -32, pad: 18 }, phone: { top: 1830, height: 650, scale: 0.92, left: -7, pad: 12 } };
 
 function Puzzle({ web }) {
   const { articles } = useEdition(), S = SHARED_WORDS[web ? 'web' : 'phone'];
@@ -35,9 +37,9 @@ function Puzzle({ web }) {
     <section aria-label="Puzzle corner" style={{ marginTop: web ? "110px" : "64px" }}>
       <Folio web={web} page={pagesOf(articles.length).puzzle} label="puzzle corner" />
       <Head web={web} kicker="DHADHA · PUZZLE" title="Puzzle corner" aside="five words, three guesses each. no googling" />
-      <div style={{ position: "relative", margin: web ? "0 -80px" : "0 -20px", height: `${S.height + (web ? 40 : 24)}px`, background: "var(--card)", borderTop: "3px double var(--ink)", borderBottom: "3px double var(--ink)", ...(web && { border: "3px double var(--ink)" }) }}>
-        <div style={{ position: "absolute", left: `${-S.left}px`, top: `${-S.top + (web ? 20 : 12)}px`, width: web ? "1440px" : "390px", height: "0" }}>
-          <WordsGameSection web={web} />
+      <div style={{ position: "relative", height: `${Math.round(S.height * S.scale) + S.pad}px`, background: "var(--card)", border: "3px double var(--ink)", overflow: "clip" }}>
+        <div style={{ position: "absolute", left: `${S.left}px`, top: `${S.pad - 4}px`, width: web ? "1440px" : "390px", height: "0", transform: `scale(${S.scale})`, transformOrigin: "0 0" }}>
+          <div style={{ position: "absolute", left: "0", top: `${-S.top}px`, width: "100%", height: "0" }}><WordsGameSection web={web} /></div>
         </div>
       </div>
     </section>

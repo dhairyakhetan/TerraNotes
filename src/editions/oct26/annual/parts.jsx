@@ -25,7 +25,7 @@ export function Head({ web, title, kicker, aside, id }) {
   return (
     <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", gap: "20px", margin: web ? "26px 0 30px" : "18px 0 20px", flexWrap: web ? "nowrap" : "wrap" }}>
       <div>
-        {kicker && <div style={{ fontFamily: FONT.mono, fontSize: web ? "12px" : "10px", letterSpacing: "1.8px", color: "var(--red)", marginBottom: web ? "6px" : "4px" }}>{kicker}</div>}
+        {kicker && <div style={{ fontFamily: FONT.mono, fontSize: web ? "12px" : "10px", letterSpacing: "1.8px", color: "var(--hand)", marginBottom: web ? "6px" : "4px" }}>{kicker}</div>}
         <h2 id={id} style={{ margin: "0", fontFamily: FONT.head, fontWeight: "400", fontSize: web ? "84px" : "46px", lineHeight: "0.95", textTransform: "uppercase", color: "var(--ink)" }}>{title}</h2>
       </div>
       {aside && <div style={{ maxWidth: web ? "380px" : "100%", fontFamily: FONT.serif, fontStyle: "italic", fontSize: web ? "26px" : "20px", lineHeight: "1.15", color: "var(--hand)", textAlign: web ? "right" : "left" }}>{aside}</div>}
