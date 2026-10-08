@@ -1,7 +1,2 @@
-node_modules
-dist
-out
-.vercel
-.DS_Store
-test-results
-playwright-report
+node_modules/
+dist/
