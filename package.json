@@ -3,6 +3,6 @@
   "private": true,
   "description": "A blank page that says fahhh. The TerraNotes site lives on the fahhh branch.",
   "scripts": {
-    "build": "mkdir -p dist && cp index.html dist/index.html"
+    "build": "mkdir -p dist && cp index.html og.png dist/"
   }
 }
