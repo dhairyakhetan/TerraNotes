@@ -12,9 +12,9 @@ import { pad2 } from '../lib/format.js';
 import { FONT } from '../styles/fonts.js';
 
 // /editions: every monthly edition, each drawn in its own colours and heading font (its look.js, put on the tile as the
-// same CSS variables the pages use, so var(--ink) inside a tile is that edition's ink). The latest on top, big: its
-// covers, its theme, its intro line and its pieces. Under it the back issues, a shelf of same-size tiles (cover, number,
-// month, theme, pieces, "open →"), newest first. Then the editions still being made (draft: true), as dashed "coming"
+// same CSS variables the pages use, so var(--ink) inside a tile is that edition's ink). The latest (the home page's) on
+// top, big: its covers, its theme, its intro line and its pieces. Under it every other issue, a shelf of same-size
+// tiles (cover, number, month, theme, pieces, "open →"), newest first. Then the editions still being made (draft: true), as dashed "coming"
 // tiles with only their month, no link and nothing of their content. Both layouts, in normal document flow.
 const MONO = { fontFamily: FONT.mono, letterSpacing: "1.4px", textTransform: "uppercase" };
 const HEAD = { fontFamily: FONT.head, fontWeight: "400", lineHeight: "calc(0.95 * var(--head-lead, 1))" };
@@ -126,9 +126,9 @@ export function EditionsPage({ web }) {
         <h1 style={{ ...HEAD, margin: "8px 0 0", fontSize: web ? "110px" : "60px", lineHeight: "0.9", textTransform: "uppercase", color: "var(--ink)" }}>Editions</h1>
         <div style={{ marginTop: "8px", fontFamily: FONT.hand, fontSize: web ? "30px" : "22px", color: "var(--hand)", transform: "rotate(-1deg)" }}>every issue, each in its own colours</div>
       </div>
-      <Kicker web={web}>The latest</Kicker>
+      <Kicker web={web}>On the front page</Kicker>
       <Latest e={latest} web={web} />
-      <Kicker web={web}>{`Back issues · ${past.length}`}</Kicker>
+      <Kicker web={web}>{`${past.some((e) => e.number > LATEST) ? 'Every other issue' : 'Back issues'} · ${past.length}`}</Kicker>
       {past.length ? (
         <div style={{ display: "grid", gridTemplateColumns: web ? "repeat(3, 1fr)" : "1fr 1fr", gap: web ? "34px" : "18px 14px" }}>{past.map((e) => <Tile key={e.number} e={e} web={web} />)}</div>
       ) : (

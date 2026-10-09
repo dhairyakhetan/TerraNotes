@@ -2,25 +2,27 @@ import { withBase } from '../lib/base.js';
 
 // TerraNotes comes out once a month; each edition is its own folder, src/editions/<id>/ (its look, articles, photo
 // wall, words and team), so every edition keeps its own look and content for good (see CLAUDE.md "New edition").
-// Newest last. The newest one that isn't a draft is the "latest": the home page (/) shows it and its articles have
-// clean links (/articles/<slug>). Every other edition lives under its id, made from its month ('September 2026' →
+// Newest last. The newest one that isn't a draft is the "latest" (or the one marked home: true): the home page (/)
+// shows it and its articles have clean links (/articles/<slug>). Every other edition lives under its id, made from its month ('September 2026' →
 // 'sep26'): its home page is /sep26 (also /sep26/photos…) and its articles /sep26/articles/<slug>. That happens by
 // itself the moment a newer edition goes live (old clean links redirect). Its files live in public/editions/<id>/.
 //   theme: the issue's name, shown on /editions (pages/EditionsPage.jsx)
+//   home:  true = this one is the home page even though newer ones are live (they live under their ids, like older
+//          ones). Delete it to let the newest take the home page again.
 //   draft: true = still being made: not the latest, not listed anywhere (edition picker, /editions, sitemap), but
 //          viewable at its own address (/oct26) with a "draft" tape. Delete the flag to put it live.
 
 export const EDITIONS = [
   { number: 1, month: 'September 2026', theme: 'Exam season' },
-  { number: 2, month: 'October 2026', theme: 'The Pujo annual' },
-  { number: 3, month: 'November 2026', theme: 'Lights', draft: true },
-  { number: 4, month: 'December 2026', theme: 'Park Street', draft: true },
-  { number: 5, month: 'January 2027', theme: 'Boi Mela', draft: true },
-  { number: 6, month: 'February 2027', theme: 'Letters', draft: true },
+  { number: 2, month: 'October 2026', theme: 'The Pujo annual', home: true },
+  { number: 3, month: 'November 2026', theme: 'Lights' },
+  { number: 4, month: 'December 2026', theme: 'Park Street' },
+  { number: 5, month: 'January 2027', theme: 'Boi Mela' },
+  { number: 6, month: 'February 2027', theme: 'Letters' },
 ];
 
 export const PUBLISHED = EDITIONS.filter((e) => !e.draft);
-export const LATEST = PUBLISHED[PUBLISHED.length - 1].number;
+export const LATEST = (PUBLISHED.find((e) => e.home) || PUBLISHED[PUBLISHED.length - 1]).number;
 export const editionOf = (n) => EDITIONS.find((e) => e.number === n);
 export const isDraft = (n) => !!editionOf(n)?.draft;
 export const editionName = (n) => `Edition ${String(n).padStart(2, '0')}`;

@@ -18,7 +18,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { chromium } from 'playwright';
 import { ALL_ARTICLES, tagOf } from '../src/data/articles.js';
-import { EDITIONS, editionId, ogImage } from '../src/data/editions.js';
+import { EDITIONS, LATEST, editionId, ogImage } from '../src/data/editions.js';
 import { GAMES } from '../src/data/games.js';
 import { editionData } from '../src/editions/index.js';
 import { withBase } from '../src/lib/base.js';
@@ -123,9 +123,11 @@ function articleCard(e, a) {
 // the main page: the magazine itself. Every edition as its notebook from the opening animation (its cover colour, the
 // "Top secret" foil and its number in a foil box), fanned on a desk, newest on top, beside the name.
 function mainCard() {
-  const eds = EDITIONS.filter((e) => !e.draft), L = editionData(eds[eds.length - 1].number).look, C = L.colors, F = L.fonts;
-  const books = eds.map((e, i) => { const { colors: c, fonts: f } = editionData(e.number).look, n = eds.length, k = i - (n - 1) / 2;
-    return `<div class="book" style="left:${790 + k * 235}px;top:${118 + Math.abs(k) * 24}px;transform:rotate(${k * 10}deg);z-index:${i};background:${c.text};box-shadow:10px 10px 0 ${c.ink}">
+  // a few editions fan wide; more fan tighter (spacing and tilt shrink) so the fan stays clear of the name
+  const eds = EDITIONS.filter((e) => !e.draft), L = editionData(LATEST).look, C = L.colors, F = L.fonts;
+  const n = eds.length, gap = n <= 2 ? 235 : 440 / (n - 1), tilt = n <= 2 ? 10 : 18 / Math.max(1, (n - 1) / 2) / 2, mid = n <= 2 ? 790 : 860;
+  const books = eds.map((e, i) => { const { colors: c, fonts: f } = editionData(e.number).look, k = i - (n - 1) / 2;
+    return `<div class="book" style="left:${mid + k * gap}px;top:${118 + Math.abs(k) * (n <= 2 ? 24 : 12)}px;transform:rotate(${k * tilt}deg);z-index:${i};background:${c.text};box-shadow:10px 10px 0 ${c.ink}">
       <div class="imp"><div class="s">Aquaterra · field notes</div><div class="sec" style="color:${c.yellow};font-family:${f.head}">Top<br>secret</div>
       <div class="rule"></div><div class="nm" style="font-family:${f.serif}">TerraNotes</div>
       <div class="iss" style="color:${c.yellow};border-color:${c.yellow};font-family:${f.head}">Issue ${pad(e.number)}</div><div class="mo" style="color:${c.page}">${esc(e.month)}</div></div></div>`; }).join('');
