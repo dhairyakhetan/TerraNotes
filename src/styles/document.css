@@ -7,7 +7,7 @@
 
 /* ── from styles/base.css ── */
 
-html.tn-on,html.tn-on body{margin:0;background:var(--tn-page,#F3EEE4)} /* the edition's page colour (lib/edition.js) */
+html.tn-on,html.tn-on body{margin:0;background:var(--tn-page,var(--page))} /* the edition's page colour (lib/edition.js) */
 /* AQ sets scroll-behavior:smooth on <html>; the handoff scrolls with explicit behaviors ('auto' = instant) and needs the browser default back */
 html.tn-on{scroll-behavior:auto}
 /* AQ lays a fixed full-screen film grain over every page (v6.css .noise::before, mix-blend-mode:overlay). Over this design it tints the paper colours

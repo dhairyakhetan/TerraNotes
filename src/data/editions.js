@@ -13,6 +13,7 @@ export const EDITIONS = [
   { number: 1, month: 'September 2026' },
   { number: 2, month: 'October 2026' },
   { number: 3, month: 'November 2026', draft: true },
+  { number: 4, month: 'December 2026', draft: true },
 ];
 
 export const PUBLISHED = EDITIONS.filter((e) => !e.draft);

@@ -26,7 +26,7 @@ export default function PhotoWall({ web, onOpen, printClass = '' }) {
                 : <span style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "6px", fontFamily: FONT.mono, fontSize: "11px", color: "var(--wallInk)" }}><PhotoIcon size={20} color="var(--wallInk)" />[photo]</span>}
             </span>
             <span className="ss-cap" style={{ display: "block", flexShrink: "0", fontFamily: FONT.hand, fontSize: web ? (i ? "21px" : "26px") : "17px", lineHeight: "1.1", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-              {p.caption || '[caption]'}{p.place && (web || !i) ? <span style={{ opacity: ".75" }}>{`, ${p.place}`}</span> : null}
+              {p.caption || '[caption]'}{p.place && !i ? <span style={{ opacity: ".75" }}>{`, ${p.place}`}</span> : null}
             </span>
           </button>
         );

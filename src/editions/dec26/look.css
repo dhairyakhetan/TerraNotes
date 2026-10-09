@@ -1,0 +1,8 @@
+/* December 2026's look, "Park Street" (src/editions/dec26/look.js): the paper pages (articles, games) get a faint
+   pattern of tinsel-gold and holly-red dots, like wrapping paper. Only this edition's pages get it (data-edition="dec26":
+   lib/edition.js), on the pages with class="page-sheet"; the pages set their background inline, so !important. */
+html[data-edition="dec26"] .page-sheet,:host([data-edition="dec26"]) .page-sheet{
+  background-image:radial-gradient(circle,color-mix(in srgb,var(--yellow) 55%,transparent) 0 2px,transparent 2.6px),radial-gradient(circle,color-mix(in srgb,var(--red) 20%,transparent) 0 1.4px,transparent 2px) !important;
+  background-size:40px 40px,40px 40px !important;
+  background-position:0 0,20px 20px !important;
+}
