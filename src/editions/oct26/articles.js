@@ -15,7 +15,7 @@ export const TAGS = {
   'Under Aquaterra': { color: '#FFC914', ink: '#26268F' },
 };
 
-// Two sample pieces, written to show off the Pujo look (from Aquaterra itself: no writer). Swap them for the
+// Five sample pieces, written to show off the Pujo look (from Aquaterra itself: no writer). Swap them for the
 // writers' articles.
 export const ARTICLES = [
   {
@@ -62,6 +62,71 @@ export const ARTICLES = [
       { then: [['Mahalaya on the radio at 4 a.m.', 'Mahalaya on a phone at 4 a.m.'], ['dhakis walking in from the villages', 'dhakis walking in from the villages'], ['dancing with the dhunuchi', 'filming the dhunuchi dance'], ['the beat that means “Pujo”', 'the same beat']], title: 'What changed, what didn’t' },
       { h2: 'The last beat' },
       'On Dashami the rhythm changes. It gets faster, louder, almost angry, as the idols are carried to the river. And then it stops, and the city is just a city again, waiting a whole year to hear it.',
+    ],
+  },
+  {
+    slug: 'bhog-plate-by-plate',
+    tag: 'Field notes',
+    title: 'Bhog, plate by plate',
+    dek: 'khichuri, labra, beguni and the aunty with the big ladle',
+    cover: '/editions/oct26/articles/bhog-plate-by-plate/cover.jpg',
+    alt: 'a banana leaf with yellow khichuri, labra, beguni and a sweet',
+    author: null,
+    date: 'Oct 2026',
+    readTime: '3',
+    body: [
+      'Bhog is the meal the goddess eats first, and then everyone else. At the para pandal it arrives at around one in the afternoon, served on leaf plates by volunteers who have been awake since five, and it is the only food all year that nobody complains about.',
+      { h2: 'The plate, from the top' },
+      { numbers: [['khichuri', '1 big ladle'], ['labra', '1 spoon'], ['beguni', '2 if lucky'], ['chutney', 'a lot'], ['payesh', '1 cup']], title: 'One plate of bhog' },
+      'Khichuri first: rice and moong dal cooked together until they give up and become one thing, yellow with turmeric and shining with ghee. Then labra, a mixed vegetable dish that is different in every house and perfect in every house. Then the crisp, hot beguni, which disappears before the chutney arrives.',
+      { quote: 'Ar ektu nao. Just a little more.', by: 'every aunty with a ladle' },
+      { h2: 'The line that moves' },
+      'The bhog line is the friendliest queue of the whole Pujo. Nobody pushes, because there is always more. Kids carry plates for grandparents. Strangers sit on the same durrie and pass the salt without being asked.',
+      { checklist: [['eat with your hands', true], ['save room for payesh', true], ['say no to a second plate', false]], title: 'Bhog rules' },
+      'By three the pots are scraped clean and the volunteers finally sit down to eat. That last plate, eaten tired and happy, is the best one of the day.',
+    ],
+  },
+  {
+    slug: 'before-the-colour',
+    tag: 'Reportage',
+    title: 'Before the colour',
+    dek: 'a morning in Kumartuli, where the goddesses are still made of clay',
+    cover: '/editions/oct26/articles/before-the-colour/cover.jpg',
+    alt: 'unpainted clay faces of the goddess drying in a Kumartuli workshop',
+    author: null,
+    date: 'Oct 2026',
+    readTime: '4',
+    body: [
+      'Kumartuli is a maze of narrow lanes in north Kolkata where most of the city’s Durga idols are made. In September it is the busiest place on earth that nobody is in a hurry to leave. Every doorway has a goddess in it, and almost none of them have their colour yet.',
+      { log: [['PLACE', 'Kumartuli'], ['WORKSHOPS', 'hundreds'], ['MATERIAL', 'straw, clay, river mud'], ['WEEKS TO PUJO', '3']] },
+      { h2: 'Straw first' },
+      'Every idol starts as a skeleton of bamboo and straw, tied by hand into the shape of arms, a body, a lion. Then comes the clay, mixed with river mud from the Hooghly, pressed on in layers and left to dry in whatever sun September offers.',
+      { loop: ['tie the straw', 'press the clay', 'wait for the sun', 'smooth the cracks'], title: 'The Kumartuli loop' },
+      { h2: 'Faces in rows' },
+      'The faces are made separately, from moulds that families have used for generations. Walk past one workshop and you see twenty of them lined up on a shelf, grey and calm, waiting. The eyes come last of all, painted on the morning of Mahalaya.',
+      { quote: 'People see her for five days. We see her for five months.', by: 'an artisan in Kumartuli' },
+      'When the trucks finally come to carry the idols away, the lanes go strangely empty. Then the artisans sweep up, and start on next year’s straw.',
+    ],
+  },
+  {
+    slug: 'red-on-red',
+    tag: 'Essay',
+    title: 'Red on red',
+    dek: 'sindoor khela, and why the last day is the loudest',
+    cover: '/editions/oct26/articles/red-on-red/cover.jpg',
+    alt: 'hands with red and white bangles in a cloud of red sindoor',
+    author: null,
+    date: 'Oct 2026',
+    readTime: '3',
+    body: [
+      'On the morning of Dashami, the goddess is about to leave. The women of the para line up in red-bordered white sarees, and before she goes, they say goodbye the only way that feels big enough: they cover her, and each other, in red.',
+      { h2: 'First the goddess' },
+      'It starts gently. Sindoor is touched to the goddess’s forehead, then sweets to her lips, a little betel leaf to her cheek. Some people cry here. It is fine. Everyone pretends not to notice.',
+      { h2: 'Then everyone else' },
+      'And then it becomes a game. Sindoor on foreheads, cheeks, hair, sarees, on the photographer who got too close. Within ten minutes nobody’s face is the colour it was. The dhak speeds up. Someone starts a dance.',
+      { quote: 'Ashche bochor abar hobe. It will happen again next year.', by: 'the whole city, at once' },
+      { then: [['only married women played', 'more and more, everyone joins in'], ['the red came off in a day', 'the red comes off in three'], ['photos in an album', 'photos everywhere']], title: 'What changed, what didn’t' },
+      'By evening the idols are carried to the river. The red on our faces has faded to pink. It stays in your hair for days, though, a little reminder that Pujo really did happen, and that it will again.',
     ],
   },
 ];

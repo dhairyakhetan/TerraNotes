@@ -6,8 +6,8 @@ import { FONT } from '../../../styles/fonts.js';
 import { Folio, Head, pagesOf } from './parts.jsx';
 
 // The annual's photo page (AnnualHome.jsx): the edition's photo wall (photos.js) printed like a magazine's picture
-// page: the first photo big, the rest in a grid beside it (phones: under it, two across), each in a white mat with a
-// "Fig. 1" caption under it in italics. A photo still to come shows its tint and "[photo]" (the placeholder). Tapping
+// page: the first photo big, the next four in a grid beside it and any more in a row under (phones: all under it, two
+// across), each in a white mat with a "Fig. 1" caption under it in italics. A photo still to come shows its tint and "[photo]" (the placeholder). Tapping
 // one opens the photo viewer at it (shared/PhotoViewer.jsx, opened by AnnualHome). Element id "photos" (/photos).
 function Print({ web, p, i, big, onOpen }) {
   const h = big ? (web ? 470 : 250) : web ? 186 : 120;
@@ -31,7 +31,7 @@ function Print({ web, p, i, big, onOpen }) {
 export default function Photos({ web, onOpen }) {
   const ref = useRef(null), { photos, articles } = useEdition(), P = pagesOf(articles.length);
   useReveal(ref);
-  const [first, ...rest] = photos;
+  const [first, ...rest] = photos, beside = rest.slice(0, 4), under = rest.slice(4);
   return (
     <section ref={ref} id="photos" aria-label="Photographs" style={{ marginTop: web ? "110px" : "64px" }}>
       <Folio web={web} page={P.photos} label="photographs" />
@@ -40,8 +40,13 @@ export default function Photos({ web, onOpen }) {
         <div style={{ display: "grid", gridTemplateColumns: web ? "1.25fr 1fr" : "1fr", gap: web ? "44px" : "26px", alignItems: "start" }}>
           <Print web={web} p={first} i={0} big onOpen={onOpen} />
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: web ? "28px 30px" : "20px 16px" }}>
-            {rest.map((p, k) => <Print key={k} web={web} p={p} i={k + 1} onOpen={onOpen} />)}
+            {(web ? beside : rest).map((p, k) => <Print key={k} web={web} p={p} i={k + 1} onOpen={onOpen} />)}
           </div>
+        </div>
+      )}
+      {web && under.length > 0 && (
+        <div style={{ display: "grid", gridTemplateColumns: `repeat(${Math.max(3, Math.min(under.length, 4))}, 1fr)`, gap: "28px 30px", marginTop: "40px" }}>
+          {under.map((p, k) => <Print key={k} web={web} p={p} i={k + 5} onOpen={onOpen} />)}
         </div>
       )}
     </section>
