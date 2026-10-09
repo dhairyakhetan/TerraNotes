@@ -1,0 +1,32 @@
+/* November's own home page (src/editions/nov26/home/), loaded with the edition's look.css (src/editions/pages.js
+   EDITION_CSS). Class names start nv- . Colours are the look's `home` (--h-…). Endless loops are named …-loop (they stop
+   for reduced motion and LITE, and pause while pages swap: src/editions/season/season.css); transform / opacity only. */
+.nv-stars{background-image:radial-gradient(circle,var(--h-star) 0 1.2px,transparent 1.8px),radial-gradient(circle,var(--h-star) 0 .8px,transparent 1.3px);background-size:170px 130px,90px 110px;background-position:20px 30px,60px 10px;opacity:.75}
+.nv-twinkle-loop{animation:nv-twinkle 4.5s ease-in-out infinite alternate}
+@keyframes nv-twinkle{from{opacity:.45}to{opacity:.9}}
+.nv-burst-loop{opacity:0;animation:nv-burst 4.2s ease-out infinite;animation-delay:var(--d,0s)}
+@keyframes nv-burst{0%{scale:.15;opacity:0}8%{opacity:1}40%{scale:1;opacity:.95}70%,100%{scale:1.1;opacity:0}}
+.nv-sway-loop{animation:nv-sway 4s ease-in-out infinite alternate;animation-delay:calc(var(--d,0s) * -1)}
+@keyframes nv-sway{from{rotate:-2.5deg}to{rotate:2.5deg}}
+.nv-flicker-loop{transform-box:fill-box;transform-origin:50% 100%;animation:nv-flicker .8s ease-in-out infinite alternate;animation-delay:calc(var(--d,0s) * -1)}
+@keyframes nv-flicker{from{scale:.88 .94}to{scale:1.06 1.04}}
+.nv-glow{text-shadow:0 0 28px var(--h-glow),0 0 90px var(--h-flame)}
+
+/* the article lanterns (Lanterns.jsx): dark until lit */
+.nv-lantern .nv-shade{opacity:.78;transition:opacity 1.1s ease .15s}
+.nv-lantern.is-lit .nv-shade{opacity:0}
+.nv-lantern .nv-halo{opacity:0;transition:opacity 1.4s ease}
+.nv-lantern.is-lit .nv-halo{opacity:.55}
+.nv-lantern .nv-tag{transition:translate .2s cubic-bezier(.3,.7,.3,1)}
+@media (hover:hover){.nv-lantern:hover .nv-tag{translate:0 -4px}.nv-lantern:hover .nv-halo{opacity:.8}}
+.nv-lantern:focus-visible{outline:3px solid var(--h-accent);outline-offset:6px}
+
+/* the goodbye's diyas (Goodbye.jsx): lit one by one */
+.nv-row .nv-flame{opacity:0;transition:opacity .5s ease var(--t,0s)}
+.nv-row.is-lit .nv-flame{opacity:1}
+
+/* the photos: polaroids glowing in the dark (season/PhotoWall.jsx) */
+.nv-print{padding:10px 10px 0 !important;background:var(--h-paper);border:0;box-shadow:0 0 0 1px var(--h-accent),0 10px 40px -10px var(--h-glow)}
+.nv-print .ss-cap{padding:8px 2px 10px;color:var(--ink)}
+.nv-print:nth-child(odd){rotate:-1deg}
+.nv-print:nth-child(even){rotate:1.2deg}

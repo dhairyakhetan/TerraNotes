@@ -1,0 +1,8 @@
+/* November 2026's look, "Lights" (src/editions/nov26/look.js): the paper pages (articles, games) get a faint scatter of
+   lamp-gold dots, like the last sparks of a phuljhari. Only this edition's pages get it (data-edition="nov26":
+   lib/edition.js), on the pages with class="page-sheet"; the pages set their background inline, so !important. */
+html[data-edition="nov26"] .page-sheet,:host([data-edition="nov26"]) .page-sheet{
+  background-image:radial-gradient(circle,color-mix(in srgb,var(--yellow) 45%,transparent) 0 1.6px,transparent 2.2px),radial-gradient(circle,color-mix(in srgb,var(--red) 22%,transparent) 0 1.2px,transparent 1.8px) !important;
+  background-size:46px 46px,46px 46px !important;
+  background-position:0 0,23px 23px !important;
+}
