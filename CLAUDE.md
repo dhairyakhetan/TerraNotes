@@ -63,6 +63,7 @@ npm run preview  # serve dist/ on :4173
 npm run check    # tools/check-embed.mjs: the mistakes that only break inside AQ's website (the build runs it first)
 node tools/make-card-covers.mjs    # after adding an article / changing a cover: its WebP copies (cover-card.webp for cards, cover-page.webp for the article page)
 node tools/make-link-previews.mjs   # after adding an article / changing a cover / a new edition: every link preview, in public/og/ (needs `npm i -D playwright`)
+node tools/make-art.mjs [id]       # the drawn stand-in pictures (covers, photo-wall pictures) from tools/art/<id>.mjs; then make-card-covers (CHROMIUM=… for another Chromium)
 node tools/check-fling-levels.mjs   # after adding / changing a Fling level (shared/buddy/flingLevels.js): plays each, checks it stands and can be cleared
 npm run test:visual           # after a build: screenshots of key pages at 390 + 1440 vs tests/visual/screenshots/ (PW_CHROMIUM=… for another Chromium)
 npm run test:visual:update    # after a change you meant: save new screenshots (commit them)
@@ -110,6 +111,9 @@ look after October is out.
   - A new role (a colour that should differ from an existing one): add it to **every** edition's `look.js`, with the colour it had before in the older ones, so they stay the same. The build stops if any look misses a key, or uses a name the code already gives its own CSS variables (`TAKEN` in `src/editions/index.js`).
   - The build writes the latest edition's look into `index.html` (`vite.config.js`), so the first paint is already right.
 - **More than a new look:** an edition can draw its own home page or article page. Keep a copy of the shared one in its folder, change it there, and register it in `src/editions/pages.js`.
+  - From November 2026 on, each month's home is its own, on a shared frame: `src/editions/season/SeasonHome.jsx` (`seasonHome(cfg)`: hero, the month's article "twist", photos `PhotoWall.jsx`, the framed words game `shared/FramedWords.jsx`, the team `shared/Board.jsx`, goodbye, end cards; CSS `season.css`, classes `ss-`). The month draws only its `Hero`, `Stories` and `Goodbye` (and a print class for its photos) in `src/editions/<id>/home/`, with `home.css` (its own class prefix). The home's own colours are in its `look.js` under `home` (each becomes `--h-<key>` on that page), so no colour lives outside `look.js`. A month's second font goes in the `script` role.
+  - The twists: November `nv-` sky lanterns that light up as you reach them; December `dc-` advent-calendar doors; January `jn-` books on a Book Fair stall's shelf; February `fb-` sealed envelopes that open.
+  - The pictures in Oct–Feb are drawn stand-ins (`tools/make-art.mjs` from `tools/art/<id>.mjs`): a real photo at the same path replaces one (then delete its entry there). The Nov–Feb articles are sample pieces (`author: null`).
   - Its own CSS goes in its folder too, scoped with `[data-edition="<id>"]` or its own class, with class names no other file uses.
 - **Never change how a live or older edition looks** while making the next one. Check it: screenshot its pages at 390px and 1440px before and after your change; they must match.
 
@@ -208,7 +212,7 @@ Tom Riddle-style diary under "Meet the team" that writes random lines in a scrip
 2026 (the latest edition) is **"Pujo"**, Durga Puja: laal-paar saree cream and alta red, maroon ink, sindoor handwriting,
 marigold strings, a pandal-night photo wall, Rozha One headings; `look.css` the saree border and an alpana dot pattern;
 `Decor.jsx` a marigold toran, alpana, dhak, conch and a "Subho Sharodiya!" tag; `Horn.jsx`, an engraving-style S-horn that now and then slides in upright from
-the page edge by the team legend (left on web, right on phones), is blown and slides back out; Pujo words; two sample articles. October's home page is its own design, **"the Pujo annual"** (a Pujabarshiki: the fat special issue Bengal's magazines
+the page edge by the team legend (left on web, right on phones), is blown and slides back out; Pujo words; five sample articles and eight photos (seven of them drawn stand-ins). October's home page is its own design, **"the Pujo annual"** (a Pujabarshiki: the fat special issue Bengal's magazines
 bring out every Pujo), laid out like print, both layouts (`src/editions/oct26/annual/`: `AnnualHome.jsx` stacks the parts;
 `Cover.jsx` a red hardback front cover with the cover lines and the lead story in an arched window; `Contents.jsx` the
 contents page and a note from the editors (id `articles`); `Stories.jsx` the lead story as a spread, the rest in ruled
@@ -301,6 +305,7 @@ build/siteFiles.js      at build: an .html per article at its address (own title
                         pages, 404, sitemap, robots, llms.txt (drafts left out)
 build/staticCopy.js     each page's text as plain HTML inside #root, for crawlers without JavaScript
 tools/make-link-previews.mjs   every link preview (1200×630) into public/og/: the main page, each edition, each article, each game, on the edition's paper
+tools/make-art.mjs + tools/art/   the drawn stand-in pictures (an SVG kit, kit.mjs, and a list per edition), rendered with the site fonts
 tools/check-embed.mjs   the guard for AQ's website (see "Inside AQ's website")   tools/export-aq.mjs   writes the magazine into it
 embed/aq/               AQ-only: README (for AQ's side), scripts/ (prerender.mjs)
 src/host.js             where this copy runs (own site / AQ's website)
@@ -312,6 +317,8 @@ src/App.jsx             routes (phone vs web page per route, articles with their
 src/editions/           one folder per edition (see "Editions"): <id>/look.js, articles.js, photos.js, words.js, team.js, index.js
   index.js              the folders by id, ALL_ARTICLES, editionData(n), the build's checks
   pages.js              editions' own pages (OWN_PAGES), CSS (EDITION_CSS) and home doodles (DECOR)
+  season/               the shared frame of the newer editions' own homes (SeasonHome, PhotoWall, season.css)
+  <id>/home/            a month's own home parts (Hero, its article twist, Goodbye, home.css)
 src/data/               site-wide content (each file documents its fields at the top)
   site.js               site URL, Aquaterra website + Instagram, a line about Aquaterra
   games.js              Buddy's games: titles, how-to lines, link-preview text; gameLink (/games/<id>)
@@ -320,7 +327,7 @@ src/data/               site-wide content (each file documents its fields at the
   labs.js               the AQ Labs gallery's teams (chapter ids, labels, colours)
 src/phone/              PhoneHome, PhoneHangingArticles (the strung-up cards), PhoneArticle, PhoneHeader, PhoneMenu
 src/web/                WebHome, WebArticleLine (sideways wire), WebArticle, WebHeader, WebEditionPicker
-src/pages/              EditionsPage (/editions), NotFoundPage (404): both layouts in one file;
+src/pages/              EditionsPage (/editions: the latest big, back issues as tiles in their own colours, coming-up), NotFoundPage (404): both layouts in one file;
                         DemoPage (an article's demo app, full-window)
 src/articles/labs/      LabsPage.jsx + labs.css: the AQ Labs gallery (the "labs" article's own page, both layouts)
 src/shared/             used by both layouts:
@@ -352,10 +359,10 @@ public/                 editions/<id>/ (articles/<slug>/: cover, preview, own ph
   1. Add an entry to its edition's `ARTICLES` (`src/editions/<id>/articles.js`; fields at the top of `data/articles.js`) and put the cover in its folder: `public/editions/<id>/articles/<slug>/cover.jpg`.
   2. Run `node tools/make-card-covers.mjs` and `node tools/make-link-previews.mjs`, and commit what they write.
   - Both layouts pick it up. Phone cards past the sixth hang in pairs; the web line grows.
-- **New edition** (e.g. November, `nov26`):
-  1. Copy the newest folder in `src/editions/` to `src/editions/nov26/` and update its header comments.
-  2. Register it in `src/editions/index.js`, and add `{ number: 3, month: 'November 2026', draft: true }` to `EDITIONS`.
-  3. Fill it in: its articles, photo wall, words, team, `INTRO`, and its look (`look.js`: colours and fonts from the owner). Files go in `public/editions/nov26/`. Preview it at `/nov26` (both widths).
+- **New edition** (e.g. March, `mar27`; November to February are already made, as drafts):
+  1. Copy the newest folder in `src/editions/` to `src/editions/mar27/` and update its header comments (its `home/` too, for its own home page on the shared frame: register it in `src/editions/pages.js` `OWN_PAGES`, `EDITION_CSS` (its look.css + season.css + home.css) and `LAYOUT`, and its line in `TAGLINE` in `tools/make-link-previews.mjs`).
+  2. Register it in `src/editions/index.js`, and add `{ number: 7, month: 'March 2027', theme: '…', draft: true }` to `EDITIONS` (`theme`: its name on `/editions`).
+  3. Fill it in: its articles, photo wall, words, team, `INTRO`, and its look (`look.js`: colours and fonts from the owner). Files go in `public/editions/mar27/`. Preview it at `/mar27` (both widths).
   4. Going live: delete `draft: true`. The previous edition moves to `/<its id>` with its own look; nothing else to change.
 - **New member:** add them to the edition's `MEMBERS` (`team.js`) with a square ~400px WebP in `public/team/`. The faces lay themselves out.
 - **New block type in articles:**
