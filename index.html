@@ -1,76 +1,59 @@
 <!doctype html>
 <html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>fahhh</title>
-<meta name="description" content="fahhh, in rainbow 3D.">
-<meta name="theme-color" content="#ffffff">
-<link rel="canonical" href="https://terranotes-aq.vercel.app/">
-<!-- link previews (WhatsApp, iMessage, Instagram, X, Slack…): og.png is the page itself at 1200x630 -->
-<meta property="og:type" content="website">
-<meta property="og:site_name" content="fahhh">
-<meta property="og:title" content="fahhh">
-<meta property="og:description" content="fahhh, in rainbow 3D.">
-<meta property="og:url" content="https://terranotes-aq.vercel.app/">
-<meta property="og:image" content="https://terranotes-aq.vercel.app/og.png">
-<meta property="og:image:width" content="1200">
-<meta property="og:image:height" content="630">
-<meta property="og:image:type" content="image/png">
-<meta property="og:image:alt" content="The word fahhh in big rainbow 3D letters on white">
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="fahhh">
-<meta name="twitter:description" content="fahhh, in rainbow 3D.">
-<meta name="twitter:image" content="https://terranotes-aq.vercel.app/og.png">
-<style>
-  /* A blank page with one word: "fahhh", in rainbow 3D, floating and turning slowly. The rest of the site lives on the
-     fahhh branch. Everything here is CSS: the word is drawn twice, a solid extruded copy behind (stacked shadows) and a
-     rainbow copy in front whose colours flow along the letters. Reduced motion: it stands still. */
-  :root { color-scheme: light; }
-  html, body { height: 100%; margin: 0; }
-  body {
-    display: grid; place-items: center; overflow: hidden;
-    background: #ffffff;
-    font-family: "Arial Black", "Helvetica Neue", Impact, system-ui, sans-serif;
-  }
-  .stage { perspective: 900px; }
-  .word {
-    position: relative; display: inline-block; margin: 0;
-    font-size: clamp(64px, 21vw, 320px); font-weight: 900; line-height: 1; letter-spacing: -0.02em;
-    transform-style: preserve-3d;
-    animation: sway 6s ease-in-out infinite;
-  }
-  /* the depth: the same word, solid, with a stack of shadows stepping back */
-  .word::before {
-    content: attr(data-text); position: absolute; inset: 0; z-index: 0;
-    color: #3b2a7a;
-    text-shadow:
-      0.0032em 0.0032em 0 #3a2878, 0.0064em 0.0064em 0 #372676, 0.0096em 0.0096em 0 #342473, 0.0128em 0.0128em 0 #312271, 0.0160em 0.0160em 0 #2e206e,
-      0.0192em 0.0192em 0 #2b1e6b, 0.0224em 0.0224em 0 #281c68, 0.0256em 0.0256em 0 #251a65, 0.0288em 0.0288em 0 #221862, 0.0320em 0.0320em 0 #1f165f,
-      0.04em 0.045em 0.06em rgba(30, 20, 80, .35), 0.06em 0.08em 0.13em rgba(30, 20, 80, .2);
-  }
-  /* the face: rainbow, flowing */
-  .word span {
-    position: relative; z-index: 1; display: inline-block;
-    background: linear-gradient(90deg, #ff2d55, #ff9500, #ffd60a, #34c759, #00c7be, #0a84ff, #5e5ce6, #bf5af2, #ff2d55);
-    background-size: 200% 100%;
-    -webkit-background-clip: text; background-clip: text; color: transparent;
-    animation: flow 4s linear infinite;
-    filter: drop-shadow(0 0 0.5px rgba(255, 255, 255, .6));
-  }
-  @keyframes flow { to { background-position: 200% 0; } }
-    @keyframes sway {
-    0%, 100% { transform: rotateY(-14deg) rotateX(8deg) translateY(0); }
-    50% { transform: rotateY(14deg) rotateX(-4deg) translateY(-3%); }
-  }
-  @media (prefers-reduced-motion: reduce) {
-    .word, .word span { animation: none !important; }
-  }
-</style>
-</head>
-<body>
-  <main class="stage">
-    <h1 class="word" data-text="fahhh" aria-label="fahhh"><span aria-hidden="true">fahhh</span></h1>
-  </main>
-</body>
+  <head>
+    <meta charset="utf-8" />
+    <!-- Phones, and tablets held upright: the 390px phone layout, scaled to fit.
+         Tablets turned sideways: real width, so they get the web layout (900px and up). Desktop browsers ignore this tag. -->
+    <meta name="viewport" content="width=390" id="viewport" />
+    <script>
+      if (Math.min(screen.width, screen.height) >= 700) {
+        var land = matchMedia('(orientation: landscape)');
+        var fit = function () { document.getElementById('viewport').content = land.matches ? 'width=device-width, initial-scale=1' : 'width=390'; };
+        fit();
+        land.addEventListener('change', fit);
+      }
+    </script>
+    <!-- Each page's text is also written into the HTML for chatbots and search engines (build/staticCopy.js).
+         Browsers that run the app never show it: this hides it before anything is drawn, and the app replaces it. -->
+    <script>document.documentElement.classList.add('tn-js')</script>
+    <style>.tn-js .tn-static{display:none}
+      /* until the app draws (it replaces #root's contents), a quiet "TerraNotes" on the edition's paper, not a blank page */
+      .tn-js #root:has(> .tn-static)::before,.tn-js #root:empty::before{content:"TerraNotes";position:fixed;inset:0;display:grid;place-items:center;
+        background:var(--page,#F5F2E9);color:var(--ink,#18213A);font:italic 400 40px/1 'Instrument Serif',Georgia,serif;animation:tn-boot 1.4s ease-in-out infinite alternate}
+      @keyframes tn-boot{from{opacity:.35}to{opacity:.9}}
+      @media (prefers-reduced-motion: reduce){.tn-js #root::before{animation:none}}</style>
+    <!-- the latest edition's colours and fonts as CSS variables, filled in from its look.js (vite.config.js) -->
+    <style>%LOOK%</style>
+    <meta name="theme-color" content="%THEME_COLOR%" />
+    <meta name="description" content="%HOME_DESC%" />
+    <title>%HOME_TITLE%</title>
+    <!-- link previews; %SITE_URL% = the site's address, filled in at build (vite.config.js) -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Aquaterra" />
+    <meta property="og:title" content="%HOME_TITLE%" />
+    <meta property="og:description" content="%HOME_DESC%" />
+    <meta property="og:url" content="%SITE_URL%/" />
+    <meta property="og:image" content="%SITE_URL%/og/home.jpg" />
+    <meta property="og:image:secure_url" content="%SITE_URL%/og/home.jpg" />
+    <meta property="og:image:type" content="image/jpeg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:image" content="%SITE_URL%/og/home.jpg" />
+    <link rel="icon" type="image/png" sizes="48x48" href="/icon-48.png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <link rel="alternate" type="application/rss+xml" title="TerraNotes by Aquaterra" href="/feed.xml" />
+    <!-- the fonts are the site's own (src/styles/fontfaces.css, files in public/fonts): no Google Fonts round trip -->
+    %LOOK_FONTS%
+  </head>
+  <body>
+    <div id="root"></div>
+    <noscript>
+      <div style="max-width:340px;margin:60px auto;padding:22px;background:#fff;border:2px solid #111;box-shadow:8px 8px 0 #F0442B;font-family:Georgia,serif;color:#111">
+        <strong>Aquaterra needs JavaScript.</strong><br />Turn it on in your browser settings to read TerraNotes: the articles, the photo wall and the words game all run on it.
+      </div>
+    </noscript>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
 </html>

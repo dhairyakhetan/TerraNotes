@@ -1,0 +1,23 @@
+/* October's annual (src/editions/oct26/annual/), loaded with the edition's look.css (src/editions/pages.js
+   EDITION_CSS). Class names start an- ; no other stylesheet uses them. Hovers only on devices that can hover. */
+
+/* the page turning when an article opens (PageTurn.jsx): transform / opacity only */
+.an-turn{animation:an-turn .78s cubic-bezier(.55,.06,.35,1) both}
+@keyframes an-turn{from{transform:rotateY(0)}to{transform:rotateY(-110deg)}}
+.an-turn-shade{opacity:0;animation:an-turn-shade .78s ease-in both}
+@keyframes an-turn-shade{to{opacity:1}}
+.an-turn-stage{animation:an-turn-out .2s linear .75s both}
+@keyframes an-turn-out{to{opacity:0}}
+
+/* links on the printed pages: an underline that draws in, a cover line that brightens, a story whose title reddens */
+@media (hover:hover){
+  .an-row:hover > span > span > span:first-child,.an-story:hover h3{color:var(--red) !important}
+  .an-line:hover span:last-child{text-decoration:underline;text-decoration-color:var(--yellow);text-underline-offset:6px}
+  .an-member:hover{background:var(--outside) !important}
+}
+.an-row,.an-story,.an-member,.an-line{transition:color .15s,background .15s}
+.an-story h3{transition:color .15s}
+
+/* /words lands on the puzzle corner's heading, not on the game inside it (its element id is the shared game's) */
+.an-home #words{scroll-margin-top:230px}
+.web .an-home #words{scroll-margin-top:205px}
