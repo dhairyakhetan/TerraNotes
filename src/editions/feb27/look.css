@@ -1,0 +1,7 @@
+/* February 2027's look, "Letters" (src/editions/feb27/look.js): the paper pages (articles, games) are ruled faintly,
+   like writing paper. Only this edition's pages get it (data-edition="feb27": lib/edition.js), on the pages with
+   class="page-sheet"; the pages set their background inline, so !important. */
+html[data-edition="feb27"] .page-sheet,:host([data-edition="feb27"]) .page-sheet{
+  background-image:repeating-linear-gradient(transparent 0 31px,color-mix(in srgb,var(--blue) 10%,transparent) 31px 32px) !important;
+  background-size:auto !important;
+}
