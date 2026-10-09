@@ -53,7 +53,7 @@ function toran(C) { // marigolds across the top, a mango leaf every few
   for (let x = 6, i = 0; x < 1200; x += 14, i++) s += `<circle cx="${x}" cy="${y(x)}" r="7" fill="${i % 3 === 2 ? C.red : C.yellow}" stroke="${C.ink}" stroke-width="1.2"/>`;
   return s + '</svg>';
 }
-const TAGLINE = { sep26: 'exam season: write-ups, photos & words', oct26: 'the Pujo issue: pandals, dhak & bhog', nov26: 'the Lights issue: lanterns, diyas & one long night', dec26: 'the Park Street issue: lights, cake & the last tram' };
+const TAGLINE = { sep26: 'exam season: write-ups, photos & words', oct26: 'the Pujo issue: pandals, dhak & bhog', nov26: 'the Lights issue: lanterns, diyas & one long night', dec26: 'the Park Street issue: lights, cake & the last tram', jan27: 'the Boi Mela issue: books, fog & little magazines' };
 function shell(e, inner, extraCss = '') {
   const { look: { colors: C, fonts: F, fontsCss } } = editionData(e.number);
   const sep = e.id === 'sep26';

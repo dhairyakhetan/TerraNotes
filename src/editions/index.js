@@ -4,11 +4,12 @@ import * as sep26 from './sep26/index.js';
 import * as oct26 from './oct26/index.js';
 import * as nov26 from './nov26/index.js';
 import * as dec26 from './dec26/index.js';
+import * as jan27 from './jan27/index.js';
 
 // Every edition's own folder, src/editions/<id>/ (look.js, articles.js, photos.js, words.js, team.js, gathered by its
 // index.js). A new edition: copy the latest folder, add it here and to EDITIONS (data/editions.js). CLAUDE.md, "New
 // edition".
-const FOLDERS = { sep26, oct26, nov26, dec26 };
+const FOLDERS = { sep26, oct26, nov26, dec26, jan27 };
 
 const folderOf = (e) => {
   const f = FOLDERS[editionId(e.number)];
