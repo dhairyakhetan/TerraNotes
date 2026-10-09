@@ -6,16 +6,17 @@ import { withBase } from '../lib/base.js';
 // clean links (/articles/<slug>). Every other edition lives under its id, made from its month ('September 2026' →
 // 'sep26'): its home page is /sep26 (also /sep26/photos…) and its articles /sep26/articles/<slug>. That happens by
 // itself the moment a newer edition goes live (old clean links redirect). Its files live in public/editions/<id>/.
+//   theme: the issue's name, shown on /editions (pages/EditionsPage.jsx)
 //   draft: true = still being made: not the latest, not listed anywhere (edition picker, /editions, sitemap), but
 //          viewable at its own address (/oct26) with a "draft" tape. Delete the flag to put it live.
 
 export const EDITIONS = [
-  { number: 1, month: 'September 2026' },
-  { number: 2, month: 'October 2026' },
-  { number: 3, month: 'November 2026', draft: true },
-  { number: 4, month: 'December 2026', draft: true },
-  { number: 5, month: 'January 2027', draft: true },
-  { number: 6, month: 'February 2027', draft: true },
+  { number: 1, month: 'September 2026', theme: 'Exam season' },
+  { number: 2, month: 'October 2026', theme: 'The Pujo annual' },
+  { number: 3, month: 'November 2026', theme: 'Lights', draft: true },
+  { number: 4, month: 'December 2026', theme: 'Park Street', draft: true },
+  { number: 5, month: 'January 2027', theme: 'Boi Mela', draft: true },
+  { number: 6, month: 'February 2027', theme: 'Letters', draft: true },
 ];
 
 export const PUBLISHED = EDITIONS.filter((e) => !e.draft);

@@ -130,6 +130,11 @@ html[data-tn-layout]::view-transition-new(root){animation:vtLayIn 420ms cubic-be
 .lift-link{display:inline-flex;transition:transform 200ms var(--settle)}
 .lift-link:hover,.lift-link:focus-visible{transform:translateY(-4px)}
 @media (prefers-reduced-motion: reduce){.lift-link{transition:none}}
+/* /editions (pages/EditionsPage.jsx): a back issue's tile lifts; an article line underlines */
+.ed-tile{transition:translate 200ms var(--settle)}
+@media (hover:hover){.ed-tile:hover{translate:0 -5px}.ed-line:hover{text-decoration:underline;text-decoration-color:var(--yellow);text-decoration-thickness:3px;text-underline-offset:4px}}
+.ed-tile:focus-visible{translate:0 -5px}
+@media (prefers-reduced-motion: reduce){.ed-tile{transition:none}}
 
 /* member card badge: a small crest in the bottom-right corner; its line slides out beside it on hover / tap */
 .card-badge{position:absolute;right:14px;bottom:16px;z-index:2;display:flex;align-items:center;gap:6px;padding:4px;border:0;background:transparent;cursor:default;-webkit-tap-highlight-color:transparent}
