@@ -84,7 +84,8 @@ animation). Automated browsers never get the intro.
 - **Every edition keeps its look and content for good.** Once a newer edition is live, the older one's folder (`src/editions/<id>/`) is frozen: don't edit it as a side effect of other work, and don't change a shared component in a way that changes how it looks (see "Editions"). When the owner asks for a change to an older edition, make it: that's their call.
 - **No new colours** outside the edition's look (`src/editions/<id>/look.js`), unless the owner supplies them. The AQ Labs project bars use colours they supplied.
 - **Changes go to `main`.** Without push access (the usual case) that means a `.patch` for the owner (above); a session
-  that can push commits to `main` unless told otherwise.
+  that can push commits straight to `main`, even when its setup names a branch to work on. Never make a branch unless the
+  owner asks for one.
 
 ## Editions
 
