@@ -14,11 +14,7 @@ import { withBase } from '../lib/base.js';
 
 export const EDITIONS = [
   { number: 1, month: 'September 2026', theme: 'Exam season' },
-  { number: 2, month: 'October 2026', theme: 'The Pujo annual', home: true },
-  { number: 3, month: 'November 2026', theme: 'Lights' },
-  { number: 4, month: 'December 2026', theme: 'Park Street' },
-  { number: 5, month: 'January 2027', theme: 'Boi Mela' },
-  { number: 6, month: 'February 2027', theme: 'Letters' },
+  { number: 2, month: 'October 2026', theme: 'The Pujo annual' },
 ];
 
 export const PUBLISHED = EDITIONS.filter((e) => !e.draft);

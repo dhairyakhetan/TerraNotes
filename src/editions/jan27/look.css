@@ -1,8 +1,0 @@
-/* January 2027's look, "Boi Mela" (src/editions/jan27/look.js): the paper pages (articles, games) get a faint fleck,
-   like old book paper. Only this edition's pages get it (data-edition="jan27": lib/edition.js), on the pages with
-   class="page-sheet"; the pages set their background inline, so !important. */
-html[data-edition="jan27"] .page-sheet,:host([data-edition="jan27"]) .page-sheet{
-  background-image:radial-gradient(circle,color-mix(in srgb,var(--string) 30%,transparent) 0 1px,transparent 1.6px),radial-gradient(circle,color-mix(in srgb,var(--blue) 12%,transparent) 0 1.2px,transparent 1.8px) !important;
-  background-size:23px 29px,37px 31px !important;
-  background-position:0 0,11px 17px !important;
-}

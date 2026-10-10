@@ -7,19 +7,6 @@ import Oct26Decor from './oct26/Decor.jsx';
 import Oct26Horn from './oct26/Horn.jsx';
 import annualCss from './oct26/annual/annual.css?inline';
 import { ANNUAL_PAGES } from './oct26/annual/pages.jsx';
-import seasonCss from './season/season.css?inline';
-import nov26Css from './nov26/look.css?inline';
-import nov26HomeCss from './nov26/home/home.css?inline';
-import { NOV_PAGES } from './nov26/home/home.jsx';
-import dec26Css from './dec26/look.css?inline';
-import dec26HomeCss from './dec26/home/home.css?inline';
-import { DEC_PAGES } from './dec26/home/home.jsx';
-import jan27Css from './jan27/look.css?inline';
-import jan27HomeCss from './jan27/home/home.css?inline';
-import { JAN_PAGES } from './jan27/home/home.jsx';
-import feb27Css from './feb27/look.css?inline';
-import feb27HomeCss from './feb27/home/home.css?inline';
-import { FEB_PAGES } from './feb27/home/home.jsx';
 
 // Pages an edition draws its own way, for a month that wants more than a new look.js: its own home page and/or article
 // page, per layout. Start from a copy of the shared one (src/web/WebHome.jsx, src/phone/PhoneHome.jsx,
@@ -29,16 +16,13 @@ import { FEB_PAGES } from './feb27/home/home.jsx';
 //   import Oct26WebHome from './oct26/WebHome.jsx';
 //   export const OWN_PAGES = { oct26: { home: { web: Oct26WebHome } } };
 // keys: edition id → { home: { web, phone }, article: { web, phone } }
-// October is drawn its own way: "the Pujo annual" (src/editions/oct26/annual/). From November on, each month's home is
-// its own too, on a shared frame (src/editions/season/SeasonHome.jsx) with the month's twist: November's lanterns
-// (nov26/home/), December's advent doors (dec26/home/), January's book stall (jan27/home/), February's envelopes
-// (feb27/home/).
-export const OWN_PAGES = { oct26: ANNUAL_PAGES, nov26: NOV_PAGES, dec26: DEC_PAGES, jan27: JAN_PAGES, feb27: FEB_PAGES };
+// October is drawn its own way: "the Pujo annual" (src/editions/oct26/annual/).
+export const OWN_PAGES = { oct26: ANNUAL_PAGES };
 
 // An edition's own decorations, beyond its look.js colours and fonts:
 // - EDITION_CSS: its look.css (scoped to [data-edition="<id>"]), put on the page while one of its pages shows (App.jsx)
 // - DECOR: a component drawn on its home pages' artboard ({ web }: which layout), for doodles and the like
-export const EDITION_CSS = { sep26: sep26Css, oct26: oct26Css + annualCss, nov26: nov26Css + seasonCss + nov26HomeCss, dec26: dec26Css + seasonCss + dec26HomeCss, jan27: jan27Css + seasonCss + jan27HomeCss, feb27: feb27Css + seasonCss + feb27HomeCss };
+export const EDITION_CSS = { sep26: sep26Css, oct26: oct26Css + annualCss };
 export const DECOR = { sep26: Sep26Decor, oct26: Oct26Decor };
 // - TEAM_NOTE: a component drawn in its "Meet the team" section, web under the legend, phone beside it ({ style, size,
 //   web }: where and how big, from shared/TeamSection.jsx), e.g. September's diary, October's horn
@@ -53,5 +37,5 @@ export const RULED = { sep26: Sep26Rule };
 //               and ends in a "more soon" slot (web/WebArticleLine.jsx)
 //     wordsRow: the web words game puts the cloud and its answers side by side, centred on each other
 //               (shared/WordsGameSection.jsx)
-export const LAYOUT = { oct26: { leadCard: true, wordsRow: true }, nov26: { leadCard: true, wordsRow: true }, dec26: { leadCard: true, wordsRow: true }, jan27: { leadCard: true, wordsRow: true }, feb27: { leadCard: true, wordsRow: true } };
+export const LAYOUT = { oct26: { leadCard: true, wordsRow: true } };
 export const TEAM_FIT = { sep26: Sep26TeamFit };

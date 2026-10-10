@@ -4,7 +4,7 @@
 // (delete its entry). Renders each SVG in Chromium (with the site's own fonts from public/fonts) and saves it with
 // sharp. Then run tools/make-card-covers.mjs for the covers' WebP copies.
 //   node tools/make-art.mjs            every edition's list
-//   node tools/make-art.mjs nov26      one edition's
+//   node tools/make-art.mjs oct26      one edition's
 import { readdirSync, mkdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { pathToFileURL } from 'node:url';
