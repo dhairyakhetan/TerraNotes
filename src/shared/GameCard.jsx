@@ -2,7 +2,8 @@ import { useEffect, useRef, useState } from 'react';
 import { openGames } from '../lib/buddyState.js';
 import { calm, LITE } from '../lib/motion.js';
 import { FONT } from '../styles/fonts.js';
-import { GAMES as ALL_GAMES } from '../data/games.js';
+import { gamesFor } from '../data/games.js';
+import { useEdition } from '../lib/edition.js';
 import { useReveal } from '../lib/reveal.js';
 
 // The mini games card at the end of the home pages (shared/EndCards.jsx places it): Buddy's two games, one tap away
@@ -11,7 +12,6 @@ import { useReveal } from '../lib/reveal.js';
 // Buddy uses (shared/buddy/BuddyGames.jsx, event 'aq-games'). The pills underneath pick one by hand.
 // web = the 1440 artboard (600 × 300), else the 390 one (342 wide).
 const SHADOW = { snake: 'var(--purple)', float: 'var(--blue)', fling: 'var(--green)' };
-const GAMES = ALL_GAMES.map((g) => ({ ...g, shadow: SHADOW[g.id] })); // titles and lines: data/games.js
 const EVERY = 4200; // ms each game shows for
 const MONO = { fontFamily: FONT.mono, fontWeight: "700", letterSpacing: "1.4px", textTransform: "uppercase" };
 
@@ -66,6 +66,7 @@ const Screen = ({ id, width }) => (
 );
 
 export default function GameCard({ web, style }) {
+  const GAMES = gamesFor(useEdition().id).map((g) => ({ ...g, shadow: SHADOW[g.id] })); // titles and lines: data/games.js (the edition's)
   const [at, setAt] = useState(0), [moved, setMoved] = useState(false); // moved: the game has changed once (so it animates)
   const box = useRef(null), held = useRef(false), seen = useRef(false);
   useReveal(box);

@@ -3,7 +3,7 @@ import { fitWord, useWordsGame } from '../lib/useWordsGame.js';
 import { useEdition } from '../lib/edition.js';
 import { FONT } from '../styles/fonts.js';
 import { useReveal } from '../lib/reveal.js';
-import { LAYOUT } from '../editions/pages.js';
+import { LAYOUT, WORDS_ART } from '../editions/pages.js';
 
 // "Words we should bring back." (id="words"), both layouts: an old word on a cloud (with how to say it), three meanings
 // to pick from, the verdict + real definition, a "psst." hint after a while, and a score card after 5 words. Game
@@ -55,16 +55,19 @@ export default function WordsGameSection({ web }) {
   const ref = useRef(null);
   useReveal(ref);
   const w = useWordsGame(ref, edition.words);
+  const art = WORDS_ART[edition.id]; // the edition's own cloud and option marks (src/editions/pages.js), if it has them
   return (
     <section id="words" ref={ref} style={{ position: "absolute", left: "0", ...L.section }}>
       <h2 data-ruled="2" data-rid="words-title" style={{ position: "absolute", margin: "0", fontFamily: FONT.serif, fontStyle: "italic", fontWeight: "400", color: "var(--ink)", ...L.title }}>Words we should bring back.</h2>
       <div data-ruled="1" data-rid="words-score" style={{ position: "absolute", fontFamily: FONT.mono, color: "var(--ink)", ...L.score }}>{web ? `MINI GAME · SCORE ${w.score} / ${w.total}` : <>MINI GAME<br />SCORE {w.score} / {w.total}</>}</div>
       {/* the word, on a cloud */}
       <div style={{ position: "absolute", left: `${C.left}px`, top: `${C.top}px`, width: `${C.w}px`, height: `${C.h}px` }}>
-        <svg width={C.w} height={C.h} viewBox="0 0 200 110" preserveAspectRatio="none" style={{ position: "absolute", left: "0", top: "0", overflow: "visible" }} aria-hidden="true">
-          <path d={CLOUD} transform="translate(2.5 3)" style={{ fill: "var(--ink)" }} />
-          <path d={CLOUD} strokeWidth="2" vectorEffect="non-scaling-stroke" style={{ fill: "var(--card)", stroke: "var(--ink)" }} />
-        </svg>
+        {art ? <art.Cloud w={C.w} h={C.h} /> : (
+          <svg width={C.w} height={C.h} viewBox="0 0 200 110" preserveAspectRatio="none" style={{ position: "absolute", left: "0", top: "0", overflow: "visible" }} aria-hidden="true">
+            <path d={CLOUD} transform="translate(2.5 3)" style={{ fill: "var(--ink)" }} />
+            <path d={CLOUD} strokeWidth="2" vectorEffect="non-scaling-stroke" style={{ fill: "var(--card)", stroke: "var(--ink)" }} />
+          </svg>
+        )}
         <div style={{ position: "absolute", left: "0", top: C.textTop, width: `${C.w}px`, textAlign: "center" }}>
           <div style={{ fontFamily: FONT.mono, color: "var(--grey)", ...C.count }}>{`WORD ${w.n} / ${w.total}`}</div>
           <div key={w.word} className="word-pop" style={{ marginTop: C.gap, fontFamily: FONT.head, fontSize: fitWord(w.word, ...C.word), lineHeight: "1", textTransform: "uppercase", letterSpacing: C.wordSpacing, color: "var(--ink)" }}>{w.word}</div>
@@ -75,9 +78,9 @@ export default function WordsGameSection({ web }) {
       {w.playing && (
         <>
           <div key={w.word} className="w-in" style={{ position: "absolute", display: "flex", flexDirection: "column", ...L.options }}>
-            {w.options.map((o) => (
+            {w.options.map((o, i) => (
               <button key={o.text} className={`w-opt ${web ? 'btn ' : ''}${o.mood}`} onClick={o.pick} disabled={w.locked} style={{ width: "100%", boxSizing: "border-box", display: "flex", alignItems: "center", textAlign: "left", background: o.bg, color: o.fg, border: "2px solid var(--ink)", opacity: o.op, fontFamily: FONT.body, fontWeight: "500", lineHeight: "1.25", ...L.option }}>
-                <span style={{ width: L.mark[0], height: L.mark[0], flexShrink: "0", border: "2px solid currentColor", boxSizing: "border-box", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: FONT.mono, fontWeight: "700", fontSize: L.mark[1] }}>{o.mark}</span>
+                <span style={{ width: L.mark[0], height: L.mark[0], flexShrink: "0", border: "2px solid currentColor", boxSizing: "border-box", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: FONT.mono, fontWeight: "700", fontSize: L.mark[1] }}>{art ? art.marks[i % art.marks.length]({ size: Math.round(parseFloat(L.mark[0]) * 0.7) }) : o.mark}</span>
                 <span style={{ flexGrow: "1" }}>{o.text}</span>
               </button>
             ))}

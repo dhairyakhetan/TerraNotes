@@ -5,6 +5,7 @@ import { giveReward, hasReward, useRewards } from '../../lib/buddyState.js';
 import { FONT } from '../../styles/fonts.js';
 import { LEVELS, ORDER, WAS } from './flingLevels.js';
 import { CloseIcon } from '../Icons.jsx';
+import { GAME_SKIN } from '../../editions/pages.js';
 
 // Fling, the slingshot game in Buddy's games (BuddyGames.jsx), played like Angry Birds: drag Buddy back in the
 // slingshot (the further, the harder), let go, and knock down towers of planks to pop the grumpy gremlins hiding in
@@ -21,6 +22,9 @@ import { CloseIcon } from '../Icons.jsx';
 // buttons drawn on the cleared / out-of-Buddies cards; the cursor changes over Buddy; Restart level under the canvas.
 // Once the crown is won (level 50 beaten), a "Reset progress" button (asks first) on the winner's screen and in the level
 // picker wipes the levels, stars and best scores to play it all again; Buddy keeps his crown and trophy.
+// An edition can dress it its own way (src/editions/pages.js GAME_SKIN fling: target, shot, bow and its words): October
+// draws a bow, an arrow for Buddy and demon faces for the gremlins; the physics and levels are the same.
+const WORDS = { foe: 'gremlin', foes: 'gremlins', shot: 'Buddy', shots: 'Buddies', Shots: 'BUDDIES', pop: 'pop' };
 const WW = 1200, WH = 540, GROUND = 490, BASE = GROUND - 30, SLING = { x: 160, y: BASE - 92 }, PULL = 100, POWER = 0.25, BR = 17;
 // the slingshot stands on a mound at the left (BASE is its top), the gremlins' forts far out at the right, like Angry Birds
 const HP = { gremlin: 1, glass: 3, wood: 8, stone: 16 }, PTS = { gremlin: 5000, glass: 300, wood: 500, stone: 800 };
@@ -53,7 +57,8 @@ const reach = (v) => { try { localStorage.setItem('aq-fling-level', String(v)); 
 const wipe = () => { try { ['aq-fling-level', 'aq-fling-stars', 'aq-fling-scores'].forEach((k) => localStorage.removeItem(k)); } catch { /* private mode */ } };
 
 export default function Fling({ W, H }) {
-  const { colors: K, fonts: F } = useEdition().look; // a canvas can't read CSS variables: the values themselves
+  const ed = useEdition(), { colors: K, fonts: F, art: A } = ed.look; // a canvas can't read CSS variables: the values themselves
+  const SKF = GAME_SKIN[ed.id]?.fling, V = { ...WORDS, ...SKF?.words }; // the edition's look for the game, and its words
   const cv = useRef(null);
   const [score, setScore] = useState(0), [scores, setScores] = useState(scoresOf), [failed, setFailed] = useState(false); // score: this level's points
   const restart = useRef(null), jump = useRef(null);
@@ -158,7 +163,7 @@ export default function Fling({ W, H }) {
           else if (s.birds > 0) {
             const n = gremlins().length;
             s.state = 'aim';
-            s.note = { text: s.hit ? `nice! ${n} gremlin${n === 1 ? '' : 's'} left` : s.broke ? `close! ${n} gremlin${n === 1 ? '' : 's'} left` : 'missed: aim with the dots, pull further', life: 2.6 };
+            s.note = { text: s.hit ? `nice! ${n} ${n === 1 ? V.foe : V.foes} left` : s.broke ? `close! ${n} ${n === 1 ? V.foe : V.foes} left` : 'missed: aim with the dots, pull further', life: 2.6 };
           }
           else { s.state = 'failed'; setFailed(true); }
         }
@@ -170,6 +175,7 @@ export default function Fling({ W, H }) {
         if (b.kind === 'gremlin') {
           const { x, y } = b.position, r = b.r;
           g.save(); g.translate(x, y); g.rotate(b.angle);
+          if (SKF) { SKF.target(g, r * 1.12, K, A); g.restore(); return; }
           g.fillStyle = K.green; ink(); g.beginPath(); g.arc(0, 0, r, 0, Math.PI * 2); g.fill(); g.stroke();
           g.fillStyle = K.card; for (const sx of [-1, 1]) { g.beginPath(); g.arc(sx * r * 0.36, -r * 0.18, r * 0.26, 0, Math.PI * 2); g.fill(); }
           g.fillStyle = K.ink; for (const sx of [-1, 1]) { g.beginPath(); g.arc(sx * r * 0.32, -r * 0.14, r * 0.12, 0, Math.PI * 2); g.fill(); }
@@ -189,6 +195,10 @@ export default function Fling({ W, H }) {
       };
       const drawSling = (front) => {
         const bx = SLING.x, by = SLING.y;
+        if (SKF) { // the edition's bow on a little stand, its string drawn back to the shot
+          if (!front) { g.fillStyle = A.wood; ink(); g.beginPath(); g.rect(bx + 4, by + 50, 10, BASE - by - 50); g.fill(); g.stroke(); SKF.bow(g, bx - 6, by, s.pull, K, A); }
+          return;
+        }
         if (!front) { // back post and band
           g.fillStyle = K.peg; ink(); g.beginPath(); g.moveTo(bx - 6, BASE); g.lineTo(bx - 4, by + 40); g.lineTo(bx + 14, by - 4); g.lineTo(bx + 20, by); g.lineTo(bx + 6, by + 44); g.lineTo(bx + 8, BASE); g.closePath(); g.fill(); g.stroke();
         }
@@ -236,18 +246,21 @@ export default function Fling({ W, H }) {
         g.fillStyle = K.yellow; g.fillRect(x + u(12), y - u(9), tw, u(20)); ink(1.5); g.strokeRect(x + u(12), y - u(9), tw, u(20));
         g.fillStyle = K.ink; g.textAlign = 'left'; g.fillText(tag, x + u(20), y + u(6));
         g.fillStyle = K.hand; g.font = `700 ${u(23)}px ${F.hand}`;
-        g.fillText(left ? `pop all ${n} gremlin${n === 1 ? '' : 's'}` : 'all popped!', x + u(14), y + u(38));
+        g.fillText(left ? `${V.pop} all ${n} ${n === 1 ? V.foe : V.foes}` : V.pop === 'pop' ? 'all popped!' : 'all down!', x + u(14), y + u(38));
         const pr = u(8), gap = Math.min(u(22), (w - u(28)) / Math.max(n, 1));
         for (let i = 0; i < n; i++) { // popped first: ticked
           const cx = x + u(14) + pr + i * gap, cy = y + u(56), done = i < n - left;
           g.fillStyle = done ? K.card : K.green; ink(1.5); g.beginPath(); g.arc(cx, cy, pr, 0, Math.PI * 2); g.fill(); g.stroke();
           if (done) { g.strokeStyle = K.hand; g.lineWidth = u(2.5); g.beginPath(); g.moveTo(cx - pr * 0.5, cy); g.lineTo(cx - pr * 0.1, cy + pr * 0.45); g.lineTo(cx + pr * 0.6, cy - pr * 0.5); g.stroke(); }
         }
-        g.fillStyle = K.ink; g.font = `700 ${u(12)}px ${F.mono}`; g.fillText('BUDDIES', x + u(14), y + u(86));
-        const bx0 = x + u(14) + g.measureText('BUDDIES').width + u(18);
-        for (let i = 0; i < 3; i++) { g.globalAlpha = i < s.birds ? 1 : 0.2; drawGhost(g, bx0 + i * u(26), y + u(80), u(9), K, { t: s.t + i, look: [1, 0] }); }
+        g.fillStyle = K.ink; g.font = `700 ${u(12)}px ${F.mono}`; g.fillText(V.Shots, x + u(14), y + u(86));
+        const bx0 = x + u(14) + g.measureText(V.Shots).width + u(18);
+        for (let i = 0; i < 3; i++) {
+          g.globalAlpha = i < s.birds ? 1 : 0.2;
+          if (SKF) { g.save(); g.translate(bx0 + i * u(26) + u(6), y + u(68)); g.rotate(Math.PI / 2); SKF.shot(g, u(26), K, A); g.restore(); } else drawGhost(g, bx0 + i * u(26), y + u(80), u(9), K, { t: s.t + i, look: [1, 0] });
+        }
         g.globalAlpha = 1; g.fillStyle = K.muted; g.font = `700 ${u(11)}px ${F.mono}`;
-        g.fillText('3★: CLEAR IT WITH ONE BUDDY', x + u(14), y + u(110));
+        g.fillText(`3★: CLEAR IT WITH ONE ${V.shot.toUpperCase()}`, x + u(14), y + u(110));
         g.restore();
       };
       const power = (p) => { // in the ground band: how hard
@@ -279,7 +292,10 @@ export default function Fling({ W, H }) {
         for (const b of M.Composite.allBodies(engine.world)) if (b.kind) drawBody(b);
         // Buddy: in the pouch, pulled back, or flying
         const at = s.ghost ? s.ghost.position : s.pull || (s.state === 'aim' ? SLING : null);
-        if (at) drawGhost(g, at.x, at.y - BR * 0.2, BR, K, { t: s.t, tilt: s.ghost ? s.ghost.angle * 0.3 : 0, look: [1, 0], face: s.ghost && s.ghost.speed > 6 ? 'boo' : 'happy' });
+        if (at && SKF) { // the edition's shot (an arrow), its point leading the way it flies
+          const v = s.ghost ? s.ghost.velocity : s.pull ? { x: SLING.x - s.pull.x, y: SLING.y - s.pull.y } : { x: 1, y: 0 }, a = Math.hypot(v.x, v.y) > 0.3 ? Math.atan2(v.y, v.x) : 0;
+          g.save(); g.translate(at.x + Math.cos(a) * BR * 1.6, at.y + Math.sin(a) * BR * 1.6); g.rotate(a); SKF.shot(g, BR * 3.6, K, A); g.restore();
+        } else if (at) drawGhost(g, at.x, at.y - BR * 0.2, BR, K, { t: s.t, tilt: s.ghost ? s.ghost.angle * 0.3 : 0, look: [1, 0], face: s.ghost && s.ghost.speed > 6 ? 'boo' : 'happy' });
         drawSling(true);
         if (s.state === 'aim' && !s.pull && s.calm <= 0) { // "grab me": a pulsing ring, and the first time a word too
           const pulse = (Math.sin(s.t * 4) + 1) / 2;
@@ -299,9 +315,12 @@ export default function Fling({ W, H }) {
         }
         if (s.pull) power(s.pull);
         // Buddies still waiting
-        for (let i = 0; i < Math.max(0, s.birds - (s.state === 'aim' ? 1 : 0)); i++) drawGhost(g, SLING.x - 50 - i * 34, BASE - 13, 12, K, { t: s.t + i, look: [1, 0] });
+        for (let i = 0; i < Math.max(0, s.birds - (s.state === 'aim' ? 1 : 0)); i++) {
+          if (SKF) { g.save(); g.translate(SLING.x - 50 - i * 22, BASE - 46); g.rotate(-Math.PI / 2 + 0.12); SKF.shot(g, 40, K, A); g.restore(); } // arrows standing by
+          else drawGhost(g, SLING.x - 50 - i * 34, BASE - 13, 12, K, { t: s.t + i, look: [1, 0] });
+        }
         // bits and points
-        s.bits.forEach((p) => { g.globalAlpha = Math.max(0, p.life); g.fillStyle = p.kind === 'gremlin' ? K.green : p.kind === 'glass' ? K.blue : p.kind === 'stone' ? K.muted : K.peg; g.fillRect(p.x - 3, p.y - 3, 6, 6); });
+        s.bits.forEach((p) => { g.globalAlpha = Math.max(0, p.life); g.fillStyle = p.kind === 'gremlin' ? (SKF ? A.flame : K.green) : p.kind === 'glass' ? K.blue : p.kind === 'stone' ? K.muted : K.peg; g.fillRect(p.x - 3, p.y - 3, 6, 6); });
         g.globalAlpha = 1;
         g.textAlign = 'center';
         s.pops.forEach((p) => { g.globalAlpha = Math.max(0, p.life); g.fillStyle = K.ink; g.font = `700 ${u(22)}px ${F.mono}`; g.fillText(p.text, p.x, p.y - (1 - p.life) * 40); });
@@ -312,7 +331,7 @@ export default function Fling({ W, H }) {
           const n = gremlins().length, a = Math.min(1, s.banner / 0.5);
           g.globalAlpha = a; g.fillStyle = K.ink; const by = T + u(56); g.fillRect(WW / 2 - u(230), by, u(460), u(92));
           g.textAlign = 'center'; g.fillStyle = K.yellow; g.font = `700 ${u(30)}px ${F.mono}`; g.fillText(`LEVEL ${s.lv + 1}`, WW / 2, by + u(40));
-          g.fillStyle = K.page; g.font = `700 ${u(26)}px ${F.hand}`; g.fillText(`pop all ${n} gremlins with ${s.birds} Buddies`, WW / 2, by + u(74));
+          g.fillStyle = K.page; g.font = `700 ${u(26)}px ${F.hand}`; g.fillText(`${V.pop} all ${n} ${n === 1 ? V.foe : V.foes} with ${s.birds} ${s.birds === 1 ? V.shot : V.shots}`, WW / 2, by + u(74));
           g.globalAlpha = 1;
         }
         if (s.note && s.state === 'aim') { // how the last turn went
@@ -334,8 +353,8 @@ export default function Fling({ W, H }) {
           g.fillText(won ? (s.newTrophy ? 'the crown AND the trophy: Buddy wears both now.' : 'Buddy wears the winner’s crown now. call him!') : 'Buddy gets the trophy. call him to see it.', WW / 2, top + v(254));
           button(won || s.lv + 1 >= LEVELS.length ? 'PLAY AGAIN ↺' : 'NEXT LEVEL →', top + v(278), K.yellow, f);
         }
-        if (s.state === 'clear') { label([[s.lv + 1 < LEVELS.length ? 'LEVEL CLEARED!' : 'EVERY GREMLIN GONE!', `700 ${u(40)}px ${F.mono}`, -40], [`+${s.pts} this level${s.birds ? ` · ${s.birds} Buddy bonus` : ''}${s.pts > s.wasBest ? ' · new best!' : ` · best ${s.wasBest}`}`, `600 ${u(30)}px ${F.hand}`, 4]], s.lv + 1 < LEVELS.length ? 'NEXT LEVEL →' : 'PLAY AGAIN ↺'); starRow(WH / 2 - u(118), s.stars); }
-        if (s.state === 'failed') { const n = gremlins().length; label([['OUT OF BUDDIES', `700 ${u(40)}px ${F.mono}`, -40], [`${n} gremlin${n === 1 ? '' : 's'} still standing`, `600 ${u(30)}px ${F.hand}`, 4]], 'TRY AGAIN ↺'); }
+        if (s.state === 'clear') { label([[s.lv + 1 < LEVELS.length ? 'LEVEL CLEARED!' : `EVERY ${V.foe.toUpperCase()} GONE!`, `700 ${u(40)}px ${F.mono}`, -40], [`+${s.pts} this level${s.birds ? ` · ${s.birds} ${V.shot} bonus` : ''}${s.pts > s.wasBest ? ' · new best!' : ` · best ${s.wasBest}`}`, `600 ${u(30)}px ${F.hand}`, 4]], s.lv + 1 < LEVELS.length ? 'NEXT LEVEL →' : 'PLAY AGAIN ↺'); starRow(WH / 2 - u(118), s.stars); }
+        if (s.state === 'failed') { const n = gremlins().length; label([[`OUT OF ${V.Shots}`, `700 ${u(40)}px ${F.mono}`, -40], [`${n} ${n === 1 ? V.foe : V.foes} still standing`, `600 ${u(30)}px ${F.hand}`, 4]], 'TRY AGAIN ↺'); }
       };
 
       let last = performance.now(), acc = 0;
@@ -398,10 +417,10 @@ export default function Fling({ W, H }) {
         <span>{`${score} points`}</span><span style={{ color: "var(--muted)" }}>{`level ${lv + 1} best ${scores[lv]}`}</span>
       </div>
       <div style={{ position: "relative", display: pick || (howto && inline) ? "none" : "block" }}>
-        <canvas ref={cv} role="img" aria-label={failed ? 'Fling: out of Buddies, tap to retry' : 'Fling: drag back anywhere on the game and let go to fling Buddy at the towers'} style={{ display: "block", width: `${W}px`, height: `${H}px`, border: "2px solid var(--ink)", touchAction: "none", cursor: "default", background: "var(--page)" }} />
-        {howto && !inline && <HowTo onClose={closeHowto} />}
+        <canvas ref={cv} role="img" aria-label={failed ? `Out of ${V.shots}, tap to retry` : `Drag back anywhere on the game and let go to send ${V.shot === 'Buddy' ? 'Buddy' : `the ${V.shot}`} at the towers`} style={{ display: "block", width: `${W}px`, height: `${H}px`, border: "2px solid var(--ink)", touchAction: "none", cursor: "default", background: "var(--page)" }} />
+        {howto && !inline && <HowTo v={V} onClose={closeHowto} />}
       </div>
-      {howto && inline && !pick && <HowTo W={W} small={W < 400} inline onClose={closeHowto} />}
+      {howto && inline && !pick && <HowTo v={V} W={W} small={W < 400} inline onClose={closeHowto} />}
       {pick && <LevelGrid W={W} H={Math.max(H, innerHeight - 250)} lv={lv} open={open} stars={stars} scores={scores} onReset={crown ? reset : null} onPick={(n) => { setPick(false); jump.current?.(n); }} onClose={() => setPick(false)} />}
       <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: W < 400 ? "8px" : "12px", marginTop: "12px" }}>
         <button type="button" className="press btn" aria-label="Previous level" disabled={lv <= 0} onClick={() => jump.current?.(lv - 1)} style={{ ...BTN, width: "44px", padding: "0", opacity: lv <= 0 ? 0.35 : 1 }}>‹</button>
@@ -411,7 +430,7 @@ export default function Fling({ W, H }) {
         <button type="button" className="press btn" aria-label="Restart level" onClick={() => { setPick(false); restart.current?.(); }} style={{ ...BTN, padding: W < 400 ? "0" : "0 14px", width: W < 400 ? "44px" : "auto" }}>{W < 400 ? '↺' : '↺ Restart'}</button>
       </div>
       {won && !pick && <div style={{ display: "flex", justifyContent: "center", marginTop: "14px" }}><ResetProgress W={W} onReset={reset} /></div>}
-      <p style={{ margin: "10px 0 0", textAlign: "center", fontFamily: FONT.hand, fontSize: W < 400 ? "18px" : "20px", lineHeight: "1.1", color: "var(--hand)" }}>{W < 400 ? 'drag back anywhere · follow the dots · let go' : 'drag back from anywhere on the game · the dots show where he’ll fly · let go'}</p>
+      <p style={{ margin: "10px 0 0", textAlign: "center", fontFamily: FONT.hand, fontSize: W < 400 ? "18px" : "20px", lineHeight: "1.1", color: "var(--hand)" }}>{W < 400 ? 'drag back anywhere · follow the dots · let go' : `drag back from anywhere on the game · the dots show where ${V.shot === 'Buddy' ? 'he' : 'it'}’ll fly · let go`}</p>
     </>
   );
 }
@@ -478,26 +497,28 @@ function Stars({ n, of = 3, size = 11, on = false }) {
 // How to play: a small card over the game (it takes the taps while it shows; on a phone, whose game is short, it takes
 // the game's place instead): drag anywhere, follow the dots, let go, pop every gremlin; stars for Buddies left. The
 // first time Fling opens, and on the ? button.
-const STEPS = [
-  ['drag back from anywhere', 'put a finger (or the mouse) down anywhere on the game and pull back. no need to grab Buddy.'],
-  ['follow the dots', 'they show where he\u2019ll fly. pull further for more power, aim higher to lob.'],
-  ['let go', 'Buddy flies. knock the forts over: every gremlin popped clears the level.'],
+// (v: the edition's words for the shot and the targets, WORDS above)
+const the = (v) => (v.shot === 'Buddy' ? 'Buddy' : `the ${v.shot}`);
+const STEPS = (v) => [
+  ['drag back from anywhere', `put a finger (or the mouse) down anywhere on the game and pull back. no need to grab ${the(v)}.`],
+  ['follow the dots', `they show where ${v.shot === 'Buddy' ? 'he' : 'it'}\u2019ll fly. pull further for more power, aim higher to lob.`],
+  ['let go', `${the(v).replace(/^t/, 'T')} flies. knock the forts over: every ${v.foe} ${v.pop === 'pop' ? 'popped' : 'hit'} clears the level.`],
 ];
-function HowTo({ W, small, inline, onClose }) {
+function HowTo({ v, W, small, inline, onClose }) {
   return (
     <div className="fade-in" onClick={(e) => { if (e.target === e.currentTarget) onClose(); }} style={inline ? { boxSizing: "border-box", width: `${W}px`, display: "flex", justifyContent: "center", padding: "4px 6px 6px 0" } : { position: "absolute", inset: "2px", display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(17,17,17,.45)", padding: "16px" }}>
-      <div className="card-drop" role="dialog" aria-label="How to play Fling" style={{ position: "relative", boxSizing: "border-box", width: small ? "100%" : "440px", background: "var(--card)", border: "2px solid var(--ink)", boxShadow: "6px 6px 0 var(--green)", padding: small ? "12px 14px" : "18px 22px", transform: "rotate(-0.8deg)" }}>
-        <div style={{ fontFamily: FONT.head, fontSize: small ? "18px" : "24px", textTransform: "uppercase", color: "var(--ink)" }}>How to fling</div>
+      <div className="card-drop" role="dialog" aria-label="How to play" style={{ position: "relative", boxSizing: "border-box", width: small ? "100%" : "440px", background: "var(--card)", border: "2px solid var(--ink)", boxShadow: "6px 6px 0 var(--green)", padding: small ? "12px 14px" : "18px 22px", transform: "rotate(-0.8deg)" }}>
+        <div style={{ fontFamily: FONT.head, fontSize: small ? "18px" : "24px", textTransform: "uppercase", color: "var(--ink)" }}>{`How to ${v.shot === 'Buddy' ? 'fling' : 'shoot'}`}</div>
         <ol style={{ listStyle: "none", margin: small ? "8px 0 0" : "12px 0 0", padding: "0", display: "flex", flexDirection: "column", gap: small ? "6px" : "10px" }}>
-          {STEPS.map(([head, text], i) => (
+          {STEPS(v).map(([head, text], i) => (
             <li key={head} style={{ display: "flex", gap: "10px", alignItems: "flex-start" }}>
               <span style={{ flexShrink: "0", width: small ? "22px" : "26px", height: small ? "22px" : "26px", display: "flex", alignItems: "center", justifyContent: "center", background: "var(--ink)", color: "var(--yellow)", fontFamily: FONT.mono, fontWeight: "700", fontSize: small ? "11px" : "13px" }}>{i + 1}</span>
               <span style={{ fontFamily: FONT.body, fontSize: small ? "12.5px" : "14.5px", lineHeight: "1.35", color: "var(--text)" }}><strong style={{ fontWeight: "700", color: "var(--ink)" }}>{head}.</strong> {text}</span>
             </li>
           ))}
         </ol>
-        <div style={{ marginTop: small ? "8px" : "12px", fontFamily: FONT.hand, fontSize: small ? "17px" : "20px", lineHeight: "1.1", color: "var(--hand)" }}>the mission card (top right) says what to pop. fewer Buddies used = more ★</div>
-        <button type="button" className="press btn" onClick={onClose} style={{ ...BTN, "--c": "var(--yellow)", marginTop: small ? "10px" : "14px", padding: "0 18px", background: "var(--ink)", color: "var(--card)", boxShadow: "4px 4px 0 var(--yellow)" }}>Got it, let’s fling →</button>
+        <div style={{ marginTop: small ? "8px" : "12px", fontFamily: FONT.hand, fontSize: small ? "17px" : "20px", lineHeight: "1.1", color: "var(--hand)" }}>{`the mission card (top right) says what to ${v.pop}. fewer ${v.shots} used = more ★`}</div>
+        <button type="button" className="press btn" onClick={onClose} style={{ ...BTN, "--c": "var(--yellow)", marginTop: small ? "10px" : "14px", padding: "0 18px", background: "var(--ink)", color: "var(--card)", boxShadow: "4px 4px 0 var(--yellow)" }}>{`Got it, let’s ${v.shot === 'Buddy' ? 'fling' : 'shoot'} →`}</button>
       </div>
     </div>
   );

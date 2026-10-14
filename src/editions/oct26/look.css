@@ -22,29 +22,27 @@ html[data-edition="oct26"] .web .page-sheet,:host([data-edition="oct26"]) .web .
    styles/loops.css, paused off screen by shared/EditionDecor.jsx). translate / rotate / scale only, so their tilt stays. */
 .oct-leaf{transform-box:fill-box;transform-origin:50% 0;animation:oct-leaf 3.4s ease-in-out infinite alternate}
 @keyframes oct-leaf{from{rotate:-7deg}to{rotate:7deg}}
-.oct-alpana{animation:oct-alpana 80s linear infinite}
-@keyframes oct-alpana{to{rotate:360deg}}
-.oct-dhak{animation:oct-dhak 2.6s ease-out infinite}
-@keyframes oct-dhak{0%,10%,20%,100%{scale:1}5%,15%{scale:1.09}}
 .oct-tag{transform-origin:50% 0;animation:oct-tag 4.2s ease-in-out infinite alternate}
 @keyframes oct-tag{from{rotate:-3deg}to{rotate:3deg}}
-.oct-conch{animation:oct-conch 5.5s ease-in-out infinite alternate}
-@keyframes oct-conch{from{translate:0 0;rotate:0deg}to{translate:-6px -9px;rotate:-4deg}}
 .oct-petal{animation:oct-petal 9.6s linear infinite}
 @keyframes oct-petal{0%{translate:0 0;rotate:0deg;opacity:0}6%{opacity:.9}25%{translate:16px 110px}50%{translate:-10px 220px;opacity:.8}70%,100%{translate:12px 320px;rotate:300deg;opacity:0}}
 .oct-twinkle{animation:oct-twinkle 2.6s ease-in-out infinite alternate}
 @keyframes oct-twinkle{from{scale:.65;rotate:-12deg;opacity:.7}to{scale:1.1;rotate:12deg;opacity:1}}
 
-/* the horn at the team legend (Horn.jsx): it slides in from the page's edge (--out: where it rests, off the edge), is
-   blown (lifts, three sound rings roll out of the bell) and slides back out. One-shots on translate / transform /
-   opacity, started from Horn.jsx (never with reduced motion or LITE, where it rests in view instead). */
-.horn-pop{animation:horn-pop 3.6s cubic-bezier(.3,.7,.3,1)}
-@keyframes horn-pop{0%{translate:var(--out)}20%,78%{translate:0}100%{translate:var(--out)}}
-.horn-lift{animation:horn-lift 1.6s ease-in-out .8s}
-@keyframes horn-lift{0%,100%{transform:none}18%{transform:rotate(7deg)}30%,62%{transform:rotate(7deg) scale(1.03)}40%,52%{transform:rotate(6deg) scale(1.05)}}
-.horn-ring{opacity:0;animation:horn-ring 1.1s ease-out forwards}
-@keyframes horn-ring{0%{opacity:0;transform:translateX(-6px)}25%{opacity:1}100%{opacity:0;transform:translateX(14px)}}
-@media (prefers-reduced-motion: reduce){.horn-pop,.horn-lift,.horn-ring{animation:none}.horn-ring{opacity:0}}
+/* the festive touches from the design brief (src/editions/oct26/festive/), slow and small: a hanging diya swings on its
+   thread and its flame flickers (Diya.jsx); the dhunuchi's smoke drifts up (Dhunuchi.jsx); the dhakis' arms beat out of
+   step and their drums bounce (DhakPlayers.jsx). Class dz: stopped by reduced motion and LITE (styles/loops.css). */
+.oct-diya-sway{animation:oct-diya-sway 4.6s ease-in-out infinite alternate}
+@keyframes oct-diya-sway{from{rotate:-3.5deg}to{rotate:3.5deg}}
+.oct-flame{transform-box:fill-box;transform-origin:50% 100%;animation:oct-flame .9s ease-in-out infinite alternate}
+@keyframes oct-flame{from{scale:.9 .94;opacity:.85}to{scale:1.06 1.05;opacity:1}}
+.oct-wisp{animation:oct-wisp 4.2s ease-in-out infinite}
+@keyframes oct-wisp{0%{translate:0 4px;opacity:0}30%{opacity:.9}100%{translate:3px -10px;opacity:0}}
+.oct-beat-l{animation:oct-beat .62s ease-in-out infinite alternate}
+.oct-beat-r{animation:oct-beat .62s ease-in-out infinite alternate-reverse}
+@keyframes oct-beat{from{rotate:-9deg}to{rotate:9deg}}
+.oct-bounce{animation:oct-bounce .62s ease-in-out infinite alternate}
+@keyframes oct-bounce{from{translate:0 0}to{translate:0 2.5px}}
 /* Rozha One's capitals are tall: headings set at 0.95 line height touch, so this edition spaces them a little more
    (the shared components multiply their heading leading by --head-lead; other editions leave it at 1) */
 html[data-edition="oct26"],:host([data-edition="oct26"]){--head-lead:1.06}

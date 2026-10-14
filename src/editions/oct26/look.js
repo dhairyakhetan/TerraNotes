@@ -66,4 +66,19 @@ export const LOOK = {
   },
   // a stylesheet for fonts the site doesn't serve itself, or '' (its fonts are self-hosted: src/styles/fontfaces.css)
   fontsCss: '',
+  // the festive illustrations' own colours (drawn in a canvas or SVG, so they read these values, not CSS variables):
+  // the games' Durga Maa and demon faces (games.js), the dhak players (DhakPlayers.jsx), the alpana and dhunuchi.
+  art: {
+    alta: '#C8202E', // alta red: the alpana border, the bow's grip, sindoor
+    skin: '#F2BE86', // Durga Maa's face
+    hair: '#1B1420',
+    gold: '#F2B705', // crowns, earrings
+    flame: '#FF8A1F', // diya flames, the demon's crown
+    demon: '#F6D9B8', // the demon's face
+    brown: '#5B3418', // his hair, brows and moustache
+    wood: '#A8642C', // the bow, the dhak's shell
+    clay: '#B5562C', // diyas, the dhunuchi
+    smoke: '#EEEAF6', // dhunuchi smoke
+    drummer: '#E9A86A', // the dhakis' skin
+  },
 };

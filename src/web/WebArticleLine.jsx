@@ -6,7 +6,7 @@ import { Clip } from '../shared/Tapes.jsx';
 import { homeLink } from '../data/editions.js';
 import { useByWriter } from '../lib/byWriter.js';
 import { useEdition } from '../lib/edition.js';
-import { LAYOUT } from '../editions/pages.js';
+import { HANGERS, LAYOUT } from '../editions/pages.js';
 import { pad2 } from '../lib/format.js';
 import { pageZoom } from '../lib/layoutMode.js';
 import { calm } from '../lib/motion.js';
@@ -173,6 +173,7 @@ export default function WebArticleLine() {
   const soon = lead ? { x: pegs[pegs.length - 1].x + PITCH, y: pegs.length % 2 ? 88 : 78 } : null; // the "more soon" slot
   const width = lead ? Math.max(soon.x + 224, 1140) : pegs[pegs.length - 1].x + 224; // 1140: the line's window: the wire reaches its edge
   const strung = soon ? [...pegs, soon] : pegs;
+  const Hanger = HANGERS[id]; // the edition's little hangers between the cards (October's diyas), if any
   useEffect(() => runLine(refs, pegs, width, strung), []);
   const scrollBy = (dx) => { refs.stopPull?.(); refs.el.scrollBy({ left: dx, behavior: 'smooth' }); };
 
@@ -224,6 +225,7 @@ export default function WebArticleLine() {
           <svg width={width} height="200" viewBox={`0 0 ${width} 200`} style={{ position: "absolute", left: "0", top: "0" }} aria-hidden="true">
             <path ref={(n) => { refs.wire = n; }} d={wireFrom(strung, width, 0)} fill="none" strokeWidth="1.8" style={{ stroke: "var(--string)" }} />
           </svg>
+
           {list.map((a, i) => {
             const p = pegs[i];
             return (
@@ -243,6 +245,10 @@ export default function WebArticleLine() {
                 </div>
               </div>
             );
+          })}
+          {Hanger && strung.slice(1).map((q, k) => { // in the gap between two cards, tied on where the wire dips, in front of them
+            const p = strung[k];
+            return <Hanger key={k} string={[24, 72][k % 2]} s={38} delay={-k * 0.9} style={{ left: `${(p.x + q.x) / 2 - 19}px`, top: `${(p.y + q.y) / 4 + 55 - 2}px` }} />;
           })}
           {soon && ( // where the next pieces will hang: a dashed slot on its own string
             <div className="hang sway" style={{ position: "absolute", left: `${soon.x - 86}px`, top: `${soon.y}px`, width: "172px", height: "230px", "--a": "0.6deg", "--d": "7.2s", animationDelay: "-2s" }}>

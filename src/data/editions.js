@@ -14,7 +14,7 @@ import { withBase } from '../lib/base.js';
 
 export const EDITIONS = [
   { number: 1, month: 'September 2026', theme: 'Exam season' },
-  { number: 2, month: 'October 2026', theme: 'The Pujo annual' },
+  { number: 2, month: 'October 2026', theme: 'Pujo & Diwali' },
 ];
 
 export const PUBLISHED = EDITIONS.filter((e) => !e.draft);

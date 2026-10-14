@@ -208,19 +208,19 @@ with `class="page-sheet"`; its home pages write on those lines: text straight on
 line) and `lib/ruled.js` `useRuledPage` sets each block's first baseline on a rule, clear of the margin, "Meet the team" via
 `TEAM_FIT` in `sep26/ruled.js`, the ruling's numbers in `RULED` (`pages.js`); `Decor.jsx` doodles on the home pages: sticky note, coffee ring, star, paper plane, moving a little; `Diary.jsx`, a
 Tom Riddle-style diary under "Meet the team" that writes random lines in a script font after you stay a while). October
-2026 (the latest edition) is **"Pujo"**, Durga Puja: laal-paar saree cream and alta red, maroon ink, sindoor handwriting,
-marigold strings, a pandal-night photo wall, Rozha One headings; `look.css` the saree border and an alpana dot pattern;
-`Decor.jsx` a marigold toran, alpana, dhak, conch and a "Subho Sharodiya!" tag; `Horn.jsx`, an engraving-style S-horn that now and then slides in upright from
-the page edge by the team legend (left on web, right on phones), is blown and slides back out; Pujo words; five sample articles and eight photos (seven of them drawn stand-ins). October's home page is its own design, **"the Pujo annual"** (a Pujabarshiki: the fat special issue Bengal's magazines
-bring out every Pujo), laid out like print, both layouts (`src/editions/oct26/annual/`: `AnnualHome.jsx` stacks the parts;
-`Cover.jsx` a red hardback front cover with the cover lines and the lead story in an arched window; `Contents.jsx` the
-contents page and a note from the editors (id `articles`); `Stories.jsx` the lead story as a spread, the rest in ruled
-columns; `Photos.jsx` the photo wall as a picture page; the shared words game framed as the puzzle corner; `Board.jsx` the
-team as an editorial board, a column per team, with its own profile card; `BackCover.jsx` the Dashami goodbye; `parts.jsx`
-the folios and page numbers). Unlike the shared home pages its parts flow one under another inside the artboard, so
-anything can grow. Its articles open with a page turn (`PageTurn.jsx`, when tapped on the home page: `takeTap()` in
-`lib/cardFlight.js`). Its CSS: `annual.css` (classes `an-`). A new edition starts from a copy of the newest look and changes the values; its own CSS and
-doodles are registered in `src/editions/pages.js` (`EDITION_CSS`, `DECOR`, `TEAM_NOTE` for a secret by the team legend: under it on web, beside it on phones; `LAYOUT` switches on newer layouts of the shared home sections per edition, so older ones keep theirs: copy the newest edition's entry).
+2026 (the latest edition) is **"Pujo & Diwali"**, from the design team's brief: the same layout as September (intro card,
+hanging articles, photo wall, words game, team), dressed for the festivals. Bright cream page, indigo ink, alta red,
+marigold; Rozha One headings; `look.css` a ribbon border and an alpana dot pattern; `Decor.jsx` a marigold toran, a "Subho
+Sharodiya!" tag, sparkles and falling petals, and on phones two hanging diyas. The rest is in `src/editions/oct26/festive/`,
+each piece switched on for October only through `src/editions/pages.js`: the intro card leads with "TerraNotes" in big
+letters (`LAYOUT` `introMast`), diyas hang from the web article wire between the cards (`Diya.jsx`, `HANGERS`), a faint
+alta-red alpana border runs round the photo wall (`Alpana.jsx`, `WALL_DECOR`), the words game's cloud is dhunuchi smoke
+and its A/B/C marks a dhunuchi, a lantern and a firework (`Dhunuchi.jsx`, `WORDS_ART`), two dhakis drum by the team
+legend (`DhakPlayers.jsx`, `TEAM_NOTE`), and Buddy's games are re-dressed (`games.js`, `GAME_SKIN`; their names in
+`data/games.js`): Snake is Durga Maa chasing demon faces with a marigold garland for a tail, Fling a bow and arrow at
+demon faces. The illustrations' own colours are in its `look.js` `art`. Pujo, Diwali and festive-feeling words; five
+sample articles and eight photos (seven of them drawn stand-ins). A new edition starts from a copy of the newest look and changes the values; its own CSS and
+doodles are registered in `src/editions/pages.js` (`EDITION_CSS`, `DECOR`, `TEAM_NOTE` for a secret by the team legend: under it on web, beside it on phones; `HANGERS`, `WALL_DECOR`, `WORDS_ART` and `GAME_SKIN` to dress the article wire, the photo wall, the words game and Buddy's games; `LAYOUT` switches on newer layouts of the shared home sections per edition, so older ones keep theirs: copy the newest edition's entry).
 Use the variables, nothing else (the look lists a few more, for the photo wall, dark panels and details).
 
 **Palette:**

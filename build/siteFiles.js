@@ -16,9 +16,9 @@ import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
 import { ALL_ARTICLES } from '../src/data/articles.js';
-import { LATEST, PUBLISHED, articleLink, editionName, homeLink, isDraft, ogImage } from '../src/data/editions.js';
+import { LATEST, PUBLISHED, articleLink, editionId, editionName, homeLink, isDraft, ogImage } from '../src/data/editions.js';
 import { SITE } from '../src/data/site.js';
-import { GAMES, gameLink } from '../src/data/games.js';
+import { GAMES, gameLink, gamesFor } from '../src/data/games.js';
 import { editionData } from '../src/editions/index.js';
 import { articleHtml, editionsHtml, homeHtml, withContent } from './staticCopy.js';
 
@@ -101,14 +101,14 @@ export default function siteFiles(host) {
       // Buddy's games open (App.jsx), each with its own title and link preview, on the edition's paper
       const gamePage = (e, g) => {
         const old = e.number !== LATEST ? ` · ${editionName(e.number)}` : '';
-        const title = g ? `${g.title} · TerraNotes games${old}` : `Buddy’s games · TerraNotes${old}`, about = g ? g.about : `Three mini games with Buddy the ghost: ${GAMES.map((x) => x.name).join(', ')}. In TerraNotes, Aquaterra’s monthly magazine.`;
+        const title = g ? `${g.title} · TerraNotes games${old}` : `Buddy’s games · TerraNotes${old}`, about = g ? g.about : `Three mini games: ${gamesFor(editionId(e.number)).map((x) => x.name).join(', ')}. In TerraNotes, Aquaterra’s monthly magazine.`;
         const p = gameLink(g?.id, e.number);
         let html = setMeta(setMeta(setTitle(base, title), 'property', 'og:title', title), 'property', 'og:url', url(p));
         html = setMeta(setMeta(html, 'name', 'description', about), 'property', 'og:description', about);
         const pic = og(g ? ogImage.game(g.id, e.number) : ogImage.games(e.number));
         out(`${p.slice(1)}.html`, pic ? withImage(html, pic, title) : withHome(html));
       };
-      for (const e of PUBLISHED) [null, ...GAMES].forEach((g) => gamePage(e, g));
+      for (const e of PUBLISHED) [null, ...gamesFor(editionId(e.number))].forEach((g) => gamePage(e, g)); // the edition's names for them
       const paths = [...pages, '/editions', ...ARTICLES.map(articleLink), gameLink(), ...GAMES.map((g) => gameLink(g.id))];
       out('sitemap.xml', `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${paths.map((p) => `  <url><loc>${url(p)}</loc></url>`).join('\n')}\n</urlset>\n`);
       // feed.xml: an RSS feed of every published article, newest issue first, so readers (and apps) hear of a new one

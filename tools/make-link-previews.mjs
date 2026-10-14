@@ -19,7 +19,7 @@ import path from 'node:path';
 import { chromium } from 'playwright';
 import { ALL_ARTICLES, tagOf } from '../src/data/articles.js';
 import { EDITIONS, LATEST, editionId, ogImage } from '../src/data/editions.js';
-import { GAMES } from '../src/data/games.js';
+import { GAMES, gamesFor } from '../src/data/games.js';
 import { editionData } from '../src/editions/index.js';
 import { withBase } from '../src/lib/base.js';
 
@@ -223,6 +223,6 @@ for (const ed of EDITIONS) {
   await shot(editionCard(e), ogImage.edition(e.number));
   for (const a of mine) await shot(articleCard(e, a), ogImage.article(a));
   await shot(gameCard(e, null), ogImage.games(e.number));
-  for (const g of GAMES) await shot(gameCard(e, g), ogImage.game(g.id, e.number));
+  for (const g of gamesFor(editionId(e.number))) await shot(gameCard(e, g), ogImage.game(g.id, e.number));
 }
 await browser.close();

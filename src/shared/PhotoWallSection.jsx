@@ -4,6 +4,7 @@ import { usePauseOffscreen } from '../lib/pauseOffscreen.js';
 import { fitFrame, usePhotoShapes } from '../lib/photoShapes.js';
 import { FONT } from '../styles/fonts.js';
 import { useReveal } from '../lib/reveal.js';
+import { WALL_DECOR } from '../editions/pages.js';
 
 // "Photo wall" (id="photos"), both layouts: a dark rounded panel with two strings of fairy lights and the edition's 5
 // PHOTOS (src/editions/<id>/photos.js) pegged up as polaroids, each framed at its photo's own shape. Tap / click one →
@@ -51,13 +52,14 @@ const Arrow = ({ w, h }) => <svg width={w} height={h} viewBox="0 0 34 22" fill="
 
 export default function PhotoWallSection({ web, onOpen }) {
   const L = web ? WEB : PHONE;
-  const { photos: PHOTOS } = useEdition();
+  const { photos: PHOTOS, id } = useEdition(), Decor = WALL_DECOR[id]; // the edition's own pattern on the panel (src/editions/pages.js)
   const shapes = usePhotoShapes(0.2, 5, PHOTOS);
   const self = useRef(null);
   useReveal(self);
   usePauseOffscreen(self);
   return (
     <section ref={self} id="photos" style={{ position: "absolute", background: "var(--wall)", overflow: "hidden", ...L.section }}>
+      {Decor && <Decor web={web} w={parseFloat(L.section.width)} h={parseFloat(L.section.height)} />}
       <div style={{ position: "absolute", fontFamily: FONT.serif, color: "var(--page)", lineHeight: "1", ...L.title }}>Photo wall</div>
       <div style={{ position: "absolute", fontFamily: FONT.hand, color: "var(--amber)", transform: "rotate(-4deg)", ...L.tagline }}>moments, strung up</div>
       <svg width={L.strings.width} height={L.strings.height} viewBox={L.strings.view} style={{ position: "absolute", left: "0", top: "0" }} aria-hidden="true">

@@ -11,8 +11,9 @@ import { calm } from '../../lib/motion.js';
 import { useLocation, useNavigate } from '../../router.jsx';
 import { gamesOf, homeOf } from '../../lib/routes.js';
 import { LATEST, editionById } from '../../data/editions.js';
-import { gameLink, gameOf } from '../../data/games.js';
+import { gameLink, gameOf, gamesFor } from '../../data/games.js';
 import Fling from './Fling.jsx';
+import { GAME_SKIN } from '../../editions/pages.js';
 
 // Buddy's games popup (mounted once in App.jsx; opened by openGames() in lib/buddyState.js, event 'aq-games').
 // Two tabs, each a <canvas> game drawn every frame with requestAnimationFrame (only while the popup is open):
@@ -23,7 +24,8 @@ import Fling from './Fling.jsx';
 //   Float: flappy style; tap / click / space floats him up between the posts.
 //   Fling: Angry Birds style; drag Buddy back in a slingshot and knock down towers of planks onto gremlins (Fling.jsx,
 //          real physics, fetched the first time the tab opens).
-// Best scores in localStorage. Esc, ✕ or a click outside closes it.
+// An edition can dress the games its own way (src/editions/pages.js GAME_SKIN: October's Durga Maa chase and bow and
+// arrow); the rules stay the same. Best scores in localStorage. Esc, ✕ or a click outside closes it.
 const MONO = { fontFamily: FONT.mono, fontWeight: "700", letterSpacing: "1.2px", textTransform: "uppercase" };
 const best = (k) => { try { return Number(localStorage.getItem(k)) || 0; } catch { return 0; } };
 const keep = (k, v) => { try { localStorage.setItem(k, String(v)); } catch { /* private mode */ } };
@@ -45,7 +47,8 @@ const card = (g, K, w, h, lines, shift = 0) => {
 // ---------------------------------------------------------------- Snake
 const DIRS = { ArrowUp: [0, -1], ArrowDown: [0, 1], ArrowLeft: [-1, 0], ArrowRight: [1, 0], w: [0, -1], s: [0, 1], a: [-1, 0], d: [1, 0] };
 function Snake({ W, small }) {
-  const { colors: K, fonts: F } = useEdition().look; // a canvas can't read CSS variables: the values themselves
+  const ed = useEdition(), { colors: K, fonts: F, art: A } = ed.look; // a canvas can't read CSS variables: the values themselves
+  const SK = GAME_SKIN[ed.id]?.snake; // the edition's own snake (head, food, tail, words), else Buddy eating stars
   const [held, setHeld] = useState(null); // big screens: the on-screen key lights up while its key is held
   const cv = useRef(null);
   const turn = useRef(null);
@@ -98,14 +101,19 @@ function Snake({ W, small }) {
       g.fillStyle = K.page; g.fillRect(-10, -10, W + 20, W + 20);
       g.fillStyle = K.outside;
       for (let x = 0; x < N; x++) for (let y = 0; y < N; y++) { g.beginPath(); g.arc((x + 0.5) * C, (y + 0.5) * C, 1.3, 0, Math.PI * 2); g.fill(); }
-      // food: a little yellow star, twinkling
+      // food: a little yellow star, twinkling (or the edition's: a bobbing demon face)
       const [fx, fy] = food, s = C * (0.34 + Math.sin(t / 180) * 0.04);
-      g.save(); g.translate((fx + 0.5) * C, (fy + 0.5) * C); g.rotate(t / 900); g.beginPath();
-      for (let i = 0; i < 10; i++) { const r = i % 2 ? s * 0.45 : s; g.lineTo(Math.cos((i * Math.PI) / 5) * r, Math.sin((i * Math.PI) / 5) * r); }
-      g.closePath(); g.fillStyle = K.yellow; g.fill(); g.strokeStyle = K.ink; g.lineWidth = 1.5; g.stroke(); g.restore();
-      // tail: wisps that glide cell to cell, smaller and fainter towards the end
+      g.save(); g.translate((fx + 0.5) * C, (fy + 0.5) * C);
+      if (SK) { g.translate(0, Math.sin(t / 220) * C * 0.04); SK.food(g, C * 0.4, K, A); } else {
+        g.rotate(t / 900); g.beginPath();
+        for (let i = 0; i < 10; i++) { const r = i % 2 ? s * 0.45 : s; g.lineTo(Math.cos((i * Math.PI) / 5) * r, Math.sin((i * Math.PI) / 5) * r); }
+        g.closePath(); g.fillStyle = K.yellow; g.fill(); g.strokeStyle = K.ink; g.lineWidth = 1.5; g.stroke();
+      }
+      g.restore();
+      // tail: wisps that glide cell to cell, smaller and fainter towards the end (or the edition's beads)
       for (let i = snake.length - 1; i > 0; i--) {
         const [x, y] = at(i), k = 1 - i / (snake.length + 2);
+        if (SK) { g.save(); g.translate(x, y); g.rotate(t / 1400 + i); SK.tail(g, C * (0.26 + 0.12 * k), K, A, i); g.restore(); continue; }
         g.globalAlpha = 0.3 + 0.6 * k; g.fillStyle = K.green;
         g.beginPath(); g.arc(x, y, C * (0.24 + 0.16 * k), 0, Math.PI * 2); g.fill();
       }
@@ -120,10 +128,12 @@ function Snake({ W, small }) {
       pops = pops.filter((p) => p.life > 0); g.globalAlpha = 1;
       const [hx, hy] = at(0), face = queue[0] || dir;
       bump = Math.max(0, bump - dt * 5);
-      drawGhost(g, hx, hy - C * 0.08, C * (0.38 + bump * 0.08), K, { look: face, t: t / 1000, face: state === 'over' ? 'boo' : 'happy' });
+      if (SK) { g.save(); g.translate(hx, hy - C * 0.04); SK.head(g, C * (0.46 + bump * 0.08), K, A, { look: face, over: state === 'over' }); g.restore(); }
+      else drawGhost(g, hx, hy - C * 0.08, C * (0.38 + bump * 0.08), K, { look: face, t: t / 1000, face: state === 'over' ? 'boo' : 'happy' });
       g.restore();
-      if (state === 'ready') card(g, K, W, W, [['SNAKE, BUT SPOOKY', `700 ${Math.round(W / 16)}px ${F.mono}`, -8], ['arrows, WASD or swipe to start', `${Math.round(W / 14)}px ${F.hand}`, 24]]);
-      if (state === 'over') card(g, K, W, W, [[`BOO. ${pts} ${pts === 1 ? 'STAR' : 'STARS'}`, `700 ${Math.round(W / 14)}px ${F.mono}`, -8], [`best ${Math.max(pts, best('aq-snake-best'))}`, `${Math.round(W / 14)}px ${F.hand}`, 22]], -30);
+      const [ready, how] = SK ? SK.ready : ['SNAKE, BUT SPOOKY', 'arrows, WASD or swipe to start'];
+      if (state === 'ready') card(g, K, W, W, [[ready, `700 ${Math.round(W / (ready.length > 18 ? 20 : 16))}px ${F.mono}`, -8], [how, `${Math.round(W / 14)}px ${F.hand}`, 24]]);
+      if (state === 'over') card(g, K, W, W, [[SK ? SK.over(pts) : `BOO. ${pts} ${pts === 1 ? 'STAR' : 'STARS'}`, `700 ${Math.round(W / 14)}px ${F.mono}`, -8], [`best ${Math.max(pts, best('aq-snake-best'))}`, `${Math.round(W / 14)}px ${F.hand}`, 22]], -30);
     };
     const loop = (t) => {
       raf = requestAnimationFrame(loop);
@@ -162,7 +172,7 @@ function Snake({ W, small }) {
   };
   return (
     <>
-      <Scores score={score} top={top} unit="stars" />
+      <Scores score={score} top={top} unit={SK?.unit || 'stars'} />
       <div style={{ position: "relative" }}>
         <canvas ref={cv} style={{ display: "block", width: `${W}px`, height: `${W}px`, border: "2px solid var(--ink)", touchAction: "none" }} />
         {over && (
@@ -273,6 +283,7 @@ const ORDER = ['snake', 'float', 'fling']; // the tabs, left to right
 export default function BuddyGames({ first = null }) {
   const [game, setGame] = useState(first);
   const [shown, leaving] = usePresence(game, 220);
+  const eid = useEdition().id, NAMES = Object.fromEntries(gamesFor(eid).map((x) => [x.id, x])); // the edition's names for them
   useEffect(() => { if (game) track('Game opened', { game }); }, [game]);
   // the address follows the popup over a home page: its edition's /games/<id> while a game is open (a link straight to
   // it, with its own link preview: data/games.js), back to the address it had once it closes. Over an article it stays.
@@ -284,7 +295,7 @@ export default function BuddyGames({ first = null }) {
     if (game && onHome) {
       if (!onGames) back.current = p + search;
       title.current ??= document.title; // the tab names the game too (as its page's title does: build/siteFiles.js)
-      document.title = `${gameOf(game).title} · TerraNotes games`;
+      document.title = `${gameOf(game, eid).title} · TerraNotes games`;
       if (p !== gameLink(game, n)) navigate(gameLink(game, n), { replace: true, state: { quiet: true } });
     } else if (!game && onGames) {
       if (title.current) { document.title = title.current; title.current = null; }
@@ -345,8 +356,8 @@ export default function BuddyGames({ first = null }) {
     <div className={leaving ? 'fade-out' : 'fade-in'} onClick={(e) => { if (e.target === e.currentTarget) setGame(null); }} style={{ position: "fixed", inset: "0", zIndex: "900", display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(17,17,17,.55)", padding: "12px" }}>
       <div ref={card} role="dialog" aria-label="Buddy's games" style={{ position: "relative", boxSizing: "border-box", background: "var(--cream)", border: "2px solid var(--ink)", boxShadow: "8px 8px 0 var(--purple)", padding: small ? "14px" : "20px", transform: "rotate(-0.6deg)", maxHeight: "calc(100dvh - 24px)", overflowY: "auto" }}>
         <div className="no-cascade" style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "12px" }}>
-          {tab('snake', 'Snake')}{tab('float', 'Float')}{tab('fling', 'Fling')}
-          <span style={{ flexGrow: "1", fontFamily: FONT.hand, fontSize: "20px", color: "var(--hand)", textAlign: "right", paddingRight: "8px" }}>{small ? '' : shown === 'snake' ? 'eat the stars' : shown === 'float' ? 'mind the posts' : 'knock ’em down'}</span>
+          {tab('snake', NAMES.snake.name)}{tab('float', NAMES.float.name)}{tab('fling', NAMES.fling.name)}
+          <span style={{ flexGrow: "1", fontFamily: FONT.hand, fontSize: "20px", color: "var(--hand)", textAlign: "right", paddingRight: "8px" }}>{small ? '' : NAMES[shown].hint}</span>
           <button className="press" onClick={() => setGame(null)} aria-label="Close the games" style={{ "--c": "var(--ink)", width: "44px", height: "44px", flexShrink: "0", padding: "0", background: "var(--card)", border: "2px solid var(--ink)", boxShadow: "3px 3px 0 var(--ink)", display: "flex", alignItems: "center", justifyContent: "center" }}>
             <CloseIcon size={14} weight={2.8} />
           </button>

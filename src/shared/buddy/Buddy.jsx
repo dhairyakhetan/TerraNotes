@@ -71,7 +71,7 @@ function CallButton() {
   );
 }
 
-// Web home, top right, under the Website / Instagram buttons. at: a page's own spot for him (October's annual: beside its
+// Web home, top right, under the Website / Instagram buttons. at: a page's own spot for him (an edition's own home page, e.g. beside its
 // cover), { left, top } on the artboard, with "tap him" above him instead of to his left.
 export function WebBuddy({ at }) {
   const { here, fresh } = useBuddy();
@@ -92,8 +92,8 @@ export function WebBuddy({ at }) {
   );
 }
 
-// Phone home: he floats next to the intro card, above its sticky note. at: a page's own spot, { left, top } (October's
-// annual: beside its "Contents" heading, under the cover)
+// Phone home: he floats next to the intro card, above its sticky note. at: a page's own spot, { left, top } (an
+// edition's own home page)
 export function PhoneBuddy({ at }) {
   const { here, fresh } = useBuddy(), { crown } = useRewards();
   // The phone menu's "click me" (MenuCall) calls him; inside AQ's website that menu isn't drawn, so a small visible
