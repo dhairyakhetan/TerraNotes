@@ -51,15 +51,15 @@ export default function Oct26Decor({ web }) {
         <>
           <Toran width={1440} top={80} swags={4} sag={26} />
           <Tag left={1262} top={452} w={128} size={20} deg={5} />
-          {[[1215, 205, 24, "mint", 0], [880, 470, 20, "pink", 0.9], [1090, 620, 28, "yellow", 1.7], [1300, 770, 22, "mint", 0.4], [1010, 880, 18, "pink", 1.3]].map(([x, y, s, c, dl]) => <Sparkle key={x} left={x} top={y} s={s} c={c} delay={dl} />)}
+          {[[1215, 205, 24, "mint", 0], [880, 470, 20, "pink", 0.9], [1300, 770, 22, "mint", 0.4], [1010, 880, 18, "pink", 1.3]].map(([x, y, s, c, dl]) => <Sparkle key={x} left={x} top={y} s={s} c={c} delay={dl} />)}
           {[[640, 0], [690, 4.8, 1], [1160, 1.6, 1], [1250, 6.4], [1350, 3.2], [1120, 8]].map(([x, d, r]) => <Petal key={x} left={x} top={120} delay={d} red={r} />)}
         </>
       ) : (
         <>
           <Toran width={390} top={64} swags={2} sag={14} />
           {/* hanging diyas in the gaps between the cards (on web they hang from the article wire itself) */}
-          <HangingDiya string={34} s={30} style={{ left: "92px", top: "1078px" }} />
-          <HangingDiya string={120} s={26} delay={-1.6} style={{ left: "352px", top: "78px" }} />
+          <HangingDiya v={3} string={30} s={30} style={{ left: "92px", top: "1078px" }} />
+          <HangingDiya v={4} string={110} s={28} delay={-1.6} style={{ left: "352px", top: "78px" }} />
           <Tag left={292} top={266} w={86} size={15} deg={6} />
           {[[300, 620, 22, "mint", 0], [262, 705, 16, "pink", 0.9], [338, 745, 20, "yellow", 1.7]].map(([x, y, s, c, dl]) => <Sparkle key={x} left={x} top={y} s={s} c={c} delay={dl} />)}
           {[[40, 0], [200, 3.6, 1], [356, 7.2]].map(([x, d, r]) => <Petal key={x} left={x} top={96} delay={d} red={r} />)}

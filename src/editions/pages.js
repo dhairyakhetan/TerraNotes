@@ -52,5 +52,5 @@ export const RULED = { sep26: Sep26Rule };
 //               (shared/WordsGameSection.jsx)
 //     introMast: the intro card leads with "TerraNotes" in big letters, the tagline smaller under it
 //               (shared/HomeIntroCard.jsx)
-export const LAYOUT = { oct26: { leadCard: true, wordsRow: true, introMast: true } };
+export const LAYOUT = { oct26: { wordsRow: true, introMast: true } };
 export const TEAM_FIT = { sep26: Sep26TeamFit };

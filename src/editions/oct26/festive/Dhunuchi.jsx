@@ -1,27 +1,34 @@
 // October's words game dressing (the design brief: the clouds become dhunuchi smoke; the A / B / C marks become a
 // dhunuchi, a paper lantern and a firework; src/editions/pages.js WORDS_ART, used by shared/WordsGameSection.jsx).
-// Smoke: drawn in the cloud's own 200 × 110 box (stretched to the game's cloud size, strokes kept even), a billow of
-// curls rising from a clay dhunuchi at its lower left, with three wisps drifting up off it (home motion: look.css
-// .oct-wisp, a loop stopped by reduced motion and LITE). The marks: small line icons in currentColor, so they turn
-// white with the option when it's picked. Decoration only (the letters stay as their accessible names).
-const SMOKE = 'M22 84 C6 84 2 66 14 58 C4 46 14 30 30 34 C30 18 50 10 62 20 C70 6 94 4 104 16 C114 4 140 6 146 22 C162 14 184 24 180 42 C196 46 198 70 182 76 C186 92 164 100 150 92 C140 104 112 104 104 94 C92 106 64 104 58 94 C46 102 26 98 22 84 Z';
-const CURLS = 'M40 44 q10 -8 18 0 q6 8 -2 12 M92 30 q12 -10 22 0 q6 8 -4 12 M136 52 q12 -8 20 2 q4 8 -6 10 M70 72 q10 -6 16 2';
+// Smoke, as in the brief's sketch: a clay dhunuchi stands at the bottom left and its smoke rises out of it and rolls
+// off to the right in one long, soft plume that the word sits on. Drawn in the cloud's own 200 × 110 box (stretched to
+// the game's cloud size, strokes kept even); the plume reaches the box's bottom so the "what do you think it means?"
+// line stays inside it. Two thin wisps drift up off the top (look.css .oct-wisp, a loop stopped by reduced motion and
+// LITE). The marks: small line icons in currentColor, so they turn white with the option when it's picked.
+// Decoration only (the options' text is their accessible name).
+// the plume: a narrow stream rising out of the cup's mouth, then out along the top in long flowing waves to a curled
+// tip at the right, and back along a deep, gently wavy underside to the stream
+const PLUME = 'M10 82 C4 72 16 66 13 58 C10 48 22 38 38 40 C56 26 88 32 108 24 C128 16 160 20 176 30 C196 34 200 56 184 58 C174 58 172 48 180 47 C198 62 198 90 176 96 C168 109 140 111 124 107 C108 112 84 112 70 107 C56 111 38 109 34 99 C28 96 26 90 28 84 C24 80 25 74 22 70 C21 77 24 81 22 84 Z';
+// the smoke's swirls: low-key, at the plume's edges, clear of the word
+const SWIRLS = 'M18 70 q-4 -8 2 -14 M44 52 q6 -8 16 -6 M150 34 q12 -6 20 2 M186 80 q4 6 -4 10 M46 102 q10 3 16 -1';
 
 export function Smoke({ w, h }) {
   return (
     <svg width={w} height={h} viewBox="0 0 200 110" preserveAspectRatio="none" style={{ position: "absolute", left: "0", top: "0", overflow: "visible" }} aria-hidden="true">
-      <path d={SMOKE} transform="translate(2.5 3)" style={{ fill: "var(--ink)" }} />
-      <path d={SMOKE} strokeWidth="2" vectorEffect="non-scaling-stroke" style={{ fill: "var(--card)", stroke: "var(--ink)" }} />
-      <path d={CURLS} strokeWidth="1.6" vectorEffect="non-scaling-stroke" style={{ fill: "none", stroke: "var(--muted)", strokeLinecap: "round", opacity: ".45" }} />
-      {[[60, 1], [104, 2.2], [150, 0.4]].map(([x, d]) => (
-        <path key={x} className="dz oct-wisp" d={`M${x} 18 q-8 -8 0 -14 q8 -6 0 -14`} strokeWidth="1.8" vectorEffect="non-scaling-stroke" style={{ fill: "none", stroke: "var(--muted)", strokeLinecap: "round", animationDelay: `${-d}s` }} />
+      <path d={PLUME} transform="translate(2.5 3)" style={{ fill: "var(--ink)" }} />
+      <path d={PLUME} strokeWidth="2" vectorEffect="non-scaling-stroke" style={{ fill: "var(--card)", stroke: "var(--ink)" }} />
+      <path d={SWIRLS} strokeWidth="1.6" vectorEffect="non-scaling-stroke" style={{ fill: "none", stroke: "var(--muted)", strokeLinecap: "round", opacity: ".4" }} />
+      {[[96, 0], [140, 2.1]].map(([x, d]) => (
+        <path key={x} className="dz oct-wisp" d={`M${x} 18 q-6 -6 0 -11 q6 -5 0 -11`} strokeWidth="1.6" vectorEffect="non-scaling-stroke" style={{ fill: "none", stroke: "var(--muted)", strokeLinecap: "round", opacity: ".6", animationDelay: `${-d}s` }} />
       ))}
-      {/* the dhunuchi: a clay cup on a stem, glowing coals, the smoke rising out of it */}
-      <g transform="translate(-6 78)">
-        <path d="M0 0 Q14 10 28 0 L24 12 Q14 16 4 12 Z" strokeWidth="1.6" vectorEffect="non-scaling-stroke" style={{ fill: "var(--red)", stroke: "var(--ink)" }} />
-        <path d="M11 13 L10 22 L18 22 L17 13" strokeWidth="1.6" vectorEffect="non-scaling-stroke" style={{ fill: "var(--red)", stroke: "var(--ink)" }} />
-        <path d="M6 22 L22 22" strokeWidth="2" vectorEffect="non-scaling-stroke" style={{ stroke: "var(--ink)" }} />
-        <ellipse cx="14" cy="1" rx="11" ry="2.6" style={{ fill: "var(--yellow)" }} />
+      {/* the dhunuchi, as in the sketch: a wide clay bowl on a short stem and foot, embers glowing in it; the plume's
+          left end rises out of its mouth */}
+      <g>
+        <path d="M2 84 Q18 80 34 84 Q32 96 18 98 Q4 96 2 84 Z" strokeWidth="2" vectorEffect="non-scaling-stroke" style={{ fill: "var(--red)", stroke: "var(--ink)", strokeLinejoin: "round" }} />
+        <path d="M5 87 Q18 90 31 87" strokeWidth="1.6" vectorEffect="non-scaling-stroke" style={{ fill: "none", stroke: "var(--yellow)", strokeDasharray: "2 3" }} />
+        <ellipse cx="18" cy="84" rx="14" ry="2.4" strokeWidth="1.6" vectorEffect="non-scaling-stroke" style={{ fill: "var(--yellow)", stroke: "var(--ink)" }} />
+        <path d="M15 98 L14 104 L22 104 L21 98" strokeWidth="2" vectorEffect="non-scaling-stroke" style={{ fill: "var(--red)", stroke: "var(--ink)", strokeLinejoin: "round" }} />
+        <path d="M8 108 Q18 102 28 108 Z" strokeWidth="2" vectorEffect="non-scaling-stroke" style={{ fill: "var(--red)", stroke: "var(--ink)", strokeLinejoin: "round" }} />
       </g>
     </svg>
   );

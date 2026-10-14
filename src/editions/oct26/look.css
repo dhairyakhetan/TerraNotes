@@ -31,18 +31,14 @@ html[data-edition="oct26"] .web .page-sheet,:host([data-edition="oct26"]) .web .
 
 /* the festive touches from the design brief (src/editions/oct26/festive/), slow and small: a hanging diya swings on its
    thread and its flame flickers (Diya.jsx); the dhunuchi's smoke drifts up (Dhunuchi.jsx); the dhakis' arms beat out of
-   step and their drums bounce (DhakPlayers.jsx). Class dz: stopped by reduced motion and LITE (styles/loops.css). */
+   step and their drums bounce (DhakPlayers.jsx, SVG animations of its own). Class dz: stopped by reduced motion and
+   LITE (styles/loops.css). */
 .oct-diya-sway{animation:oct-diya-sway 4.6s ease-in-out infinite alternate}
 @keyframes oct-diya-sway{from{rotate:-3.5deg}to{rotate:3.5deg}}
 .oct-flame{transform-box:fill-box;transform-origin:50% 100%;animation:oct-flame .9s ease-in-out infinite alternate}
 @keyframes oct-flame{from{scale:.9 .94;opacity:.85}to{scale:1.06 1.05;opacity:1}}
 .oct-wisp{animation:oct-wisp 4.2s ease-in-out infinite}
 @keyframes oct-wisp{0%{translate:0 4px;opacity:0}30%{opacity:.9}100%{translate:3px -10px;opacity:0}}
-.oct-beat-l{animation:oct-beat .62s ease-in-out infinite alternate}
-.oct-beat-r{animation:oct-beat .62s ease-in-out infinite alternate-reverse}
-@keyframes oct-beat{from{rotate:-9deg}to{rotate:9deg}}
-.oct-bounce{animation:oct-bounce .62s ease-in-out infinite alternate}
-@keyframes oct-bounce{from{translate:0 0}to{translate:0 2.5px}}
 /* Rozha One's capitals are tall: headings set at 0.95 line height touch, so this edition spaces them a little more
    (the shared components multiply their heading leading by --head-lead; other editions leave it at 1) */
 html[data-edition="oct26"],:host([data-edition="oct26"]){--head-lead:1.06}

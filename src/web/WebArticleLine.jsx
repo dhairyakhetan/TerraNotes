@@ -26,9 +26,10 @@ const CARD_TOP = [106, 158, 118, 180, 112, 150, 162, 118, 136, 184, 122, 160]; /
 const TILT = [-2.2, 1.6, -1.2, 2.4, -1.8, 1.4, -2.6, 1.9, -1.1, 2.2, -1.6, 1.2];
 const SWING = [1.75, 1.39, 1.63, 1.26, 1.69, 1.45, 1.3, 1.73, 1.48, 1.23, 1.59, 1.38];
 const DURATION = [4.8, 5.5, 6.2];
-const peg = (i, lead) => {
+// pitch: the space from one card's peg to the next (wider for an edition that hangs things between them: HANGERS)
+const peg = (i, lead, pitch = PITCH) => {
   if (lead && i === 0) return { x: LEAD_X, y: 78, drop: 18, tilt: -1.2, swing: 0.9, dur: DURATION[0], lead: true };
-  const x = lead ? AFTER_LEAD + PITCH * (i - 1) : 164 + PITCH * i, y = i % 2 ? 88 : 78;
+  const x = lead ? AFTER_LEAD + pitch * (i - 1) : 164 + pitch * i, y = i % 2 ? 88 : 78;
   return { x, y, drop: CARD_TOP[i % 12] - y, tilt: TILT[i % 12], swing: SWING[i % 12], dur: DURATION[i % 3] };
 };
 // the wire from peg `from` (where the lead string ties on) to the far end
@@ -169,11 +170,12 @@ export default function WebArticleLine() {
   const { by, mine, isMine, list } = useByWriter(); // ?by=<name>: that writer's pieces first, taped
   const { number, id } = useEdition();
   const lead = !!LAYOUT[id]?.leadCard && list.length > 1;
-  const pegs = list.map((_, i) => peg(i, lead));
-  const soon = lead ? { x: pegs[pegs.length - 1].x + PITCH, y: pegs.length % 2 ? 88 : 78 } : null; // the "more soon" slot
+  const Hanger = HANGERS[id]; // the edition's little hangers between the cards (October's diyas), if any
+  const pitch = Hanger ? 250 : PITCH; // room for them: clear of the cards on both sides
+  const pegs = list.map((_, i) => peg(i, lead, pitch));
+  const soon = lead ? { x: pegs[pegs.length - 1].x + pitch, y: pegs.length % 2 ? 88 : 78 } : null; // the "more soon" slot
   const width = lead ? Math.max(soon.x + 224, 1140) : pegs[pegs.length - 1].x + 224; // 1140: the line's window: the wire reaches its edge
   const strung = soon ? [...pegs, soon] : pegs;
-  const Hanger = HANGERS[id]; // the edition's little hangers between the cards (October's diyas), if any
   useEffect(() => runLine(refs, pegs, width, strung), []);
   const scrollBy = (dx) => { refs.stopPull?.(); refs.el.scrollBy({ left: dx, behavior: 'smooth' }); };
 
@@ -248,7 +250,7 @@ export default function WebArticleLine() {
           })}
           {Hanger && strung.slice(1).map((q, k) => { // in the gap between two cards, tied on where the wire dips, in front of them
             const p = strung[k];
-            return <Hanger key={k} string={[24, 72][k % 2]} s={38} delay={-k * 0.9} style={{ left: `${(p.x + q.x) / 2 - 19}px`, top: `${(p.y + q.y) / 4 + 55 - 2}px` }} />;
+            return <Hanger key={k} v={k} string={[30, 78, 48, 96, 38, 64][k % 6]} s={34} delay={-k * 0.9} style={{ left: `${(p.x + q.x) / 2 - 17}px`, top: `${(p.y + q.y) / 4 + 55 - 2}px` }} />;
           })}
           {soon && ( // where the next pieces will hang: a dashed slot on its own string
             <div className="hang sway" style={{ position: "absolute", left: `${soon.x - 86}px`, top: `${soon.y}px`, width: "172px", height: "230px", "--a": "0.6deg", "--d": "7.2s", animationDelay: "-2s" }}>
