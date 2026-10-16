@@ -24,7 +24,7 @@ const articleList = (e) => `<ul>${e.articles.map((a) => `<li><a href="${at(artic
 
 export function articleHtml(a) {
   const body = a.body.map((b) => {
-    if (typeof b === 'string') return `<p>${esc(b)}</p>`;
+    if (typeof b === 'string') return `<p>${esc(b).replace(/\n/g, '<br>')}</p>`; // a poem's lines
     if (b.h2) return `<h2>${esc(b.h2)}</h2>`;
     if (b.projects) return `<ol>${b.projects.map((x) => `<li><strong>${esc(x.name)}</strong>, ${esc(x.what)} (${esc(x.meta)})</li>`).join('')}</ol>`;
     return '';

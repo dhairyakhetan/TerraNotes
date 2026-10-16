@@ -14,7 +14,7 @@ const HEAD = { fontFamily: FONT.head, textTransform: "uppercase", lineHeight: "1
 const cap = (t) => t.match(/^[“‘"'(]*./u)[0]; // the drop cap: first letter, with any opening quote mark before it
 
 function Block({ b, first, part, a, tag, web }) {
-  const para = { fontFamily: FONT.read, color: "var(--text)", margin: "0", ...P[web ? 'web' : 'phone'] };
+  const para = { fontFamily: FONT.read, color: "var(--text)", margin: "0", ...P[web ? 'web' : 'phone'], ...(typeof b === 'string' && b.includes('\n') && { whiteSpace: "pre-line" }) }; // a poem's stanza keeps its lines
   if (typeof b === 'string') {
     if (!first) return <p style={para}>{b}</p>;
     const draft = b.startsWith('['); // still a [placeholder]: the drop cap is the title's first letter

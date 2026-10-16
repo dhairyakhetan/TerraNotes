@@ -15,7 +15,8 @@ import { ALL_ARTICLES, editionData } from '../editions/index.js';
 //   date:     the edition's month, e.g. 'Sep 2026'
 //   readTime: minutes, e.g. '6'
 //   body:     the article, top to bottom. Each item is one block:
-//     'Some text.'                                         paragraph (the first one gets the drop cap)
+//     'Some text.'                                         paragraph (the first one gets the drop cap; a \n inside
+//                                                          breaks the line there, for a poem's stanza)
 //     { h2: 'Heading' }                                    section heading
 //     { quote: 'The line.', by: 'who said it' }            pull quote
 //     { photo: '/editions/…/x.jpg', caption: '' }          pinned photo

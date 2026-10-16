@@ -1,57 +1,62 @@
-// October 2026's drawn pictures (tools/make-art.mjs): three article covers in the edition's Pujo poster style (alta
-// red, maroon, marigold frame, Rozha One titles, like the first two covers) and photo-wall pictures of Pujo nights.
-import { burst, circle, coverText, crowd, figure, glow, grad, howrah, lights, path, radial, rect, rng, skyline, stars, svg, water } from './kit.mjs';
+// October 2026's drawn pictures (tools/make-art.mjs): stand-in covers for the writers' five articles, in the edition's
+// Pujo poster style (deep colours, a marigold frame, Rozha One titles), and photo-wall pictures of Pujo nights.
+import { burst, circle, coverText, crowd, figure, glow, grad, howrah, lights, path, radial, rect, rng, skyline, stars, svg, taxi, water } from './kit.mjs';
 
 const C = { red: '#C8102E', maroon: '#3A0A10', deep: '#5A0E18', gold: '#FFC914', cream: '#FFF4D6', ink: '#1A0508', green: '#2E7D32', leaf: '#4CAF50', white: '#FFF8EC' };
 const head = "'Rozha One', Georgia, serif";
 const D = '/editions/oct26';
 
-// --- covers (900 × 1200)
-function bhog() {
+// --- covers (900 × 1200): the writers' pieces
+function weave() {
   const w = 900, h = 1200, r = rng(31);
-  let rice = '';
-  for (let i = 0; i < 220; i++) { const a = r() * Math.PI * 2, d = Math.sqrt(r()) * 150; rice += circle((450 + Math.cos(a) * d).toFixed(1), (560 + Math.sin(a) * d * 0.8).toFixed(1), (3 + r() * 3).toFixed(1), r() < 0.5 ? '#F2C230' : '#E8B020'); }
-  let peas = '';
-  for (let i = 0; i < 30; i++) { const a = r() * Math.PI * 2, d = Math.sqrt(r()) * 120; peas += circle((450 + Math.cos(a) * d).toFixed(1), (560 + Math.sin(a) * d * 0.8).toFixed(1), 5, '#7CB342'); }
-  return svg(w, h, `${rect(0, 0, w, h, C.deep)}
-${glow(450, 600, 520, C.gold, 0.18, 'bg')}
-<g transform="translate(90 -30) scale(.8)">${path('M120 340 Q450 200 800 330 Q860 620 760 900 Q450 1010 150 900 Q60 620 120 340 Z', C.leaf)}
-${path('M150 360 Q450 240 780 350', 'none', `stroke="${C.green}" stroke-width="6"`)}
-${path('M450 260 L450 980', 'none', `stroke="${C.green}" stroke-width="5" opacity=".6"`)}
-${circle(450, 560, 175, '#E9A919')}${rice}${peas}
-${circle(240, 760, 85, '#E36414')}${circle(230, 750, 40, '#F7A35C')}${circle(262, 790, 28, '#8BC34A')}
-${path('M600 720 L760 690 L770 735 L610 770 Z', '#B5651D')}${path('M590 780 L750 760 L758 805 L598 822 Z', '#C27A2B')}
-${circle(680, 860, 70, '#B71C1C')}${circle(668, 848, 18, '#E57373')}
-${circle(300, 420, 60, C.white)}${circle(300, 420, 46, '#FFF3D9')}</g>
-${coverText({ w, h, kicker: 'FIELD NOTES · PUJO FOOD', title: 'BHOG, PLATE', title2: 'BY PLATE', ink: C.cream, accent: C.gold, font: head, size: 96, frame: C.gold })}`, { defs: '' });
+  const saree = (y, body, border, k) => `<g transform="rotate(${k} 450 ${y + 60})">${rect(170, y, 560, 120, body, `stroke="${C.ink}" stroke-width="4"`)}${rect(170, y + 92, 560, 28, border)}${rect(170, y + 6, 560, 10, C.gold)}${Array.from({ length: 13 }, (_, i) => circle(205 + i * 42, y + 52, 6, C.gold, 'opacity=".75"')).join('')}</g>`;
+  let threads = '';
+  for (let i = 0; i < 26; i++) threads += path(`M${(r() * 900).toFixed(0)} 160 q${(r() - 0.5) * 120} 300 ${(r() - 0.5) * 60} 700`, 'none', `stroke="${C.gold}" stroke-width="1.4" opacity=".18"`);
+  return svg(w, h, `${rect(0, 0, w, h, C.deep)}${threads}
+${saree(300, C.white, C.red, -2)}${saree(430, C.red, C.gold, 1.5)}${saree(560, '#1F6E43', C.red, -1)}${saree(690, C.white, C.red, 2)}
+${path('M560 260 q60 -40 120 0 l20 70 q-80 30 -160 0 Z', '#E7A72B', `stroke="${C.ink}" stroke-width="4"`)}${path('M600 270 q20 30 40 0', 'none', `stroke="${C.ink}" stroke-width="3"`)}
+${coverText({ w, h, kicker: 'ESSAY · PRIYADARSHINI HAZRA', title: 'WHISPERS IN', title2: 'THE WEAVE', ink: C.cream, accent: C.gold, font: head, size: 100, frame: C.gold })}`);
 }
-function kumartuli() {
+function kolkata() {
   const w = 900, h = 1200, r = rng(44);
-  const face = (x, y, s, tone) => `${path(`M${x} ${y - s} Q${x + s * 0.85} ${y - s} ${x + s * 0.8} ${y} Q${x + s * 0.7} ${y + s * 1.05} ${x} ${y + s * 1.15} Q${x - s * 0.7} ${y + s * 1.05} ${x - s * 0.8} ${y} Q${x - s * 0.85} ${y - s} ${x} ${y - s} Z`, tone)}
-${path(`M${x - s * 0.48} ${y - s * 0.05} Q${x - s * 0.28} ${y - s * 0.22} ${x - s * 0.1} ${y - s * 0.05} Q${x - s * 0.28} ${y + s * 0.08} ${x - s * 0.48} ${y - s * 0.05} Z M${x + s * 0.1} ${y - s * 0.05} Q${x + s * 0.28} ${y - s * 0.22} ${x + s * 0.48} ${y - s * 0.05} Q${x + s * 0.28} ${y + s * 0.08} ${x + s * 0.1} ${y - s * 0.05} Z`, '#00000033')}
-${path(`M${x} ${y + s * 0.05} L${x - s * 0.08} ${y + s * 0.42} L${x + s * 0.08} ${y + s * 0.42}`, 'none', 'stroke="#00000030" stroke-width="4"')}
-${path(`M${x - s * 0.22} ${y + s * 0.65} Q${x} ${y + s * 0.78} ${x + s * 0.22} ${y + s * 0.65}`, 'none', 'stroke="#00000035" stroke-width="5"')}
-${circle(x, y - s * 0.45, s * 0.07, '#00000030')}`;
-  let straw = '';
-  for (let i = 0; i < 160; i++) { const x = r() * w, y = 860 + r() * 340; straw += `<line x1="${x.toFixed(1)}" y1="${y.toFixed(1)}" x2="${(x + (r() - 0.5) * 80).toFixed(1)}" y2="${(y - 30 - r() * 60).toFixed(1)}" stroke="${r() < 0.5 ? '#C9A35A' : '#A9823C'}" stroke-width="3"/>`; }
-  return svg(w, h, `${rect(0, 0, w, h, '#2B1A12')}
-${rect(0, 0, w, h, 'url(#shed)')}
-${face(250, 470, 130, '#8E7A68')}${face(640, 430, 150, '#A08B76')}${face(450, 700, 120, '#7D6A59')}${face(160, 790, 95, '#9C8571')}${face(760, 760, 105, '#8A7563')}
-${straw}
-${coverText({ w, h, kicker: 'REPORTAGE · KUMARTULI', title: 'BEFORE THE', title2: 'COLOUR', ink: C.cream, accent: C.gold, font: head, size: 100, frame: C.gold })}`, { defs: grad('shed', [[0, '#000', 0.55], [0.5, '#000', 0], [1, '#000', 0.5]]) });
+  return svg(w, h, `${rect(0, 0, w, h, 'url(#k)')}${glow(640, 330, 260, '#FFD27A', 0.55, 'sun')}${circle(640, 330, 70, '#FFC56A')}
+${skyline(r, { x1: w, y: 760, hMin: 140, hMax: 300, fill: '#3A1420', lit: C.gold, litChance: 0.2 })}
+${howrah(60, 840, 760, { ink: C.ink, lw: 7 })}${water(r, { y: 760, w, h: 1200, fill: '#5A2030', ripple: '#F4B183', n: 40 })}
+${taxi(150, 742, 230, { body: '#F5C518', ink: C.ink })}
+${coverText({ w, h, kicker: 'FIELD NOTES · PAHAL SETHI', title: 'KOLKATA AS', title2: 'WE KNOW IT', ink: C.cream, accent: C.gold, font: head, size: 104, frame: C.gold })}`, { defs: grad('k', [[0, '#F29E6B'], [0.55, '#B8405A'], [1, C.maroon]]) });
 }
-function sindoor() {
+function cab() {
   const w = 900, h = 1200, r = rng(57);
+  let rain = '';
+  for (let i = 0; i < 140; i++) { const x = r() * w, y = r() * 1000; rain += `<line x1="${x.toFixed(0)}" y1="${y.toFixed(0)}" x2="${(x - 10).toFixed(0)}" y2="${(y + 34).toFixed(0)}" stroke="#9FC3D6" stroke-width="2" opacity=".45"/>`; }
+  return svg(w, h, `${rect(0, 0, w, h, '#1E1A2E')}${rain}${glow(450, 640, 380, '#F5C518', 0.25, 'g')}
+${rect(0, 820, w, 380, '#2A2438')}${path('M0 860 L900 860', 'none', 'stroke="#F5C518" stroke-width="6" stroke-dasharray="40 30" opacity=".6"')}
+${taxi(120, 820, 660, { body: '#F5C518', ink: C.ink })}
+${rect(380, 560, 140, 44, C.ink)}<text x="450" y="590" text-anchor="middle" font-family="'Space Mono', monospace" font-weight="700" font-size="20" fill="#F5C518">NO REFUSAL</text>
+${coverText({ w, h, kicker: 'PROSE · DHRITI AGARWAL', title: 'ECHOES OF THE', title2: 'YELLOW CAB', ink: C.cream, accent: '#F5C518', font: head, size: 92, frame: '#F5C518' })}`);
+}
+function festive() {
+  const w = 900, h = 1200, r = rng(71);
+  let sp = '';
+  for (const [x, y, k] of [[180, 300, 0], [720, 260, 1], [760, 620, 2], [140, 640, 3]]) sp += burst(r, x, y, 90, [[C.gold, '#FF5FA2', '#3DDCC4', '#FFFFFF'][k], C.gold, '#FFFFFF'], 24);
+  return svg(w, h, `${rect(0, 0, w, h, '#2A0A3A')}${sp}
+<g transform="rotate(-6 450 520)">${rect(270, 230, 360, 620, '#14101E', 'rx="44"')}${rect(290, 280, 320, 520, 'url(#p)', 'rx="10"')}
+${path('M330 800 L330 600 Q330 420 450 420 Q570 420 570 600 L570 800 Z', C.red)}${circle(450, 600, 60, '#FFE082')}${glow(450, 600, 160, '#FFB300', 0.5, 'core')}
+${lights({ x1: 290, y1: 330, x2: 610, y2: 320, sag: 20, n: 12, bulb: '#FFE082', wire: '#000', r: 5, glowColor: '#FFC107' })}
+${circle(450, 760, 34, 'none', 'stroke="#FFFFFF" stroke-width="5"')}${rect(400, 246, 100, 14, '#2A2438', 'rx="7"')}</g>
+${coverText({ w, h, kicker: 'DISPATCH · DITI SHAH', title: 'MAIN CHARACTER', title2: 'ENERGY?', ink: C.cream, accent: C.gold, font: head, size: 78, frame: C.gold })}`, { defs: grad('p', [[0, '#3B1A5C'], [1, '#7A1F4A']]) });
+}
+function dirt() {
+  const w = 900, h = 1200, r = rng(83);
   let dust = '';
-  for (let i = 0; i < 260; i++) { const a = r() * Math.PI * 2, d = 60 + r() * 330; dust += circle((450 + Math.cos(a) * d).toFixed(1), (520 + Math.sin(a) * d * 0.9).toFixed(1), (2 + r() * 9).toFixed(1), r() < 0.7 ? '#E3122B' : '#FF5468', `opacity="${(0.35 + r() * 0.6).toFixed(2)}"`); }
-  const bangle = (x, y, rx, c) => `<ellipse cx="${x}" cy="${y}" rx="${rx}" ry="${rx * 0.32}" fill="none" stroke="${c}" stroke-width="16"/>`;
-  return svg(w, h, `${rect(0, 0, w, h, C.white)}
-<g transform="translate(67 -60) scale(.85)">${dust}
-${path('M450 300 Q620 360 640 520 Q650 700 470 760 Q300 790 250 620 Q210 430 450 300 Z', '#D90F2B')}
-${path('M300 980 Q330 760 410 640 Q440 600 470 640 Q500 700 470 760 Q440 860 430 1000 Z', '#C68B59')}
-${path('M600 1000 Q580 820 520 700 Q500 660 520 640 Q560 650 590 720 Q640 840 660 1000 Z', '#B5794A')}
-${bangle(392, 900, 70, C.white)}${bangle(392, 900, 70, '#E8E1D0')}${bangle(392, 935, 70, '#C8102E')}${bangle(618, 890, 62, '#FFFFFF')}${bangle(618, 922, 62, '#C8102E')}</g>
-${coverText({ w, h, kicker: 'ESSAY · DASHAMI', title: 'RED ON', title2: 'RED', ink: C.maroon, accent: '#C8102E', font: head, size: 110, frame: '#C8102E' })}`);
+  for (let i = 0; i < 220; i++) dust += circle((r() * w).toFixed(0), (760 + r() * 300).toFixed(0), (1 + r() * 5).toFixed(1), r() < 0.5 ? '#8E7A68' : '#6E5C4C', `opacity="${(0.3 + r() * 0.6).toFixed(2)}"`);
+  const s = 230, x = 450, y = 470;
+  return svg(w, h, `${rect(0, 0, w, h, '#2B1A12')}${glow(450, 420, 420, '#C8102E', 0.25, 'g')}${dust}
+${path(`M${x} ${y - s} Q${x + s * 0.85} ${y - s} ${x + s * 0.8} ${y} Q${x + s * 0.7} ${y + s * 1.05} ${x} ${y + s * 1.15} Q${x - s * 0.7} ${y + s * 1.05} ${x - s * 0.8} ${y} Q${x - s * 0.85} ${y - s} ${x} ${y - s} Z`, '#9C8571')}
+${path(`M${x - 110} ${y - 10} Q${x - 64} ${y - 50} ${x - 22} ${y - 10} Q${x - 64} ${y + 18} ${x - 110} ${y - 10} Z M${x + 22} ${y - 10} Q${x + 64} ${y - 50} ${x + 110} ${y - 10} Q${x + 64} ${y + 18} ${x + 22} ${y - 10} Z`, '#00000033')}
+${path(`M${x} ${y - 120} q14 22 0 44 q-14 -22 0 -44 Z`, C.red)}${path(`M${x - 50} ${y + 150} Q${x} ${y + 175} ${x + 50} ${y + 150}`, 'none', 'stroke="#00000040" stroke-width="7"')}
+${path('M120 980 Q170 860 280 820 Q330 800 340 840 Q300 880 250 990 Z', '#B07A50', `stroke="${C.ink}" stroke-width="4"`)}${path('M780 980 Q730 860 620 820 Q570 800 560 840 Q600 880 650 990 Z', '#A06C44', `stroke="${C.ink}" stroke-width="4"`)}
+${coverText({ w, h, kicker: 'POETRY · RISHAVI BANERJEE', title: 'DIRT BENEATH', title2: 'HER FEET', ink: C.cream, accent: '#E8A33D', font: head, size: 100, frame: '#E8A33D' })}`);
 }
 
 // --- the photo wall (illustrations of Pujo nights)
@@ -122,9 +127,11 @@ ${path('M600 600 Q620 470 640 440 Q660 420 680 440 Q700 470 720 600 Z', '#2B1A24
 }
 
 export default [
-  { out: `public${D}/articles/bhog-plate-by-plate/cover.jpg`, w: 900, h: 1200, svg: bhog() },
-  { out: `public${D}/articles/before-the-colour/cover.jpg`, w: 900, h: 1200, svg: kumartuli() },
-  { out: `public${D}/articles/red-on-red/cover.jpg`, w: 900, h: 1200, svg: sindoor() },
+  { out: `public${D}/articles/whispers-in-the-weave/cover.jpg`, w: 900, h: 1200, svg: weave() },
+  { out: `public${D}/articles/kolkata-as-we-know-it/cover.jpg`, w: 900, h: 1200, svg: kolkata() },
+  { out: `public${D}/articles/echoes-of-the-yellow-cab/cover.jpg`, w: 900, h: 1200, svg: cab() },
+  { out: `public${D}/articles/festive-season-or-peak-main-character-energy/cover.jpg`, w: 900, h: 1200, svg: festive() },
+  { out: `public${D}/articles/dirt-beneath-her-feet/cover.jpg`, w: 900, h: 1200, svg: dirt() },
   { out: `public${D}/photos/pandal-gate.webp`, w: 1000, h: 750, svg: gate() },
   { out: `public${D}/photos/dhunuchi.webp`, w: 750, h: 1000, svg: dhunuchi() },
   { out: `public${D}/photos/queue.webp`, w: 1000, h: 750, svg: queue() },
