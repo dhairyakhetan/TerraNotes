@@ -1,10 +1,10 @@
 // October 2026's look, "Pujo", in bright festival colours: a sunny cream page, royal-indigo ink (borders, text, hard
-// shadows), hibiscus-pink handwriting, marigold strings and lights, a vivid violet photo wall, and a festive poster serif
-// for headings (Rozha One). Everything is bright on purpose: no browns, no near-black. The ribbon borders, alpana dots
-// and the toran of marigolds are in look.css and Decor.jsx. Every colour and font the site's shared pieces are drawn
-// with, by role: the pages use them as CSS variables (var(--ink), var(--font-head): lib/edition.js puts them on the
-// page), so a value here restyles that role everywhere in this edition, and only in this edition. Every edition's look
-// must have the same keys (src/editions/index.js).
+// shadows), hibiscus-pink handwriting, marigold strings and lights, a black photo wall, and a festive poster serif for
+// headings (Rozha One). Everything is bright on purpose: no browns, no near-black (the photo wall is black at the
+// owner's ask). The ribbon borders, alpana dots and the toran of marigolds are in look.css and Decor.jsx. Every colour
+// and font the site's shared pieces are drawn with, by role: the pages use them as CSS variables (var(--ink),
+// var(--font-head): lib/edition.js puts them on the page), so a value here restyles that role everywhere in this
+// edition, and only in this edition. Every edition's look must have the same keys (src/editions/index.js).
 export const LOOK = {
   colors: {
     // the palette (CLAUDE.md)
@@ -26,7 +26,7 @@ export const LOOK = {
     pink: '#FF5FA2', // lotus pink
     mint: '#3DDCC4', // aqua mint
     // the photo wall
-    wall: '#5B50F0', // its panel: vivid violet
+    wall: '#111111', // its panel: black
     amber: '#FFC914', // its prints' shadows and tagline: marigold lights
     wallInk: '#FFFFFF', // "[photo]" on an empty print
     mutedDark: '#D9D6FF', // its strings; small print on dark panels (photo viewer, phone menu)

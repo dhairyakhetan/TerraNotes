@@ -1,7 +1,7 @@
 // October 2026 (Edition 02), the Pujo issue: everything its pages show, gathered for src/editions/index.js.
 export { LOOK } from './look.js';
 export { TAGS, ARTICLES } from './articles.js';
-export { PHOTOS } from './photos.js';
+export { PHOTOS, SHOW } from './photos.js';
 export { WORDS } from './words.js';
 export { TEAMS, MEMBERS } from './team.js';
 

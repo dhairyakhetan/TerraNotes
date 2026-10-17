@@ -1,3 +1,3 @@
 // The fahhh switch
 
-export const FAHHH = true;
+export const FAHHH = false;

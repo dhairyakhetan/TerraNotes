@@ -11,6 +11,7 @@ import { usePresence } from '../lib/usePresence.js';
 import { useDialogA11y } from '../lib/useDialogA11y.js';
 import { faceSpots, profileTop, teamLinks, useFaceColors } from '../lib/teamLayout.js';
 import { FONT } from '../styles/fonts.js';
+import { calm } from '../lib/motion.js';
 import { useReveal } from '../lib/reveal.js';
 import { TEAM_NOTE, RULED, TEAM_FIT } from '../editions/pages.js';
 import { useRuleSnap } from '../lib/ruled.js';
@@ -93,6 +94,20 @@ export const Badge = ({ b }) => (
     <img src={b.img} alt="" width="24" height="24" decoding="sync" />
   </button>
 );
+// flip: a picture in team.js → their photo in the profile card turns over to it when tapped, and back on the next tap
+// (their face in the section keeps the usual photo). Turning shows the back face mirrored, so its shadow is mirrored too.
+const FlipPhoto = ({ front, back, name, size, color }) => {
+  const [over, setOver] = useState(false);
+  const face = (flip) => ({ position: "absolute", inset: "0", borderRadius: "50%", border: "2px solid var(--ink)", background: "var(--blank)", overflow: "hidden", boxShadow: `${flip ? -6 : 6}px 5px 0 ${color}`, backfaceVisibility: "hidden", WebkitBackfaceVisibility: "hidden", transform: flip ? "rotateY(180deg)" : undefined });
+  return (
+    <div style={{ width: size, height: size, perspective: "600px" }}>
+      <button type="button" onClick={() => setOver((o) => !o)} aria-pressed={over ? 'true' : 'false'} aria-label={`Turn ${name}'s photo over`} style={{ position: "relative", display: "block", width: "100%", height: "100%", padding: "0", border: "0", background: "transparent", cursor: "pointer", transformStyle: "preserve-3d", transform: `rotateY(${over ? 180 : 0}deg)`, transition: calm() ? "none" : "transform 0.6s cubic-bezier(0.3, 1.3, 0.5, 1)" }}>
+        <span style={face(false)}><img src={front} alt={name} style={photoFill} /></span>
+        <span style={face(true)}><img src={back} alt="" style={photoFill} /></span>
+      </button>
+    </div>
+  );
+};
 const badges = new Map(); // picture → its preloaded Image
 const preloadBadges = (members) => members.filter((m) => m.badge && !badges.has(m.badge.img)).forEach((m) => { const i = new Image(); i.src = m.badge.img; i.decode?.().catch(() => {}); badges.set(m.badge.img, i); });
 
@@ -189,9 +204,11 @@ export default function TeamSection({ web }) {
             </button>
             <div style={{ position: "relative", alignSelf: "flex-start" }}>
               {sel.crown && <Crown />}
-              <div style={{ width: C.photo, height: C.photo, borderRadius: "50%", border: "2px solid var(--ink)", background: "var(--blank)", boxShadow: `6px 5px 0 ${color}`, display: "flex", alignItems: "center", justifyContent: "center", overflow: sel.photo ? "hidden" : undefined }}>
-                {sel.photo ? <img src={sel.photo} alt={sel.name} style={photoFill} /> : <PhotoIcon size={22} />}
-              </div>
+              {sel.flip && sel.photo
+                ? <FlipPhoto key={shown} front={sel.photo} back={sel.flip} name={sel.name} size={C.photo} color={color} />
+                : <div style={{ width: C.photo, height: C.photo, borderRadius: "50%", border: "2px solid var(--ink)", background: "var(--blank)", boxShadow: `6px 5px 0 ${color}`, display: "flex", alignItems: "center", justifyContent: "center", overflow: sel.photo ? "hidden" : undefined }}>
+                  {sel.photo ? <img src={sel.photo} alt={sel.name} style={photoFill} /> : <PhotoIcon size={22} />}
+                </div>}
             </div>
             <div style={{ fontFamily: FONT.head, fontSize: C.name, lineHeight: "calc(0.95 * var(--head-lead, 1))", textTransform: "uppercase", color: "var(--ink)" }}>{sel.name}</div>
             <div style={{ fontFamily: FONT.hand, fontSize: C.role, lineHeight: "1.1", color: "var(--hand)" }}>{sel.role}</div>

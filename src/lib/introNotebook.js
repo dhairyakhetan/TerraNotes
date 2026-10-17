@@ -5,10 +5,10 @@ import { gamesOf, isDemoPath } from './routes.js';
 // last seen, on a hard refresh (Ctrl/Cmd+Shift+R), and always with ?intro in the address (the ?intro is then dropped).
 // Automated browsers (tests, crawlers) never get it.
 const KEY = 'aq-intro';
-const TTL = 2.5 * 60 * 60 * 1000;
+export const INTRO_TTL = 2.5 * 60 * 60 * 1000; // also how long the photo wall keeps its pick (lib/photoPick.js)
 
 // A hard refresh re-downloads everything: this script arrived over the network in full rather than from the cache.
-function hardRefresh() {
+export function hardRefresh() {
   const nav = performance.getEntriesByType?.('navigation')[0];
   if (!nav || nav.type !== 'reload') return false;
   const me = performance.getEntriesByName(import.meta.url)[0];
@@ -36,7 +36,7 @@ function decide() {
       return true;
     }
     if (navigator.webdriver) return false;
-    return Date.now() - (Number(localStorage.getItem(KEY)) || 0) > TTL || hardRefresh();
+    return Date.now() - (Number(localStorage.getItem(KEY)) || 0) > INTRO_TTL || hardRefresh();
   } catch {
     return false; // no storage (some private modes): don't replay it on every page
   }

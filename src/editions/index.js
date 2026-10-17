@@ -1,5 +1,6 @@
 import { EDITIONS, editionId, editionName } from '../data/editions.js';
 import { withBase } from '../lib/base.js';
+import { pickPhotos } from '../lib/photoPick.js';
 import * as sep26 from './sep26/index.js';
 import * as oct26 from './oct26/index.js';
 
@@ -19,7 +20,7 @@ const folderOf = (e) => {
 const block = (b) => (b && typeof b === 'object' && (b.photo || b.photos)
   ? { ...b, ...(b.photo && { photo: withBase(b.photo) }), ...(b.photos && { photos: b.photos.map((p) => ({ ...p, photo: withBase(p.photo) })) }) }
   : b);
-const member = (m) => ({ ...m, photo: withBase(m.photo), ...(m.badge && { badge: { ...m.badge, img: withBase(m.badge.img) } }) });
+const member = (m) => ({ ...m, photo: withBase(m.photo), ...(m.flip && { flip: withBase(m.flip) }), ...(m.badge && { badge: { ...m.badge, img: withBase(m.badge.img) } }) });
 
 // Every article in every edition, edition by edition, each marked with its edition's number (`edition`).
 export const ALL_ARTICLES = EDITIONS.flatMap((e) => folderOf(e).ARTICLES.map((a) => ({ ...a, edition: e.number, cover: withBase(a.cover), body: a.body.map(block) })));
@@ -44,6 +45,6 @@ for (const e of EDITIONS) {
 // intro }. The pages get the one they belong to from useEdition() (lib/edition.js).
 const DATA = new Map(EDITIONS.map((e) => {
   const f = folderOf(e);
-  return [e.number, { ...e, id: editionId(e.number), look: f.LOOK, tags: f.TAGS, articles: ALL_ARTICLES.filter((a) => a.edition === e.number), photos: f.PHOTOS.map((p) => ({ ...p, photo: withBase(p.photo) })), words: f.WORDS, teams: f.TEAMS, members: f.MEMBERS.map(member), intro: f.INTRO }];
+  return [e.number, { ...e, id: editionId(e.number), look: f.LOOK, tags: f.TAGS, articles: ALL_ARTICLES.filter((a) => a.edition === e.number), photos: pickPhotos(editionId(e.number), f.PHOTOS.map((p) => ({ ...p, photo: withBase(p.photo) })), f.SHOW), words: f.WORDS, teams: f.TEAMS, members: f.MEMBERS.map(member), intro: f.INTRO }];
 }));
 export const editionData = (n) => DATA.get(n);
