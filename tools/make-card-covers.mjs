@@ -7,9 +7,10 @@
 // Run after adding or changing a cover (needs `npm install`, for sharp):  node tools/make-card-covers.mjs
 import { readdirSync, existsSync, statSync } from 'node:fs';
 import { join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import sharp from 'sharp';
 
-const ROOT = new URL('../public/editions/', import.meta.url).pathname;
+const ROOT = fileURLToPath(new URL('../public/editions/', import.meta.url));
 let n = 0;
 for (const ed of readdirSync(ROOT)) {
   const arts = join(ROOT, ed, 'articles');

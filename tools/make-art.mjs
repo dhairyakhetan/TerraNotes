@@ -7,11 +7,11 @@
 //   node tools/make-art.mjs oct26      one edition's
 import { readdirSync, mkdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
-import { pathToFileURL } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import sharp from 'sharp';
 import { chromium } from 'playwright';
 
-const ROOT = new URL('..', import.meta.url).pathname;
+const ROOT = fileURLToPath(new URL('..', import.meta.url));
 const only = process.argv[2];
 const lists = readdirSync(join(ROOT, 'tools/art')).filter((f) => f !== 'kit.mjs' && f.endsWith('.mjs') && (!only || f === `${only}.mjs`));
 const fontsCss = (await import('node:fs')).readFileSync(join(ROOT, 'src/styles/fontfaces.css'), 'utf8').replaceAll('url(/fonts/', `url(${pathToFileURL(join(ROOT, 'public/fonts')).href}/`);

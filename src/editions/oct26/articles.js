@@ -18,7 +18,7 @@ export const TAGS = {
 
 // The writers' pieces, as they sent them (a poem keeps its line breaks, \n, inside each stanza; numbered headings keep
 // their words, the page numbers them). The deks and cover descriptions are the editors'; the covers are drawn
-// stand-ins (tools/art/oct26.mjs) until real ones come.
+// stand-ins (tools/art/oct26.mjs) until real ones come; Aarav's poem has none yet (cover: '', the placeholder shows).
 export const ARTICLES = [
   {
     slug: "whispers-in-the-weave",
@@ -123,6 +123,23 @@ export const ARTICLES = [
     body: [
       "Clay was gathered from the abandoned streets\nDoorsteps filled with shameful allegations ,\nHands that would never hold them in prayer,\nIs moulding a goddess from the dust lying there.",
       "It was called divine ,\nMade the goddess shine ,\nBut woman behind that Door ,\nWhat was she, if not malign .\nThe dhak beats louder\nHER eye echoes power\nYet today's women stay in Cower\nWhat is that makes one divine\nWhile another is condemned by society's line\nWe call the soil sacred when it carries your name\nBut the women who gave it we see them as shame .\nFor no women is dirt, no women shame\nNo woman deserves to be blamed for her faith\nAnd if this Clay is known as sacred then let this be known as ,\nThe mother we worship you through\nMust not be left alone.",
+    ],
+  },
+  {
+    slug: "the-kind-of-beautiful-you-dont-forget",
+    tag: "Poetry",
+    title: "the kind of beautiful you don’t forget",
+    dek: "a little poem for the girl who doesn’t know",
+    cover: '',
+    alt: "her eyes, like stars that settled there",
+    author: "Aarav Agarwal",
+    date: 'Oct 2026',
+    readTime: '1',
+    body: [
+      "Your eyes have this quiet kind of magic,\nlike the stars forgot the sky and settled there;\none look, and all the noise inside me softens—\nI could get lost in them and still call it fair.",
+      "Your hair falls like a scene from a late-night movie,\nmessy or perfect, it somehow feels the same;\nand every little thing you do without thinking\nmakes ordinary moments feel like they have a name.",
+      "It’s not just your smile, or the way your face lights up,\nit’s the warmth you leave behind when you’re gone;\nyou make the simplest seconds feel unforgettable,\nlike a song my heart keeps quietly playing on.",
+      "And maybe you’ll never see yourself the way I see you,\nor feel the things I’m too afraid to say;\nbut if beauty is a feeling, not just something you look like,\nthen you’re the kind that stays with me long after the day.",
     ],
   },
 ];

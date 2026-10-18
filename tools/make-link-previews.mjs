@@ -16,6 +16,7 @@
 // src/styles/fontfaces.css), put in each picture's page, so nothing is fetched.
 import fs from 'node:fs';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { chromium } from 'playwright';
 import { ALL_ARTICLES, tagOf } from '../src/data/articles.js';
 import { EDITIONS, LATEST, editionId, ogImage } from '../src/data/editions.js';
@@ -23,7 +24,7 @@ import { GAMES, gamesFor } from '../src/data/games.js';
 import { editionData } from '../src/editions/index.js';
 import { withBase } from '../src/lib/base.js';
 
-const root = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..'); // the project (inside AQ: its frontend/)
+const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..'); // the project (inside AQ: its frontend/)
 const pub = (url) => path.join(root, 'public', url.replace(/^\//, '')); // a site URL (with AQ's base) → its file
 const TYPES = { jpg: 'image/jpeg', jpeg: 'image/jpeg', png: 'image/png', webp: 'image/webp' };
 const data = (url) => `data:${TYPES[url.split('.').pop().toLowerCase()]};base64,${fs.readFileSync(pub(url)).toString('base64')}`;

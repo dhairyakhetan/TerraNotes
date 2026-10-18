@@ -11,8 +11,9 @@
 // A line that really needs one of these (a document-level element, say) ends with the comment: embed-ok
 import fs from 'node:fs';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
-const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..');
+const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const SRC = path.join(ROOT, 'src');
 const all = fs.readdirSync(SRC, { recursive: true }).filter((f) => fs.statSync(path.join(SRC, f)).isFile());
 const problems = [];

@@ -18,8 +18,9 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { execFileSync, spawnSync } from 'node:child_process';
+import { fileURLToPath } from 'node:url';
 
-const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..');
+const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const args = process.argv.slice(2);
 const DRY = args.includes('--dry'), VERIFY = args.includes('--verify');
 const target = args.find((a) => !a.startsWith('--'));
@@ -71,7 +72,7 @@ const fromSrc = (text, up) => text.replaceAll("'../src/", `'${up}src/terranotes/
 want.set('scripts/terranotes/staticCopy.mjs', fromSrc(fs.readFileSync(path.join(ROOT, 'build/staticCopy.js'), 'utf8'), '../../'));
 for (const f of files(path.join(ROOT, 'embed/aq/scripts'))) want.set(path.join('scripts/terranotes', f), fs.readFileSync(path.join(ROOT, 'embed/aq/scripts', f)));
 want.set('scripts/terranotes/tools/make-link-previews.mjs', fromSrc(fs.readFileSync(path.join(ROOT, 'tools/make-link-previews.mjs'), 'utf8'), '../../../')
-  .replace("new URL(import.meta.url).pathname), '..');", "new URL(import.meta.url).pathname), '../../..');")
+  .replace("fileURLToPath(import.meta.url)), '..');", "fileURLToPath(import.meta.url)), '../../..');")
   .replace('node tools/make-link-previews.mjs', 'node scripts/terranotes/tools/make-link-previews.mjs'));
 
 // ---- 2. compare with what's there
