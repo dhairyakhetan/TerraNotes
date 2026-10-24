@@ -219,7 +219,7 @@ and its A/B/C marks a dhunuchi, a lantern and a firework (`Dhunuchi.jsx`, `WORDS
 legend (`DhakPlayers.jsx`, `TEAM_NOTE`), and Buddy's games are re-dressed (`games.js`, `GAME_SKIN`; their names in
 `data/games.js`): Snake is Durga Maa chasing demon faces with a marigold garland for a tail, Fling a bow and arrow at
 demon faces. The illustrations' own colours are in its `look.js` `art`. Pujo, Diwali and festive-feeling words; the
-writers' five articles (four of them drawn stand-in covers) and eight photos (seven of them drawn stand-ins). A new edition starts from a copy of the newest look and changes the values; its own CSS and
+writers' five articles (three of them drawn stand-in covers) and eight photos (seven of them drawn stand-ins). A new edition starts from a copy of the newest look and changes the values; its own CSS and
 doodles are registered in `src/editions/pages.js` (`EDITION_CSS`, `DECOR`, `TEAM_NOTE` for a secret by the team legend: under it on web, beside it on phones; `HANGERS`, `WALL_DECOR`, `WORDS_ART` and `GAME_SKIN` to dress the article wire, the photo wall, the words game and Buddy's games; `LAYOUT` switches on newer layouts of the shared home sections per edition, so older ones keep theirs: copy the newest edition's entry).
 Use the variables, nothing else (the look lists a few more, for the photo wall, dark panels and details).
 

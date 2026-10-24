@@ -1,20 +1,12 @@
 // October 2026's drawn pictures (tools/make-art.mjs): stand-in covers for the writers' articles that have no real one yet, in the edition's
 // Pujo poster style (deep colours, a marigold frame, Rozha One titles). The photo wall has readers' real photos.
-import { burst, circle, coverText, glow, grad, howrah, lights, path, rect, rng, skyline, svg, taxi, water } from './kit.mjs';
+import { burst, circle, coverText, glow, grad, lights, path, rect, rng, svg, taxi } from './kit.mjs';
 
 const C = { red: '#C8102E', maroon: '#3A0A10', deep: '#5A0E18', gold: '#FFC914', cream: '#FFF4D6', ink: '#1A0508', green: '#2E7D32', leaf: '#4CAF50', white: '#FFF8EC' };
 const head = "'Rozha One', Georgia, serif";
 const D = '/editions/oct26';
 
 // --- covers (900 × 1200): the writers' pieces
-function kolkata() {
-  const w = 900, h = 1200, r = rng(44);
-  return svg(w, h, `${rect(0, 0, w, h, 'url(#k)')}${glow(640, 330, 260, '#FFD27A', 0.55, 'sun')}${circle(640, 330, 70, '#FFC56A')}
-${skyline(r, { x1: w, y: 760, hMin: 140, hMax: 300, fill: '#3A1420', lit: C.gold, litChance: 0.2 })}
-${howrah(60, 840, 760, { ink: C.ink, lw: 7 })}${water(r, { y: 760, w, h: 1200, fill: '#5A2030', ripple: '#F4B183', n: 40 })}
-${taxi(150, 742, 230, { body: '#F5C518', ink: C.ink })}
-${coverText({ w, h, kicker: 'FIELD NOTES · PAHAL SETHI', title: 'KOLKATA AS', title2: 'WE KNOW IT', ink: C.cream, accent: C.gold, font: head, size: 104, frame: C.gold })}`, { defs: grad('k', [[0, '#F29E6B'], [0.55, '#B8405A'], [1, C.maroon]]) });
-}
 function cab() {
   const w = 900, h = 1200, r = rng(57);
   let rain = '';
@@ -50,7 +42,6 @@ ${coverText({ w, h, kicker: 'POETRY · RISHAVI BANERJEE', title: 'DIRT BENEATH',
 }
 
 export default [
-  { out: `public${D}/articles/kolkata-as-we-know-it/cover.jpg`, w: 900, h: 1200, svg: kolkata() },
   { out: `public${D}/articles/echoes-of-the-yellow-cab/cover.jpg`, w: 900, h: 1200, svg: cab() },
   { out: `public${D}/articles/festive-season-or-peak-main-character-energy/cover.jpg`, w: 900, h: 1200, svg: festive() },
   { out: `public${D}/articles/dirt-beneath-her-feet/cover.jpg`, w: 900, h: 1200, svg: dirt() },

@@ -17,9 +17,9 @@ export const TAGS = {
 };
 
 // The writers' pieces, as they sent them (a poem keeps its line breaks, \n, inside each stanza; numbered headings keep
-// their words, the page numbers them). The deks and cover descriptions are the editors'; Whispers in the Weave has
-// its real cover, the others are drawn stand-ins (tools/art/oct26.mjs) until real ones come; Aarav's poem has none
-// yet (cover: '', the placeholder shows).
+// their words, the page numbers them). The deks and cover descriptions are the editors'; Whispers in the Weave and
+// Kolkata As We Know It have their real covers, the others are drawn stand-ins (tools/art/oct26.mjs) until real ones
+// come; Aarav's poem has none yet (cover: '', the placeholder shows).
 export const ARTICLES = [
   {
     slug: "whispers-in-the-weave",
@@ -46,7 +46,7 @@ export const ARTICLES = [
     title: "Kolkata As We Know It",
     dek: "the city of joy, on a teenager’s map",
     cover: '/editions/oct26/articles/kolkata-as-we-know-it/cover.jpg',
-    alt: "the Howrah Bridge over the river, with a yellow taxi below",
+    alt: "a collage under \"Kolkata, the city of joy\": the Victoria Memorial, a clock tower, the red-and-white GPO, Durga Maa, a tram, a yellow Ambassador taxi, a hand-pulled rickshaw, rosogollas and phuchka",
     author: "Pahal Sethi",
     date: 'Oct 2026',
     readTime: '3',
