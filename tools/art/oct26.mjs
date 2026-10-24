@@ -1,4 +1,4 @@
-// October 2026's drawn pictures (tools/make-art.mjs): stand-in covers for the writers' five articles, in the edition's
+// October 2026's drawn pictures (tools/make-art.mjs): stand-in covers for the writers' articles that have no real one yet, in the edition's
 // Pujo poster style (deep colours, a marigold frame, Rozha One titles). The photo wall has readers' real photos.
 import { burst, circle, coverText, glow, grad, howrah, lights, path, rect, rng, skyline, svg, taxi, water } from './kit.mjs';
 
@@ -7,16 +7,6 @@ const head = "'Rozha One', Georgia, serif";
 const D = '/editions/oct26';
 
 // --- covers (900 × 1200): the writers' pieces
-function weave() {
-  const w = 900, h = 1200, r = rng(31);
-  const saree = (y, body, border, k) => `<g transform="rotate(${k} 450 ${y + 60})">${rect(170, y, 560, 120, body, `stroke="${C.ink}" stroke-width="4"`)}${rect(170, y + 92, 560, 28, border)}${rect(170, y + 6, 560, 10, C.gold)}${Array.from({ length: 13 }, (_, i) => circle(205 + i * 42, y + 52, 6, C.gold, 'opacity=".75"')).join('')}</g>`;
-  let threads = '';
-  for (let i = 0; i < 26; i++) threads += path(`M${(r() * 900).toFixed(0)} 160 q${(r() - 0.5) * 120} 300 ${(r() - 0.5) * 60} 700`, 'none', `stroke="${C.gold}" stroke-width="1.4" opacity=".18"`);
-  return svg(w, h, `${rect(0, 0, w, h, C.deep)}${threads}
-${saree(300, C.white, C.red, -2)}${saree(430, C.red, C.gold, 1.5)}${saree(560, '#1F6E43', C.red, -1)}${saree(690, C.white, C.red, 2)}
-${path('M560 260 q60 -40 120 0 l20 70 q-80 30 -160 0 Z', '#E7A72B', `stroke="${C.ink}" stroke-width="4"`)}${path('M600 270 q20 30 40 0', 'none', `stroke="${C.ink}" stroke-width="3"`)}
-${coverText({ w, h, kicker: 'ESSAY · PRIYADARSHINI HAZRA', title: 'WHISPERS IN', title2: 'THE WEAVE', ink: C.cream, accent: C.gold, font: head, size: 100, frame: C.gold })}`);
-}
 function kolkata() {
   const w = 900, h = 1200, r = rng(44);
   return svg(w, h, `${rect(0, 0, w, h, 'url(#k)')}${glow(640, 330, 260, '#FFD27A', 0.55, 'sun')}${circle(640, 330, 70, '#FFC56A')}
@@ -60,7 +50,6 @@ ${coverText({ w, h, kicker: 'POETRY · RISHAVI BANERJEE', title: 'DIRT BENEATH',
 }
 
 export default [
-  { out: `public${D}/articles/whispers-in-the-weave/cover.jpg`, w: 900, h: 1200, svg: weave() },
   { out: `public${D}/articles/kolkata-as-we-know-it/cover.jpg`, w: 900, h: 1200, svg: kolkata() },
   { out: `public${D}/articles/echoes-of-the-yellow-cab/cover.jpg`, w: 900, h: 1200, svg: cab() },
   { out: `public${D}/articles/festive-season-or-peak-main-character-energy/cover.jpg`, w: 900, h: 1200, svg: festive() },
