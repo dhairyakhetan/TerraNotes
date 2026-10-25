@@ -40,9 +40,14 @@ ${lines.map(([t, c], i) => `<text x="80" y="${last - (lines.length - 1 - i) * si
 // edge and a hard shadow, so the team's own artwork sits in the same frame as the drawn covers. (x, y, w, h) is the
 // picture itself; give it the picture's own shape.
 export function print(file, x, y, w, h, { paper = '#FFF8EC', edge = 14, shadow = '#00000073', off = 14, tilt = 0 } = {}) {
-  const href = `data:image/jpeg;base64,${readFileSync(file).toString('base64')}`;
   return `<g transform="rotate(${tilt} ${x + w / 2} ${y + h / 2})">${rect(x - edge + off, y - edge + off, w + edge * 2, h + edge * 2, shadow)}${rect(x - edge, y - edge, w + edge * 2, h + edge * 2, paper)}
-<image href="${href}" x="${x}" y="${y}" width="${w}" height="${h}" preserveAspectRatio="xMidYMid slice"/></g>`;
+${drawing(file, x, y, w, h)}</g>`;
+}
+
+// a picture straight on the poster, no paper: a JPEG, or a PNG with see-through parts (a pencil sketch on its own layer)
+export function drawing(file, x, y, w, h) {
+  const href = `data:image/${file.endsWith('.png') ? 'png' : 'jpeg'};base64,${readFileSync(file).toString('base64')}`;
+  return `<image href="${href}" x="${x}" y="${y}" width="${w}" height="${h}" preserveAspectRatio="xMidYMid slice"/>`;
 }
 
 // stars in a band of sky

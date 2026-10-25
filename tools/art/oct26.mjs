@@ -2,15 +2,15 @@
 // and writer up top, a Rozha One title below. Where the team made the artwork (tools/art/oct26/<slug>.jpg, kept as
 // they sent it), it sits in the poster as a print; the rest are drawn here. The photo wall has readers' real photos.
 import { fileURLToPath } from 'node:url';
-import { burst, circle, coverText, glow, grad, lights, path, print, rect, rng, stars, svg, taxi } from './kit.mjs';
+import { burst, circle, coverText, drawing, glow, grad, lights, path, print, rect, rng, svg, taxi } from './kit.mjs';
 
 const C = { red: '#C8102E', maroon: '#3A0A10', deep: '#5A0E18', gold: '#FFC914', cream: '#FFF4D6', ink: '#1A0508', green: '#2E7D32', leaf: '#4CAF50', white: '#FFF8EC' };
 const head = "'Rozha One', Georgia, serif";
 const D = '/editions/oct26';
-const art = (slug) => fileURLToPath(new URL(`./oct26/${slug}.jpg`, import.meta.url));
+const art = (slug, ext = 'jpg') => fileURLToPath(new URL(`./oct26/${slug}.${ext}`, import.meta.url));
 
 // --- covers (900 × 1200): the writers' pieces
-// the team's artwork (3 : 4 and square), framed like the drawn ones
+// artwork made outside this file (3 : 4 and square), framed like the drawn ones
 function weave() {
   const w = 900, h = 1200;
   return svg(w, h, `${rect(0, 0, w, h, C.deep)}${glow(450, 520, 420, C.gold, 0.18, 'g')}
@@ -57,19 +57,15 @@ ${path('M120 980 Q170 860 280 820 Q330 800 340 840 Q300 880 250 990 Z', '#B07A50
 ${coverText({ w, h, kicker: 'POETRY · RISHAVI BANERJEE', title: 'DIRT BENEATH', title2: 'HER FEET', ink: C.cream, accent: '#E8A33D', font: head, size: 100, frame: '#E8A33D' })}`);
 }
 function beautiful() {
-  // her eyes, like stars that settled there: a night sky, and two eyes with a star caught in each
-  const w = 900, h = 1200, r = rng(97);
-  const eye = (x, y) => `${path(`M${x - 130} ${y} Q${x} ${y - 120} ${x + 130} ${y} Q${x} ${y + 100} ${x - 130} ${y} Z`, '#FFF4D6', 'opacity=".96"')}
-${circle(x, y - 6, 54, '#26268F')}${circle(x, y - 6, 24, '#0E0B2A')}${glow(x, y - 6, 70, C.gold, 0.45, `e${x}`)}
-${path(`M${x} ${y - 40} L${x + 8} ${y - 14} L${x + 34} ${y - 6} L${x + 8} ${y + 2} L${x} ${y + 28} L${x - 8} ${y + 2} L${x - 34} ${y - 6} L${x - 8} ${y - 14} Z`, C.gold)}
-${path(`M${x - 130} ${y} Q${x} ${y - 120} ${x + 130} ${y}`, 'none', `stroke="${C.cream}" stroke-width="7" stroke-linecap="round"`)}
-${[-90, -50, -10, 30, 70].map((dx) => `<line x1="${x + dx}" y1="${y - 74 + Math.abs(dx) * 0.35}" x2="${x + dx * 1.25}" y2="${y - 112 + Math.abs(dx) * 0.4}" stroke="${C.cream}" stroke-width="6" stroke-linecap="round"/>`).join('')}`;
-  const fall = [[720, 150, 600, 420], [820, 260, 690, 470], [180, 170, 290, 430]].map(([x1, y1, x2, y2], i) => `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="url(#t${i})" stroke-width="4" stroke-linecap="round"/>${circle(x2, y2, 5, C.gold)}`).join('');
-  const trail = (i, [x1, y1, x2, y2]) => `<linearGradient id="t${i}" gradientUnits="userSpaceOnUse" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}"><stop offset="0" stop-color="${C.gold}" stop-opacity="0"/><stop offset="1" stop-color="${C.gold}"/></linearGradient>`;
-  return svg(w, h, `${rect(0, 0, w, h, 'url(#n)')}${stars(r, 160, w, 860, '#FFF4D6')}${fall}
-${eye(270, 600)}${eye(630, 600)}
-${coverText({ w, h, kicker: 'POETRY · AARAV AGARWAL', title: 'THE KIND OF', title2: 'BEAUTIFUL YOU', title3: 'DON’T FORGET', ink: C.cream, accent: C.gold, font: head, size: 84, frame: C.gold })}`,
-  { defs: grad('n', [[0, '#0E0B2A'], [0.6, '#26268F'], [1, '#3A1A5C']]) + [[720, 150, 600, 420], [820, 260, 690, 470], [180, 170, 290, 430]].map((l, i) => trail(i, l)).join('') });
+  // what Aarav asked for: "draw my heart and her eyes", her eyes inside the heart in pencil (drawn from a photo; only
+  // the drawing is kept, a see-through layer the size of the cover), straight on the cover's cream, under a few stars
+  const w = 900, h = 1200, r = rng(97), ink = '#26268F';
+  let sp = '';
+  for (let i = 0; i < 26; i++) sp += circle((90 + r() * 720).toFixed(0), (150 + r() * 700).toFixed(0), (1.5 + r() * 2.5).toFixed(1), i % 3 ? C.gold : ink, `opacity="${(0.35 + r() * 0.5).toFixed(2)}"`);
+  return svg(w, h, `${rect(0, 0, w, h, 'url(#n)')}${glow(450, 480, 420, C.gold, 0.16, 'g')}${sp}
+${drawing(art('the-kind-of-beautiful-you-dont-forget', 'png'), 0, 0, w, h)}
+${coverText({ w, h, kicker: 'POETRY · AARAV AGARWAL', title: 'THE KIND OF', title2: 'BEAUTIFUL YOU', title3: 'DON’T FORGET', ink, accent: C.red, font: head, size: 84, frame: C.gold })}`,
+  { defs: grad('n', [[0, C.white], [1, C.cream]]) });
 }
 
 export default [

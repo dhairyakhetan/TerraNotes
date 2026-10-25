@@ -19,7 +19,7 @@ export const TAGS = {
 // The writers' pieces, as they sent them (a poem keeps its line breaks, \n, inside each stanza; numbered headings keep
 // their words, the page numbers them). The deks and cover descriptions are the editors'. The covers are made by
 // tools/art/oct26.mjs in one poster style: Whispers in the Weave and Kolkata As We Know It frame the team's artwork,
-// the others are drawn.
+// Aarav's poem has a pencil sketch drawn straight on (what Aarav asked for), the others are drawn.
 export const ARTICLES = [
   {
     slug: "whispers-in-the-weave",
@@ -132,7 +132,7 @@ export const ARTICLES = [
     title: "the kind of beautiful you don’t forget",
     dek: "a little poem for the girl who doesn’t know",
     cover: '/editions/oct26/articles/the-kind-of-beautiful-you-dont-forget/cover.jpg',
-    alt: "two eyes under a night sky, a star caught in each, with shooting stars falling",
+    alt: "a pencil sketch of her eyes inside a heart",
     author: "Aarav Agarwal",
     date: 'Oct 2026',
     readTime: '1',
