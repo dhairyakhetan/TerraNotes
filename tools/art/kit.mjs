@@ -3,6 +3,8 @@
 // colours, a little grain. Coordinates are the picture's own pixels. rng(seed) makes the "random" parts (stars,
 // windows, crowds) the same every time, so re-running the tool gives the same pictures.
 
+import { readFileSync } from 'node:fs';
+
 export const rng = (seed) => { let s = seed >>> 0 || 1; return () => ((s = (s * 1664525 + 1013904223) >>> 0) / 4294967296); };
 const esc = (t) => String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;');
 
@@ -26,13 +28,21 @@ export const glow = (x, y, r, color, a = 0.55, id = `g${Math.round(x)}x${Math.ro
 
 // text on a cover: a small kicker at the top, a two-line title at the bottom (the second line in the accent), in a
 // frame inset from the edges, as the October covers have
-export function coverText({ w, h, kicker, title, title2, ink, accent, font, mono = "'Space Mono', monospace", size = 92, frame = null, at = 'bottom' }) {
+export function coverText({ w, h, kicker, title, title2, title3, ink, accent, font, mono = "'Space Mono', monospace", size = 92, frame = null, at = 'bottom' }) {
   const fr = frame ? `<rect x="40" y="40" width="${w - 80}" height="${h - 80}" fill="none" stroke="${frame}" stroke-width="4"/>` : '';
-  const y2 = at === 'bottom' ? h - 110 : 330, y1 = y2 - size * 1.05;
+  const lines = [[title, ink], [title2, accent], [title3, ink]].filter(([t]) => t), last = at === 'bottom' ? h - 110 : 330;
   return `${fr}
 <text x="80" y="118" font-family="${mono}" font-size="26" letter-spacing="4" fill="${ink}" opacity=".85">${esc(kicker)}</text>
-<text x="80" y="${title2 ? y1 : y2}" font-family="${font}" font-size="${size}" fill="${ink}" letter-spacing="1">${esc(title)}</text>
-${title2 ? `<text x="80" y="${y2}" font-family="${font}" font-size="${size}" fill="${accent}" letter-spacing="1">${esc(title2)}</text>` : ''}`;
+${lines.map(([t, c], i) => `<text x="80" y="${last - (lines.length - 1 - i) * size * 1.05}" font-family="${font}" font-size="${size}" fill="${c}" letter-spacing="1">${esc(t)}</text>`).join('\n')}`;
+}
+
+// a real picture (a JPEG kept beside the edition's list, tools/art/<id>/), laid on the poster as a print: a paper
+// edge and a hard shadow, so the team's own artwork sits in the same frame as the drawn covers. (x, y, w, h) is the
+// picture itself; give it the picture's own shape.
+export function print(file, x, y, w, h, { paper = '#FFF8EC', edge = 14, shadow = '#00000073', off = 14, tilt = 0 } = {}) {
+  const href = `data:image/jpeg;base64,${readFileSync(file).toString('base64')}`;
+  return `<g transform="rotate(${tilt} ${x + w / 2} ${y + h / 2})">${rect(x - edge + off, y - edge + off, w + edge * 2, h + edge * 2, shadow)}${rect(x - edge, y - edge, w + edge * 2, h + edge * 2, paper)}
+<image href="${href}" x="${x}" y="${y}" width="${w}" height="${h}" preserveAspectRatio="xMidYMid slice"/></g>`;
 }
 
 // stars in a band of sky

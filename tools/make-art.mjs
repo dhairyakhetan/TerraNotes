@@ -1,7 +1,7 @@
 // Draws the editions' pictures: article covers (cover.jpg) and photo-wall pictures (.webp), from the drawing lists in
-// tools/art/<edition id>.mjs (each a list of { out, w, h, svg }, built with tools/art/kit.mjs). They are illustrations
-// made in code, standing in until real photos arrive: drop a real picture at the same path and stop drawing that one
-// (delete its entry). Renders each SVG in Chromium (with the site's own fonts from public/fonts) and saves it with
+// tools/art/<edition id>.mjs (each a list of { out, w, h, svg }, built with tools/art/kit.mjs). Most are illustrations
+// made in code; a team's own artwork goes in tools/art/<edition id>/ and its entry frames it (kit.mjs print()), so
+// both kinds share one cover style. A real photo can also simply replace a picture at its path (then delete its entry). Renders each SVG in Chromium (with the site's own fonts from public/fonts) and saves it with
 // sharp. Then run tools/make-card-covers.mjs for the covers' WebP copies.
 //   node tools/make-art.mjs            every edition's list
 //   node tools/make-art.mjs oct26      one edition's

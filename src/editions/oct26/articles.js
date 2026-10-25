@@ -17,9 +17,9 @@ export const TAGS = {
 };
 
 // The writers' pieces, as they sent them (a poem keeps its line breaks, \n, inside each stanza; numbered headings keep
-// their words, the page numbers them). The deks and cover descriptions are the editors'; Whispers in the Weave and
-// Kolkata As We Know It have their real covers, the others are drawn stand-ins (tools/art/oct26.mjs) until real ones
-// come; Aarav's poem has none yet (cover: '', the placeholder shows).
+// their words, the page numbers them). The deks and cover descriptions are the editors'. The covers are made by
+// tools/art/oct26.mjs in one poster style: Whispers in the Weave and Kolkata As We Know It frame the team's artwork,
+// the others are drawn.
 export const ARTICLES = [
   {
     slug: "whispers-in-the-weave",
@@ -27,7 +27,7 @@ export const ARTICLES = [
     title: "Whispers in the Weave",
     dek: "on borrowed sarees, the family tailor and the culture folded in our cupboards",
     cover: '/editions/oct26/articles/whispers-in-the-weave/cover.jpg',
-    alt: "a mother in a saree hands a folded saree to her young daughter, above an open cupboard of folded sarees, a needle and thread and a garland of marigolds",
+    alt: "the team's drawing in a marigold frame: a mother in a saree hands a folded saree to her young daughter, above an open cupboard of folded sarees, a needle and thread and a garland of marigolds",
     author: "Priyadarshini Hazra",
     date: 'Oct 2026',
     readTime: '3',
@@ -46,7 +46,7 @@ export const ARTICLES = [
     title: "Kolkata As We Know It",
     dek: "the city of joy, on a teenager’s map",
     cover: '/editions/oct26/articles/kolkata-as-we-know-it/cover.jpg',
-    alt: "a collage under \"Kolkata, the city of joy\": the Victoria Memorial, a clock tower, the red-and-white GPO, Durga Maa, a tram, a yellow Ambassador taxi, a hand-pulled rickshaw, rosogollas and phuchka",
+    alt: "the team's collage in a marigold frame, under \"Kolkata, the city of joy\": the Victoria Memorial, a clock tower, the red-and-white GPO, Durga Maa, a tram, a yellow Ambassador taxi, a hand-pulled rickshaw, rosogollas and phuchka",
     author: "Pahal Sethi",
     date: 'Oct 2026',
     readTime: '3',
@@ -131,8 +131,8 @@ export const ARTICLES = [
     tag: "Poetry",
     title: "the kind of beautiful you don’t forget",
     dek: "a little poem for the girl who doesn’t know",
-    cover: '',
-    alt: "her eyes, like stars that settled there",
+    cover: '/editions/oct26/articles/the-kind-of-beautiful-you-dont-forget/cover.jpg',
+    alt: "two eyes under a night sky, a star caught in each, with shooting stars falling",
     author: "Aarav Agarwal",
     date: 'Oct 2026',
     readTime: '1',

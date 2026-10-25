@@ -63,7 +63,7 @@ npm run preview  # serve dist/ on :4173
 npm run check    # tools/check-embed.mjs: the mistakes that only break inside AQ's website (the build runs it first)
 node tools/make-card-covers.mjs    # after adding an article / changing a cover: its WebP copies (cover-card.webp for cards, cover-page.webp for the article page)
 node tools/make-link-previews.mjs   # after adding an article / changing a cover / a new edition: every link preview, in public/og/ (needs `npm i -D playwright`)
-node tools/make-art.mjs [id]       # the drawn stand-in pictures (covers, photo-wall pictures) from tools/art/<id>.mjs; then make-card-covers (CHROMIUM=… for another Chromium)
+node tools/make-art.mjs [id]       # the covers and drawn photo-wall pictures from tools/art/<id>.mjs (team artwork in tools/art/<id>/); then make-card-covers (CHROMIUM=… for another Chromium)
 node tools/check-fling-levels.mjs   # after adding / changing a Fling level (shared/buddy/flingLevels.js): plays each, checks it stands and can be cleared
 npm run test:visual           # after a build: screenshots of key pages at 390 + 1440 vs tests/visual/screenshots/ (PW_CHROMIUM=… for another Chromium)
 npm run test:visual:update    # after a change you meant: save new screenshots (commit them)
@@ -112,7 +112,7 @@ look after October is out.
   - A new role (a colour that should differ from an existing one): add it to **every** edition's `look.js`, with the colour it had before in the older ones, so they stay the same. The build stops if any look misses a key, or uses a name the code already gives its own CSS variables (`TAKEN` in `src/editions/index.js`).
   - The build writes the latest edition's look into `index.html` (`vite.config.js`), so the first paint is already right.
 - **More than a new look:** an edition can draw its own home page or article page. Keep a copy of the shared one in its folder, change it there, and register it in `src/editions/pages.js`.
-  - October's pictures are drawn stand-ins (`tools/make-art.mjs` from `tools/art/<id>.mjs`): a real photo at the same path replaces one (then delete its entry there).
+  - October's covers all come from `tools/make-art.mjs` (`tools/art/<id>.mjs`) in one poster style (marigold frame, tag · writer, title): drawn ones, and the team's own artwork (kept as sent in `tools/art/<id>/<slug>.jpg`) laid in as a print with `print()` (`kit.mjs`). New team artwork goes there, not straight over `cover.jpg`. A real photo at a picture's path still replaces a drawn photo-wall picture (then delete its entry).
   - Its own CSS goes in its folder too, scoped with `[data-edition="<id>"]` or its own class, with class names no other file uses.
 - **Never change how a live or older edition looks** while making the next one. Check it: screenshot its pages at 390px and 1440px before and after your change; they must match.
 
@@ -219,7 +219,7 @@ and its A/B/C marks a dhunuchi, a lantern and a firework (`Dhunuchi.jsx`, `WORDS
 legend (`DhakPlayers.jsx`, `TEAM_NOTE`), and Buddy's games are re-dressed (`games.js`, `GAME_SKIN`; their names in
 `data/games.js`): Snake is Durga Maa chasing demon faces with a marigold garland for a tail, Fling a bow and arrow at
 demon faces. The illustrations' own colours are in its `look.js` `art`. Pujo, Diwali and festive-feeling words; the
-writers' five articles (three of them drawn stand-in covers) and eight photos (seven of them drawn stand-ins). A new edition starts from a copy of the newest look and changes the values; its own CSS and
+writers' six articles (covers in one poster style: two frame the team's artwork, four are drawn) and eight photos (seven of them drawn stand-ins). A new edition starts from a copy of the newest look and changes the values; its own CSS and
 doodles are registered in `src/editions/pages.js` (`EDITION_CSS`, `DECOR`, `TEAM_NOTE` for a secret by the team legend: under it on web, beside it on phones; `HANGERS`, `WALL_DECOR`, `WORDS_ART` and `GAME_SKIN` to dress the article wire, the photo wall, the words game and Buddy's games; `LAYOUT` switches on newer layouts of the shared home sections per edition, so older ones keep theirs: copy the newest edition's entry).
 Use the variables, nothing else (the look lists a few more, for the photo wall, dark panels and details).
 
@@ -304,7 +304,7 @@ build/siteFiles.js      at build: an .html per article at its address (own title
                         pages, 404, sitemap, robots, llms.txt (drafts left out)
 build/staticCopy.js     each page's text as plain HTML inside #root, for crawlers without JavaScript
 tools/make-link-previews.mjs   every link preview (1200×630) into public/og/: the main page, each edition, each article, each game, on the edition's paper
-tools/make-art.mjs + tools/art/   the drawn stand-in pictures (an SVG kit, kit.mjs, and a list per edition), rendered with the site fonts
+tools/make-art.mjs + tools/art/   the covers and drawn pictures (an SVG kit, kit.mjs, a list per edition, team artwork in <id>/), rendered with the site fonts
 tools/check-embed.mjs   the guard for AQ's website (see "Inside AQ's website")   tools/export-aq.mjs   writes the magazine into it
 embed/aq/               AQ-only: README (for AQ's side), scripts/ (prerender.mjs)
 src/host.js             where this copy runs (own site / AQ's website)
