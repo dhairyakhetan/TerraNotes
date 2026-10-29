@@ -4,6 +4,67 @@ Vite + React 19 + React Router 8, static site on Vercel. No backend, no UI libra
 edition has its own folder, `src/editions/<id>/`, with its look and content; site-wide content is in `src/data/`. Every
 file starts with a comment saying what it does; read that before editing it.
 
+## Integrating into AQ's website (for Claude in AQ's repo: start here)
+
+You are in AQ's site repo (the one with `frontend/`), asked to bring TerraNotes in. The `handoff` branch of this repo
+(`https://github.com/dhairyakhetan/TerraNotes`, public) is a cleaned, tested snapshot made for this. Integrating is
+running this repo's export into AQ's `frontend/`: it writes three folders there and nothing else. Never copy files by
+hand, and never edit those three folders in AQ's repo afterwards (the next export replaces them).
+
+| In AQ's `frontend/` | Comes from (this repo) | The export |
+|---|---|---|
+| `src/terranotes/` | `src/` (all but `main.jsx`), `host.js` set to `{ base: '/terranotes', embedded: true }`, `react-router` renamed `react-router-dom`, + `embed/aq/README.md` as its README | replaces it whole |
+| `public/terranotes/` (~13 MB) | `public/` (all but the own site's icons and manifest): fonts, covers, photos, link previews, the Wisdom Woods demo | adds and updates; never deletes AQ's own files there |
+| `scripts/terranotes/` | `build/staticCopy.js`, `embed/aq/scripts/prerender.mjs`, `tools/make-link-previews.mjs` | replaces it whole |
+
+**Steps** (from the root of AQ's repo):
+1. `git clone -b handoff https://github.com/dhairyakhetan/TerraNotes.git ../terranotes-handoff` (outside AQ's repo:
+   never commit it there). The export needs only Node 20+, no `npm install` in the clone.
+2. `cd frontend && npm install matter-js@^0.20.0`. Buddy's Fling game loads it, and AQ's `package.json` doesn't have it:
+   without it AQ's `vite build` stops with `failed to resolve import "matter-js"`. The rest the magazine needs is already
+   in AQ's `frontend/package.json`: `react` and `react-dom` 19, `react-router-dom` 7.18+ (it uses
+   `UNSAFE_createBrowserHistory`, `unstable_HistoryRouter`), `@vercel/analytics`.
+3. `node ../terranotes-handoff/tools/export-aq.mjs . --dry` (from `frontend/`): it runs the AQ guard
+   (`tools/check-embed.mjs`), then lists what it would add, change and remove. Then the same without `--dry`.
+   From an older integration it removes files that no longer exist here: `TerraNotesApp.jsx`,
+   `data/photos.js`, `data/team.js`, `data/words.js`, `shared/SnakeCard.jsx`, `scripts/terranotes/tools/make-card-covers.mjs`
+   (each edition's content now lives in `src/terranotes/editions/<id>/`). That's expected.
+4. `npm run build` in `frontend/` (AQ's whole chain). Tested on a copy of AQ's repo (October 2026): it passes, i.e. accent lint,
+   `verify-routing`, `tsc -b`, `vite build`, the sitemap gate, the bundle budget (eager 672 KB of 683.6 KB; the lazy
+   `TerraNotesRoot` chunk, 273 KB, only prints a "worth splitting" note) and the prerender (34 Terra Notes pages, plus
+   `llms.txt`).
+5. Check it in a browser (`npm run dev`, or `npx vite preview` after the build), at 1440px and at 390px (emulate touch):
+   `/terranotes` (October), `/terranotes/articles/whispers-in-the-weave`, `/terranotes/sep26` (September, its own look),
+   `/terranotes/sep26/articles/exam-stress`, `/terranotes/sep26/articles/labs` (AQ Labs), `/terranotes/photos`,
+   `/labs` (redirects into AQ Labs). AQ's nav and phone dock must sit over the top of every page, with the "← Back to
+   home" pill just under the nav; no errors in the console from the magazine.
+6. Commit only: `frontend/package.json` + `package-lock.json` (matter-js), `frontend/src/terranotes/`,
+   `frontend/public/terranotes/`, `frontend/scripts/terranotes/`. Delete the clone.
+
+**What AQ's own code already does for it** (it's in AQ's repo from the first integration; keep it, don't redo it. On a
+repo that has none of it, these are what to add):
+- `src/lib/routeModules.ts`: `terranotes: () => import('../terranotes/TerraNotesRoot.jsx')` (and `labs` → `terranotes`);
+  `App.tsx`: `<Route path="/terranotes/*" element={<TerraNotesRoot />} />` (lazy).
+- `App.tsx` `AppRouter`: the router's history is `createAnimatedHistory()` (`terranotes/lib/animatedHistory`), with
+  `useTransitions={false}` while a TerraNotes page shows (`history.onShown` + `isTnPath`): the card flights need it.
+  Its scroll-to-top skips `isTnPath()` pages (the magazine keeps its own scroll positions).
+- `App.tsx` `LabsRedirect` and `vercel.json`: `/labs` and `/labs/<slug>` → `/terranotes/articles/labs[/<chapter>]`
+  (the magazine then sends that on to the edition AQ Labs is in, `/terranotes/sep26/articles/labs`); `vercel.json` gives
+  `/terranotes/editions/:id/articles/:slug/:chapter/demo/*` `X-Frame-Options: SAMEORIGIN` (the demo opens in a
+  same-origin frame) and leaves it out of the site-wide `DENY`.
+- `components/PublicLayout.tsx`: on `isTnPath()` pages it keeps AQ's nav and phone dock, adds no nav padding to `<main>`
+  (the magazine leaves room itself), keeps `isBottomNavHidden()` false, and AQ keeps `--nav-h` on `:root` set to the
+  nav's height (the magazine's "← Back to home" pill sits at `var(--nav-h) + 10px`). More in `src/shared/AqNavSlot.jsx`.
+- `scripts/prerender-meta.mjs` writes `terraNotesPages()` and `terraNotesLlms()`, `scripts/generate-sitemap.mjs` adds
+  `terraNotesSitemapPaths()` (all from `scripts/terranotes/prerender.mjs`); `scripts/verify-routing.mjs` checks the
+  `/terranotes` routes and the demo's frame header.
+- The `.d.ts` stubs beside `TerraNotesRoot.jsx`, `lib/animatedHistory.js` and `lib/base.js` are what `tsc` sees; the
+  magazine itself is JavaScript and isn't linted or type-checked by AQ's tooling (this repo checks it).
+
+How it draws inside AQ (shadow root, `/terranotes` prefix, looks as CSS variables on the shadow host) is in "Inside AQ's
+website" below and in `embed/aq/README.md` (which becomes `src/terranotes/README.md` there). A later update is the same
+steps, from `main` (or a new `handoff`), without step 2.
+
 ## How you work: clone, change, hand over a .patch
 
 You usually have no push access here. The owner runs you in a chat, and gets your changes into the repo as a
@@ -46,24 +107,17 @@ You usually have no push access here. The owner runs you in a chat, and gets you
 
    Patch files are hand-over only: never commit them to the repo.
 
-## The fahhh switch
-
-`fahhh/switch.js` (`FAHHH = true / false`; the environment variable `FAHHH=1 / 0` in Vercel overrides it). On, the
-build (`tools/build.mjs`, what `npm run build` runs) makes only the fahhh page (`fahhh/index.html`, its link preview
-`fahhh/og.png`): every address shows it, with its own title and preview, and none of the magazine is built. Off, the
-magazine builds as normal. Leave it off unless the owner asks.
-
 ## Commands
 
 ```bash
 npm install
 npm run dev      # http://localhost:5173
-npm run build    # → dist/ (tools/build.mjs: the magazine, or only the fahhh page while the fahhh switch is on)
+npm run build    # → dist/ (runs npm run check first: the AQ guard)
 npm run preview  # serve dist/ on :4173
 npm run check    # tools/check-embed.mjs: the mistakes that only break inside AQ's website (the build runs it first)
 node tools/make-card-covers.mjs    # after adding an article / changing a cover: its WebP copies (cover-card.webp for cards, cover-page.webp for the article page)
 node tools/make-link-previews.mjs   # after adding an article / changing a cover / a new edition: every link preview, in public/og/ (needs `npm i -D playwright`)
-node tools/make-art.mjs [id]       # the covers and drawn photo-wall pictures from tools/art/<id>.mjs (team artwork in tools/art/<id>/); then make-card-covers (CHROMIUM=… for another Chromium)
+node tools/make-art.mjs [id]       # the covers from tools/art/<id>.mjs (team artwork in tools/art/<id>/); then make-card-covers (CHROMIUM=… for another Chromium)
 node tools/check-fling-levels.mjs   # after adding / changing a Fling level (shared/buddy/flingLevels.js): plays each, checks it stands and can be cleared
 npm run test:visual           # after a build: screenshots of key pages at 390 + 1440 vs tests/visual/screenshots/ (PW_CHROMIUM=… for another Chromium)
 npm run test:visual:update    # after a change you meant: save new screenshots (commit them)
@@ -86,6 +140,8 @@ animation). Automated browsers never get the intro.
 - **Changes go to `main`.** Without push access (the usual case) that means a `.patch` for the owner (above); a session
   that can push commits straight to `main`, even when its setup names a branch to work on. Never make a branch unless the
   owner asks for one.
+- **The `handoff` branch** is the snapshot AQ's Claude integrates from ("Integrating into AQ's website"). It moves only
+  when the owner asks for a new handoff: then reset it to `main` once `main` builds and has been checked.
 
 ## Editions
 
@@ -112,15 +168,15 @@ look after October is out.
   - A new role (a colour that should differ from an existing one): add it to **every** edition's `look.js`, with the colour it had before in the older ones, so they stay the same. The build stops if any look misses a key, or uses a name the code already gives its own CSS variables (`TAKEN` in `src/editions/index.js`).
   - The build writes the latest edition's look into `index.html` (`vite.config.js`), so the first paint is already right.
 - **More than a new look:** an edition can draw its own home page or article page. Keep a copy of the shared one in its folder, change it there, and register it in `src/editions/pages.js`.
-  - October's covers all come from `tools/make-art.mjs` (`tools/art/<id>.mjs`) in one poster style (marigold frame, tag · writer, title): drawn ones, and the team's own artwork (kept as sent in `tools/art/<id>/<slug>.jpg`) laid in as a print with `print()` (`kit.mjs`). New team artwork goes there, not straight over `cover.jpg`. A real photo at a picture's path still replaces a drawn photo-wall picture (then delete its entry).
+  - October's covers all come from `tools/make-art.mjs` (`tools/art/<id>.mjs`) in one poster style (marigold frame, tag · writer, title): drawn ones, and the team's own artwork (kept as sent in `tools/art/<id>/<slug>.jpg`) laid in as a print with `print()` (`kit.mjs`). New team artwork goes there, not straight over `cover.jpg`.
   - Its own CSS goes in its folder too, scoped with `[data-edition="<id>"]` or its own class, with class names no other file uses.
 - **Never change how a live or older edition looks** while making the next one. Check it: screenshot its pages at 390px and 1440px before and after your change; they must match.
 
 ## Inside AQ's website
 
 The magazine also runs inside AQ's main website, at `/terranotes`, from this same code. Putting it there is AQ's job,
-not part of the work here (`tools/export-aq.mjs` is their tool; don't run it unless the owner asks). Your job: keep
-every change working there too, by the rules below.
+not part of the work here (`tools/export-aq.mjs` is their tool; don't run it unless the owner asks; the steps are in
+"Integrating into AQ's website" at the top). Your job: keep every change working there too, by the rules below.
 
 - **`src/host.js` is what differs:** AQ's copy says `{ base: '/terranotes', embedded: true }`. AQ-only behaviour checks
   `HOST.embedded` (the phone "call Buddy" button, no skip link of its own, AQ Labs running full width,
@@ -150,7 +206,7 @@ every change working there too, by the rules below.
   `isTnPath`, `lib/animatedHistory.js` `createAnimatedHistory()` with `onShown()`, and `embed/aq/scripts/prerender.mjs`
   (`terraNotesPages()`, `terraNotesLlms()`, `terraNotesSitemapPaths()`; it builds on `build/staticCopy.js`).
 - **AQ-only files:** `src/TerraNotesRoot.jsx`, `src/styles/document.css`, the `.d.ts` stubs, and `embed/aq/` (the
-  README for AQ's side, the prerender, the card-cover tool). The self-hosted fonts are shared: `public/fonts/`.
+  README for AQ's side and the prerender). The self-hosted fonts are shared: `public/fonts/`.
 
 ## Layout model
 
@@ -184,7 +240,7 @@ Two separate layouts, chosen by window width (`lib/layoutMode.js`, `useIsWeb()`)
   - It gets no card flight (no cover to land on; `flight()` in `lib/cardFlight.js`), just the crossfade.
   - `chapters`: its sections get addresses, `<article>/<id>` (element ids).
   - `demos`: `{ chapter: folder }`, a web app kept in its folder, opened in a new tab at `<article>/<chapter>/demo`. `pages/DemoPage.jsx` shows it full-window in a same-origin frame, with no footer, Buddy or opening animation. Its files stay as the team made them.
-  - **AQ Labs** (`src/articles/labs/`, the "labs" article; teams and chapter ids in `data/labs.js`) is the AQ Labs team's own gallery site, ported. Its Wisdom Woods chapter opens the team's demo at `/articles/labs/wisdom-woods/demo` (files: `public/editions/sep26/articles/labs/wisdom-woods/demo/`). It keeps their look on purpose: their fonts (`public/fonts/`, JetBrains Mono from Google Fonts), their palette and rounded pills. Don't restyle it into the magazine's design.
+  - **AQ Labs** (`src/articles/labs/`, the "labs" article; teams and chapter ids in `data/labs.js`) is the AQ Labs team's own gallery site, ported. Its Wisdom Woods chapter opens the team's demo at `/articles/labs/wisdom-woods/demo` (files: `public/editions/sep26/articles/labs/wisdom-woods/demo/`). It keeps their look on purpose: their fonts (`public/fonts/`, JetBrains Mono, self-hosted too), their palette and rounded pills. Don't restyle it into the magazine's design.
     - Built from the AQ Labs design. Web: one long scroll (intro with a 3D bookshelf, then every chapter), sticky chapter tabs as a floating glass pill (as on AQ's website). Phone: one chapter at a time (the shelf is the start; `/articles/labs/<id>` opens a chapter as its own page, so Back returns to the shelf); search lives in the "view all projects" sheet.
     - Books sit in fixed hover slots (`.bslot`), so the pulled-out book never flickers. Karyaarth's stills open in the site's `PhotoViewer` (it takes `photos`, `title`, `label`, `count`).
   - Its CSS (`labs.css`) is scoped to `.labs`. Its class names must not match any in `src/styles/` (it had to rename `.intro` and `.orbit`). Its loops keep the motion rules below, inside `labs.css`: transform / opacity only, stopped by reduced motion, `.tn-lite`, `.off-screen` and `html[data-tn-nav]` (with their `:host` twins). It brings its own stylesheet (`labs.css?inline`, a `<style>` beside the page), so it loads with the gallery.
@@ -219,7 +275,7 @@ and its A/B/C marks a dhunuchi, a lantern and a firework (`Dhunuchi.jsx`, `WORDS
 legend (`DhakPlayers.jsx`, `TEAM_NOTE`), and Buddy's games are re-dressed (`games.js`, `GAME_SKIN`; their names in
 `data/games.js`): Snake is Durga Maa chasing demon faces with a marigold garland for a tail, Fling a bow and arrow at
 demon faces. The illustrations' own colours are in its `look.js` `art`. Pujo, Diwali and festive-feeling words; the
-writers' six articles (covers in one poster style: two frame the team's artwork, Aarav's poem has a pencil sketch of her eyes in a heart drawn straight on, three are drawn) and eight photos (seven of them drawn stand-ins). A new edition starts from a copy of the newest look and changes the values; its own CSS and
+writers' six articles (covers in one poster style: two frame the team's artwork, Aarav's poem has a pencil sketch of her eyes in a heart drawn straight on, three are drawn) and readers' photos on a black photo wall (20 of them, five hung at a time, picked at random: `lib/photoPick.js`). A new edition starts from a copy of the newest look and changes the values; its own CSS and
 doodles are registered in `src/editions/pages.js` (`EDITION_CSS`, `DECOR`, `TEAM_NOTE` for a secret by the team legend: under it on web, beside it on phones; `HANGERS`, `WALL_DECOR`, `WORDS_ART` and `GAME_SKIN` to dress the article wire, the photo wall, the words game and Buddy's games; `LAYOUT` switches on newer layouts of the shared home sections per edition, so older ones keep theirs: copy the newest edition's entry).
 Use the variables, nothing else (the look lists a few more, for the photo wall, dark panels and details).
 
@@ -334,7 +390,7 @@ src/shared/             used by both layouts:
   HomeIntroCard         the home intro card                   AqNavSlot     placeholder for AQ's nav (AQ's look, own site)
   EndCards              the home pages' end: GameCard (Snake → Float → Fling) + EditionsCard (InsideAQ, with AQ's look)
   IntroNotebook         the opening animation (the address's edition: its cover, number, month)              ErrorBoundary crash card
-  Tapes                 Clip, ByTape, FeaturedTape, LatestTag, DraftTape    Icons   Globe, Instagram, Close, Chevron, Photo, Menu
+  Tapes                 Clip, ByTape, FeaturedTape, LatestTag, DraftTape    Icons   Close, Chevron, Photo, Menu
   ImageSlot  Logo  BackHome                                    buddy/        Buddy (easter-egg ghost), Ghost, BuddyGames (Snake, Float,
                         Fling: Angry Birds style, matter-js physics loaded with its tab)
 src/lib/                logic only, no JSX:
