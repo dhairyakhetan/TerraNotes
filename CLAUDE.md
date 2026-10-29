@@ -17,6 +17,13 @@ hand, and never edit those three folders in AQ's repo afterwards (the next expor
 | `public/terranotes/` (~13 MB) | `public/` (all but the own site's icons and manifest): fonts, covers, photos, link previews, the Wisdom Woods demo | adds and updates; never deletes AQ's own files there |
 | `scripts/terranotes/` | `build/staticCopy.js`, `embed/aq/scripts/prerender.mjs`, `tools/make-link-previews.mjs` | replaces it whole |
 
+**Check before you trust this.** The owner wrote these notes from a copy of AQ's repo, and may have it wrong. Before
+writing anything, look at AQ's repo as it is: where its frontend lives (`frontend/`?), whether `src/terranotes/` is
+already there and what's in it, whether its `App.tsx`, `PublicLayout.tsx`, `routeModules.ts`, `vercel.json` and
+prerender scripts do what the list below says, and which versions of `react`, `react-dom` and `react-router-dom` it has.
+Where something differs, follow the repo, not these notes: adapt the steps, and tell the owner what was different and
+what you did about it. If it differs in a way you can't safely work around, stop and ask.
+
 **Steps** (from the root of AQ's repo):
 1. `git clone -b handoff https://github.com/dhairyakhetan/TerraNotes.git ../terranotes-handoff` (outside AQ's repo:
    never commit it there). The export needs only Node 20+, no `npm install` in the clone.
