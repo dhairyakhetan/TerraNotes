@@ -39,7 +39,8 @@ hand, and never edit those three folders in AQ's repo afterwards (the next expor
    `/labs` (redirects into AQ Labs). AQ's nav and phone dock must sit over the top of every page, with the "← Back to
    home" pill just under the nav; no errors in the console from the magazine.
 6. Commit only: `frontend/package.json` + `package-lock.json` (matter-js), `frontend/src/terranotes/`,
-   `frontend/public/terranotes/`, `frontend/scripts/terranotes/`. Delete the clone.
+   `frontend/public/terranotes/`, `frontend/scripts/terranotes/`, and `frontend/public/sitemap.xml` (AQ's build rewrites
+   it with the magazine's addresses). `git status` should show nothing else. Delete the clone.
 
 **What AQ's own code already does for it** (it's in AQ's repo from the first integration; keep it, don't redo it. On a
 repo that has none of it, these are what to add):
