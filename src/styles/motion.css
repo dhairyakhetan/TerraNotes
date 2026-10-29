@@ -101,7 +101,7 @@
 }
 
 /* Page to page (lib/animatedHistory.js sets html[data-tn-nav] to into / next / prev / back / page during the swap).
-   Inside AQ's website these ::view-transition rules can't work from the shadow root: embed/aq/styles/document.css
+   Inside AQ's website these ::view-transition rules can't work from the shadow root: src/styles/document.css
    carries a copy (keep the two in step).
    The header is its own layer, so it holds still while the pages move under it. */
 header.site-header{view-transition-name:site-header}

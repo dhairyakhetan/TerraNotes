@@ -125,7 +125,7 @@ function articleCard(e, a) {
 // "Top secret" foil and its number in a foil box), fanned on a desk, newest on top, beside the name.
 function mainCard() {
   // a few editions fan wide; more fan tighter (spacing and tilt shrink) so the fan stays clear of the name
-  const eds = EDITIONS.filter((e) => !e.draft), L = editionData(LATEST).look, C = L.colors, F = L.fonts;
+  const eds = EDITIONS.filter((e) => !e.draft), L = editionData(LATEST).look, F = L.fonts;
   const n = eds.length, gap = n <= 2 ? 235 : 440 / (n - 1), tilt = n <= 2 ? 10 : 18 / Math.max(1, (n - 1) / 2) / 2, mid = n <= 2 ? 790 : 860;
   const books = eds.map((e, i) => { const { colors: c, fonts: f } = editionData(e.number).look, k = i - (n - 1) / 2;
     return `<div class="book" style="left:${mid + k * gap}px;top:${118 + Math.abs(k) * (n <= 2 ? 24 : 12)}px;transform:rotate(${k * tilt}deg);z-index:${i};background:${c.text};box-shadow:10px 10px 0 ${c.ink}">

@@ -42,9 +42,3 @@ export const ogImage = {
   games: (n) => withBase(`/og/${editionId(n)}-games.jpg`), // an edition's /games: Buddy's three games on its paper
   game: (id, n) => withBase(`/og/${editionId(n)}-game-${id}.jpg`), // its /games/snake, /games/float, /games/fling
 };
-// the month a new edition is due, for the empty "previous editions" shelf
-export const nextMonth = () => {
-  const [m, y] = editionOf(LATEST).month.split(' ');
-  const d = new Date(`${m} 1, ${y}`); d.setMonth(d.getMonth() + 1);
-  return d.toLocaleString('en', { month: 'long', year: 'numeric' });
-};

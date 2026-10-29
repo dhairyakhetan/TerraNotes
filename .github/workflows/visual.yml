@@ -22,7 +22,6 @@ jobs:
       - run: npm ci
       - run: npx playwright install --with-deps chromium
       - run: npm run build
-        env: { FAHHH: '0' } # the test is of the magazine, whatever the fahhh switch says (fahhh/switch.js)
       - name: Compare
         if: ${{ !inputs.update }}
         run: npx playwright test

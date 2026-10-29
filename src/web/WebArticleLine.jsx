@@ -6,7 +6,7 @@ import { Clip } from '../shared/Tapes.jsx';
 import { homeLink } from '../data/editions.js';
 import { useByWriter } from '../lib/byWriter.js';
 import { useEdition } from '../lib/edition.js';
-import { HANGERS, LAYOUT } from '../editions/pages.js';
+import { HANGERS } from '../editions/pages.js';
 import { pad2 } from '../lib/format.js';
 import { pageZoom } from '../lib/layoutMode.js';
 import { calm } from '../lib/motion.js';
@@ -17,19 +17,14 @@ import { FONT } from '../styles/fonts.js';
 // "Articles" label card hangs from the intro card's knot, and a lead string runs from its knot to the card nearest
 // the "spot" (where the first card rests). Everything that moves is in runLine() below.
 // Peg i hangs at x = 164 + 208·i; the per-card tables repeat every 12 pegs.
-// With the edition's LAYOUT leadCard (src/editions/pages.js) the first piece hangs as the big card (webNext, drawn at
-// LEAD_SCALE so it clears the photo wall), the rest follow it, the wire runs on to the page's edge, and a dashed
-// "more soon" slot hangs after the last card, so the line never just stops.
-const PITCH = 208, LEAD_SCALE = 0.92, LEAD_W = Math.round(340 * LEAD_SCALE), LEAD_H = Math.round(460 * LEAD_SCALE);
-const LEAD_X = 250, AFTER_LEAD = LEAD_X + LEAD_W / 2 + 40 + 86; // the big card's peg, and the next one's
+const PITCH = 208;
 const CARD_TOP = [106, 158, 118, 180, 112, 150, 162, 118, 136, 184, 122, 160]; // y of each card's clip
 const TILT = [-2.2, 1.6, -1.2, 2.4, -1.8, 1.4, -2.6, 1.9, -1.1, 2.2, -1.6, 1.2];
 const SWING = [1.75, 1.39, 1.63, 1.26, 1.69, 1.45, 1.3, 1.73, 1.48, 1.23, 1.59, 1.38];
 const DURATION = [4.8, 5.5, 6.2];
 // pitch: the space from one card's peg to the next (wider for an edition that hangs things between them: HANGERS)
-const peg = (i, lead, pitch = PITCH) => {
-  if (lead && i === 0) return { x: LEAD_X, y: 78, drop: 18, tilt: -1.2, swing: 0.9, dur: DURATION[0], lead: true };
-  const x = lead ? AFTER_LEAD + pitch * (i - 1) : 164 + pitch * i, y = i % 2 ? 88 : 78;
+const peg = (i, pitch = PITCH) => {
+  const x = 164 + pitch * i, y = i % 2 ? 88 : 78;
   return { x, y, drop: CARD_TOP[i % 12] - y, tilt: TILT[i % 12], swing: SWING[i % 12], dur: DURATION[i % 3] };
 };
 // the wire from peg `from` (where the lead string ties on) to the far end
@@ -50,7 +45,7 @@ const PULL_K = 0.07, PULL_DAMP = 0.8;    // the pull's spring: a little overshoo
 // - the lead string runs from the label's knot to the card nearest the spot; once you let go of the line it pulls
 //   that card into the spot (or to the very end, so the last cards are reachable)
 // - progress bar and arrow states are written directly, so scrolling never re-renders React
-function runLine(r, pegs, width, strung = pegs) { // strung: every peg on the wire (the cards', and a "more soon" slot's)
+function runLine(r, pegs, width) {
   const { el, svg, knot, lead, wire, bar, prev, next } = r;
   const hangs = [...r.hangs], kicks = [...r.kicks]; // copies: React clears the originals on unmount
   const still = calm();
@@ -119,7 +114,7 @@ function runLine(r, pegs, width, strung = pegs) { // strung: every peg on the wi
     if (retie) {
       if (tie >= 0 && !still && end) { from = end; tiedAt = now; }
       tie = k;
-      wire.setAttribute('d', wireFrom(strung, width, k));
+      wire.setAttribute('d', wireFrom(pegs, width, k));
     }
     const t = from ? Math.min(1, (now - tiedAt) / RETIE_MS) : 1, e = 1 - (1 - t) ** 3;
     end = t < 1 ? { x: from.x + (target.x - from.x) * e, y: from.y + (target.y - from.y) * e } : target;
@@ -169,14 +164,11 @@ export default function WebArticleLine() {
   const refs = useRef({ hangs: [], kicks: [] }).current;
   const { by, mine, isMine, list } = useByWriter(); // ?by=<name>: that writer's pieces first, taped
   const { number, id } = useEdition();
-  const lead = !!LAYOUT[id]?.leadCard && list.length > 1;
   const Hanger = HANGERS[id]; // the edition's little hangers between the cards (October's diyas), if any
   const pitch = Hanger ? 250 : PITCH; // room for them: clear of the cards on both sides
-  const pegs = list.map((_, i) => peg(i, lead, pitch));
-  const soon = lead ? { x: pegs[pegs.length - 1].x + pitch, y: pegs.length % 2 ? 88 : 78 } : null; // the "more soon" slot
-  const width = lead ? Math.max(soon.x + 224, 1140) : pegs[pegs.length - 1].x + 224; // 1140: the line's window: the wire reaches its edge
-  const strung = soon ? [...pegs, soon] : pegs;
-  useEffect(() => runLine(refs, pegs, width, strung), []);
+  const pegs = list.map((_, i) => peg(i, pitch));
+  const width = pegs[pegs.length - 1].x + 224;
+  useEffect(() => runLine(refs, pegs, width), []);
   const scrollBy = (dx) => { refs.stopPull?.(); refs.el.scrollBy({ left: dx, behavior: 'smooth' }); };
 
   // mouse: drag the line sideways (touch and trackpads scroll it natively); a drag doesn't count as a click on a card
@@ -223,44 +215,29 @@ export default function WebArticleLine() {
         </div>
       </div>
       <div ref={(n) => { refs.el = n; }} role="region" className="art-scroller" onPointerDown={onPointerDown} onClickCapture={onClickCapture} onDragStart={(e) => e.preventDefault()} tabIndex={0} aria-label="All write-ups, scroll sideways" style={{ position: "absolute", left: "300px", top: "470px", width: "1140px", height: "530px", overflowX: "auto", overflowY: "hidden", userSelect: "none", WebkitUserSelect: "none" }}>
-        <div style={{ position: "relative", width: `${width}px`, height: lead ? "530px" : "520px" }}>
+        <div style={{ position: "relative", width: `${width}px`, height: "520px" }}>
           <svg width={width} height="200" viewBox={`0 0 ${width} 200`} style={{ position: "absolute", left: "0", top: "0" }} aria-hidden="true">
-            <path ref={(n) => { refs.wire = n; }} d={wireFrom(strung, width, 0)} fill="none" strokeWidth="1.8" style={{ stroke: "var(--string)" }} />
+            <path ref={(n) => { refs.wire = n; }} d={wireFrom(pegs, width, 0)} fill="none" strokeWidth="1.8" style={{ stroke: "var(--string)" }} />
           </svg>
 
           {list.map((a, i) => {
             const p = pegs[i];
             return (
               // a gentle idle sway (CSS); the inner box takes the swing from scrolling (runLine)
-              <div key={a.slug} ref={(n) => { refs.hangs[i] = n; }} className="hang sway" style={{ position: "absolute", left: `${p.x - (p.lead ? LEAD_W / 2 : 86)}px`, top: `${p.y}px`, width: `${p.lead ? LEAD_W : 172}px`, height: `${p.drop + (p.lead ? LEAD_H : 272)}px`, "--a": `${(p.swing * 0.45).toFixed(2)}deg`, "--d": `${(p.dur * 1.5).toFixed(1)}s`, animationDelay: `${(-1.3 * i).toFixed(1)}s` }}>
+              <div key={a.slug} ref={(n) => { refs.hangs[i] = n; }} className="hang sway" style={{ position: "absolute", left: `${p.x - 86}px`, top: `${p.y}px`, width: "172px", height: `${p.drop + 272}px`, "--a": `${(p.swing * 0.45).toFixed(2)}deg`, "--d": `${(p.dur * 1.5).toFixed(1)}s`, animationDelay: `${(-1.3 * i).toFixed(1)}s` }}>
                 <div ref={(n) => { refs.kicks[i] = n; }} style={{ position: "absolute", inset: "0", transformOrigin: "50% 0" }}>
-                  <div style={{ position: "absolute", left: `${(p.lead ? LEAD_W / 2 : 86) - 0.7}px`, top: "0", width: "1.4px", height: `${p.drop + 2}px`, background: "var(--string)" }} />
-                  {p.lead ? (
-                    <div style={{ position: "absolute", left: "0", top: `${p.drop}px`, width: "340px", height: "460px", transform: `rotate(${p.tilt}deg) scale(${LEAD_SCALE})`, transformOrigin: "0 0" }}>
-                      <ArticleCard article={a} look="webNext" mark={isMine(a) ? by : undefined} />
-                    </div>
-                  ) : (
-                    <div style={{ position: "absolute", left: "0", top: `${p.drop}px`, width: "172px", height: "272px", transform: `rotate(${p.tilt}deg)`, transformOrigin: "50% 0" }}>
-                      <ArticleCard article={a} look="web" mark={isMine(a) ? by : undefined} />
-                    </div>
-                  )}
+                  <div style={{ position: "absolute", left: "85.3px", top: "0", width: "1.4px", height: `${p.drop + 2}px`, background: "var(--string)" }} />
+                  <div style={{ position: "absolute", left: "0", top: `${p.drop}px`, width: "172px", height: "272px", transform: `rotate(${p.tilt}deg)`, transformOrigin: "50% 0" }}>
+                    <ArticleCard article={a} look="web" mark={isMine(a) ? by : undefined} />
+                  </div>
                 </div>
               </div>
             );
           })}
-          {Hanger && strung.slice(1).map((q, k) => { // in the gap between two cards, tied on where the wire dips, in front of them
-            const p = strung[k];
+          {Hanger && pegs.slice(1).map((q, k) => { // in the gap between two cards, tied on where the wire dips, in front of them
+            const p = pegs[k];
             return <Hanger key={k} v={k} string={[30, 78, 48, 96, 38, 64][k % 6]} s={34} delay={-k * 0.9} style={{ left: `${(p.x + q.x) / 2 - 17}px`, top: `${(p.y + q.y) / 4 + 55 - 2}px` }} />;
           })}
-          {soon && ( // where the next pieces will hang: a dashed slot on its own string
-            <div className="hang sway" style={{ position: "absolute", left: `${soon.x - 86}px`, top: `${soon.y}px`, width: "172px", height: "230px", "--a": "0.6deg", "--d": "7.2s", animationDelay: "-2s" }}>
-              <div style={{ position: "absolute", left: "85.3px", top: "0", width: "1.4px", height: "42px", background: "var(--string)" }} />
-              <div style={{ position: "absolute", left: "0", top: "40px", width: "172px", height: "180px", boxSizing: "border-box", border: "2px dashed var(--ink)", background: "var(--cream)", transform: "rotate(1.6deg)", transformOrigin: "50% 0", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "8px", padding: "14px", textAlign: "center" }}>
-                <div style={{ fontFamily: FONT.hand, fontSize: "26px", lineHeight: "1", color: "var(--hand)" }}>more soon</div>
-                <div style={{ fontFamily: FONT.mono, fontSize: "11px", letterSpacing: "1.2px", textTransform: "uppercase", color: "var(--ink)" }}>a new issue every month</div>
-              </div>
-            </div>
-          )}
         </div>
       </div>
       <div data-ruled="" style={{ position: "absolute", left: "300px", top: "1024px", width: "1060px", display: "flex", alignItems: "center", gap: "20px" }}>

@@ -1,5 +1,5 @@
 // Finding what TerraNotes drew. On its own site everything is in the document; inside AQ's website it draws inside a
-// shadow root (embed/aq/TerraNotesRoot.jsx), where document.getElementById and querySelector find nothing. So code here
+// shadow root (src/TerraNotesRoot.jsx), where document.getElementById and querySelector find nothing. So code here
 // never asks `document` for an element it drew: it uses byId / $ (and pop-ups go into portalRoot(), not document.body).
 // The embed registers its shadow root here (setRoot); on the standalone site nothing does and the document is used.
 let root = null, host = null, portals = null;

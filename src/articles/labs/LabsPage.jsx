@@ -246,7 +246,7 @@ export default function LabsPage({ article: a, web, chapter }) {
   const [shownStill, stillLeaving] = usePresence(still, 180);
   const ch = web ? null : chapter; // phone: the chapter open (null = the shelf)
   useEffect(() => { document.title = `Aquaterra — ${a.title}`; }, [a.title]);
-  useEffect(() => { flag('tnLabs', ''); return () => flag('tnLabs', null); }, []); // inside AQ: its footer meets the gallery (embed/aq/styles/document.css)
+  useEffect(() => { flag('tnLabs', ''); return () => flag('tnLabs', null); }, []); // inside AQ: its footer meets the gallery (src/styles/document.css)
   const img = (f, alt = '') => ({ src: `${dir}/${f}`, alt });
   const stills = useMemo(() => STILLS.map((caption, i) => ({ photo: `${dir}/karyaarth/still-${pad2(i + 1)}.webp`, caption, place: `KA ${pad2(i + 1)}` })), [dir]);
 

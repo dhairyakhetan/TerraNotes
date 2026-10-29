@@ -21,7 +21,3 @@ Import the repo in Vercel; it detects Vite. `vercel.json` adds the single-page-a
 preview) and security and cache headers.
 The site's address for link previews is `SITE.url` in `src/data/site.js`. To override it, set `SITE_URL` in the
 Vercel project.
-
-## The fahhh switch
-
-`fahhh/switch.js`: set `FAHHH = true` (or the Vercel environment variable `FAHHH=1`) and the whole site is just the animated "fahhh" page, with its own title and link preview. `false` (or `FAHHH=0`) shows the magazine.

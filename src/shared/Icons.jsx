@@ -2,10 +2,6 @@
 // in the style: a CSS variable colour (var(--ink)) isn't safe in an SVG attribute everywhere.
 const svg = (size, view, { stroke, ...props }, children) => <svg width={size} height={size} viewBox={`0 0 ${view} ${view}`} fill="none" aria-hidden="true" style={{ stroke }} {...props}>{children}</svg>;
 
-export const GlobeIcon = ({ size = 14 }) => svg(size, 16, { stroke: "currentColor", strokeWidth: "1.5" }, <><circle cx="8" cy="8" r="6.5" /><path d="M1.5 8 H14.5" /><path d="M8 1.5 C5.5 4 5.5 12 8 14.5 C10.5 12 10.5 4 8 1.5" /></>);
-
-export const InstagramIcon = ({ size = 14 }) => svg(size, 16, { stroke: "currentColor", strokeWidth: "1.5" }, <><rect x="1.75" y="1.75" width="12.5" height="12.5" rx="3.5" /><circle cx="8" cy="8" r="3" /><circle cx="11.9" cy="4.1" r=".6" fill="currentColor" stroke="none" /></>);
-
 // ✕ for close buttons
 export const CloseIcon = ({ size = 16, weight = 2.6 }) => svg(size, 20, { stroke: "var(--ink)", strokeWidth: weight, strokeLinecap: "square" }, <><path d="M3 3 L17 17" /><path d="M17 3 L3 17" /></>);
 
