@@ -18,6 +18,8 @@ html,a,button{touch-action:manipulation} /* no double-tap zoom, so no tap delay 
    spacer under that nav (every artboard is positioned against its 64px / 80px), visibility so nothing that measures
    it breaks. */
 :host([data-tn-aq]) header.site-header > *,html[data-tn-aq] header.site-header > *{visibility:hidden} /* the band stays: text doesn't show through under AQ's nav */
+/* AQ's nav is z-index 50: the band (sticky, z-index 50 inline) goes just under it, still over the page scrolling by */
+:host([data-tn-aq]) header.site-header,html[data-tn-aq] header.site-header{z-index:49 !important}
 
 /* press feedback: links and buttons dim while pressed, except the ones with their own press style */
 :where(a,button):active{opacity:.6}
