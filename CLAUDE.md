@@ -17,6 +17,12 @@ hand, and never edit those three folders in AQ's repo afterwards (the next expor
 | `public/terranotes/` (~13 MB) | `public/` (all but the own site's icons and manifest): fonts, covers, photos, link previews, the Wisdom Woods demo | adds and updates; never deletes AQ's own files there |
 | `scripts/terranotes/` | `build/staticCopy.js`, `embed/aq/scripts/prerender.mjs`, `tools/make-link-previews.mjs` | replaces it whole |
 
+**If your prompt named one folder** (say "make the changes in `frontend/public/terranotes`"): that's the owner's
+shorthand for "put the magazine into AQ's site". The magazine is all three folders in the table above, and the export
+writes them together; `public/terranotes/` alone is only its pictures and fonts, with no code. Do all three, as below,
+and say so. A link like `https://github.com/dhairyakhetan/TerraNotes/tree/handoff` means: clone this repo's `handoff`
+branch (step 1).
+
 **Check before you trust this.** The owner wrote these notes from a copy of AQ's repo, and may have it wrong. Before
 writing anything, look at AQ's repo as it is: where its frontend lives (`frontend/`?), whether `src/terranotes/` is
 already there and what's in it, whether its `App.tsx`, `PublicLayout.tsx`, `routeModules.ts`, `vercel.json` and
