@@ -10,7 +10,7 @@ import { FONT } from '../styles/fonts.js';
 //   2. The magazine leaves room for the nav itself: its own header is hidden but keeps its box (80px on laptops, 64px
 //      on phones) at the top of every page, under AQ's fixed nav. So <main> must NOT add AQ's usual nav padding on
 //      /terranotes pages (PublicLayout.tsx skips it there today: keep it that way).
-//   3. The magazine's "← Back to home" pill sits just under the nav, at top: var(--nav-h) + 10px. Keep AQ setting
+//   3. The magazine's "← Back to home" pill sits a little under the nav, at top: var(--nav-h) + 30px. Keep AQ setting
 //      --nav-h on :root (70px, 62px at ≤760px) to the nav's real height, or the pill will overlap it.
 //   4. AQ's phone dock covers the foot of the screen; the magazine has no footer of its own, so AQ's footer should
 //      keep its usual room for the dock (isBottomNavHidden() must stay false for /terranotes).

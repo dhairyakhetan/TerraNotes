@@ -6,6 +6,7 @@ import { cardCover } from './ArticleCard.jsx';
 import { EDITIONS, LATEST, editionLink, editionName } from '../data/editions.js';
 import { editionData } from '../editions/index.js';
 import { useEdition } from '../lib/edition.js';
+import { isHomePath } from '../lib/routes.js';
 import { AQ_LOOK } from '../host.js';
 import { FONT } from '../styles/fonts.js';
 
@@ -15,8 +16,8 @@ import { FONT } from '../styles/fonts.js';
 //   beside the games card (shared/EndCards.jsx). The page's own edition says "you're here"; one still being made
 //   (draft: true in data/editions.js) shows as "coming", with no link and nothing of its content.
 // - BackToMagazine: a small "← Back to home" pill under AQ's nav on the other pages (the header's back link).
-// - EditionPills: "Latest edition →" (while an older edition shows) and "All editions" (/editions), pills at the top
-//   right under AQ's nav on every page (the header's edition picker); App.jsx draws them.
+// - EditionPills: "Latest edition →" and "All editions" (/editions), on an older edition's home page only (the latest's
+//   has the editions card at its end), top right under AQ's nav; App.jsx draws them.
 const MONO = { fontFamily: FONT.mono, fontWeight: "700", letterSpacing: "1.4px", textTransform: "uppercase" };
 const short = (month) => month.replace(/^(\w{3})\w*/, '$1');
 
@@ -84,25 +85,24 @@ export function BackToMagazine({ web }) {
   if (!AQ_LOOK) return null;
   const z = web ? 'var(--web-zoom, 1)' : 'var(--phone-zoom, 1)';
   return (
-    <BackHome className={web ? 'btn' : 'press'} aria-hidden={away ? 'true' : undefined} tabIndex={away ? -1 : undefined} style={{ transition: "transform .25s ease, opacity .25s ease, translate 160ms ease", transform: away ? "translateY(-24px)" : "none", opacity: away ? "0" : "1", pointerEvents: away ? "none" : "auto", position: "fixed", zIndex: "40", top: `calc(var(--nav-h, 70px) / ${z} + 16px)`, left: web ? "24px" : "12px", display: "inline-flex", alignItems: "center", minHeight: "44px", padding: "0 16px", boxSizing: "border-box", borderRadius: "999px", background: "var(--card)", border: "2px solid var(--ink)", boxShadow: "3px 3px 0 var(--ink)", "--c": "var(--ink)", ...MONO, fontSize: web ? "12px" : "11px", color: "var(--ink)", textDecoration: "none" }}>← Back to home</BackHome>
+    <BackHome className={web ? 'btn' : 'press'} aria-hidden={away ? 'true' : undefined} tabIndex={away ? -1 : undefined} style={{ transition: "transform .25s ease, opacity .25s ease, translate 160ms ease", transform: away ? "translateY(-24px)" : "none", opacity: away ? "0" : "1", pointerEvents: away ? "none" : "auto", position: "fixed", zIndex: "40", top: `calc(var(--nav-h, 70px) / ${z} + 30px)`, left: web ? "24px" : "12px", display: "inline-flex", alignItems: "center", minHeight: "44px", padding: "0 16px", boxSizing: "border-box", borderRadius: "999px", background: "var(--card)", border: "2px solid var(--ink)", boxShadow: "3px 3px 0 var(--ink)", "--c": "var(--ink)", ...MONO, fontSize: web ? "12px" : "11px", color: "var(--ink)", textDecoration: "none" }}>← Back to home</BackHome>
   );
 }
 
-// top right, under AQ's fixed nav (--nav-h; on the own site its placeholder is 70px). Drawn outside the zoomed page
-// (App.jsx), so the offset is in screen pixels. Not on /editions (unless an older edition is showing), and not on the
-// phone's AQ Labs page, where its own tabs sit there.
+// top right, a little under AQ's fixed nav (--nav-h; on the own site its placeholder is 70px), clear of the page's top
+// edge. Drawn outside the zoomed page (App.jsx), so the offset is in screen pixels. Only on an older edition's home page
+// (/sep26, /sep26/photos…): not on the latest edition, and not on article pages, where the "In this piece" panel sits
+// there. Side by side, so on phones they stay clear of Buddy under them.
 export function EditionPills({ web }) {
   const away = useScrollAway();
   const { number } = useEdition();
   const { pathname } = useLocation();
-  if (!AQ_LOOK) return null;
-  const onEditions = pathname === '/editions', older = number !== LATEST;
-  if ((onEditions && !older) || (!web && /\/articles\/labs(\/|$)/.test(pathname))) return null;
-  const pill = { display: "inline-flex", alignItems: "center", justifyContent: "center", minHeight: "44px", padding: "0 16px", boxSizing: "border-box", borderRadius: "999px", background: "var(--card)", border: "2px solid var(--ink)", boxShadow: "3px 3px 0 var(--ink)", "--c": "var(--ink)", ...MONO, fontSize: web ? "12px" : "11px", color: "var(--ink)", textDecoration: "none", whiteSpace: "nowrap" };
+  if (!AQ_LOOK || number === LATEST || !isHomePath(pathname)) return null;
+  const pill = { display: "inline-flex", alignItems: "center", justifyContent: "center", minHeight: "44px", padding: web ? "0 16px" : "0 12px", boxSizing: "border-box", borderRadius: "999px", background: "var(--card)", border: "2px solid var(--ink)", boxShadow: "3px 3px 0 var(--ink)", "--c": "var(--ink)", ...MONO, fontSize: web ? "12px" : "11px", color: "var(--ink)", textDecoration: "none", whiteSpace: "nowrap" };
   return (
-    <div aria-hidden={away ? 'true' : undefined} style={{ ...slip(away), position: "fixed", zIndex: "40", top: "calc(var(--nav-h, 70px) + 16px)", right: web ? "24px" : "12px", display: "flex", flexDirection: web ? "row" : "column", alignItems: "flex-end", gap: "10px" }}>
-      {older && <Link to={editionLink(LATEST)} className={web ? 'btn' : 'press'} tabIndex={away ? -1 : undefined} style={{ ...pill, background: "var(--yellow)" }}>Latest edition →</Link>}
-      {!onEditions && <Link to="/editions" className={web ? 'btn' : 'press'} tabIndex={away ? -1 : undefined} style={pill}>All editions</Link>}
+    <div aria-hidden={away ? 'true' : undefined} style={{ ...slip(away), position: "fixed", zIndex: "40", top: `calc(var(--nav-h, 70px) + ${web ? 30 : 22}px)`, right: web ? "24px" : "12px", display: "flex", gap: web ? "10px" : "8px" }}>
+      <Link to={editionLink(LATEST)} className={web ? 'btn' : 'press'} tabIndex={away ? -1 : undefined} style={{ ...pill, background: "var(--yellow)" }}>Latest edition →</Link>
+      <Link to="/editions" className={web ? 'btn' : 'press'} tabIndex={away ? -1 : undefined} style={pill}>All editions</Link>
     </div>
   );
 }

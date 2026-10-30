@@ -47,14 +47,19 @@ what you did about it. If it differs in a way you can't safely work around, stop
    `verify-routing`, `tsc -b`, `vite build`, the sitemap gate, the bundle budget (eager 666 KB of 683.6 KB; the lazy
    `TerraNotesRoot` chunk, ~275 KB, only prints a "worth splitting" note). If AQ's `scripts/check-bundle-budget.mjs` was
    raised to 705,000 bytes for an earlier export (the magazine's page animations used to load up front), set it back to
-   700,000: they load with the magazine now (`lib/pageSwap.js`) and the prerender (34 Terra Notes pages, plus
-   `llms.txt`).
+   700,000: they load with the magazine now (`lib/pageSwap.js`) and the prerender (a page per live article and
+   edition section, plus `llms.txt`; an edition scheduled with `live` joins it at the first build after its time).
 5. Check it in a browser (`npm run dev`, or `npx vite preview` after the build), at 1440px and at 390px (emulate touch):
    `/terranotes` (October), `/terranotes/articles/whispers-in-the-weave`, `/terranotes/sep26` (September, its own look),
    `/terranotes/sep26/articles/exam-stress`, `/terranotes/sep26/articles/labs` (AQ Labs), `/terranotes/photos`,
    `/labs` (redirects into AQ Labs). AQ's nav and phone dock must sit over the top of every page, with the "← Back to
    home" pill just under the nav; no errors in the console from the magazine.
-6. Commit only: `frontend/package.json` + `package-lock.json` (matter-js), `frontend/src/terranotes/`,
+6. A scheduled edition (`live` in `src/terranotes/data/editions.js`) shows on AQ's site at its time by itself; AQ's
+   prerendered pages and sitemap catch up at AQ's next build. To have that happen within the hour, add a copy of this
+   repo's `.github/workflows/go-live.yml` to AQ's repo, with its import pointed at
+   `./frontend/src/terranotes/data/editions.js` and a `VERCEL_DEPLOY_HOOK` secret for AQ's Vercel project (ask the owner
+   to create it; without it, the step just warns).
+7. Commit only: `frontend/package.json` + `package-lock.json` (matter-js), `frontend/src/terranotes/`,
    `frontend/public/terranotes/`, `frontend/scripts/terranotes/`, and `frontend/public/sitemap.xml` (AQ's build rewrites
    it with the magazine's addresses). `git status` should show nothing else. Delete the clone.
 
@@ -198,7 +203,8 @@ not part of the work here (`tools/export-aq.mjs` is their tool; don't run it unl
 - **`src/host.js` is what differs:** AQ's copy says `{ base: '/terranotes', embedded: true }`. AQ-only behaviour checks
   `HOST.embedded` (the phone "call Buddy" button, no skip link of its own, AQ Labs running full width,
   and `shared/InsideAQ.jsx`: the editions card at the end of the home pages, a "← Back to home" pill under AQ's
-  nav, and "Latest edition →" / "All editions" pills top right (`EditionPills`), standing in for the hidden header); AQ-only styles are rules that
+  nav, and "Latest edition →" / "All editions" pills top right on an older edition's home page (`EditionPills`),
+  standing in for the hidden header); AQ-only styles are rules that
   start with `:host`.
 - **AQ's look on the own site too.** The own site is AQ's testing ground, so by default it shows the magazine as it
   sits inside AQ (`AQ_LOOK` in `src/host.js`): header hidden, a plain placeholder box where AQ's nav goes (`shared/AqNavSlot.jsx`, with the integration notes for AQ's Claude),
@@ -435,9 +441,11 @@ public/                 editions/<id>/ (articles/<slug>/: cover, preview, own ph
   2. Register it in `src/editions/index.js`, and add `{ number: 3, month: 'November 2026', theme: '…', draft: true }` to `EDITIONS` (`theme`: its name on `/editions`).
   3. Fill it in: its articles, photo wall, words, team, `INTRO`, and its look (`look.js`: colours and fonts from the owner). Files go in `public/editions/nov26/`. Preview it at `/nov26` (both widths).
   4. Going live: delete `draft: true`. The previous edition moves to `/<its id>` with its own look; nothing else to change.
-     Or schedule it: `live: 'YYYY-MM-DD'` in place of `draft: true` (e.g. the month's last day) and push it whenever it's ready:
-     it stays a draft (its tape says when it goes live) until midnight India time that day, then goes live by itself, and
-     `.github/workflows/go-live.yml` rebuilds the site that night (it needs the `VERCEL_DEPLOY_HOOK` secret; see the file).
+     Or schedule it: `live: 'YYYY-MM-DD HH:MM'` (India time) in place of `draft: true`, e.g. `'2026-10-31 20:00'`, and push
+     it whenever it's ready: it stays a draft (the edition before it stays the home page; its tape says when it goes live)
+     until that moment, then goes live by itself, and `.github/workflows/go-live.yml` rebuilds the site within the hour
+     (it needs the `VERCEL_DEPLOY_HOOK` secret; see the file). The visual test runs a year ahead, so a switchover never
+     changes its screenshots.
 - **New member:** add them to the edition's `MEMBERS` (`team.js`) with a square ~400px WebP in `public/team/`. The faces lay themselves out.
 - **New block type in articles:**
   1. Render it in `shared/ArticleBody.jsx` (both sizes, `web` = ×1.25).

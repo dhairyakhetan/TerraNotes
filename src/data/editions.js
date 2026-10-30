@@ -11,18 +11,25 @@ import { withBase } from '../lib/base.js';
 //          ones). Delete it to let the newest take the home page again.
 //   draft: true = still being made: not the latest, not listed anywhere (edition picker, /editions, sitemap), but
 //          viewable at its own address (/oct26) with a "draft" tape. Delete the flag to put it live.
-//   live:  'YYYY-MM-DD' = goes live by itself at midnight, India time, at the start of that day (e.g. the month's last
-//          day, '2026-11-30'). Until then it's a draft, as above, its tape saying when it goes live; so a finished
-//          edition can be pushed early. Each reader's page checks the time when it loads, and
-//          .github/workflows/go-live.yml rebuilds the site that night (link previews, sitemap, the home page's title).
+//   live:  'YYYY-MM-DD HH:MM' (or just 'YYYY-MM-DD': midnight), India time = when it goes live by itself, e.g.
+//          '2026-10-31 20:00'. Until then it's a draft, as above (the edition before it stays the home page), its tape
+//          saying when it goes live; so a finished edition can be pushed early. Each reader's page checks the time
+//          when it loads, and .github/workflows/go-live.yml rebuilds the site within the hour (link previews,
+//          sitemap, the home page's title).
 
 const EDITION_LIST = [
   { number: 1, month: 'September 2026', theme: 'Exam season' },
-  { number: 2, month: 'October 2026', theme: 'Pujo & Diwali' },
+  { number: 2, month: 'October 2026', theme: 'Pujo & Diwali', live: '2026-10-31 20:00' },
 ];
 
-// 00:00 in Kolkata (UTC+5:30) on an edition's `live` day, as a time; an edition without one is live already
-export const liveAt = (e) => (e.live ? Date.parse(`${e.live}T00:00:00+05:30`) : 0);
+// an edition's `live` moment (India time, UTC+5:30) as a time; an edition without one is live already
+export const liveAt = (e) => {
+  if (!e.live) return 0;
+  const [day, time = '00:00'] = e.live.trim().split(/[ T]+/);
+  const t = Date.parse(`${day}T${time}:00+05:30`);
+  if (Number.isNaN(t)) throw new Error(`data/editions.js: ${e.month} has live: '${e.live}', which isn't 'YYYY-MM-DD HH:MM'`);
+  return t;
+};
 // an edition whose day hasn't come is a draft until it does (`until`: the day, for its tape)
 export const EDITIONS = EDITION_LIST.map((e) => (liveAt(e) > Date.now() ? { ...e, draft: true, until: e.live } : e));
 

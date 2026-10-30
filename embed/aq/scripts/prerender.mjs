@@ -53,7 +53,7 @@ export function terraNotesPages(origin = SITE.website) {
   // a page with the main page's picture, or (an edition's other pages) that edition's
   const site = (path, title, body, n) => { const pv = n ? preview(ogImage.edition(n)) : preview(ogImage.home()); pages.push({
     path, file: `${path.slice(1)}.html`,
-    title: title ? `Aquaterra — ${title}` : 'Terra Notes | AquaTerra’s Monthly Digital Magazine',
+    title: title ? `Aquaterra — ${title}` : `Terra Notes · ${PUBLISHED.find((e) => e.number === LATEST).month} issue | AquaTerra’s Monthly Digital Magazine`, // names the current issue, like the own site's
     description: title ? `${title} · Terra Notes by AquaTerra.` : HOME_DESC,
     type: 'website', image: pv.image ? `${origin}${pv.image}` : '', imageAlt: n ? `Terra Notes ${editionName(n)}` : 'Terra Notes by AquaTerra', wide: pv.wide,
     label: title || 'Terra Notes', body, copy: pv.copy,

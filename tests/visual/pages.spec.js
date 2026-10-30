@@ -6,7 +6,7 @@ import { test, expect } from '@playwright/test';
 // diary's writing). The latest edition's pages, and an older edition's (/sep26), which must never change.
 const PAGES = {
   home: '/',
-  article: '/articles/pandal-hopping-field-guide',
+  article: '/articles/whispers-in-the-weave',
   'sep26-home': '/sep26',
   'sep26-article': '/sep26/articles/exam-stress',
 };
@@ -25,12 +25,17 @@ const seedRandom = () => {
   };
 };
 
+// The page's clock, a year on: every scheduled edition (data/editions.js `live`) is live, so the screenshots don't change
+// the day one goes live.
+const farFuture = () => { const ahead = 365 * 864e5, now = Date.now; Date.now = () => now() + ahead; };
+
 for (const [layout, device] of Object.entries(LAYOUTS)) {
   test.describe(layout, () => {
     test.use(device);
     for (const [name, path] of Object.entries(PAGES)) {
       test(name, async ({ page }) => {
         await page.addInitScript(seedRandom);
+        await page.addInitScript(farFuture);
         await page.goto(path, { waitUntil: 'networkidle' });
         await page.evaluate(async () => {
           await document.fonts.ready;
