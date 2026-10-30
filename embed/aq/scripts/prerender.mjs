@@ -20,7 +20,7 @@ import path from 'node:path';
 import crypto from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import { ALL_ARTICLES } from '../../src/terranotes/data/articles.js';
-import { LATEST, PUBLISHED, articleFolder, articleLink, editionName, homeLink, isDraft, ogImage } from '../../src/terranotes/data/editions.js';
+import { LATEST, PUBLISHED, articleFolder, articleLink, editionId, editionName, homeLink, isDraft, ogImage } from '../../src/terranotes/data/editions.js';
 import { SITE } from '../../src/terranotes/data/site.js';
 import { editionData } from '../../src/terranotes/editions/index.js';
 import { BASE } from '../../src/terranotes/lib/base.js';
@@ -50,7 +50,7 @@ const previewFor = (a) => preview(ogImage.article(a), a.cover || '');
 
 export function terraNotesPages(origin = SITE.website) {
   const pages = [];
-  // a page with the main page's picture, or (an edition's other pages) that edition's
+  // a page with its edition's link preview (n), or the all-editions one (/editions)
   const site = (path, title, body, n) => { const pv = n ? preview(ogImage.edition(n)) : preview(ogImage.home()); pages.push({
     path, file: `${path.slice(1)}.html`,
     title: title ? `Aquaterra — ${title}` : `Terra Notes · ${PUBLISHED.find((e) => e.number === LATEST).month} issue | AquaTerra’s Monthly Digital Magazine`, // names the current issue, like the own site's
@@ -58,16 +58,27 @@ export function terraNotesPages(origin = SITE.website) {
     type: 'website', image: pv.image ? `${origin}${pv.image}` : '', imageAlt: n ? `Terra Notes ${editionName(n)}` : 'Terra Notes by AquaTerra', wide: pv.wide,
     label: title || 'Terra Notes', body, copy: pv.copy,
   }); };
-  // each edition's home page and its sections, newest first (an older edition's: under its id, its edition in the title)
+  // each edition's home page and its sections, newest first (an older edition's: under its id, its edition in the title),
+  // each with its edition's link preview: /terranotes the latest's, /terranotes/sep26 September's. The latest is also
+  // written under its id (/terranotes/oct26…; the page sends you on to /terranotes), so an edition's own link shows its month.
   for (const e of [...PUBLISHED].reverse()) {
-    const old = e.number !== LATEST && `${editionName(e.number)} · ${e.month}`;
-    for (const [section, name] of Object.entries(SECTIONS)) site(at(homeLink(e.number, section)), [name, old].filter(Boolean).join(' · '), homeHtml[section](editionData(e.number)), homeLink(e.number, section) === '/' ? 0 : e.number);
+    for (const alias of e.number === LATEST ? [false, true] : [false]) {
+      const old = (e.number !== LATEST || alias) && `${editionName(e.number)} · ${e.month}`;
+      for (const [section, name] of Object.entries(SECTIONS)) {
+        const p = alias ? `/${editionId(e.number)}${section ? `/${section}` : ''}` : homeLink(e.number, section);
+        site(at(p), [name, old].filter(Boolean).join(' · '), homeHtml[section](editionData(e.number)), e.number);
+      }
+    }
   }
   site(at('/editions'), 'Editions', editionsHtml());
-  for (const a of ARTICLES) {
+  // each article at its address; one from an older edition also at the address it had while its edition was the latest
+  // (/terranotes/articles/<slug>, if no newer article has it), so a link shared then still shows its own preview
+  const taken = new Set(ARTICLES.filter((a) => a.edition === LATEST).map((a) => a.slug));
+  const earlier = [...ARTICLES].reverse().filter((a) => a.edition !== LATEST && !taken.has(a.slug) && taken.add(a.slug));
+  for (const [a, addr] of [...ARTICLES.map((a) => [a, articleLink(a)]), ...earlier.map((a) => [a, `/articles/${a.slug}`])]) {
     const desc = `${a.dek}${a.author ? ` — by ${a.author}` : ''}`;
     const pv = previewFor(a);
-    const base = at(articleLink(a));
+    const base = at(addr);
     const one = (p, file, extra = {}) => pages.push({
       path: p, file, title: `Aquaterra — ${a.title}`, description: desc, type: 'article',
       image: pv.image.startsWith('http') ? pv.image : `${origin}${pv.image}`, imageAlt: a.alt || a.title, wide: pv.wide, label: a.title,

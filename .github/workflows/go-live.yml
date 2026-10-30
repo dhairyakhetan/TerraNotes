@@ -1,11 +1,10 @@
-# An edition with a `live` time (src/data/editions.js, India time) goes live by itself at that moment: each reader's
-# page checks the time when it loads. This rebuilds the own site soon after, so what's made at build time catches up:
-# the home page's title and first colours, link previews, the sitemap, llms.txt.
-# It runs every hour at :05 India time and only does something when an edition went live in the last 90 minutes: it
-# calls the Vercel deploy hook in the repository secret VERCEL_DEPLOY_HOOK (Vercel → the project → Settings → Git →
-# Deploy Hooks, branch main; then GitHub → Settings → Secrets and variables → Actions). Run it by hand to rebuild now.
-# AQ's website builds from its own repo: it shows the new edition at the same moment (the same check in the page),
-# and its sitemap and prerendered pages catch up at its next build (CLAUDE.md, "Integrating into AQ's website").
+# Rebuilds the own site soon after an edition goes live, so what's made at build time catches up with it: page titles
+# and first colours, link previews, the sitemap, llms.txt. (The edition itself shows at its launch without this: each
+# reader's page checks the time.) An edition's launch is in src/data/editions.js: by default 8 pm India time on the last
+# day of its month, or its `live`. Every hour at :05 India time, tools/go-live-due.mjs asks whether one went live in the
+# last 90 minutes; if so, this calls the Vercel deploy hook in the repository secret VERCEL_DEPLOY_HOOK (Vercel → the
+# project → Settings → Git → Deploy Hooks, branch main; then GitHub → Settings → Secrets and variables → Actions).
+# Run it by hand to rebuild now. AQ's website runs its own copy (embed/aq/scripts/terranotes-go-live.yml).
 name: Go live
 on:
   schedule:
@@ -22,13 +21,7 @@ jobs:
         with: { node-version: 22 }
       - name: Did an edition just go live?
         id: due
-        run: |
-          node --input-type=module -e "
-            const { EDITIONS, liveAt } = await import('./src/data/editions.js');
-            const now = Date.now(), due = EDITIONS.filter((e) => e.live && liveAt(e) <= now && liveAt(e) > now - 90 * 60e3).map((e) => e.month);
-            console.log(due.length ? 'Just went live: ' + due.join(', ') : 'Nothing went live in the last 90 minutes.');
-            (await import('node:fs')).appendFileSync(process.env.GITHUB_OUTPUT, 'due=' + (due.length ? 'yes' : 'no') + '\n');
-          "
+        run: node tools/go-live-due.mjs
       - name: Rebuild the site
         if: ${{ steps.due.outputs.due == 'yes' || github.event_name == 'workflow_dispatch' }}
         env: { HOOK: '${{ secrets.VERCEL_DEPLOY_HOOK }}' }

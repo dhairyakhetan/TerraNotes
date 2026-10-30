@@ -11,27 +11,34 @@ import { withBase } from '../lib/base.js';
 //          ones). Delete it to let the newest take the home page again.
 //   draft: true = still being made: not the latest, not listed anywhere (edition picker, /editions, sitemap), but
 //          viewable at its own address (/oct26) with a "draft" tape. Delete the flag to put it live.
-//   live:  'YYYY-MM-DD HH:MM' (or just 'YYYY-MM-DD': midnight), India time = when it goes live by itself, e.g.
-//          '2026-10-31 20:00'. Until then it's a draft, as above (the edition before it stays the home page), its tape
-//          saying when it goes live; so a finished edition can be pushed early. Each reader's page checks the time
-//          when it loads, and .github/workflows/go-live.yml rebuilds the site within the hour (link previews,
-//          sitemap, the home page's title).
+//   live:  when it goes live by itself. Left out: LAUNCH below, 8 pm India time on the last day of its month (October
+//          2026: 31 Oct, 8 pm), so a new edition can be pushed whenever it's ready and comes out on time with nothing
+//          to set. Or 'YYYY-MM-DD HH:MM' (India time; 'YYYY-MM-DD' alone = midnight) for another moment, or 'now'.
+//          Until then it's a draft, as above (the edition before it stays the home page), its tape saying when it
+//          goes live. Each reader's page checks the time when it loads; .github/workflows/go-live.yml rebuilds the
+//          site within the hour (link previews, sitemap, page titles; on AQ's website its own copy does).
 
 const EDITION_LIST = [
   { number: 1, month: 'September 2026', theme: 'Exam season' },
-  { number: 2, month: 'October 2026', theme: 'Pujo & Diwali', live: '2026-10-31 20:00' },
+  { number: 2, month: 'October 2026', theme: 'Pujo & Diwali' },
 ];
 
-// an edition's `live` moment (India time, UTC+5:30) as a time; an edition without one is live already
+// an edition's launch, unless its `live` says otherwise: at this time (India time) on the last day of its month
+export const LAUNCH_TIME = '20:00';
+const lastDay = (month) => { const d = new Date(month.replace(' ', ' 1, ')); return new Date(Date.UTC(d.getFullYear(), d.getMonth() + 1, 0)).toISOString().slice(0, 10); };
+// its launch as 'YYYY-MM-DD HH:MM' (India time), or null for live: 'now'
+export const launchOf = (e) => (e.live === 'now' ? null : e.live || `${lastDay(e.month)} ${LAUNCH_TIME}`);
+// its launch as a time (UTC+5:30 is India time); 0 for live: 'now'
 export const liveAt = (e) => {
-  if (!e.live) return 0;
-  const [day, time = '00:00'] = e.live.trim().split(/[ T]+/);
+  const when = launchOf(e);
+  if (!when) return 0;
+  const [day, time = '00:00'] = when.trim().split(/[ T]+/);
   const t = Date.parse(`${day}T${time}:00+05:30`);
-  if (Number.isNaN(t)) throw new Error(`data/editions.js: ${e.month} has live: '${e.live}', which isn't 'YYYY-MM-DD HH:MM'`);
+  if (Number.isNaN(t)) throw new Error(`data/editions.js: ${e.month} has live: '${e.live}', which isn't 'YYYY-MM-DD HH:MM' or 'now'`);
   return t;
 };
-// an edition whose day hasn't come is a draft until it does (`until`: the day, for its tape)
-export const EDITIONS = EDITION_LIST.map((e) => (liveAt(e) > Date.now() ? { ...e, draft: true, until: e.live } : e));
+// an edition whose launch hasn't come is a draft until it does (`until`: its launch, for its tape)
+export const EDITIONS = EDITION_LIST.map((e) => (liveAt(e) > Date.now() ? { ...e, draft: true, until: launchOf(e) } : e));
 
 export const PUBLISHED = EDITIONS.filter((e) => !e.draft);
 export const LATEST = (PUBLISHED.find((e) => e.home) || PUBLISHED[PUBLISHED.length - 1]).number;

@@ -1,0 +1,37 @@
+# TerraNotes' go-live rebuild for AQ's website. Copy this file once to .github/workflows/terranotes-go-live.yml in
+# AQ's repo; it never needs changing after that: the logic is scripts/terranotes/go-live-due.mjs, which every export keeps
+# up to date. Every hour it asks whether a TerraNotes edition went live in the last 90 minutes (by default 8 pm India
+# time on the last day of its month) and, if so, calls the Vercel deploy hook in the secret VERCEL_DEPLOY_HOOK (AQ's
+# Vercel project → Settings → Git → Deploy Hooks, branch main; then this repo's Settings → Secrets and variables →
+# Actions), so the prerendered pages, link previews and sitemap show the new edition. The new edition itself shows at
+# its time without this (each page checks the time). Run it by hand to rebuild now.
+name: TerraNotes go-live
+on:
+  schedule:
+    - cron: '35 * * * *' # every hour at :35 UTC = :05 India time
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  rebuild:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            frontend/src/terranotes
+            frontend/scripts/terranotes
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - name: Did an edition just go live?
+        id: due
+        run: node frontend/scripts/terranotes/go-live-due.mjs
+      - name: Rebuild the site
+        if: ${{ steps.due.outputs.due == 'yes' || github.event_name == 'workflow_dispatch' }}
+        env: { HOOK: '${{ secrets.VERCEL_DEPLOY_HOOK }}' }
+        run: |
+          if [ -z "$HOOK" ]; then
+            echo "::warning::No VERCEL_DEPLOY_HOOK secret: the new edition shows anyway, but the prerendered pages, link previews and sitemap wait for the next deploy."
+            exit 0
+          fi
+          curl -fsS -X POST "$HOOK" > /dev/null && echo "Rebuild started."

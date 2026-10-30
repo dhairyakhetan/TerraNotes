@@ -17,6 +17,33 @@ hand, and never edit those three folders in AQ's repo afterwards (the next expor
 | `public/terranotes/` (~13 MB) | `public/` (all but the own site's icons and manifest): fonts, covers, photos, link previews, the Wisdom Woods demo | adds and updates; never deletes AQ's own files there |
 | `scripts/terranotes/` | `build/staticCopy.js`, `embed/aq/scripts/prerender.mjs`, `tools/make-link-previews.mjs` | replaces it whole |
 
+### Pending on AQ's site: do these (the owner removes each one once it's done there)
+
+This list grows until the owner says it's been added. Claude in AQ's repo: do every item, in order, then tell the owner
+which you did. Claude in this repo: add every change AQ's site needs here, and only delete an item when the owner says
+it's on AQ's site.
+
+1. **Update TerraNotes from the `handoff` branch** with the export ("Updating a site that already has it" below), after
+   31 Oct 2026, 8 pm India time, so the build already has October in it (check: `TZ=Asia/Kolkata date`). It brings:
+   - the edition pills ("Latest edition →", "All editions") on an older edition's home page itself, clear of Buddy's
+     hidden call button (they covered it on web);
+   - link previews right for every address: `/terranotes` the latest edition's, `/terranotes/sep26` September's (also
+     while it's the latest: its address gets its own page), `/terranotes/editions` all of them; a scheduled edition's
+     nothing until it's live;
+   - the launch timer's default: an edition goes live at 8 pm India time on the last day of its month, nothing to set.
+2. **Delete the `public/terranotes/` files the export says it left alone** (`og/home.jpg`, replaced by one preview per
+   edition).
+3. **Install the go-live rebuild, once:** copy `frontend/scripts/terranotes/terranotes-go-live.yml` (the export writes
+   it) to `.github/workflows/terranotes-go-live.yml`, and ask the owner to create a Vercel deploy hook for AQ's project
+   (Settings → Git → Deploy Hooks, branch `main`) and save it as the repository secret `VERCEL_DEPLOY_HOOK`. From then on
+   every edition's launch rebuilds AQ's site within the hour by itself (sitemap, prerendered pages, link previews).
+4. **Delete the branch `claude/friendly-thompson-4brvft`** (already in `main`).
+5. **Full build, check, push to `main`**: `npm run build`; at 1440px and 390px `/terranotes` shows October and
+   `/terranotes/sep26` September with its pills; don't commit `public/sitemap.xml` (Vercel's build makes it, with
+   Supabase). After Vercel deploys: `https://www.ngoaquaterra.com/sitemap.xml` lists
+   `/terranotes/articles/whispers-in-the-weave` and `/terranotes/sep26/articles/exam-stress`; `/terranotes`'s
+   `og:image` is October's (`og/oct26-….jpg`), `/terranotes/sep26`'s September's.
+
 **Updating a site that already has it** (the usual case: AQ's site is live with TerraNotes; this is a fix or a new
 edition, not a new integration): skip the setup. From `frontend/`: clone the `handoff` branch next to the repo, run
 `node <clone>/tools/export-aq.mjs . --dry`, then without `--dry`; delete the `public/terranotes/` files it says it left
@@ -264,6 +291,10 @@ Two separate layouts, chosen by window width (`lib/layoutMode.js`, `useIsWeb()`)
 - **Addresses follow the editions** (`data/editions.js`; each edition's id comes from its month, `sep26`):
   - latest edition: `/` and `/articles/<slug>`; older ones and drafts: `/<id>` (that edition's whole home page, in its own look) and `/<id>/articles/<slug>`.
   - Build links with `articleLink(a)` / `editionLink(n)` / `homeLink(n, section)`, never by hand. A new edition moves the old links by itself; either address of an article redirects to its current one (`App.jsx`).
+- **Link previews follow the address:** the main page (`/`, AQ's `/terranotes`) and its sections show the latest
+  edition's card (`og/<id>.jpg`); an edition's own address (`/sep26`, `/sep26/photos`; the latest's too, written as its
+  own page by the build) shows that month's; `/editions` and the 404 the all-editions picture (`og/home-<latest id>.jpg`);
+  articles and games their own. A scheduled edition's pages aren't built until it's live, so nothing of it shows early.
 - **Files follow the editions too:** `public/editions/<id>/` holds that edition's files, latest or not. Each article has a folder, `public/editions/<id>/articles/<slug>/`: `cover.jpg`, `cover-card.webp` and `cover-page.webp` (the WebP copies the cards and the article page use, made by the tool; link previews keep the JPEG) and any photos of its own (`articleFolder(a)`). Every link preview lives together in `public/og/` (`ogImage` in `data/editions.js`): `home-<id>.jpg` (the main page, `/` and `/editions`: one per edition, the latest's used, so a scheduled edition's stays unseen until it's live), `<id>.jpg` (an edition's home and section pages), `<id>-<slug>.jpg` (an article). The photo wall's pictures are in `public/editions/<id>/photos/`.
 - **An article can have its own page** instead of the usual layout: `page: 'labs'` in its data and an entry in `PAGES` (`App.jsx`). It lives in `src/articles/<name>/`.
   - Its `body` is still what crawlers and AIs read.
@@ -446,12 +477,12 @@ public/                 editions/<id>/ (articles/<slug>/: cover, preview, own ph
   1. Copy the newest folder in `src/editions/` to `src/editions/nov26/` and update its header comments; register its CSS, doodles and `LAYOUT` in `src/editions/pages.js` (copy the newest edition's entries), and add its line to `TAGLINE` in `tools/make-link-previews.mjs`.
   2. Register it in `src/editions/index.js`, and add `{ number: 3, month: 'November 2026', theme: '…', draft: true }` to `EDITIONS` (`theme`: its name on `/editions`).
   3. Fill it in: its articles, photo wall, words, team, `INTRO`, and its look (`look.js`: colours and fonts from the owner). Files go in `public/editions/nov26/`. Preview it at `/nov26` (both widths).
-  4. Going live: delete `draft: true`. The previous edition moves to `/<its id>` with its own look; nothing else to change.
-     Or schedule it: `live: 'YYYY-MM-DD HH:MM'` (India time) in place of `draft: true`, e.g. `'2026-10-31 20:00'`, and push
-     it whenever it's ready: it stays a draft (the edition before it stays the home page; its tape says when it goes live)
-     until that moment, then goes live by itself, and `.github/workflows/go-live.yml` rebuilds the site within the hour
-     (it needs the `VERCEL_DEPLOY_HOOK` secret; see the file). The visual test runs a year ahead, so a switchover never
-     changes its screenshots.
+  4. Going live is automatic: delete `draft: true` once it's ready and push it. It stays a draft (the edition before it
+     stays the home page; its tape says when it goes live) until its launch, 8 pm India time on the last day of its month
+     (`LAUNCH_TIME` in `data/editions.js`), then goes live by itself: the previous edition moves to `/<its id>` with its
+     own look. Another moment: `live: 'YYYY-MM-DD HH:MM'` (India time), or `live: 'now'`. `.github/workflows/go-live.yml`
+     rebuilds the own site within the hour (it needs the `VERCEL_DEPLOY_HOOK` secret; see the file), and AQ's copy
+     rebuilds AQ's. The visual test runs a year ahead, so a launch never changes its screenshots.
 - **New member:** add them to the edition's `MEMBERS` (`team.js`) with a square ~400px WebP in `public/team/`. The faces lay themselves out.
 - **New block type in articles:**
   1. Render it in `shared/ArticleBody.jsx` (both sizes, `web` = ×1.25).

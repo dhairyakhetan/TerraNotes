@@ -53,7 +53,12 @@ export default function siteFiles(host) {
       };
       const home = og(ogImage.home()), withHome = (html) => (home ? withImage(html, home, 'TerraNotes by Aquaterra') : html);
 
-      for (const a of ARTICLES) {
+      // each article at its address; one from an older edition also at the address it had while its edition was the
+      // latest (/articles/<slug>, if no newer article has it), so a link shared then still shows its own preview
+      // (the page itself sends you on to its address now)
+      const taken = new Set(ARTICLES.filter((a) => a.edition === LATEST).map((a) => a.slug));
+      const earlier = [...ARTICLES].reverse().filter((a) => a.edition !== LATEST && !taken.has(a.slug) && taken.add(a.slug));
+      for (const [a, at] of [...ARTICLES.map((a) => [a, articleLink(a)]), ...earlier.map((a) => [a, `/articles/${a.slug}`])]) {
         const desc = `${a.dek}${a.author ? ` — by ${a.author}` : ''}`;
         let html = setTitle(base, `Aquaterra — ${a.title}`);
         html = setMeta(html, 'name', 'description', desc);
@@ -67,31 +72,34 @@ export default function siteFiles(host) {
           if (pic === a.cover) html = html.replace(/\s*<meta property="og:image:(width|height)"[^>]*>/g, ''); // a cover isn't 1200×630
         }
         html = html.replace('</title>', `</title>\n    <link rel="canonical" href="${esc(url(articleLink(a)))}" />`);
-        out(`${articleLink(a).slice(1)}.html`, withContent(html, articleHtml(a)));
+        out(`${at.slice(1)}.html`, withContent(html, articleHtml(a)));
         // its chapters (<article>/<id>) share its page; a demo (<article>/<chapter>/demo) gets its own title
-        for (const c of a.chapters || []) out(`${articleLink(a).slice(1)}/${c}.html`, withContent(setMeta(html, 'property', 'og:url', url(`${articleLink(a)}/${c}`)), articleHtml(a)));
+        for (const c of a.chapters || []) out(`${at.slice(1)}/${c}.html`, withContent(setMeta(html, 'property', 'og:url', url(`${articleLink(a)}/${c}`)), articleHtml(a)));
         for (const c of Object.keys(a.demos || {})) {
           const name = `${c.replace(/-/g, ' ').replace(/\b\w/g, (x) => x.toUpperCase())} · demo`;
-          out(`${articleLink(a).slice(1)}/${c}/demo.html`, setMeta(setMeta(setTitle(html, name), 'property', 'og:title', name), 'property', 'og:url', url(`${articleLink(a)}/${c}/demo`)));
+          out(`${at.slice(1)}/${c}/demo.html`, setMeta(setMeta(setTitle(html, name), 'property', 'og:title', name), 'property', 'og:url', url(`${articleLink(a)}/${c}/demo`)));
         }
       }
 
-      // each edition's home page and its sections (an older edition's: under its id, its edition in the title)
+      // each edition's home page and its sections (an older edition's: under its id, its edition in the title), each with
+      // its edition's link preview: the main page (/) the latest's, /sep26 September's. The latest is also written under its
+      // id (/oct26, /oct26/photos…; the page itself sends you on to /), so an edition's own link always shows its month.
       const TITLES = { '': '', articles: 'All articles', photos: 'Photo wall', words: 'Words we should bring back', members: 'Meet the team' };
       const pages = [];
-      for (const e of [...PUBLISHED].reverse()) { // newest first
-        const old = e.number !== LATEST && `${editionName(e.number)} · ${e.month}`;
+      const addresses = [...PUBLISHED].reverse().flatMap((e) => [[e, false], ...(e.number === LATEST ? [[e, true]] : [])]); // newest first
+      for (const [e, alias] of addresses) {
+        const old = (e.number !== LATEST || alias) && `${editionName(e.number)} · ${e.month}`;
         for (const [section, name] of Object.entries(TITLES)) {
-          const p = homeLink(e.number, section), title = [name, old].filter(Boolean).join(' · ');
+          const p = alias ? `/${editionId(e.number)}${section ? `/${section}` : ''}` : homeLink(e.number, section), title = [name, old].filter(Boolean).join(' · ');
           let html = title ? setMeta(setTitle(base, `Aquaterra — ${title}`), 'property', 'og:title', `${title} · TerraNotes`) : base;
           html = setMeta(html, 'property', 'og:url', url(p));
           const about = `${editionData(e.number).intro} ${editionName(e.number)} · ${e.month} · TerraNotes by Aquaterra.`;
-          if (e.number !== LATEST) html = setMeta(setMeta(html, 'name', 'description', about), 'property', 'og:description', about); // the latest's: index.html's own
-          // the main page shows the magazine; an edition's other pages show that edition
-          const pic = p === '/' ? null : og(ogImage.edition(e.number));
+          if (old) html = setMeta(setMeta(html, 'name', 'description', about), 'property', 'og:description', about); // the latest's: index.html's own
+          if (alias) html = html.replace('</title>', `</title>\n    <link rel="canonical" href="${esc(url(homeLink(e.number, section)))}" />`);
+          const pic = og(ogImage.edition(e.number));
           html = pic ? withImage(html, pic, `TerraNotes ${editionName(e.number)} · ${e.month}`) : withHome(html);
           out(p === '/' ? 'index.html' : `${p.slice(1)}.html`, withContent(html, homeHtml[section](editionData(e.number))));
-          if (e.number === LATEST || !section) pages.push(p); // the sitemap: the latest's sections, an older edition's home
+          if (!alias && (e.number === LATEST || !section)) pages.push(p); // the sitemap: the latest's sections, an older edition's home
         }
       }
       out('editions.html', withContent(withHome(setMeta(setMeta(setTitle(base, 'Aquaterra — Editions'), 'property', 'og:title', 'Editions · TerraNotes'), 'property', 'og:url', url('/editions'))), editionsHtml()));

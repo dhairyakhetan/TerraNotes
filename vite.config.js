@@ -9,7 +9,7 @@ import siteFiles from './build/siteFiles.js';
 // because link previews need absolute URLs; build/siteFiles.js writes the per-page HTML, sitemap and llms.txt.
 // The latest edition's look (src/editions/<id>/look.js) fills %LOOK% (its colours and fonts as CSS variables, so the
 // page is drawn in them before the app starts; then lib/edition.js puts on the look of the page's own edition),
-// %HOME_OG% (the latest edition's main-page preview, data/editions.js ogImage), %THEME_COLOR% (the browser bar) and %LOOK_FONTS% (its extra fonts stylesheet, if any); %HOME_TITLE% / %HOME_DESC% the
+// %HOME_OG% (the main page's link preview: the latest edition's, data/editions.js ogImage), %THEME_COLOR% (the browser bar) and %LOOK_FONTS% (its extra fonts stylesheet, if any); %HOME_TITLE% / %HOME_DESC% the
 // main page's title and description, naming the current issue.
 const host = (process.env.SITE_URL || SITE.url).replace(/\/$/, '');
 const look = editionData(LATEST).look;
@@ -17,7 +17,7 @@ const vars = [...Object.entries(look.colors).map(([k, v]) => `--${k}:${v}`), ...
 // the main page's title and description name the current issue (the per-page copies, build/siteFiles.js, start from these)
 const latest = PUBLISHED.find((e) => e.number === LATEST), attr = (t) => t.replace(/&/g, '&amp;').replace(/"/g, '&quot;');
 const homeDesc = `${editionData(LATEST).intro} ${editionName(LATEST)} · ${latest.month} · TerraNotes by Aquaterra, notes from where the land meets the water.`;
-const fill = (html) => html.replaceAll('%SITE_URL%', host).replaceAll('%HOME_OG%', ogImage.home()).replaceAll('%HOME_TITLE%', attr(homeHeadline())).replaceAll('%HOME_DESC%', attr(homeDesc)).replace('%LOOK%', `:root{${vars}}`).replace('%THEME_COLOR%', look.colors.page)
+const fill = (html) => html.replaceAll('%SITE_URL%', host).replaceAll('%HOME_OG%', ogImage.edition(LATEST)).replaceAll('%HOME_TITLE%', attr(homeHeadline())).replaceAll('%HOME_DESC%', attr(homeDesc)).replace('%LOOK%', `:root{${vars}}`).replace('%THEME_COLOR%', look.colors.page)
   .replace('%LOOK_FONTS%', look.fontsCss ? `<link href="${look.fontsCss}" rel="stylesheet" />` : '');
 
 export default defineConfig({
