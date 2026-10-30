@@ -1,7 +1,8 @@
 // Link-preview pictures (1200×630, the shape WhatsApp, Instagram, iMessage… show big), all kept together in public/og/
 // (src/data/editions.js ogImage):
-//   home.jpg            the main page: every edition as its notebook from the opening animation ("Top secret", its
-//                       issue in a foil box), fanned beside the TerraNotes name
+//   home-<id>.jpg       the main page while that edition is the latest (home-oct26.jpg): it and the editions before it as
+//                       notebooks from the opening animation ("Top secret", its issue in a foil box), fanned beside the
+//                       TerraNotes name. One per live or scheduled edition; pages use the latest's
 //   <edition id>.jpg    each edition (sep26.jpg): its paper (September ruled notebook, October's Pujo ribbon and toran),
 //                       the name, its month and a "No. 01" stamp, and up to three of its covers (topped up from its
 //                       photo wall) hanging on a string
@@ -19,7 +20,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { chromium } from 'playwright';
 import { ALL_ARTICLES, tagOf } from '../src/data/articles.js';
-import { EDITIONS, LATEST, editionId, ogImage } from '../src/data/editions.js';
+import { EDITIONS, editionId, ogImage } from '../src/data/editions.js';
 import { GAMES, gamesFor } from '../src/data/games.js';
 import { editionData } from '../src/editions/index.js';
 import { withBase } from '../src/lib/base.js';
@@ -123,9 +124,12 @@ function articleCard(e, a) {
 
 // the main page: the magazine itself. Every edition as its notebook from the opening animation (its cover colour, the
 // "Top secret" foil and its number in a foil box), fanned on a desk, newest on top, beside the name.
-function mainCard() {
+// One per edition (home-<id>.jpg), drawn as the main page is while that edition is the latest: it and the ones before
+// it, in its look. So a scheduled edition (data/editions.js `live`) has its own ready, unused until it goes live.
+const SHOWN = EDITIONS.filter((e) => !e.draft || e.until); // live and scheduled ones (not plain drafts)
+function mainCard(top) {
   // a few editions fan wide; more fan tighter (spacing and tilt shrink) so the fan stays clear of the name
-  const eds = EDITIONS.filter((e) => !e.draft), L = editionData(LATEST).look, F = L.fonts;
+  const eds = SHOWN.filter((e) => e.number <= top), L = editionData(top).look, F = L.fonts;
   const n = eds.length, gap = n <= 2 ? 235 : 440 / (n - 1), tilt = n <= 2 ? 10 : 18 / Math.max(1, (n - 1) / 2) / 2, mid = n <= 2 ? 790 : 860;
   const books = eds.map((e, i) => { const { colors: c, fonts: f } = editionData(e.number).look, k = i - (n - 1) / 2;
     return `<div class="book" style="left:${mid + k * gap}px;top:${118 + Math.abs(k) * (n <= 2 ? 24 : 12)}px;transform:rotate(${k * tilt}deg);z-index:${i};background:${c.text};box-shadow:10px 10px 0 ${c.ink}">
@@ -156,7 +160,7 @@ function mainCard() {
     <div class="hand">notes from where the land meets the water</div>
     <div class="line">Stories, research, fashion, photos and art by Aquaterra's students. A new edition every month, each with its own look.</div></div>
   ${books}
-  <div class="tape">${eds.length} editions so far · read them all</div>
+  <div class="tape">${eds.length === 1 ? "the first edition · read it" : `${eds.length} editions so far · read them all`}</div>
   <div class="logo"><img class="g" src="${globe}"><img class="w" src="${word}"></div></body></html>`;
 }
 
@@ -216,7 +220,7 @@ const shot = async (html, url) => {
   await p.screenshot({ path: file, type: 'jpeg', quality: 84 });
   console.log(url, Math.round(fs.statSync(file).size / 1024), 'KB');
 };
-await shot(mainCard(), ogImage.home());
+for (const e of SHOWN) await shot(mainCard(e.number), ogImage.home(e.number));
 
 for (const ed of EDITIONS) {
   const e = { ...ed, id: editionId(ed.number) }, d = editionData(e.number), mine = ALL_ARTICLES.filter((a) => a.edition === e.number && a.cover);

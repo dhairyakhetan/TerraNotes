@@ -50,9 +50,10 @@ export const articleLink = (a) => `${a.edition === LATEST ? '' : `/${editionId(a
 // (inside AQ's website under its /terranotes: lib/base.js)
 export const articleFolder = (a) => withBase(`/editions/${editionId(a.edition)}/articles/${a.slug}`);
 // the link-preview pictures (1200×630, made by tools/make-link-previews.mjs), all kept together in public/og/: the main
-// page's (home.jpg), each edition's (sep26.jpg) and each article's (sep26-labs.jpg), as URLs (inside AQ: under /terranotes)
+// page's (home-oct26.jpg: one per edition, as the main page looked while it was the latest, so a scheduled edition's
+// stays unseen until it's live), each edition's (sep26.jpg) and each article's (sep26-labs.jpg), as URLs (inside AQ: under /terranotes)
 export const ogImage = {
-  home: () => withBase('/og/home.jpg'),
+  home: (n = LATEST) => withBase(`/og/home-${editionId(n)}.jpg`),
   edition: (n) => withBase(`/og/${editionId(n)}.jpg`),
   article: (a) => withBase(`/og/${editionId(a.edition)}-${a.slug}.jpg`),
   games: (n) => withBase(`/og/${editionId(n)}-games.jpg`), // an edition's /games: Buddy's three games on its paper
