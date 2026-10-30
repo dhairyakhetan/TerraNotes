@@ -48,7 +48,8 @@ The same code runs as the magazine's own site and here; `src/terranotes/host.js`
    `lib/animatedHistory.js` `createAnimatedHistory()` with `onShown()` (`App.tsx` `AppRouter`), and
    `scripts/terranotes/prerender.mjs` `terraNotesPages()`, `terraNotesLlms()`, `terraNotesSitemapPaths()`
    (`prerender-meta.mjs`, `generate-sitemap.mjs`). The `.d.ts` stubs beside them are what `tsc` sees.
-4. **Page-change animation** (card flights, crossfades) is `lib/animatedHistory.js`, which is AQ's router history
+4. **Page-change animation** (card flights, crossfades) goes through `lib/animatedHistory.js`, which is AQ's router history
+   (kept small: AQ loads it with its first page; the animating itself, `lib/pageSwap.js`, loads with the magazine)
    (`App.tsx` `AppRouter`). It only animates changes that stay inside `/terranotes`; everything else passes through.
    Its `useTransitions={false}` toggle in `AppRouter` is needed for the flights: don't remove it.
 5. **AQ's nav, dock and footer wrap it (the magazine has no footer); the magazine's own header is hidden** (`:host header.site-header{visibility:hidden}`

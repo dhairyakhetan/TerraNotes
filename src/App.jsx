@@ -32,6 +32,9 @@ import { HOST, AQ_LOOK } from './host.js';
 import { gameLink, gameOf } from './data/games.js';
 import { openGames } from './lib/buddyState.js';
 import AqNavSlot from './shared/AqNavSlot.jsx';
+import { EditionPills } from './shared/InsideAQ.jsx';
+import { setPageSwap } from './lib/animatedHistory.js';
+import { pageSwap } from './lib/pageSwap.js';
 import { ALL_ARTICLES } from './data/articles.js';
 import { LATEST, articleFolder, articleLink, editionById, editionLink, editionOf, homeLink, isDraft } from './data/editions.js';
 import { editionData } from './editions/index.js';
@@ -63,6 +66,9 @@ import { ScrollMemory } from './lib/scrollMemory.js';
 // Around them: the skip link, the crash card and Buddy's games popup (it outlives navigation). There is no footer.
 // Inside AQ's website (src/host.js embedded; src/TerraNotesRoot.jsx mounts this) AQ draws the skip link, so this
 // doesn't; on the own site, AQ's look puts a placeholder where AQ's nav will be (shared/AqNavSlot.jsx).
+
+// page changes within the magazine animate (lib/pageSwap.js) once the magazine has loaded (lib/animatedHistory.js)
+setPageSwap(pageSwap);
 
 // Articles with their own page instead of the usual layout (an article's `page` in data/articles.js)
 const PAGES = { labs: LabsPage };
@@ -168,6 +174,7 @@ export default function App() {
           </Routes></Zoom>
         )}
       </ErrorBoundary>
+      {!bare && <EditionPills web={web} />}
       {!bare && <Games />}
       {edition.draft && !bare && <DraftTape />}
     </EditionContext.Provider>

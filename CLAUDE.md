@@ -44,8 +44,10 @@ what you did about it. If it differs in a way you can't safely work around, stop
    `data/photos.js`, `data/team.js`, `data/words.js`, `shared/SnakeCard.jsx`, `scripts/terranotes/tools/make-card-covers.mjs`
    (each edition's content now lives in `src/terranotes/editions/<id>/`). That's expected.
 4. `npm run build` in `frontend/` (AQ's whole chain). Tested on a copy of AQ's repo (October 2026): it passes, i.e. accent lint,
-   `verify-routing`, `tsc -b`, `vite build`, the sitemap gate, the bundle budget (eager 672 KB of 683.6 KB; the lazy
-   `TerraNotesRoot` chunk, 273 KB, only prints a "worth splitting" note) and the prerender (34 Terra Notes pages, plus
+   `verify-routing`, `tsc -b`, `vite build`, the sitemap gate, the bundle budget (eager 666 KB of 683.6 KB; the lazy
+   `TerraNotesRoot` chunk, ~275 KB, only prints a "worth splitting" note). If AQ's `scripts/check-bundle-budget.mjs` was
+   raised to 705,000 bytes for an earlier export (the magazine's page animations used to load up front), set it back to
+   700,000: they load with the magazine now (`lib/pageSwap.js`) and the prerender (34 Terra Notes pages, plus
    `llms.txt`).
 5. Check it in a browser (`npm run dev`, or `npx vite preview` after the build), at 1440px and at 390px (emulate touch):
    `/terranotes` (October), `/terranotes/articles/whispers-in-the-weave`, `/terranotes/sep26` (September, its own look),
@@ -195,8 +197,8 @@ not part of the work here (`tools/export-aq.mjs` is their tool; don't run it unl
 
 - **`src/host.js` is what differs:** AQ's copy says `{ base: '/terranotes', embedded: true }`. AQ-only behaviour checks
   `HOST.embedded` (the phone "call Buddy" button, no skip link of its own, AQ Labs running full width,
-  and `shared/InsideAQ.jsx`: the editions card at the end of the home pages and a "← Back to home" pill under AQ's
-  nav, standing in for the hidden header); AQ-only styles are rules that
+  and `shared/InsideAQ.jsx`: the editions card at the end of the home pages, a "← Back to home" pill under AQ's
+  nav, and "Latest edition →" / "All editions" pills top right (`EditionPills`), standing in for the hidden header); AQ-only styles are rules that
   start with `:host`.
 - **AQ's look on the own site too.** The own site is AQ's testing ground, so by default it shows the magazine as it
   sits inside AQ (`AQ_LOOK` in `src/host.js`): header hidden, a plain placeholder box where AQ's nav goes (`shared/AqNavSlot.jsx`, with the integration notes for AQ's Claude),
@@ -218,7 +220,8 @@ not part of the work here (`tools/export-aq.mjs` is their tool; don't run it unl
   - `npm run build` runs `tools/check-embed.mjs` first and fails on any of these. A line that genuinely needs one (a
     document-level element) ends with the comment `embed-ok`.
 - **What AQ's code uses from here** (keep these working): `TerraNotesRoot.jsx` (default export), `lib/base.js`
-  `isTnPath`, `lib/animatedHistory.js` `createAnimatedHistory()` with `onShown()`, and `embed/aq/scripts/prerender.mjs`
+  `isTnPath`, `lib/animatedHistory.js` `createAnimatedHistory()` with `onShown()` (AQ loads these two with its first
+  page, so keep them small: the page animations are `lib/pageSwap.js`, which `App.jsx` plugs in), and `embed/aq/scripts/prerender.mjs`
   (`terraNotesPages()`, `terraNotesLlms()`, `terraNotesSitemapPaths()`; it builds on `build/staticCopy.js`).
 - **AQ-only files:** `src/TerraNotesRoot.jsx`, `src/styles/document.css`, the `.d.ts` stubs, and `embed/aq/` (the
   README for AQ's side and the prerender). The self-hosted fonts are shared: `public/fonts/`.
@@ -363,7 +366,7 @@ Popups are white cards with a hard shadow and a clip:
 - **One-shot animations** go in `styles/motion.css`. Entrances animate the `translate` / `rotate` / `scale` properties (not `transform`) so elements keep their tilt.
 - **JS animation** must check `calm()` (reduced motion) from `lib/motion.js`. For per-frame work, run `requestAnimationFrame` only while something moves. `web/WebArticleLine.jsx` is the model.
 - **`LITE`** (low-end devices: ≤2 GB memory, ≤2 cores, Data Saver, or `?lite`) stops every loop.
-- **Page changes** go through `lib/animatedHistory.js`. A card link flies (`lib/cardFlight.js`); anything else crossfades.
+- **Page changes** go through `lib/animatedHistory.js` (animated by `lib/pageSwap.js`). A card link flies (`lib/cardFlight.js`); anything else crossfades.
 
 ## Where things are
 
@@ -410,7 +413,7 @@ src/shared/             used by both layouts:
                         Fling: Angry Birds style, matter-js physics loaded with its tab)
 src/lib/                logic only, no JSX:
   base (BASE, withBase)   dom (byId, $, portalRoot, flag)   useDialogA11y
-  edition (useEdition, applyLook)   layoutMode   routes   scrollMemory   animatedHistory   cardFlight   motion (calm, LITE)   fitTitle
+  edition (useEdition, applyLook)   layoutMode   routes   scrollMemory   animatedHistory + pageSwap (page-change animations)   cardFlight   motion (calm, LITE)   fitTitle
   byWriter (?by=)   teamLayout   photoShapes   useGallery   useWordsGame   usePresence   pauseOffscreen
   scrollLock   buddyState   introNotebook   consoleHello   format (pad2, firstName, instagramUrl, teamsOf)
   freshCode (a page from before a deploy reloads once when its lazy code is gone: wrap new React.lazy loaders in freshLoad)
