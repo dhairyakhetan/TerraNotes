@@ -1,0 +1,41 @@
+# An edition with a `live` day (src/data/editions.js) goes live by itself at midnight India time: each reader's page
+# checks the time when it loads. This rebuilds the own site that night too, so what's made at build time catches up:
+# the home page's title and first colours, link previews, the sitemap, llms.txt.
+# It runs every night at 00:05 IST and only does something on a day an edition goes live: it calls the Vercel deploy
+# hook in the repository secret VERCEL_DEPLOY_HOOK (Vercel → the project → Settings → Git → Deploy Hooks, branch
+# main; then GitHub → Settings → Secrets and variables → Actions). Run it by hand to rebuild now.
+# AQ's website builds from its own repo: it shows the new edition at the same moment (the same check in the page),
+# and its sitemap and prerendered pages catch up at its next build.
+name: Go live
+on:
+  schedule:
+    - cron: '35 18 * * *' # 18:35 UTC = 00:05 IST
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  rebuild:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - name: Does an edition go live today?
+        id: today
+        run: |
+          node --input-type=module -e "
+            const { EDITIONS } = await import('./src/data/editions.js');
+            const today = new Date(Date.now() + 5.5 * 3600e3).toISOString().slice(0, 10); // the date in India
+            const due = EDITIONS.filter((e) => e.live === today).map((e) => e.month);
+            console.log(due.length ? 'Going live today: ' + due.join(', ') : 'Nothing goes live today (' + today + ').');
+            (await import('node:fs')).appendFileSync(process.env.GITHUB_OUTPUT, 'due=' + (due.length ? 'yes' : 'no') + '\n');
+          "
+      - name: Rebuild the site
+        if: ${{ steps.today.outputs.due == 'yes' || github.event_name == 'workflow_dispatch' }}
+        env: { HOOK: '${{ secrets.VERCEL_DEPLOY_HOOK }}' }
+        run: |
+          if [ -z "$HOOK" ]; then
+            echo "::warning::No VERCEL_DEPLOY_HOOK secret: the new edition shows anyway, but the build-time parts (link previews, sitemap) wait for the next deploy."
+            exit 0
+          fi
+          curl -fsS -X POST "$HOOK" > /dev/null && echo "Rebuild started."

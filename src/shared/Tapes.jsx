@@ -25,8 +25,9 @@ export const LatestTag = ({ size = '9px' }) => (
   <span style={{ fontFamily: FONT.mono, fontWeight: "700", fontSize: size, letterSpacing: "1px", textTransform: "uppercase", background: "var(--yellow)", color: "var(--ink)", border: "1.5px solid var(--ink)", padding: "2px 6px", lineHeight: "1.2", whiteSpace: "nowrap" }}>Latest</span>
 );
 
-// "Draft · not live yet", fixed in a corner of every page of a draft edition (data/editions.js draft: true), so a
-// preview is never mistaken for the live magazine
-export const DraftTape = () => (
-  <div role="note" style={{ ...TAPE, position: "fixed", top: "auto", left: "12px", bottom: "12px", zIndex: "90", fontFamily: FONT.mono, fontWeight: "700", fontSize: "11px", letterSpacing: "1.2px", textTransform: "uppercase", lineHeight: "1.6", transform: "rotate(-2deg)" }}>Draft · not live yet</div>
+// "Draft · not live yet" (or "Goes live 30 Nov" for one with a `live` day), fixed in a corner of every page of a draft
+// edition (data/editions.js draft: true), so a preview is never mistaken for the live magazine
+const day = (d) => new Date(`${d}T12:00:00Z`).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', timeZone: 'UTC' });
+export const DraftTape = ({ until }) => (
+  <div role="note" style={{ ...TAPE, position: "fixed", top: "auto", left: "12px", bottom: "12px", zIndex: "90", fontFamily: FONT.mono, fontWeight: "700", fontSize: "11px", letterSpacing: "1.2px", textTransform: "uppercase", lineHeight: "1.6", transform: "rotate(-2deg)" }}>{until ? `Goes live ${day(until)}` : 'Draft · not live yet'}</div>
 );

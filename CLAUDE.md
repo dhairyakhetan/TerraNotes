@@ -435,6 +435,9 @@ public/                 editions/<id>/ (articles/<slug>/: cover, preview, own ph
   2. Register it in `src/editions/index.js`, and add `{ number: 3, month: 'November 2026', theme: '…', draft: true }` to `EDITIONS` (`theme`: its name on `/editions`).
   3. Fill it in: its articles, photo wall, words, team, `INTRO`, and its look (`look.js`: colours and fonts from the owner). Files go in `public/editions/nov26/`. Preview it at `/nov26` (both widths).
   4. Going live: delete `draft: true`. The previous edition moves to `/<its id>` with its own look; nothing else to change.
+     Or schedule it: `live: 'YYYY-MM-DD'` in place of `draft: true` (e.g. the month's last day) and push it whenever it's ready:
+     it stays a draft (its tape says when it goes live) until midnight India time that day, then goes live by itself, and
+     `.github/workflows/go-live.yml` rebuilds the site that night (it needs the `VERCEL_DEPLOY_HOOK` secret; see the file).
 - **New member:** add them to the edition's `MEMBERS` (`team.js`) with a square ~400px WebP in `public/team/`. The faces lay themselves out.
 - **New block type in articles:**
   1. Render it in `shared/ArticleBody.jsx` (both sizes, `web` = ×1.25).

@@ -176,7 +176,7 @@ export default function App() {
       </ErrorBoundary>
       {!bare && <EditionPills web={web} />}
       {!bare && <Games />}
-      {edition.draft && !bare && <DraftTape />}
+      {edition.draft && !bare && <DraftTape until={edition.until} />}
     </EditionContext.Provider>
   );
 }
