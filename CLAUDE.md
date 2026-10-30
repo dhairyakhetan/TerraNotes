@@ -17,11 +17,12 @@ hand, and never edit those three folders in AQ's repo afterwards (the next expor
 | `public/terranotes/` (~13 MB) | `public/` (all but the own site's icons and manifest): fonts, covers, photos, link previews, the Wisdom Woods demo | adds and updates; never deletes AQ's own files there |
 | `scripts/terranotes/` | `build/staticCopy.js`, `embed/aq/scripts/prerender.mjs`, `tools/make-link-previews.mjs` | replaces it whole |
 
-**If your prompt named one folder** (say "make the changes in `frontend/public/terranotes`"): that's the owner's
-shorthand for "put the magazine into AQ's site". The magazine is all three folders in the table above, and the export
-writes them together; `public/terranotes/` alone is only its pictures and fonts, with no code. Do all three, as below,
-and say so. A link like `https://github.com/dhairyakhetan/TerraNotes/tree/handoff` means: clone this repo's `handoff`
-branch (step 1).
+**If your prompt says "replace the existing `*/terranotes`"** (or names one of the folders): that means these three
+folders, and the export is how they're replaced. Don't copy this repo's folders over by hand: the layouts differ
+(this repo's `src/` becomes `src/terranotes/`, `host.js` is rewritten, `react-router` is renamed). The export replaces
+`src/terranotes/` and `scripts/terranotes/` whole; in `public/terranotes/` it adds and updates, then lists the files
+it left alone: delete those too, unless something in AQ's own code uses one. A link like
+`https://github.com/dhairyakhetan/TerraNotes/tree/handoff` means: clone this repo's `handoff` branch (step 1).
 
 **Check before you trust this.** The owner wrote these notes from a copy of AQ's repo, and may have it wrong. Before
 writing anything, look at AQ's repo as it is: where its frontend lives (`frontend/`?), whether `src/terranotes/` is
