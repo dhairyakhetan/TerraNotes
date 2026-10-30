@@ -8,6 +8,7 @@ import WordsGameSection from '../shared/WordsGameSection.jsx';
 import TeamSection, { teamHeight } from '../shared/TeamSection.jsx';
 import { PhoneBuddy } from '../shared/buddy/Buddy.jsx';
 import EditionDecor from '../shared/EditionDecor.jsx';
+import { EditionPills } from '../shared/InsideAQ.jsx';
 import EndCards, { endCardsSpace } from '../shared/EndCards.jsx';
 import { homeTitle, useEdition } from '../lib/edition.js';
 import { usePauseOffscreen } from '../lib/pauseOffscreen.js';
@@ -37,6 +38,7 @@ export default function PhoneHome() {
         <PhoneHeader current="home" />
         <EditionDecor />
         <PhoneBuddy />
+        <EditionPills />
         <HomeIntroCard />
         <div id="articles" aria-hidden="true" style={{ position: "absolute", left: "0", top: "236px", width: "1px", height: "1px" }} />
         <div ref={hangers} style={{ position: "absolute", left: "0", top: "0", width: "390px", height: `${1100 + extra}px`, pointerEvents: "none" }}>

@@ -1,12 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
 import { useReveal } from '../lib/reveal.js';
-import { Link, useLocation } from '../router.jsx';
+import { Link } from '../router.jsx';
 import BackHome from './BackHome.jsx';
 import { cardCover } from './ArticleCard.jsx';
 import { EDITIONS, LATEST, editionLink, editionName } from '../data/editions.js';
 import { editionData } from '../editions/index.js';
 import { useEdition } from '../lib/edition.js';
-import { isHomePath } from '../lib/routes.js';
 import { AQ_LOOK } from '../host.js';
 import { FONT } from '../styles/fonts.js';
 
@@ -17,7 +16,7 @@ import { FONT } from '../styles/fonts.js';
 //   (draft: true in data/editions.js) shows as "coming", with no link and nothing of its content.
 // - BackToMagazine: a small "← Back to home" pill under AQ's nav on the other pages (the header's back link).
 // - EditionPills: "Latest edition →" and "All editions" (/editions), on an older edition's home page only (the latest's
-//   has the editions card at its end), top right under AQ's nav; App.jsx draws them.
+//   has the editions card at its end), top right on the page; WebHome / PhoneHome draw them.
 const MONO = { fontFamily: FONT.mono, fontWeight: "700", letterSpacing: "1.4px", textTransform: "uppercase" };
 const short = (month) => month.replace(/^(\w{3})\w*/, '$1');
 
@@ -65,7 +64,7 @@ export function EditionsCard({ web }) {
   );
 }
 
-// Pills under AQ's nav slip away while you scroll down (they would sit on the text) and come back when you scroll up.
+// "← Back to home" slips away while you scroll down (it would sit on the text) and comes back when you scroll up.
 function useScrollAway() {
   const [away, setAway] = useState(false);
   useEffect(() => {
@@ -76,7 +75,6 @@ function useScrollAway() {
   }, []);
   return away;
 }
-const slip = (away) => ({ transition: "transform .25s ease, opacity .25s ease", transform: away ? "translateY(-24px)" : "none", opacity: away ? "0" : "1", pointerEvents: away ? "none" : "auto" });
 
 // floats just under AQ's fixed nav (AQ sets --nav-h on its page; the custom property reaches into the shadow root),
 // left, so it never moves the page's own layout. The page is zoomed, so the offset is divided back.
@@ -89,20 +87,17 @@ export function BackToMagazine({ web }) {
   );
 }
 
-// top right, a little under AQ's fixed nav (--nav-h; on the own site its placeholder is 70px), clear of the page's top
-// edge. Drawn outside the zoomed page (App.jsx), so the offset is in screen pixels. Only on an older edition's home page
-// (/sep26, /sep26/photos…): not on the latest edition, and not on article pages, where the "In this piece" panel sits
-// there. Side by side, so on phones they stay clear of Buddy under them.
+// On an older edition's home page (WebHome / PhoneHome draw them), top right on the page itself, so they scale and
+// scroll with it: on web just right of the "TerraNotes · write-ups" line and under Buddy's hidden call button (its
+// corner, 1240-1390 × 88-124), on phones above Buddy. Not on the latest edition's (it has the editions card at its end).
 export function EditionPills({ web }) {
-  const away = useScrollAway();
   const { number } = useEdition();
-  const { pathname } = useLocation();
-  if (!AQ_LOOK || number === LATEST || !isHomePath(pathname)) return null;
+  if (!AQ_LOOK || number === LATEST) return null;
   const pill = { display: "inline-flex", alignItems: "center", justifyContent: "center", minHeight: "44px", padding: web ? "0 16px" : "0 12px", boxSizing: "border-box", borderRadius: "999px", background: "var(--card)", border: "2px solid var(--ink)", boxShadow: "3px 3px 0 var(--ink)", "--c": "var(--ink)", ...MONO, fontSize: web ? "12px" : "11px", color: "var(--ink)", textDecoration: "none", whiteSpace: "nowrap" };
   return (
-    <div aria-hidden={away ? 'true' : undefined} style={{ ...slip(away), position: "fixed", zIndex: "40", top: `calc(var(--nav-h, 70px) + ${web ? 30 : 22}px)`, right: web ? "24px" : "12px", display: "flex", gap: web ? "10px" : "8px" }}>
-      <Link to={editionLink(LATEST)} className={web ? 'btn' : 'press'} tabIndex={away ? -1 : undefined} style={{ ...pill, background: "var(--yellow)" }}>Latest edition →</Link>
-      <Link to="/editions" className={web ? 'btn' : 'press'} tabIndex={away ? -1 : undefined} style={pill}>All editions</Link>
+    <div style={{ position: "absolute", zIndex: "7", top: web ? "134px" : "74px", right: web ? "24px" : "12px", display: "flex", gap: web ? "10px" : "8px" }}>
+      <Link to={editionLink(LATEST)} className={web ? 'btn' : 'press'} style={{ ...pill, background: "var(--yellow)" }}>Latest edition →</Link>
+      <Link to="/editions" className={web ? 'btn' : 'press'} style={pill}>All editions</Link>
     </div>
   );
 }

@@ -8,6 +8,7 @@ import WordsGameSection from '../shared/WordsGameSection.jsx';
 import TeamSection, { teamHeight } from '../shared/TeamSection.jsx';
 import { WebBuddy } from '../shared/buddy/Buddy.jsx';
 import EditionDecor from '../shared/EditionDecor.jsx';
+import { EditionPills } from '../shared/InsideAQ.jsx';
 import EndCards, { endCardsSpace } from '../shared/EndCards.jsx';
 import { homeTitle, useEdition } from '../lib/edition.js';
 import { usePauseEach } from '../lib/pauseOffscreen.js';
@@ -44,6 +45,7 @@ export default function WebHome() {
         </div>
         <div data-ruled="1" style={{ position: "absolute", left: "1150px", top: "380px", width: "220px", fontFamily: FONT.hand, fontSize: "26px", lineHeight: "1.05", color: "var(--hand)", transform: "rotate(-4deg)" }}>write-ups, fresh off the line ↓</div>
         <WebBuddy />
+        <EditionPills web />
         {edition.articles.length > 0 && <WebArticleLine />}
         <PhotoWallSection web onOpen={setPhoto} />
         <WordsGameSection web />

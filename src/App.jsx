@@ -32,7 +32,6 @@ import { HOST, AQ_LOOK } from './host.js';
 import { gameLink, gameOf } from './data/games.js';
 import { openGames } from './lib/buddyState.js';
 import AqNavSlot from './shared/AqNavSlot.jsx';
-import { EditionPills } from './shared/InsideAQ.jsx';
 import { setPageSwap } from './lib/animatedHistory.js';
 import { pageSwap } from './lib/pageSwap.js';
 import { ALL_ARTICLES } from './data/articles.js';
@@ -174,7 +173,6 @@ export default function App() {
           </Routes></Zoom>
         )}
       </ErrorBoundary>
-      {!bare && <EditionPills web={web} />}
       {!bare && <Games />}
       {edition.draft && !bare && <DraftTape until={edition.until} />}
     </EditionContext.Provider>
