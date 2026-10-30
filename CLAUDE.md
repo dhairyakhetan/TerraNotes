@@ -17,6 +17,12 @@ hand, and never edit those three folders in AQ's repo afterwards (the next expor
 | `public/terranotes/` (~13 MB) | `public/` (all but the own site's icons and manifest): fonts, covers, photos, link previews, the Wisdom Woods demo | adds and updates; never deletes AQ's own files there |
 | `scripts/terranotes/` | `build/staticCopy.js`, `embed/aq/scripts/prerender.mjs`, `tools/make-link-previews.mjs` | replaces it whole |
 
+**Updating a site that already has it** (the usual case: AQ's site is live with TerraNotes; this is a fix or a new
+edition, not a new integration): skip the setup. From `frontend/`: clone the `handoff` branch next to the repo, run
+`node <clone>/tools/export-aq.mjs . --dry`, then without `--dry`; delete the `public/terranotes/` files it says it left
+alone (old ones nothing uses); `npm run build`; check the pages in step 5; commit the three folders. Don't touch AQ's
+own code unless the prompt asks for it. Step 6's go-live workflow is optional.
+
 **If your prompt says "replace the existing `*/terranotes`"** (or names one of the folders): that means these three
 folders, and the export is how they're replaced. Don't copy this repo's folders over by hand: the layouts differ
 (this repo's `src/` becomes `src/terranotes/`, `host.js` is rewritten, `react-router` is renamed). The export replaces
