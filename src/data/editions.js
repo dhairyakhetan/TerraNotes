@@ -20,7 +20,7 @@ import { withBase } from '../lib/base.js';
 
 const EDITION_LIST = [
   { number: 1, month: 'September 2026', theme: 'Exam season' },
-  { number: 2, month: 'October 2026', theme: 'Pujo & Diwali' },
+  { number: 2, month: 'October 2026', theme: 'Pujo & Diwali', live: '2026-10-31 17:45' },
 ];
 
 // an edition's launch, unless its `live` says otherwise: at this time (India time) on the last day of its month

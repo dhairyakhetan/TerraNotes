@@ -24,7 +24,8 @@ which you did. Claude in this repo: add every change AQ's site needs here, and o
 it's on AQ's site.
 
 1. **Update TerraNotes from the `handoff` branch** with the export ("Updating a site that already has it" below), after
-   31 Oct 2026, 8 pm India time, so the build already has October in it (check: `TZ=Asia/Kolkata date`). It brings:
+   31 Oct 2026, 5:45 pm India time (October's launch), so the build already has October in it (check:
+   `TZ=Asia/Kolkata date`). It keeps October at 5:45 pm (AQ had it hand-set in its copy; this repo has it now). It brings:
    - the edition pills ("Latest edition →", "All editions") on an older edition's home page itself, clear of Buddy's
      hidden call button (they covered it on web);
    - link previews right for every address: `/terranotes` the latest edition's, `/terranotes/sep26` September's (also
@@ -38,6 +39,9 @@ it's on AQ's site.
    (Settings → Git → Deploy Hooks, branch `main`) and save it as the repository secret `VERCEL_DEPLOY_HOOK`. From then on
    every edition's launch rebuilds AQ's site within the hour by itself (sitemap, prerendered pages, link previews).
 4. **Delete the branch `claude/friendly-thompson-4brvft`** (already in `main`).
+4b. **After 31 Oct, 6 pm India time: remove AQ's one-day countdown** (AQ's own code, not the magazine's):
+   `TerraNotesCountdown.tsx`, `lib/terraNotesCountdownTime.ts`, its mount in `PublicLayout.tsx`, and the `oct26` guard
+   in `App.tsx`.
 5. **Full build, check, push to `main`**: `npm run build`; at 1440px and 390px `/terranotes` shows October and
    `/terranotes/sep26` September with its pills; don't commit `public/sitemap.xml` (Vercel's build makes it, with
    Supabase). After Vercel deploys: `https://www.ngoaquaterra.com/sitemap.xml` lists
